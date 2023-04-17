@@ -3,314 +3,349 @@
       xmlns:sec="https://github.com/thymeleaf/thymeleaf-extras-springsecurity"
       xmlns:data="https://github.com/mxab/thymeleaf-extras-data-attribute"
       layout:decorate="~{base}">
+
   <head>
     <title th:text="|#{page.title.topics}: #{topic}|">Topics: Topic</title>
   </head>
+
   <body>
-  <th:block layout:fragment="content" th:object="${topic}">
-    <div class="content">
-      <div class="container-fluid">
-        <div id="content-header">
-          <div class="row">
-            <div class="col-sm-6">
-              <h1 th:text="#{topic}">Topic</h1>
-            </div>
-            <div class="col-sm-6">
-              <div class="float-right">
-                <a class="btn btn-primary" id="edit-button" th:href="@{*{uuid} + '/edit'}" th:text="#{edit}">edit</a>
+    <th:block layout:fragment="content" th:object="${topic}">
+      <div class="content">
+        <div class="container-fluid">
+          <div id="content-header">
+            <div class="row">
+              <div class="col-sm-6">
+                <h1 th:text="#{topic}">Topic</h1>
+              </div>
+              <div class="col-sm-6">
+                <div class="float-right">
+                  <a class="btn btn-primary" id="edit-button" th:href="@{*{uuid} + '/edit'}" th:text="#{edit}">edit</a>
+                </div>
               </div>
             </div>
           </div>
-        </div>
 
-        <div id="content-body" class="rows-striped">
-          <div class="row">
-            <div class="col-12">
-              <ol class="breadcrumb hidden-xs-down">
-                <li class="breadcrumb-item"><a th:href="@{/}">Home</a></li>
-                <li class="breadcrumb-item"><a th:href="@{/topics}" th:text="#{topics}">Topics</a></li>
-                <th:block th:if="${not #lists.isEmpty(breadcrumbs)}">
-                  <th:block th:each="breadcrumb : ${breadcrumbs}">
-                    <li class="breadcrumb-item"><a th:href="@{/topics/} + ${breadcrumb.targetId}"><th:block th:insert="cudami/fragments/localizedtext::renderLocalizedText(${breadcrumb.label}, ${locale})">Node Label</th:block></a></li>
+          <div id="content-body" class="rows-striped">
+            <div class="row">
+              <div class="col-12">
+                <ol class="breadcrumb hidden-xs-down">
+                  <li class="breadcrumb-item"><a th:href="@{/}">Home</a></li>
+                  <li class="breadcrumb-item"><a th:href="@{/topics}" th:text="#{topics}">Topics</a></li>
+                  <th:block th:if="${not #lists.isEmpty(breadcrumbs)}">
+                    <th:block th:each="breadcrumb : ${breadcrumbs}">
+                      <li class="breadcrumb-item"><a th:href="@{/topics/} + ${breadcrumb.targetId}">
+                          <th:block th:insert="cudami/fragments/localizedtext::renderLocalizedText(${breadcrumb.label}, ${locale})">Node Label</th:block>
+                        </a></li>
+                    </th:block>
                   </th:block>
-                </th:block>
-              </ol>
-            </div>
-          </div>
-
-          <!-- TODO it always contains "und" undefined language? -->
-          <th:block th:if="${not #lists.isEmpty(existingLanguages)}">
-            <div class="language-selection">
-              <span th:text="#{lbl.data_language}">Show language dependent values in</span>&nbsp;
-              <select th:replace="fragments/components/select-language-dropdown::render('data-languages', ${existingLanguages}, ${dataLanguage})">English</select>
-            </div>
-          </th:block>
-
-          <th:block th:insert="fragments/uniqueobject::renderFields(${topic})"></th:block>
-
-          <th:block th:insert="fragments/identifiable::renderFields(${topic})"></th:block>
-
-          <th:block th:insert="fragments/entity::renderFields(${topic})"></th:block>
-
-          <hr/>
-
-          <div class="row">
-            <div class="col-md-3"><label th:text="#{lbl.subtopics}">Subtopics</label></div>
-            <div class="col-md-9">
-              <div id="toolbar-subtopics">
-                <!-- TODO it always contains "und" undefined language? -->
-                <th:block th:if="${not #lists.isEmpty(existingSubtopicsLanguages)}">
-                  <span th:text="#{lbl.data_language}">Show language dependent values in</span>&nbsp;
-                  <select th:replace="fragments/components/select-language-dropdown::render('subtopics-languages', ${existingSubtopicsLanguages}, ${dataLanguageSubtopics})">English</select>
-                </th:block>
+                </ol>
               </div>
-              <table id="table-subtopics"
-                     data-toggle="table"
-                     th:data-url="@{/api/topics/__${topic.uuid}__/topics}"
-                     th:data-locale="${#locale}"
-                     data-buttons="buttonsSubtopics"
-                     data-cookie="true"
-                     data-cookie-id-table="table-subtopics"
-                     data-id-field="uuid"
-                     data-pagination="true"
-                     data-pagination-v-align="both"
-                     data-query-params="queryParamsSubtopics"
-                     data-search="true"
-                     data-search-highlight="true"
-                     data-search-on-enter-key="true"
-                     data-server-sort="true"
-                     data-show-search-button="true"
-                     data-show-search-clear-button="true"
-                     data-side-pagination="server"
-                     data-sort-name="label"
-                     data-sort-order="asc"
-                     data-toolbar="#toolbar-subtopics"
-                     data-unique-id="uuid">
-                <thead>
-                  <tr>
-                    <th data-field="index" data-formatter="formatRowNumberSubtopics" data-halign="right" data-align="right" th:text="#{lbl.row_number}">#</th>
-                    <th data-field="previewImage" data-formatter="renderPreviewImage" data-halign="center" data-align="center"><i class="fas fa-image"></i></th>
-                    <th data-field="label" data-formatter="formatLabelSubtopics" th:text="#{lbl.label}">Label</th>
-                    <th data-field="lastModified" data-formatter="renderDateTime" th:text="#{lbl.last_modified}">last modified</th>
-                    <th data-field="created" data-formatter="renderDateTime" th:text="#{lbl.created}">created</th>
-                    <th data-field="actions" data-formatter="formatActionsSubtopics" th:text="#{lbl.actions}">Actions</th>
-                  </tr>
-                </thead>
-              </table>
-
             </div>
-          </div>
 
-          <div class="row">
-            <div class="col-md-3"><label th:text="#{lbl.entities}">Entities</label></div>
-            <div class="col-md-9">
-              <div id="toolbar-entities">
-                <!-- TODO it always contains "und" undefined language? -->
-                <th:block th:if="${not #lists.isEmpty(existingEntitiesLanguages)}">
-                  <span th:text="#{lbl.data_language}">Show language dependent values in</span>&nbsp;
-                  <select th:replace="fragments/components/select-language-dropdown::render('entities-languages', ${existingEntitiesLanguages}, ${dataLanguageEntities})">English</select>
-                </th:block>
+            <!-- TODO it always contains "und" undefined language? -->
+            <th:block th:if="${not #lists.isEmpty(existingLanguages)}">
+              <div class="language-selection">
+                <span th:text="#{lbl.data_language}">Show language dependent values in</span>&nbsp;
+                <select th:replace="fragments/components/select-language-dropdown::render('data-languages', ${existingLanguages}, ${dataLanguage})">English</select>
               </div>
-              <table id="table-entities"
-                     data-toggle="table"
-                     th:data-url="@{/api/topics/__${topic.uuid}__/entities}"
-                     th:data-locale="${#locale}"
+            </th:block>
 
-                     data-cookie="true"
-                     data-cookie-id-table="table-entities"
-                     data-id-field="uuid"
-                     data-pagination="true"
-                     data-pagination-v-align="both"
-                     data-query-params="queryParamsEntities"
-                     data-search="true"
-                     data-search-highlight="true"
-                     data-search-on-enter-key="true"
-                     data-server-sort="true"
-                     data-show-search-button="true"
-                     data-show-search-clear-button="true"
-                     data-side-pagination="server"
-                     data-sort-name="label"
-                     data-sort-order="asc"
-                     data-toolbar="#toolbar-entities"
-                     data-unique-id="uuid">
-                <thead>
-                  <tr>
-                    <th data-field="index" data-formatter="formatRowNumberEntities" data-halign="right" data-align="right" th:text="#{lbl.row_number}">#</th>
-                    <th data-field="previewImage" data-formatter="renderPreviewImage" data-halign="center" data-align="center"><i class="fas fa-image"></i></th>
-                    <th data-field="label" data-formatter="formatLabelEntities" th:text="#{lbl.label}">Label</th>
-                    <th data-field="lastModified" data-formatter="renderDateTime" th:text="#{lbl.last_modified}">last modified</th>
-                    <th data-field="created" data-formatter="renderDateTime" th:text="#{lbl.created}">created</th>
-                    <th data-field="actions" data-formatter="formatActionsEntities" th:text="#{lbl.actions}">Actions</th>
-                  </tr>
-                </thead>
-              </table>
+            <th:block th:insert="fragments/uniqueobject::renderFields(${topic})"></th:block>
 
+            <th:block th:insert="fragments/identifiable::renderFields(${topic})"></th:block>
+
+            <th:block th:insert="fragments/entity::renderFields(${topic})"></th:block>
+
+            <hr />
+
+            <div class="row">
+              <div class="col-md-3"><label th:text="#{lbl.subtopics}">Subtopics</label></div>
+              <div class="col-md-9">
+                <div id="toolbar-subtopics">
+                  <!-- TODO it always contains "und" undefined language? -->
+                  <th:block th:if="${not #lists.isEmpty(existingSubtopicsLanguages)}">
+                    <span th:text="#{lbl.data_language}">Show language dependent values in</span>&nbsp;
+                    <select th:replace="fragments/components/select-language-dropdown::render('subtopics-languages', ${existingSubtopicsLanguages}, ${dataLanguageSubtopics})">English</select>
+                  </th:block>
+                </div>
+                <table id="table-subtopics"
+                       data-toggle="table"
+                       th:data-url="@{/api/topics/__${topic.uuid}__/topics}"
+                       th:data-locale="${#locale}"
+                       data-buttons="buttonsSubtopics"
+                       data-cookie="true"
+                       data-cookie-id-table="table-subtopics"
+                       data-id-field="uuid"
+                       data-pagination="true"
+                       data-pagination-v-align="both"
+                       data-query-params="queryParamsSubtopics"
+                       data-search="true"
+                       data-search-highlight="true"
+                       data-search-on-enter-key="true"
+                       data-server-sort="true"
+                       data-show-search-button="true"
+                       data-show-search-clear-button="true"
+                       data-side-pagination="server"
+                       data-sort-name="label"
+                       data-sort-order="asc"
+                       data-toolbar="#toolbar-subtopics"
+                       data-unique-id="uuid">
+                  <thead>
+                    <tr>
+                      <th data-field="index" data-formatter="formatRowNumberSubtopics" data-halign="right" data-align="right" th:text="#{lbl.row_number}">#</th>
+                      <th data-field="previewImage" data-formatter="renderPreviewImage" data-halign="center" data-align="center"><i class="fas fa-image"></i></th>
+                      <th data-field="label" data-formatter="formatLabelSubtopics" th:text="#{lbl.label}">Label</th>
+                      <th data-field="lastModified" data-formatter="renderDateTime" th:text="#{lbl.last_modified}">last modified</th>
+                      <th data-field="created" data-formatter="renderDateTime" th:text="#{lbl.created}">created</th>
+                      <th data-field="actions" data-formatter="formatActionsSubtopics" th:text="#{lbl.actions}">Actions</th>
+                    </tr>
+                  </thead>
+                </table>
+
+              </div>
             </div>
-          </div>
 
-          <div class="row">
-            <div class="col-md-3"><label th:text="#{lbl.fileresources}">Files</label></div>
-            <div class="col-md-9">
-              <div id="toolbar-fileresources">
-                <!-- TODO it always contains "und" undefined language? -->
-                <th:block th:if="${not #lists.isEmpty(existingFileresourcesLanguages)}">
-                  <span th:text="#{lbl.data_language}">Show language dependent values in</span>&nbsp;
-                  <select th:replace="fragments/components/select-language-dropdown::render('fileresources-languages', ${existingFileresourcesLanguages}, ${dataLanguageFileresources})">English</select>
-                </th:block>
+            <div class="row">
+              <div class="col-md-3"><label th:text="#{lbl.entities}">Entities</label></div>
+              <div class="col-md-9">
+                <div id="toolbar-entities">
+                  <!-- TODO it always contains "und" undefined language? -->
+                  <th:block th:if="${not #lists.isEmpty(existingEntitiesLanguages)}">
+                    <span th:text="#{lbl.data_language}">Show language dependent values in</span>&nbsp;
+                    <select th:replace="fragments/components/select-language-dropdown::render('entities-languages', ${existingEntitiesLanguages}, ${dataLanguageEntities})">English</select>
+                  </th:block>
+                </div>
+                <table id="table-entities"
+                       data-toggle="table"
+                       th:data-url="@{/api/topics/__${topic.uuid}__/entities}"
+                       th:data-locale="${#locale}"
+
+                       data-cookie="true"
+                       data-cookie-id-table="table-entities"
+                       data-id-field="uuid"
+                       data-pagination="true"
+                       data-pagination-v-align="both"
+                       data-query-params="queryParamsEntities"
+                       data-search="true"
+                       data-search-highlight="true"
+                       data-search-on-enter-key="true"
+                       data-server-sort="true"
+                       data-show-search-button="true"
+                       data-show-search-clear-button="true"
+                       data-side-pagination="server"
+                       data-sort-name="label"
+                       data-sort-order="asc"
+                       data-toolbar="#toolbar-entities"
+                       data-unique-id="uuid">
+                  <thead>
+                    <tr>
+                      <th data-field="index" data-formatter="formatRowNumberEntities" data-halign="right" data-align="right" th:text="#{lbl.row_number}">#</th>
+                      <th data-field="previewImage" data-formatter="renderPreviewImage" data-halign="center" data-align="center"><i class="fas fa-image"></i></th>
+                      <th data-field="label" data-formatter="formatLabelEntities" th:text="#{lbl.label}">Label</th>
+                      <th data-field="lastModified" data-formatter="renderDateTime" th:text="#{lbl.last_modified}">last modified</th>
+                      <th data-field="created" data-formatter="renderDateTime" th:text="#{lbl.created}">created</th>
+                      <th data-field="actions" data-formatter="formatActionsEntities" th:text="#{lbl.actions}">Actions</th>
+                    </tr>
+                  </thead>
+                </table>
+
               </div>
-              <table id="table-fileresources"
-                     data-toggle="table"
-                     th:data-url="@{/api/topics/__${topic.uuid}__/fileresources}"
-                     th:data-locale="${#locale}"
+            </div>
 
-                     data-cookie="true"
-                     data-cookie-id-table="table-fileresources"
-                     data-id-field="uuid"
-                     data-pagination="true"
-                     data-pagination-v-align="both"
-                     data-query-params="queryParamsFileresources"
-                     data-search="true"
-                     data-search-highlight="true"
-                     data-search-on-enter-key="true"
-                     data-server-sort="true"
-                     data-show-search-button="true"
-                     data-show-search-clear-button="true"
-                     data-side-pagination="server"
-                     data-sort-name="label"
-                     data-sort-order="asc"
-                     data-toolbar="#toolbar-fileresources"
-                     data-unique-id="uuid">
-                <thead>
-                  <tr>
-                    <th data-field="index" data-formatter="formatRowNumberFileresources" data-halign="right" data-align="right" th:text="#{lbl.row_number}">#</th>
-                    <th data-field="previewImage" data-formatter="renderPreviewImage" data-halign="center" data-align="center"><i class="fas fa-image"></i></th>
-                    <th data-field="label" data-formatter="formatLabelFileresources" th:text="#{lbl.label}">Label</th>
-                    <th data-field="lastModified" data-formatter="renderDateTime" th:text="#{lbl.last_modified}">last modified</th>
-                    <th data-field="created" data-formatter="renderDateTime" th:text="#{lbl.created}">created</th>
-                    <th data-field="actions" data-formatter="formatActionsFileresources" th:text="#{lbl.actions}">Actions</th>
-                  </tr>
-                </thead>
-              </table>
+            <div class="row">
+              <div class="col-md-3"><label th:text="#{lbl.fileresources}">Files</label></div>
+              <div class="col-md-9">
+                <div id="toolbar-fileresources">
+                  <!-- TODO it always contains "und" undefined language? -->
+                  <th:block th:if="${not #lists.isEmpty(existingFileresourcesLanguages)}">
+                    <span th:text="#{lbl.data_language}">Show language dependent values in</span>&nbsp;
+                    <select th:replace="fragments/components/select-language-dropdown::render('fileresources-languages', ${existingFileresourcesLanguages}, ${dataLanguageFileresources})">English</select>
+                  </th:block>
+                </div>
+                <table id="table-fileresources"
+                       data-toggle="table"
+                       th:data-url="@{/api/topics/__${topic.uuid}__/fileresources}"
+                       th:data-locale="${#locale}"
 
+                       data-cookie="true"
+                       data-cookie-id-table="table-fileresources"
+                       data-id-field="uuid"
+                       data-pagination="true"
+                       data-pagination-v-align="both"
+                       data-query-params="queryParamsFileresources"
+                       data-search="true"
+                       data-search-highlight="true"
+                       data-search-on-enter-key="true"
+                       data-server-sort="true"
+                       data-show-search-button="true"
+                       data-show-search-clear-button="true"
+                       data-side-pagination="server"
+                       data-sort-name="label"
+                       data-sort-order="asc"
+                       data-toolbar="#toolbar-fileresources"
+                       data-unique-id="uuid">
+                  <thead>
+                    <tr>
+                      <th data-field="index" data-formatter="formatRowNumberFileresources" data-halign="right" data-align="right" th:text="#{lbl.row_number}">#</th>
+                      <th data-field="previewImage" data-formatter="renderPreviewImage" data-halign="center" data-align="center"><i class="fas fa-image"></i></th>
+                      <th data-field="label" data-formatter="formatLabelFileresources" th:text="#{lbl.label}">Label</th>
+                      <th data-field="lastModified" data-formatter="renderDateTime" th:text="#{lbl.last_modified}">last modified</th>
+                      <th data-field="created" data-formatter="renderDateTime" th:text="#{lbl.created}">created</th>
+                      <th data-field="actions" data-formatter="formatActionsFileresources" th:text="#{lbl.actions}">Actions</th>
+                    </tr>
+                  </thead>
+                </table>
+
+              </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
-  </th:block>
+    </th:block>
 
-  <section layout:fragment="beforeBodyEnds">
-    <script type="text/javascript">
-      $(addDataLanguageChangeHandler());
+    <section layout:fragment="beforeBodyEnds">
+      <script type="text/javascript">
+        $(addDataLanguageChangeHandler());
 
-      $(function () {
-        $("#entities-languages").change(function () {
-          $('#table-entities').bootstrapTable('refresh');
+        $(function () {
+          $("#entities-languages").change(function () {
+            $('#table-entities').bootstrapTable('refresh');
+          });
+          $("#fileresources-languages").change(function () {
+            $('#table-fileresources').bootstrapTable('refresh');
+          });
+          $("#subtopics-languages").change(function () {
+            $('#table-subtopics').bootstrapTable('refresh');
+          });
         });
-        $("#fileresources-languages").change(function () {
-          $('#table-fileresources').bootstrapTable('refresh');
-        });
-        $("#subtopics-languages").change(function () {
-          $('#table-subtopics').bootstrapTable('refresh');
-        });
-      });
 
-      function formatRowNumberEntities(value, row, index) {
-        return renderRowNumber($('#table-entities'), index);
-      }
-      function formatRowNumberFileresources(value, row, index) {
-        return renderRowNumber($('#table-fileresources'), index);
-      }
-      function formatRowNumberSubtopics(value, row, index) {
-        return renderRowNumber($('#table-subtopics'), index);
-      }
-      function queryParamsEntities(params) {
-        let dataLanguage = $("#entities-languages").val();
-        params.dataLanguage = dataLanguage;
-        return params;
-      }
-      function queryParamsFileresources(params) {
-        let dataLanguage = $("#fileresources-languages").val();
-        params.dataLanguage = dataLanguage;
-        return params;
-      }
-      function queryParamsSubtopics(params) {
-        let dataLanguage = $("#subtopics-languages").val();
-        params.dataLanguage = dataLanguage;
-        return params;
-      }
-    </script>
+        function formatRowNumberEntities(value, row, index) {
+          return renderRowNumber($('#table-entities'), index);
+        }
+        function formatRowNumberFileresources(value, row, index) {
+          return renderRowNumber($('#table-fileresources'), index);
+        }
+        function formatRowNumberSubtopics(value, row, index) {
+          return renderRowNumber($('#table-subtopics'), index);
+        }
+        function queryParamsEntities(params) {
+          let dataLanguage = $("#entities-languages").val();
+          params.dataLanguage = dataLanguage;
+          return params;
+        }
+        function queryParamsFileresources(params) {
+          let dataLanguage = $("#fileresources-languages").val();
+          params.dataLanguage = dataLanguage;
+          return params;
+        }
+        function queryParamsSubtopics(params) {
+          let dataLanguage = $("#subtopics-languages").val();
+          params.dataLanguage = dataLanguage;
+          return params;
+        }
+      </script>
 
-    <script type="text/javascript" th:inline="javascript">
-      /*<![CDATA[*/
-      function buttonsSubtopics() {
-        /*[+
-         const baseUrl = [[@{'/topics'}]];
-         const textAdd = [[#{btn.add}]];
-         const tooltipAdd = [[#{tooltip.add_new_table_entry}]];
-         const parentUuid = [[${topic.uuid}]]
-         +]*/
-        return {
-          btnAdd: {
-            text: textAdd,
-            icon: 'fa-plus',
-            event: function () {
-              location.href = baseUrl + '/new?parentType=topic&parentUuid=' + parentUuid;
-            },
-            attributes: {
-              title: tooltipAdd
-            }
+      <script type="text/javascript" th:inline="javascript">
+        /*<![CDATA[*/
+        $('#table-entities').bootstrapTable({
+          formatSearch: function () {
+            /*[+
+             let columnName = [[#{lbl.label}]];
+             let placeholder = `[(#{placeholder.search})]`;
+             +]*/
+            return placeholder;
           }
-        };
-      }
+        });
 
-      function formatActionsEntities(value, row) {
-        return '';
-      }
+        $('#table-fileresources').bootstrapTable({
+          formatSearch: function () {
+            /*[+
+             let columnName = [[#{lbl.label}]];
+             let placeholder = `[(#{placeholder.search})]`;
+             +]*/
+            return placeholder;
+          }
+        });
 
-      function formatActionsFileresources(value, row) {
-        /*[+
-         const baseUrl = [[@{'/fileresources'}]] + '/' + row.uuid;
-         +]*/
-        return [
-          renderViewAction(baseUrl)
-        ].join(' ');
-      }
+        $('#table-subtopics').bootstrapTable({
+          formatSearch: function () {
+            /*[+
+             let columnName = [[#{lbl.label}]];
+             let placeholder = `[(#{placeholder.search})]`;
+             +]*/
+            return placeholder;
+          }
+        });
 
-      function formatActionsSubtopics(value, row) {
-        /*[+
-         const baseUrl = [[@{'/topics'}]] + '/' + row.uuid;
-         +]*/
-        return [
-          renderViewAction(baseUrl),
-          renderEditAction(baseUrl)
-        ].join(' ');
-      }
+        function buttonsSubtopics() {
+          /*[+
+           const baseUrl = [[@{'/topics'}]];
+           const textAdd = [[#{btn.add}]];
+           const tooltipAdd = [[#{tooltip.add_new_table_entry}]];
+           const parentUuid = [[${topic.uuid}]]
+           +]*/
+          return {
+            btnAdd: {
+              text: textAdd,
+              icon: 'fa-plus',
+              event: function () {
+                location.href = baseUrl + '/new?parentType=topic&parentUuid=' + parentUuid;
+              },
+              attributes: {
+                title: tooltipAdd
+              }
+            }
+          };
+        }
 
-      function formatLabelEntities(value, row) {
-        const dataLanguage = $("#entities-languages").val();
-        return renderLocalizedText(value, dataLanguage);
-      }
+        function formatActionsEntities(value, row) {
+          return '';
+        }
 
-      function formatLabelFileresources(value, row) {
-        /*[+
-         const baseUrl = [[@{'/fileresources'}]] + '/' + row.uuid;
-         +]*/
-        const dataLanguage = $("#fileresources-languages").val();
-        return renderLabel(baseUrl, value, dataLanguage);
-      }
+        function formatActionsFileresources(value, row) {
+          /*[+
+           const baseUrl = [[@{'/fileresources'}]] + '/' + row.uuid;
+           +]*/
+          return [
+            renderViewAction(baseUrl)
+          ].join(' ');
+        }
 
-      function formatLabelSubtopics(value, row) {
-        /*[+
-         const baseUrl = [[@{'/topics'}]] + '/' + row.uuid;
-         +]*/
-        const dataLanguage = $("#subtopics-languages").val();
-        return renderLabel(baseUrl, value, dataLanguage);
-      }
+        function formatActionsSubtopics(value, row) {
+          /*[+
+           const baseUrl = [[@{'/topics'}]] + '/' + row.uuid;
+           +]*/
+          return [
+            renderViewAction(baseUrl),
+            renderEditAction(baseUrl)
+          ].join(' ');
+        }
+
+        function formatLabelEntities(value, row) {
+          const dataLanguage = $("#entities-languages").val();
+          return renderLocalizedText(value, dataLanguage);
+        }
+
+        function formatLabelFileresources(value, row) {
+          /*[+
+           const baseUrl = [[@{'/fileresources'}]] + '/' + row.uuid;
+           +]*/
+          const dataLanguage = $("#fileresources-languages").val();
+          return renderLabel(baseUrl, value, dataLanguage);
+        }
+
+        function formatLabelSubtopics(value, row) {
+          /*[+
+           const baseUrl = [[@{'/topics'}]] + '/' + row.uuid;
+           +]*/
+          const dataLanguage = $("#subtopics-languages").val();
+          return renderLabel(baseUrl, value, dataLanguage);
+        }
       /*]]>*/
-    </script>
+      </script>
 
-    <div th:replace="fragments/bootstrap-table :: data-formatter"></div>
-  </section>
-</body>
+      <div th:replace="fragments/bootstrap-table :: data-formatter"></div>
+    </section>
+  </body>
+
 </html>

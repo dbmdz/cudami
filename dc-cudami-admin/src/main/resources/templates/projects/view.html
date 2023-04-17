@@ -142,6 +142,16 @@
 
       <script type="text/javascript" th:inline="javascript">
         /*<![CDATA[*/
+        $('#table-digitalobjects').bootstrapTable({
+          formatSearch: function () {
+            /*[+
+             let columnName = [[#{lbl.label}]];
+             let placeholder = `[(#{placeholder.search})]`;
+             +]*/
+            return placeholder;
+          }
+        });
+
         function addDigitalObjects() {
           /*[+
            const errorMessage = [[#{error.technical_error}]];
@@ -193,7 +203,7 @@
           $(btnOk).html(modalBtnText);
           $(modalDialog).modal('show');
         }
-        
+
         function buttonsDigitalObjects() {
           /*[+
            const textAdd = [[#{btn.add}]];
@@ -212,7 +222,7 @@
             }
           };
         }
-        
+
         function formatActionsDigitalObjects(value, row) {
           /*[+
            const baseUrl = [[@{'/digitalobjects'}]] + '/' + row.uuid;

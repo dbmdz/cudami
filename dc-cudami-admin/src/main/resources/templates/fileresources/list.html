@@ -4,11 +4,13 @@
       xmlns:sec="https://github.com/thymeleaf/thymeleaf-extras-springsecurity"
       xmlns:data="https://github.com/mxab/thymeleaf-extras-data-attribute"
       layout:decorate="~{base}">
+
   <head>
     <title th:text="#{fileresources}">Files</title>
 
     <script th:src="@{/webjars/filesize/lib/filesize.min.js}"></script>
   </head>
+
   <body>
     <section layout:fragment="content">
       <div class="content-header">
@@ -76,69 +78,80 @@
       </div>
     </section>
 
-  <th:block layout:fragment="beforeBodyEnds">
-    <div th:replace="fragments/modals/confirm-yes-no :: confirm-yes-no-dialog"></div>
+    <th:block layout:fragment="beforeBodyEnds">
+      <div th:replace="fragments/modals/confirm-yes-no :: confirm-yes-no-dialog"></div>
 
-    <script type="text/javascript">
-      $(function () {
-        $("#fileresources-languages").change(function () {
-          $('#table-fileresources').bootstrapTable('refresh');
+      <script type="text/javascript">
+        $(function () {
+          $("#fileresources-languages").change(function () {
+            $('#table-fileresources').bootstrapTable('refresh');
+          });
         });
-      });
 
-      function formatRowNumberFileResources(value, row, index) {
-        return renderRowNumber($('#table-fileresources'), index);
-      }
-      
-      function queryParamsFileResources(params) {
-        let dataLanguage = $("#fileresources-languages").val();
-        params.dataLanguage = dataLanguage;
-        return params;
-      }
-    </script>
+        function formatRowNumberFileResources(value, row, index) {
+          return renderRowNumber($('#table-fileresources'), index);
+        }
 
-    <script type="text/javascript" th:inline="javascript">
-      /*<![CDATA[*/
-      function buttonsFileResources() {
-        /*[+
-         const baseUrl = [[@{'/fileresources'}]];
-         const textAdd = [[#{btn.add}]];
-         const tooltipAdd = [[#{tooltip.add_new_table_entry}]];
-         +]*/
-        return {
-          btnAdd: {
-            text: textAdd,
-            icon: 'fa-plus',
-            event: function () {
-              location.href = baseUrl + '/new';
-            },
-            attributes: {
-              title: tooltipAdd
-            }
+        function queryParamsFileResources(params) {
+          let dataLanguage = $("#fileresources-languages").val();
+          params.dataLanguage = dataLanguage;
+          return params;
+        }
+      </script>
+
+      <script type="text/javascript" th:inline="javascript">
+        /*<![CDATA[*/
+        $('#table-fileresources').bootstrapTable({
+          formatSearch: function () {
+            /*[+
+             let columnName = [[#{lbl.label}]];
+             let placeholder = `[(#{placeholder.search})]`;
+             +]*/
+            return placeholder;
           }
-        };
-      }
+        });
 
-      function formatActionsFileResources(value, row) {
-        /*[+
-         const baseUrl = [[@{'/fileresources'}]] + '/' + row.uuid;
-         +]*/
-        return [
-          renderViewAction(baseUrl),
-          renderEditAction(baseUrl)
-        ].join(' ');
-      }
+        function buttonsFileResources() {
+          /*[+
+           const baseUrl = [[@{'/fileresources'}]];
+           const textAdd = [[#{btn.add}]];
+           const tooltipAdd = [[#{tooltip.add_new_table_entry}]];
+           +]*/
+          return {
+            btnAdd: {
+              text: textAdd,
+              icon: 'fa-plus',
+              event: function () {
+                location.href = baseUrl + '/new';
+              },
+              attributes: {
+                title: tooltipAdd
+              }
+            }
+          };
+        }
 
-      function formatLabelFileResources(value, row) {
-        /*[+
-         const baseUrl = [[@{'/fileresources'}]] + '/' + row.uuid;
-         +]*/
-        const dataLanguage = $("#fileresources-languages").val();
-        return renderLabel(baseUrl, value, dataLanguage);
-      }
+        function formatActionsFileResources(value, row) {
+          /*[+
+           const baseUrl = [[@{'/fileresources'}]] + '/' + row.uuid;
+           +]*/
+          return [
+            renderViewAction(baseUrl),
+            renderEditAction(baseUrl)
+          ].join(' ');
+        }
+
+        function formatLabelFileResources(value, row) {
+          /*[+
+           const baseUrl = [[@{'/fileresources'}]] + '/' + row.uuid;
+           +]*/
+          const dataLanguage = $("#fileresources-languages").val();
+          return renderLabel(baseUrl, value, dataLanguage);
+        }
       /*]]>*/
-    </script>
-    <div th:replace="fragments/bootstrap-table :: data-formatter"></div>
-  </th:block>
-</body>
+      </script>
+      <div th:replace="fragments/bootstrap-table :: data-formatter"></div>
+    </th:block>
+  </body>
+
 </html>

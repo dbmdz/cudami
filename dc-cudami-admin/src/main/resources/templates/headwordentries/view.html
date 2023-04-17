@@ -3,72 +3,75 @@
       xmlns:sec="https://github.com/thymeleaf/thymeleaf-extras-springsecurity"
       xmlns:data="https://github.com/mxab/thymeleaf-extras-data-attribute"
       layout:decorate="~{base}">
+
   <head>
     <title th:text="|#{page.title.headwordentries}: #{lbl.headwordentry}|">Headword articles: Headword article</title>
     <!-- Custom styles for this template -->
     <link th:href="@{/css/cudami/media-in-text.css}" rel="stylesheet" />
   </head>
+
   <body>
-  <th:block layout:fragment="content" th:object="${headwordEntry}">
-    <div class="content">
-      <div class="container-fluid">
-        <div id="content-header">
-          <div class="row">
-            <div class="col-sm-6">
-              <h1 th:text="#{lbl.headwordentry}">Headword article</h1>
-            </div>
-            <div class="col-sm-6">
-              <div class="float-right">
-<!--                <a class="btn btn-primary" id="edit-button" th:href="@{*{uuid} + '/edit'}" th:text="#{edit}">edit</a>-->
+    <th:block layout:fragment="content" th:object="${headwordEntry}">
+      <div class="content">
+        <div class="container-fluid">
+          <div id="content-header">
+            <div class="row">
+              <div class="col-sm-6">
+                <h1 th:text="#{lbl.headwordentry}">Headword article</h1>
+              </div>
+              <div class="col-sm-6">
+                <div class="float-right">
+                  <!--                <a class="btn btn-primary" id="edit-button" th:href="@{*{uuid} + '/edit'}" th:text="#{edit}">edit</a>-->
+                </div>
               </div>
             </div>
           </div>
-        </div>
-        
-        <div id="content-body" class="rows-striped">
-          <!-- TODO it always contains "und" undefined language? -->
-          <th:block th:if="${not #lists.isEmpty(existingLanguages)}">
-            <div class="language-selection">
-              <span th:text="#{lbl.data_language}">Show language dependent values in</span>&nbsp;
-              <select th:replace="fragments/components/select-language-dropdown::render('data-languages', ${existingLanguages}, ${dataLanguage})">English</select>
+
+          <div id="content-body" class="rows-striped">
+            <!-- TODO it always contains "und" undefined language? -->
+            <th:block th:if="${not #lists.isEmpty(existingLanguages)}">
+              <div class="language-selection">
+                <span th:text="#{lbl.data_language}">Show language dependent values in</span>&nbsp;
+                <select th:replace="fragments/components/select-language-dropdown::render('data-languages', ${existingLanguages}, ${dataLanguage})">English</select>
+              </div>
+            </th:block>
+
+            <th:block th:insert="fragments/uniqueobject::renderFields(${headwordEntry})"></th:block>
+
+            <th:block th:insert="fragments/identifiable::renderFields(${headwordEntry})"></th:block>
+
+            <th:block th:insert="fragments/entity::renderFields(${headwordEntry})"></th:block>
+
+            <hr />
+
+            <div class="row mb-1">
+              <div class="col-md-3"><label th:text="#{lbl.headword}">Headword</label></div>
+              <div class="col-md-9"><a th:href="@{/headwords/__${headwordEntry.headword.uuid}__}" th:text="${headwordEntry.headword.label}">headword label</a></div>
             </div>
-          </th:block>
 
-          <th:block th:insert="fragments/uniqueobject::renderFields(${headwordEntry})"></th:block>
-
-          <th:block th:insert="fragments/identifiable::renderFields(${headwordEntry})"></th:block>
-
-          <th:block th:insert="fragments/entity::renderFields(${headwordEntry})"></th:block>
-
-          <hr/>
-
-          <div class="row mb-1">
-            <div class="col-md-3"><label th:text="#{lbl.headword}">Headword</label></div>
-            <div class="col-md-9"><a th:href="@{/headwords/__${headwordEntry.headword.uuid}__}" th:text="${headwordEntry.headword.label}">headword label</a></div>
-          </div>
-          
-          <div class="row mb-1">
-            <div class="col-md-3 multilanguage"><label th:text="#{lbl.text}">Long text</label></div>
-            <div class="col-md-9">
-              <th:block th:if="${headwordEntry.text?.containsKey(#locale.forLanguageTag(dataLanguage))}">
-                <div class="card">
-                  <div class="card-body">
-                    <th:block th:insert="fragments/text::renderLocalizedStructuredContent(${headwordEntry.text}, ${dataLanguage})"></th:block>
+            <div class="row mb-1">
+              <div class="col-md-3 multilanguage"><label th:text="#{lbl.text}">Long text</label></div>
+              <div class="col-md-9">
+                <th:block th:if="${headwordEntry.text?.containsKey(#locale.forLanguageTag(dataLanguage))}">
+                  <div class="card">
+                    <div class="card-body">
+                      <th:block th:insert="fragments/text::renderLocalizedStructuredContent(${headwordEntry.text}, ${dataLanguage})"></th:block>
+                    </div>
                   </div>
-                </div>
-              </th:block>
+                </th:block>
+              </div>
             </div>
-          </div>
 
+          </div>
         </div>
       </div>
-    </div>
-  </th:block>
+    </th:block>
 
-  <section layout:fragment="beforeBodyEnds">
-    <script type="text/javascript">
-      $(addDataLanguageChangeHandler());
-    </script>
-  </section>
-</body>
+    <section layout:fragment="beforeBodyEnds">
+      <script type="text/javascript">
+        $(addDataLanguageChangeHandler());
+      </script>
+    </section>
+  </body>
+
 </html>

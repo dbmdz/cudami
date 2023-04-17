@@ -190,6 +190,16 @@
 
       <script type="text/javascript" th:inline="javascript">
         /*<![CDATA[*/
+        $('#table-sub-webpages').bootstrapTable({
+          formatSearch: function () {
+            /*[+
+             let columnName = [[#{lbl.label}]];
+             let placeholder = `[(#{placeholder.search})]`;
+             +]*/
+            return placeholder;
+          }
+        });
+
         function buttonsWebpages() {
           /*[+
            const baseUrl = [[@{'/webpages'}]];
@@ -250,14 +260,14 @@
           const dataLanguage = $("#subpages-languages").val();
           return renderLabel(baseUrl, value, dataLanguage);
         }
-        
+
         function updateListOrder(tableId) {
           /*[+
            const errorMessage = [[#{error.technical_error}]];
            const apiUrl = [[@{/api/webpages/__${webpage.uuid}__/webpages}]];
            const successMessage = `[(#{msg.save_reordered_list.success})]`;
            +]*/
-           
+
           let list = $(tableId).bootstrapTable('getData');
 
           // update sub pages order

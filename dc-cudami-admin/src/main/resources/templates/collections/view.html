@@ -278,6 +278,26 @@
 
       <script type="text/javascript" th:inline="javascript">
         /*<![CDATA[*/
+        $('#table-digitalobjects').bootstrapTable({
+          formatSearch: function () {
+            /*[+
+             let columnName = [[#{lbl.label}]];
+             let placeholder = `[(#{placeholder.search})]`;
+             +]*/
+            return placeholder;
+          }
+        });
+
+        $('#table-sub-collections').bootstrapTable({
+          formatSearch: function () {
+            /*[+
+             let columnName = [[#{lbl.label}]];
+             let placeholder = `[(#{placeholder.search})]`;
+             +]*/
+            return placeholder;
+          }
+        });
+
         function addDigitalObjects() {
           /*[+
            const errorMessage = [[#{error.technical_error}]];

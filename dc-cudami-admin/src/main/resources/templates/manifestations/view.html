@@ -3,332 +3,355 @@
       xmlns:sec="https://github.com/thymeleaf/thymeleaf-extras-springsecurity"
       xmlns:data="https://github.com/mxab/thymeleaf-extras-data-attribute"
       layout:decorate="~{base}">
+
   <head>
     <title th:text="|#{page.title.manifestations}: #{lbl.manifestation}|">Manifestations: Manifestation</title>
   </head>
+
   <body>
-  <th:block layout:fragment="content" th:object="${manifestation}">
-    <div class="content">
-      <div class="container-fluid">
-        <div id="content-header">
-          <div class="row">
-            <div class="col-sm-6">
-              <h1 th:text="#{lbl.manifestation}">Manifestation</h1>
-            </div>
-            <div class="col-sm-6">
-              <div class="float-right">
-                <!--              <a class="btn btn-primary" id="edit-button" th:href="@{*{uuid} + '/edit'}" th:text="#{edit}">edit</a>-->
+    <th:block layout:fragment="content" th:object="${manifestation}">
+      <div class="content">
+        <div class="container-fluid">
+          <div id="content-header">
+            <div class="row">
+              <div class="col-sm-6">
+                <h1 th:text="#{lbl.manifestation}">Manifestation</h1>
+              </div>
+              <div class="col-sm-6">
+                <div class="float-right">
+                  <!--              <a class="btn btn-primary" id="edit-button" th:href="@{*{uuid} + '/edit'}" th:text="#{edit}">edit</a>-->
+                </div>
               </div>
             </div>
           </div>
-        </div>
 
-        <div id="content-body" class="rows-striped">
-          <!-- TODO it always contains "und" undefined language? -->
-          <th:block th:if="${not #lists.isEmpty(existingLanguages)}">
-            <div class="language-selection">
-              <span th:text="#{lbl.data_language}">Show language dependent values in</span>&nbsp;
-              <select th:replace="~{fragments/components/select-language-dropdown::render('data-languages', ${existingLanguages}, ${dataLanguage})}">English</select>
-            </div>
-          </th:block>
-
-          <th:block th:insert="~{fragments/uniqueobject::renderFields(${manifestation})}"></th:block>
-
-          <th:block th:insert="~{fragments/identifiable::renderFields(${manifestation})}"></th:block>
-
-          <th:block th:insert="~{fragments/entity::renderFields(${manifestation})}"></th:block>
-
-          <hr/>
-
-          <div class="row">
-            <div class="col-md-3"><label th:text="#{lbl.productioninfo}">Production info</label></div>
-            <div class="align-items-center col-md-9 d-flex">
-              <th:block th:insert="~{:: displayPublishingInfo(${manifestation.productionInfo})}">...</th:block>
-            </div>
-          </div>
-
-          <div class="row">
-            <div class="col-md-3"><label th:text="#{lbl.publicationinfo}">Publication info</label></div>
-            <div class="align-items-center col-md-9 d-flex">
-              <th:block th:insert="~{:: displayPublishingInfo(${manifestation.publicationInfo})}">...</th:block>
-            </div>
-          </div>
-
-          <div class="row">
-            <div class="col-md-3"><label th:text="#{lbl.distributioninfo}">Distribution info</label></div>
-            <div class="align-items-center col-md-9 d-flex">
-              <th:block th:insert="~{:: displayPublishingInfo(${manifestation.distributionInfo})}">...</th:block>
-            </div>
-          </div>
-
-          <div class="row">
-            <div class="col-md-3"><label th:text="#{lbl.mediatypes}">Media types</label></div>
-            <div class="align-items-center col-md-9 d-flex">
-              <th:block th:insert="~{::renderMediaTypes(${manifestation.mediaTypes})}">...</th:block>
-            </div>
-          </div>
-
-          <div class="row">
-            <div class="col-md-3"><label th:text="#{lbl.manufacturingtype}">Manufacturing type</label></div>
-            <div class="align-items-center col-md-9 d-flex">
-              <span th:with="manufacturingType=${#messages.msgOrNull('manufacturingtype.' + manifestation.manufacturingType)}" th:text="${manufacturingType != null ? manufacturingType : manifestation.manufacturingType}">...</span>
-            </div>
-          </div>
-
-          <div class="row">
-            <div class="col-md-3"><label th:text="#{lbl.manifestationtype}">Manifestation type</label></div>
-            <div class="align-items-center col-md-9 d-flex">
-              <span th:with="manifestationType=${#messages.msgOrNull('manifestationtype.' + #strings.toLowerCase(manifestation.manifestationType))}" th:text="${manifestationType != null ? manifestationType : manifestation.manifestationType}">...</span>
-            </div>
-          </div>
-
-          <div class="row">
-            <div class="col-md-3"><label th:text="#{lbl.dimensions}">Dimensions</label></div>
-            <div class="align-items-center col-md-9 d-flex">
-              <span th:text="${manifestation.dimensions}">...</span>
-            </div>
-          </div>
-
-          <div class="row">
-            <div class="col-md-3"><label th:text="#{lbl.scale}">Scale</label></div>
-            <div class="align-items-center col-md-9 d-flex">
-              <span th:text="${manifestation.scale}">...</span>
-            </div>
-          </div>
-
-          <div class="row">
-            <div class="col-md-3"><label th:text="#{lbl.composition}">Composition</label></div>
-            <div class="align-items-center col-md-9 d-flex">
-              <span th:text="${manifestation.composition}">...</span>
-            </div>
-          </div>
-
-          <th:block th:insert="~{fragments/subjects::renderSubjects(${manifestation.subjects}, ${dataLanguage})}"></th:block>
-
-          <th:block th:insert="~{fragments/entity::renderRelations(${manifestation.relations})}"></th:block>
-
-          <div class="row">
-            <div class="col-md-3"><label th:text="#{lbl.language}">Language</label></div>
-            <div class="align-items-center col-md-9 d-flex" th:text="${T(de.digitalcollections.cudami.admin.controller.fragments.FragmentsController).getDisplayLanguages(#locale, manifestation.otherLanguages)}" >...</div>
-          </div>
-
-          <div class="row">
-            <div class="col-md-3"><label th:text="#{lbl.other_languages}">Other languages</label></div>
-            <div class="align-items-center col-md-9 d-flex" th:text="${T(de.digitalcollections.cudami.admin.controller.fragments.FragmentsController).getDisplayLanguages(#locale, manifestation.otherLanguages)}" >...</div>
-          </div>
-
-          <th:block th:insert="~{fragments/titles::renderTitles(${manifestation.titles}, ${dataLanguage})}"></th:block>
-
-          <div class="row">
-            <div class="col-md-3 multilanguage"><label th:text="#{lbl.work}">Work</label></div>
-            <div class="align-items-center col-md-9 d-flex">
-              <span th:with="work=${manifestation.work}" th:if="${manifestation.work}">
-                &nbsp;<a th:href="@{/works/{uuid}(uuid=${work.uuid})}" th:text="${work.label?.getText(dataLanguage)} ?: ${work.uuid}">work label</a>
-              </span>
-            </div>
-          </div>
-
-          <div class="row">
-            <div class="col-md-3 multilanguage"><label th:text="#{lbl.parent_manifestation_s}">Parents</label></div>
-            <div class="align-items-center col-md-9 d-flex" th:each="parent, iterStat: ${manifestation.parents}">
-              <span th:text="${parent.title}" style="font-weight: bold"></span> &nbsp;
-              &nbsp<span th:text="#{in_manifestation}"></span>&nbsp;
-              <a th:href="@{/manifestations/{uuid}(uuid=${parent.subject?.uuid})}" th:text="${parent.subject?.label?.getText(dataLanguage)} ?: ${parent.subject?.uuid}">parent label</a>&nbsp;
-              <span th:if="${parent.sortKey != null}" th:text="#{with_sortkey(${parent.sortKey})}">...</span>
-              <br th:if="${!iterStat.last}"/>
-            </div>
-          </div>
-
-          <div class="row">
-            <div class="col-md-3"><label th:text="#{lbl.child_manifestations}">Child manifestations</label></div>
-            <div class="col-md-9">
-              <table id="table-childmanifestations"
-                     data-toggle="table"
-                     th:data-url="@{/api/manifestations/__${manifestation.uuid}__/children}"
-                     th:data-locale="${#locale}"
-
-                     data-cookie="true"
-                     data-cookie-id-table="table-childmanifestations"
-                     data-id-field="uuid"
-                     data-pagination="true"
-                     data-pagination-v-align="both"
-                     data-query-params="queryParamsChildManifestations"
-                     data-search="false"
-                     data-search-highlight="false"
-                     data-search-on-enter-key="false"
-                     data-server-sort="true"
-                     data-show-search-button="false"
-                     data-show-search-clear-button="false"
-                     data-side-pagination="server"
-                     data-sort-name="label"
-                     data-sort-order="asc"
-                     data-toolbar="#toolbar-childmanifestations"
-                     data-unique-id="uuid">
-                <thead>
-                <tr>
-                  <th data-field="index" data-formatter="formatRowNumberChildManifestations" data-halign="right" data-align="right" th:text="#{lbl.row_number}">#</th>
-                  <th data-field="sortKey" data-formatter="formatSortKeyChildManifestations" th:text="#{lbl.sortkey}">Sortkey</th>
-                  <th data-field="title" data-formatter="formatTitleChildManifestations" th:text="#{lbl.title}">Title</th>
-                  <th data-field="actions" data-formatter="formatActionsChildManifestations" th:text="#{lbl.actions}">Actions</th>
-                </tr>
-                </thead>
-              </table>
-
-            </div>
-          </div>
-
-          <div class="row">
-            <div class="col-md-3"><label th:text="#{lbl.items}">Items</label></div>
-            <div class="col-md-9">
-              <div id="toolbar-items">
-                <!-- TODO it always contains "und" undefined language? -->
-                <th:block th:if="${not #lists.isEmpty(existingItemsLanguages)}">
-                  <span th:text="#{lbl.data_language}">Show language dependent values in</span>&nbsp;
-                  <select th:replace="fragments/components/select-language-dropdown::render('items-languages', ${existingItemsLanguages}, ${dataLanguageItems})">English</select>
-                </th:block>
+          <div id="content-body" class="rows-striped">
+            <!-- TODO it always contains "und" undefined language? -->
+            <th:block th:if="${not #lists.isEmpty(existingLanguages)}">
+              <div class="language-selection">
+                <span th:text="#{lbl.data_language}">Show language dependent values in</span>&nbsp;
+                <select th:replace="~{fragments/components/select-language-dropdown::render('data-languages', ${existingLanguages}, ${dataLanguage})}">English</select>
               </div>
-              <table id="table-items"
-                     data-toggle="table"
-                     th:data-url="@{/api/manifestations/__${manifestation.uuid}__/items}"
-                     th:data-locale="${#locale}"
+            </th:block>
 
-                     data-cookie="true"
-                     data-cookie-id-table="table-items"
-                     data-id-field="uuid"
-                     data-pagination="true"
-                     data-pagination-v-align="both"
-                     data-query-params="queryParamsItems"
-                     data-search="false"
-                     data-search-highlight="true"
-                     data-search-on-enter-key="true"
-                     data-server-sort="true"
-                     data-show-search-button="false"
-                     data-show-search-clear-button="false"
-                     data-side-pagination="server"
-                     data-sort-name="label"
-                     data-sort-order="asc"
-                     data-toolbar="#toolbar-items"
-                     data-unique-id="uuid">
-                <thead>
-                <tr>
-                  <th data-field="index" data-formatter="formatRowNumberItems" data-halign="right" data-align="right" th:text="#{lbl.row_number}">#</th>
-                  <th data-field="label" data-sortable="true" data-formatter="formatLabelItems" th:text="#{lbl.label}">Label</th>
-                  <th data-field="identifiers" data-sortable="false" data-formatter="renderIdentifiers" th:text="#{identifiers}">Identifiers</th>
-                  <th data-field="actions" data-formatter="formatActionsItems" th:text="#{lbl.actions}">Actions</th>
-                </tr>
-                </thead>
-              </table>
+            <th:block th:insert="~{fragments/uniqueobject::renderFields(${manifestation})}"></th:block>
+
+            <th:block th:insert="~{fragments/identifiable::renderFields(${manifestation})}"></th:block>
+
+            <th:block th:insert="~{fragments/entity::renderFields(${manifestation})}"></th:block>
+
+            <hr />
+
+            <div class="row">
+              <div class="col-md-3"><label th:text="#{lbl.productioninfo}">Production info</label></div>
+              <div class="align-items-center col-md-9 d-flex">
+                <th:block th:insert="~{:: displayPublishingInfo(${manifestation.productionInfo})}">...</th:block>
+              </div>
             </div>
+
+            <div class="row">
+              <div class="col-md-3"><label th:text="#{lbl.publicationinfo}">Publication info</label></div>
+              <div class="align-items-center col-md-9 d-flex">
+                <th:block th:insert="~{:: displayPublishingInfo(${manifestation.publicationInfo})}">...</th:block>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-3"><label th:text="#{lbl.distributioninfo}">Distribution info</label></div>
+              <div class="align-items-center col-md-9 d-flex">
+                <th:block th:insert="~{:: displayPublishingInfo(${manifestation.distributionInfo})}">...</th:block>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-3"><label th:text="#{lbl.mediatypes}">Media types</label></div>
+              <div class="align-items-center col-md-9 d-flex">
+                <th:block th:insert="~{::renderMediaTypes(${manifestation.mediaTypes})}">...</th:block>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-3"><label th:text="#{lbl.manufacturingtype}">Manufacturing type</label></div>
+              <div class="align-items-center col-md-9 d-flex">
+                <span th:with="manufacturingType=${#messages.msgOrNull('manufacturingtype.' + manifestation.manufacturingType)}" th:text="${manufacturingType != null ? manufacturingType : manifestation.manufacturingType}">...</span>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-3"><label th:text="#{lbl.manifestationtype}">Manifestation type</label></div>
+              <div class="align-items-center col-md-9 d-flex">
+                <span th:with="manifestationType=${#messages.msgOrNull('manifestationtype.' + #strings.toLowerCase(manifestation.manifestationType))}" th:text="${manifestationType != null ? manifestationType : manifestation.manifestationType}">...</span>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-3"><label th:text="#{lbl.dimensions}">Dimensions</label></div>
+              <div class="align-items-center col-md-9 d-flex">
+                <span th:text="${manifestation.dimensions}">...</span>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-3"><label th:text="#{lbl.scale}">Scale</label></div>
+              <div class="align-items-center col-md-9 d-flex">
+                <span th:text="${manifestation.scale}">...</span>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-3"><label th:text="#{lbl.composition}">Composition</label></div>
+              <div class="align-items-center col-md-9 d-flex">
+                <span th:text="${manifestation.composition}">...</span>
+              </div>
+            </div>
+
+            <th:block th:insert="~{fragments/subjects::renderSubjects(${manifestation.subjects}, ${dataLanguage})}"></th:block>
+
+            <th:block th:insert="~{fragments/entity::renderRelations(${manifestation.relations})}"></th:block>
+
+            <div class="row">
+              <div class="col-md-3"><label th:text="#{lbl.language}">Language</label></div>
+              <div class="align-items-center col-md-9 d-flex" th:text="${T(de.digitalcollections.cudami.admin.controller.fragments.FragmentsController).getDisplayLanguages(#locale, manifestation.otherLanguages)}">...</div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-3"><label th:text="#{lbl.other_languages}">Other languages</label></div>
+              <div class="align-items-center col-md-9 d-flex" th:text="${T(de.digitalcollections.cudami.admin.controller.fragments.FragmentsController).getDisplayLanguages(#locale, manifestation.otherLanguages)}">...</div>
+            </div>
+
+            <th:block th:insert="~{fragments/titles::renderTitles(${manifestation.titles}, ${dataLanguage})}"></th:block>
+
+            <div class="row">
+              <div class="col-md-3 multilanguage"><label th:text="#{lbl.work}">Work</label></div>
+              <div class="align-items-center col-md-9 d-flex">
+                <span th:with="work=${manifestation.work}" th:if="${manifestation.work}">
+                  &nbsp;<a th:href="@{/works/{uuid}(uuid=${work.uuid})}" th:text="${work.label?.getText(dataLanguage)} ?: ${work.uuid}">work label</a>
+                </span>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-3 multilanguage"><label th:text="#{lbl.parent_manifestation_s}">Parents</label></div>
+              <div class="align-items-center col-md-9 d-flex" th:each="parent, iterStat: ${manifestation.parents}">
+                <span th:text="${parent.title}" style="font-weight: bold"></span> &nbsp;
+                &nbsp<span th:text="#{in_manifestation}"></span>&nbsp;
+                <a th:href="@{/manifestations/{uuid}(uuid=${parent.subject?.uuid})}" th:text="${parent.subject?.label?.getText(dataLanguage)} ?: ${parent.subject?.uuid}">parent label</a>&nbsp;
+                <span th:if="${parent.sortKey != null}" th:text="#{with_sortkey(${parent.sortKey})}">...</span>
+                <br th:if="${!iterStat.last}" />
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-3"><label th:text="#{lbl.child_manifestations}">Child manifestations</label></div>
+              <div class="col-md-9">
+                <table id="table-childmanifestations"
+                       data-toggle="table"
+                       th:data-url="@{/api/manifestations/__${manifestation.uuid}__/children}"
+                       th:data-locale="${#locale}"
+
+                       data-cookie="true"
+                       data-cookie-id-table="table-childmanifestations"
+                       data-id-field="uuid"
+                       data-pagination="true"
+                       data-pagination-v-align="both"
+                       data-query-params="queryParamsChildManifestations"
+                       data-search="false"
+                       data-search-highlight="false"
+                       data-search-on-enter-key="false"
+                       data-server-sort="true"
+                       data-show-search-button="false"
+                       data-show-search-clear-button="false"
+                       data-side-pagination="server"
+                       data-sort-name="label"
+                       data-sort-order="asc"
+                       data-toolbar="#toolbar-childmanifestations"
+                       data-unique-id="uuid">
+                  <thead>
+                    <tr>
+                      <th data-field="index" data-formatter="formatRowNumberChildManifestations" data-halign="right" data-align="right" th:text="#{lbl.row_number}">#</th>
+                      <th data-field="sortKey" data-formatter="formatSortKeyChildManifestations" th:text="#{lbl.sortkey}">Sortkey</th>
+                      <th data-field="title" data-formatter="formatTitleChildManifestations" th:text="#{lbl.title}">Title</th>
+                      <th data-field="actions" data-formatter="formatActionsChildManifestations" th:text="#{lbl.actions}">Actions</th>
+                    </tr>
+                  </thead>
+                </table>
+
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-3"><label th:text="#{lbl.items}">Items</label></div>
+              <div class="col-md-9">
+                <div id="toolbar-items">
+                  <!-- TODO it always contains "und" undefined language? -->
+                  <th:block th:if="${not #lists.isEmpty(existingItemsLanguages)}">
+                    <span th:text="#{lbl.data_language}">Show language dependent values in</span>&nbsp;
+                    <select th:replace="fragments/components/select-language-dropdown::render('items-languages', ${existingItemsLanguages}, ${dataLanguageItems})">English</select>
+                  </th:block>
+                </div>
+                <table id="table-items"
+                       data-toggle="table"
+                       th:data-url="@{/api/manifestations/__${manifestation.uuid}__/items}"
+                       th:data-locale="${#locale}"
+
+                       data-cookie="true"
+                       data-cookie-id-table="table-items"
+                       data-id-field="uuid"
+                       data-pagination="true"
+                       data-pagination-v-align="both"
+                       data-query-params="queryParamsItems"
+                       data-search="false"
+                       data-search-highlight="true"
+                       data-search-on-enter-key="true"
+                       data-server-sort="true"
+                       data-show-search-button="false"
+                       data-show-search-clear-button="false"
+                       data-side-pagination="server"
+                       data-sort-name="label"
+                       data-sort-order="asc"
+                       data-toolbar="#toolbar-items"
+                       data-unique-id="uuid">
+                  <thead>
+                    <tr>
+                      <th data-field="index" data-formatter="formatRowNumberItems" data-halign="right" data-align="right" th:text="#{lbl.row_number}">#</th>
+                      <th data-field="label" data-sortable="true" data-formatter="formatLabelItems" th:text="#{lbl.label}">Label</th>
+                      <th data-field="identifiers" data-sortable="false" data-formatter="renderIdentifiers" th:text="#{identifiers}">Identifiers</th>
+                      <th data-field="actions" data-formatter="formatActionsItems" th:text="#{lbl.actions}">Actions</th>
+                    </tr>
+                  </thead>
+                </table>
+              </div>
+            </div>
+
           </div>
-
         </div>
-      </div>
-    </div>
-  </th:block>
-
-  <div th:fragment="renderMediaTypes(mediaTypes)">
-    <div th:each="mediaTypeKey, iterStat: ${mediaTypes}">
-      <span th:with="mediaType=${#messages.msgOrNull('mediatype.' + mediaTypeKey)}" th:text="${mediaType != null ? mediaType : mediaTypeKey}">...</span>
-      <span th:if="${!iterStat.last ? ',&nbsp;' : ''}"></span>
-    </div>
-  </div>
-
-  <div th:fragment="displayPublishingInfo(publishingInfo)" th:with="show_data = ${(publishingInfo != null && !publishingInfo.isEmpty())}">
-    <th:block th:if="${show_data}">
-      <div th:if="${(publishingInfo.datePresentation != null || publishingInfo.navDateRange != null || publishingInfo.timeValueRange != null)}">
-        <span th:text="${publishingInfo.datePresentation}">...</span>
-        <span th:if="${publishingInfo.navDateRange}" th:with="navDateRange=${publishingInfo.navDateRange}">
-          (<span th:with="df=#{date.format},date=${navDateRange.start}" th:text="${#temporals.format(date,df)}">01.01.2000</span>
-          -
-          <span th:with="df=#{date.format},date=${navDateRange.end}" th:text="${#temporals.format(date,df)}">01.01.2000</span>
-         )</span>&nbsp;
-        <th:block th:if="${(publishingInfo.timeValueRange != null)}" th:insert="~{fragments/uniqueobject :: renderTimeValueRange(${publishingInfo.timeValueRange})}">...</th:block>
-      </div>
-      <div th:each="publisher: ${publishingInfo.publishers}">
-        <th:block th:with="agent=${publisher.agent}">
-          <th:block th:if="${agent}" th:insert="~{fragments/entity::renderAgent(${agent})}"></th:block>
-          <span th:if="${agent}" th:text="': '">:</span>
-        </th:block>
-        <th:block th:if="${publisher.datePresentation}">
-          (<span th:text="${publisher.datePresentation}">...</span>)&nbsp;
-        </th:block>
-        <span th:each="humanSettlement, iterStat: ${publisher.locations}">
-          <th:block th:insert="~{fragments/entity::renderGeolocation(${humanSettlement})}"></th:block>
-          <span th:text="${!iterStat.last ? ', ' : ''}">,</span>
-        </span>
       </div>
     </th:block>
-    <th:block th:unless="${show_data}">-</th:block>
-  </div>
 
-  <section layout:fragment="beforeBodyEnds">
-    <script type="text/javascript">
-      $(addDataLanguageChangeHandler());
+    <div th:fragment="renderMediaTypes(mediaTypes)">
+      <div th:each="mediaTypeKey, iterStat: ${mediaTypes}">
+        <span th:with="mediaType=${#messages.msgOrNull('mediatype.' + mediaTypeKey)}" th:text="${mediaType != null ? mediaType : mediaTypeKey}">...</span>
+        <span th:if="${!iterStat.last ? ',&nbsp;' : ''}"></span>
+      </div>
+    </div>
 
-      function formatRowNumberChildManifestations(value, row, index) {
-        return renderRowNumber($('#table-childmanifestations'), index);
-      }
+    <div th:fragment="displayPublishingInfo(publishingInfo)" th:with="show_data = ${(publishingInfo != null && !publishingInfo.isEmpty())}">
+      <th:block th:if="${show_data}">
+        <div th:if="${(publishingInfo.datePresentation != null || publishingInfo.navDateRange != null || publishingInfo.timeValueRange != null)}">
+          <span th:text="${publishingInfo.datePresentation}">...</span>
+          <span th:if="${publishingInfo.navDateRange}" th:with="navDateRange=${publishingInfo.navDateRange}">
+            (<span th:with="df=#{date.format},date=${navDateRange.start}" th:text="${#temporals.format(date,df)}">01.01.2000</span>
+            -
+            <span th:with="df=#{date.format},date=${navDateRange.end}" th:text="${#temporals.format(date,df)}">01.01.2000</span>
+            )</span>&nbsp;
+          <th:block th:if="${(publishingInfo.timeValueRange != null)}" th:insert="~{fragments/uniqueobject :: renderTimeValueRange(${publishingInfo.timeValueRange})}">...</th:block>
+        </div>
+        <div th:each="publisher: ${publishingInfo.publishers}">
+          <th:block th:with="agent=${publisher.agent}">
+            <th:block th:if="${agent}" th:insert="~{fragments/entity::renderAgent(${agent})}"></th:block>
+            <span th:if="${agent}" th:text="': '">:</span>
+          </th:block>
+          <th:block th:if="${publisher.datePresentation}">
+            (<span th:text="${publisher.datePresentation}">...</span>)&nbsp;
+          </th:block>
+          <span th:each="humanSettlement, iterStat: ${publisher.locations}">
+            <th:block th:insert="~{fragments/entity::renderGeolocation(${humanSettlement})}"></th:block>
+            <span th:text="${!iterStat.last ? ', ' : ''}">,</span>
+          </span>
+        </div>
+      </th:block>
+      <th:block th:unless="${show_data}">-</th:block>
+    </div>
 
-      function formatRowNumberItems(value, row, index) {
-        return renderRowNumber($('#table-items'), index);
-      }
+    <section layout:fragment="beforeBodyEnds">
+      <script type="text/javascript">
+        $(addDataLanguageChangeHandler());
 
-      function queryParamsChildManifestations(params) {
-        let dataLanguage = $("#childmanifestations-languages").val();
-        params.dataLanguage = dataLanguage;
-        return params;
-      }
+        function formatRowNumberChildManifestations(value, row, index) {
+          return renderRowNumber($('#table-childmanifestations'), index);
+        }
 
-      function queryParamsItems(params) {
-        let dataLanguage = $("#items-languages").val();
-        params.dataLanguage = dataLanguage;
-        return params;
-      }
-    </script>
+        function formatRowNumberItems(value, row, index) {
+          return renderRowNumber($('#table-items'), index);
+        }
 
-    <script type="text/javascript" th:inline="javascript">
-      /*<![CDATA[*/
-      function formatTitleChildManifestations(value, row) {
-        /*[+
-         const baseUrl = [[@{'/manifestations'}]] + '/' + row.object.uuid;
-         +]*/
+        function queryParamsChildManifestations(params) {
+          let dataLanguage = $("#childmanifestations-languages").val();
+          params.dataLanguage = dataLanguage;
+          return params;
+        }
 
-        return '<a href="' + baseUrl + '">' + value+ '</a>';
-      }
+        function queryParamsItems(params) {
+          let dataLanguage = $("#items-languages").val();
+          params.dataLanguage = dataLanguage;
+          return params;
+        }
+      </script>
 
-      function formatSortKeyChildManifestations(value, row) {
-        return value;
-      }
+      <script type="text/javascript" th:inline="javascript">
+        /*<![CDATA[*/
+        $('#table-childmanifestations').bootstrapTable({
+          formatSearch: function () {
+            /*[+
+             let columnName = [[#{lbl.label}]];
+             let placeholder = `[(#{placeholder.search})]`;
+             +]*/
+            return placeholder;
+          }
+        });
 
-      function formatActionsChildManifestations(value, row) {
-        /*[+
-         const baseUrl = [[@{'/manifestations'}]] + '/' + row.object.uuid;
-         +]*/
-        return [
-          renderViewAction(baseUrl)
-        ].join(' ');
-      }
+        $('#table-items').bootstrapTable({
+          formatSearch: function () {
+            /*[+
+             let columnName = [[#{lbl.label}]];
+             let placeholder = `[(#{placeholder.search})]`;
+             +]*/
+            return placeholder;
+          }
+        });
 
-      function formatActionsItems(value, row) {
-        /*[+
-         const baseUrl = [[@{'/items'}]] + '/' + row.uuid;
-         +]*/
-        return [
-          renderViewAction(baseUrl)
-        ].join(' ');
-      }
+        function formatTitleChildManifestations(value, row) {
+          /*[+
+           const baseUrl = [[@{'/manifestations'}]] + '/' + row.object.uuid;
+           +]*/
 
-      function formatLabelItems(value, row) {
-        /*[+
-         const baseUrl = [[@{'/items'}]] + '/' + row.uuid;
-         +]*/
-        const dataLanguage = $("#items-languages").val();
-        return renderLabel(baseUrl, value, dataLanguage);
-      }
+          return '<a href="' + baseUrl + '">' + value + '</a>';
+        }
+
+        function formatSortKeyChildManifestations(value, row) {
+          return value;
+        }
+
+        function formatActionsChildManifestations(value, row) {
+          /*[+
+           const baseUrl = [[@{'/manifestations'}]] + '/' + row.object.uuid;
+           +]*/
+          return [
+            renderViewAction(baseUrl)
+          ].join(' ');
+        }
+
+        function formatActionsItems(value, row) {
+          /*[+
+           const baseUrl = [[@{'/items'}]] + '/' + row.uuid;
+           +]*/
+          return [
+            renderViewAction(baseUrl)
+          ].join(' ');
+        }
+
+        function formatLabelItems(value, row) {
+          /*[+
+           const baseUrl = [[@{'/items'}]] + '/' + row.uuid;
+           +]*/
+          const dataLanguage = $("#items-languages").val();
+          return renderLabel(baseUrl, value, dataLanguage);
+        }
       /*]]>*/
-    </script>
+      </script>
 
-    <div th:replace="fragments/bootstrap-table :: data-formatter"></div>
-  </section>
-</body>
+      <div th:replace="fragments/bootstrap-table :: data-formatter"></div>
+    </section>
+  </body>
+
 </html>
