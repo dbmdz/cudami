@@ -55,11 +55,6 @@ public class FamilynamesAPIController
       throws TechnicalException, ServiceException {
     return find(
         Predicate.class, offset, limit, sortProperty, sortOrder, "label", searchTerm, dataLanguage);
-
-    /* FIXME
-     * empty list: Got 500 for backend call GET /v6/familynames?pageNumber=0&pageSize=10&sortBy=label.asc.ignorecase.
-     * ERROR: function lower(jsonb) does not exist; Hinweis: No function matches the given name and argument types. You might need to add explicit type casts.
-     */
   }
 
   @GetMapping("/api/familynames/{uuid:" + ParameterHelper.UUID_PATTERN + "}")

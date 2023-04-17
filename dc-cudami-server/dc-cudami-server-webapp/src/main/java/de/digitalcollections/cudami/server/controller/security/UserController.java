@@ -89,8 +89,7 @@ public class UserController extends AbstractUniqueObjectController<User> {
 
   @Override
   protected UniqueObjectService<User> getService() {
-    // not used, yet
-    return null;
+    return service;
   }
 
   @Operation(summary = "Save a newly created user")

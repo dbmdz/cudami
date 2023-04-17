@@ -73,8 +73,7 @@ public class RenderingTemplateController extends AbstractUniqueObjectController<
 
   @Override
   protected UniqueObjectService<RenderingTemplate> getService() {
-    // FIXME: remove find from inherited. find not used, no need for getService()...
-    return null;
+    return service;
   }
 
   @Operation(summary = "Save a newly created rendering template")

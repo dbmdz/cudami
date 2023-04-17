@@ -75,8 +75,7 @@ public class IdentifierTypeController extends AbstractUniqueObjectController<Ide
 
   @Override
   protected UniqueObjectService<IdentifierType> getService() {
-    // FIXME: remove find from inherited. find not used, no need for getService()...
-    return null;
+    return service;
   }
 
   @Operation(summary = "save a newly created identifier type")
