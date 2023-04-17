@@ -44,7 +44,7 @@ public class HeadwordEntryController extends AbstractIdentifiableController<Head
       value = {"/v6/headwordentries/count", "/v5/headwordentries/count"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public long count() throws ServiceException {
-    return service.count();
+    return super.count();
   }
 
   @Operation(summary = "Get all headwordentries as (paged, sorted, filtered) list")
@@ -124,7 +124,7 @@ public class HeadwordEntryController extends AbstractIdentifiableController<Head
       value = {"/v6/headwordentries/languages", "/v5/headwordentries/languages"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public List<Locale> getLanguages() throws ServiceException {
-    return this.service.getLanguages();
+    return super.getLanguages();
   }
 
   @Override

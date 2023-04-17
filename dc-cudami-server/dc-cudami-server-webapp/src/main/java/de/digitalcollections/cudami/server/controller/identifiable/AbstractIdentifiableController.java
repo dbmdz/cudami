@@ -7,6 +7,8 @@ import de.digitalcollections.cudami.server.controller.AbstractUniqueObjectContro
 import de.digitalcollections.cudami.server.controller.ParameterHelper;
 import de.digitalcollections.model.identifiable.Identifiable;
 import de.digitalcollections.model.identifiable.Identifier;
+import java.util.List;
+import java.util.Locale;
 import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.http.HttpStatus;
@@ -51,4 +53,8 @@ public abstract class AbstractIdentifiableController<T extends Identifiable>
 
   @Override
   protected abstract IdentifiableService<T> getService();
+
+  protected List<Locale> getLanguages() throws ServiceException {
+    return getService().getLanguages();
+  }
 }

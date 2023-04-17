@@ -169,7 +169,7 @@ public class FileResourceMetadataController extends AbstractIdentifiableControll
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public List<Locale> getLanguages() throws ServiceException {
-    return service.getLanguages();
+    return super.getLanguages();
   }
 
   @Override

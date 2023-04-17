@@ -20,7 +20,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -52,7 +51,7 @@ public class EventController extends AbstractIdentifiableController<Event> {
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public long count() throws ServiceException {
-    return service.count();
+    return super.count();
   }
 
   @Operation(summary = "Delete an event")
@@ -62,15 +61,7 @@ public class EventController extends AbstractIdentifiableController<Event> {
   public ResponseEntity delete(
       @Parameter(example = "", description = "UUID of the event") @PathVariable("uuid") UUID uuid)
       throws ConflictException {
-    boolean successful;
-    try {
-      successful = service.delete(Event.builder().uuid(uuid).build());
-    } catch (ServiceException e) {
-      return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-    return successful
-        ? new ResponseEntity<>(HttpStatus.NO_CONTENT)
-        : new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    return super.delete(uuid);
   }
 
   @Operation(summary = "get all events as (paged, sorted, filtered) list")
@@ -121,7 +112,7 @@ public class EventController extends AbstractIdentifiableController<Event> {
       value = {"/v6/events/languages"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public List<Locale> getLanguages() throws ServiceException {
-    return service.getLanguages();
+    return super.getLanguages();
   }
 
   @Override

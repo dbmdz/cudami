@@ -3,12 +3,12 @@ package de.digitalcollections.cudami.server.controller.identifiable.entity.work;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ConflictException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
-import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifiableService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.DigitalObjectService;
+import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.EntityService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.work.ItemService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.work.WorkService;
+import de.digitalcollections.cudami.server.controller.AbstractEntityController;
 import de.digitalcollections.cudami.server.controller.ParameterHelper;
-import de.digitalcollections.cudami.server.controller.identifiable.AbstractIdentifiableController;
 import de.digitalcollections.model.identifiable.entity.digitalobject.DigitalObject;
 import de.digitalcollections.model.identifiable.entity.item.Item;
 import de.digitalcollections.model.identifiable.entity.work.Work;
@@ -27,8 +27,6 @@ import java.util.Locale;
 import java.util.Set;
 import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -44,9 +42,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @Tag(name = "Item controller")
-public class ItemController extends AbstractIdentifiableController<Item> {
-
-  private static final Logger LOGGER = LoggerFactory.getLogger(ItemController.class);
+public class ItemController extends AbstractEntityController<Item> {
 
   private final DigitalObjectService digitalObjectService;
   private final ItemService service;
@@ -76,7 +72,7 @@ public class ItemController extends AbstractIdentifiableController<Item> {
           UUID digitalObjectUuid)
       throws ValidationException, ConflictException, ServiceException {
 
-    Item item = service.getByExample(Item.builder().uuid(uuid).build());
+    Item item = service.getByExample(buildExampleWithUuid(uuid));
     boolean successful =
         digitalObjectService.setItem(DigitalObject.builder().uuid(digitalObjectUuid).build(), item);
     return successful
@@ -89,7 +85,7 @@ public class ItemController extends AbstractIdentifiableController<Item> {
       value = {"/v6/items/count", "/v5/items/count", "/v2/items/count", "/latest/items/count"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public long count() throws ServiceException {
-    return service.count();
+    return super.count();
   }
 
   @Operation(summary = "Delete an item")
@@ -99,15 +95,7 @@ public class ItemController extends AbstractIdentifiableController<Item> {
   public ResponseEntity delete(
       @Parameter(example = "", description = "UUID of the item") @PathVariable("uuid") UUID uuid)
       throws ConflictException {
-    boolean successful;
-    try {
-      successful = service.delete(Item.builder().uuid(uuid).build());
-    } catch (ServiceException e) {
-      return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-    return successful
-        ? new ResponseEntity<>(HttpStatus.NO_CONTENT)
-        : new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    return super.delete(uuid);
   }
 
   @Operation(summary = "Get all items as (paged, sorted, filtered) list")
@@ -140,7 +128,7 @@ public class ItemController extends AbstractIdentifiableController<Item> {
       Sorting sorting = new Sorting(sortBy);
       pageRequest.setSorting(sorting);
     }
-    return service.findDigitalObjects(Item.builder().uuid(uuid).build(), pageRequest);
+    return service.findDigitalObjects(buildExampleWithUuid(uuid), pageRequest);
   }
 
   @Operation(
@@ -212,7 +200,7 @@ public class ItemController extends AbstractIdentifiableController<Item> {
       value = {"/v6/items/languages"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public List<Locale> getLanguages() throws ServiceException {
-    return service.getLanguages();
+    return super.getLanguages();
   }
 
   @Operation(
@@ -225,11 +213,11 @@ public class ItemController extends AbstractIdentifiableController<Item> {
   public List<Locale> getLanguagesOfDigitalObjects(
       @Parameter(name = "uuid", description = "UUID of the item") @PathVariable UUID uuid)
       throws ServiceException {
-    return service.getLanguagesOfDigitalObjects(Item.builder().uuid(uuid).build());
+    return service.getLanguagesOfDigitalObjects(buildExampleWithUuid(uuid));
   }
 
   @Override
-  protected IdentifiableService<Item> getService() {
+  protected EntityService<Item> getService() {
     return service;
   }
 
@@ -244,7 +232,7 @@ public class ItemController extends AbstractIdentifiableController<Item> {
   public Set<Work> getWorks(
       @Parameter(name = "uuid", description = "UUID of the item") @PathVariable UUID uuid)
       throws ServiceException {
-    return Set.of(workService.getByItem(Item.builder().uuid(uuid).build()));
+    return Set.of(workService.getByItem(buildExampleWithUuid(uuid)));
   }
 
   @Operation(summary = "save a newly created item")

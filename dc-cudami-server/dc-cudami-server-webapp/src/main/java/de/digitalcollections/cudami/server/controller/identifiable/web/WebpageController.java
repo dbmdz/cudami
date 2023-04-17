@@ -66,8 +66,7 @@ public class WebpageController extends AbstractIdentifiableController<Webpage> {
   public void addRelatedFileResource(@PathVariable UUID uuid, @PathVariable UUID fileResourceUuid)
       throws ServiceException {
     service.addRelatedFileresource(
-        Webpage.builder().uuid(uuid).build(),
-        FileResource.builder().uuid(fileResourceUuid).build());
+        buildExampleWithUuid(uuid), FileResource.builder().uuid(fileResourceUuid).build());
   }
 
   @Operation(summary = "Get all webpages as (paged, sorted, filtered) list")
@@ -103,9 +102,9 @@ public class WebpageController extends AbstractIdentifiableController<Webpage> {
     PageRequest pageRequest =
         createPageRequest(Webpage.class, pageNumber, pageSize, sortBy, filterCriteria);
     if (active != null) {
-      return service.findActiveChildren(Webpage.builder().uuid(uuid).build(), pageRequest);
+      return service.findActiveChildren(buildExampleWithUuid(uuid), pageRequest);
     }
-    return service.findChildren(Webpage.builder().uuid(uuid).build(), pageRequest);
+    return service.findChildren(buildExampleWithUuid(uuid), pageRequest);
   }
 
   @Operation(summary = "Get the breadcrumb for a webpage")
@@ -135,11 +134,11 @@ public class WebpageController extends AbstractIdentifiableController<Webpage> {
     BreadcrumbNavigation breadcrumbNavigation;
 
     if (pLocale == null) {
-      breadcrumbNavigation = service.getBreadcrumbNavigation(Webpage.builder().uuid(uuid).build());
+      breadcrumbNavigation = service.getBreadcrumbNavigation(buildExampleWithUuid(uuid));
     } else {
       breadcrumbNavigation =
           service.getBreadcrumbNavigation(
-              Webpage.builder().uuid(uuid).build(), pLocale, localeService.getDefaultLocale());
+              buildExampleWithUuid(uuid), pLocale, localeService.getDefaultLocale());
     }
 
     if (breadcrumbNavigation == null || breadcrumbNavigation.getNavigationItems().isEmpty()) {
@@ -175,18 +174,19 @@ public class WebpageController extends AbstractIdentifiableController<Webpage> {
           String active)
       throws ServiceException {
     Webpage webpage;
+    Webpage example = buildExampleWithUuid(uuid);
+
     if (active != null) {
       if (pLocale == null) {
-        webpage = service.getByExampleAndActive(Webpage.builder().uuid(uuid).build());
+        webpage = service.getByExampleAndActive(example);
       } else {
-        webpage =
-            service.getByExampleAndActiveAndLocale(Webpage.builder().uuid(uuid).build(), pLocale);
+        webpage = service.getByExampleAndActiveAndLocale(example, pLocale);
       }
     } else {
       if (pLocale == null) {
-        webpage = service.getByExample(Webpage.builder().uuid(uuid).build());
+        webpage = service.getByExample(example);
       } else {
-        webpage = service.getByExampleAndLocale(Webpage.builder().uuid(uuid).build(), pLocale);
+        webpage = service.getByExampleAndLocale(example, pLocale);
       }
     }
     return new ResponseEntity<>(webpage, webpage != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
@@ -213,8 +213,8 @@ public class WebpageController extends AbstractIdentifiableController<Webpage> {
       throws ServiceException {
 
     return (active != null)
-        ? service.getActiveChildrenTree(Webpage.builder().uuid(uuid).build())
-        : service.getChildrenTree(Webpage.builder().uuid(uuid).build());
+        ? service.getActiveChildrenTree(buildExampleWithUuid(uuid))
+        : service.getChildrenTree(buildExampleWithUuid(uuid));
   }
 
   @Operation(summary = "Get parent of a webpage as JSON")
@@ -234,7 +234,7 @@ public class WebpageController extends AbstractIdentifiableController<Webpage> {
           @PathVariable("uuid")
           UUID uuid)
       throws ServiceException {
-    return service.getParent(Webpage.builder().uuid(uuid).build());
+    return service.getParent(buildExampleWithUuid(uuid));
   }
 
   @Operation(summary = "Get file resources related to webpage")
@@ -249,7 +249,7 @@ public class WebpageController extends AbstractIdentifiableController<Webpage> {
   public PageResponse<FileResource> findRelatedFileResources(@PathVariable UUID uuid)
       throws ServiceException {
     PageRequest pageRequest = PageRequest.builder().pageNumber(0).pageSize(25).build();
-    return service.findRelatedFileResources(Webpage.builder().uuid(uuid).build(), pageRequest);
+    return service.findRelatedFileResources(buildExampleWithUuid(uuid), pageRequest);
   }
 
   @Override
@@ -274,7 +274,7 @@ public class WebpageController extends AbstractIdentifiableController<Webpage> {
           @PathVariable("uuid")
           UUID uuid)
       throws ServiceException {
-    return service.getWebsite(Webpage.builder().uuid(uuid).build());
+    return service.getWebsite(buildExampleWithUuid(uuid));
   }
 
   @Operation(summary = "Save a newly created webpage")
@@ -289,7 +289,7 @@ public class WebpageController extends AbstractIdentifiableController<Webpage> {
   public Webpage saveWithParentWebpage(
       @PathVariable UUID parentWebpageUuid, @RequestBody Webpage webpage, BindingResult errors)
       throws ServiceException, ValidationException {
-    return service.saveWithParent(webpage, Webpage.builder().uuid(parentWebpageUuid).build());
+    return service.saveWithParent(webpage, buildExampleWithUuid(parentWebpageUuid));
   }
 
   @Operation(summary = "Save a newly created top-level webpage")
@@ -336,8 +336,7 @@ public class WebpageController extends AbstractIdentifiableController<Webpage> {
       @Parameter(example = "", description = "List of the children") @RequestBody
           List<Webpage> rootPages)
       throws ServiceException {
-    boolean successful =
-        service.updateChildrenOrder(Webpage.builder().uuid(uuid).build(), rootPages);
+    boolean successful = service.updateChildrenOrder(buildExampleWithUuid(uuid), rootPages);
     return successful
         ? new ResponseEntity<>(HttpStatus.NO_CONTENT)
         : new ResponseEntity<>(HttpStatus.NOT_FOUND);

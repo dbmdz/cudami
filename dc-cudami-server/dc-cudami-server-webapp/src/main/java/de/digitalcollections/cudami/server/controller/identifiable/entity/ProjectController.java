@@ -67,13 +67,10 @@ public class ProjectController extends AbstractIdentifiableController<Project> {
           @PathVariable("digitalObjectUuid")
           UUID digitalObjectUuid)
       throws ServiceException {
-    Project project = new Project();
-    project.setUuid(projectUuid);
-
     DigitalObject digitalObject = new DigitalObject();
     digitalObject.setUuid(digitalObjectUuid);
 
-    boolean successful = service.addDigitalObject(project, digitalObject);
+    boolean successful = service.addDigitalObject(buildExampleWithUuid(projectUuid), digitalObject);
     return successful
         ? new ResponseEntity<>(HttpStatus.NO_CONTENT)
         : new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -94,10 +91,8 @@ public class ProjectController extends AbstractIdentifiableController<Project> {
       @Parameter(example = "", description = "List of the digital objects") @RequestBody
           List<DigitalObject> digitalObjects)
       throws ServiceException {
-    Project project = new Project();
-    project.setUuid(projectUuid);
-
-    boolean successful = service.addDigitalObjects(project, digitalObjects);
+    boolean successful =
+        service.addDigitalObjects(buildExampleWithUuid(projectUuid), digitalObjects);
     return successful
         ? new ResponseEntity<>(HttpStatus.NO_CONTENT)
         : new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -116,16 +111,7 @@ public class ProjectController extends AbstractIdentifiableController<Project> {
   public ResponseEntity delete(
       @Parameter(example = "", description = "UUID of the project") @PathVariable("uuid") UUID uuid)
       throws ConflictException {
-
-    boolean successful;
-    try {
-      successful = service.delete(Project.builder().uuid(uuid).build());
-    } catch (ServiceException e) {
-      return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-    return successful
-        ? new ResponseEntity<>(HttpStatus.NO_CONTENT)
-        : new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    return super.delete(uuid);
   }
 
   @Operation(summary = "Get all projects as (paged, sorted, filtered) list")
@@ -155,9 +141,7 @@ public class ProjectController extends AbstractIdentifiableController<Project> {
       throws ServiceException {
     PageRequest pageRequest =
         createPageRequest(DigitalObject.class, pageNumber, pageSize, sortBy, filterCriteria);
-    Project project = new Project();
-    project.setUuid(projectUuid);
-    return service.findDigitalObjects(project, pageRequest);
+    return service.findDigitalObjects(buildExampleWithUuid(projectUuid), pageRequest);
   }
 
   @Override
@@ -218,7 +202,7 @@ public class ProjectController extends AbstractIdentifiableController<Project> {
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public List<Locale> getLanguages() throws ServiceException {
-    return service.getLanguages();
+    return super.getLanguages();
   }
 
   @Override
@@ -250,13 +234,11 @@ public class ProjectController extends AbstractIdentifiableController<Project> {
           @PathVariable("digitalObjectUuid")
           UUID digitalObjectUuid)
       throws ServiceException {
-    Project project = new Project();
-    project.setUuid(projectUuid);
-
     DigitalObject digitalObject = new DigitalObject();
     digitalObject.setUuid(digitalObjectUuid);
 
-    boolean successful = service.removeDigitalObject(project, digitalObject);
+    boolean successful =
+        service.removeDigitalObject(buildExampleWithUuid(projectUuid), digitalObject);
     return successful
         ? new ResponseEntity<>(HttpStatus.NO_CONTENT)
         : new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -286,10 +268,8 @@ public class ProjectController extends AbstractIdentifiableController<Project> {
       @Parameter(example = "", description = "List of the digital objects") @RequestBody
           List<DigitalObject> digitalObjects)
       throws ServiceException {
-    Project project = new Project();
-    project.setUuid(projectUuid);
-
-    boolean successful = service.setDigitalObjects(project, digitalObjects);
+    boolean successful =
+        service.setDigitalObjects(buildExampleWithUuid(projectUuid), digitalObjects);
     return successful
         ? new ResponseEntity<>(HttpStatus.NO_CONTENT)
         : new ResponseEntity<>(HttpStatus.NOT_FOUND);

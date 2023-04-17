@@ -75,7 +75,7 @@ public class WebsiteController extends AbstractIdentifiableController<Website> {
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public long count() throws ServiceException {
-    return service.count();
+    return super.count();
   }
 
   @Operation(summary = "Get all websites as (paged, sorted, filtered) list")
@@ -191,7 +191,7 @@ public class WebsiteController extends AbstractIdentifiableController<Website> {
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public List<Locale> getLanguages() throws ServiceException {
-    return service.getLanguages();
+    return super.getLanguages();
   }
 
   @Override
@@ -289,10 +289,7 @@ public class WebsiteController extends AbstractIdentifiableController<Website> {
       @Parameter(required = true, description = "rootpages as a list of webpages") @RequestBody
           List<Webpage> rootPages)
       throws ServiceException {
-    Website website = new Website();
-    website.setUuid(uuid);
-
-    boolean successful = service.updateRootWebpagesOrder(website, rootPages);
+    boolean successful = service.updateRootWebpagesOrder(buildExampleWithUuid(uuid), rootPages);
     return successful
         ? new ResponseEntity<>(HttpStatus.NO_CONTENT)
         : new ResponseEntity<>(HttpStatus.NOT_FOUND);

@@ -1,6 +1,7 @@
 package de.digitalcollections.cudami.server.controller.legal;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.when;
 
@@ -68,7 +69,10 @@ public class LicenseControllerTest extends BaseControllerTest {
 
   @Test
   public void testDeleteByUuid() throws Exception {
+    License example = License.builder().uuid("599a120c-2dd5-11e8-b467-0ed5f89f718b").build();
+    when(licenseService.delete(eq(example))).thenReturn(true);
     testDeleteSuccessful("/v5/licenses/599a120c-2dd5-11e8-b467-0ed5f89f718b");
+    testDeleteSuccessful("/v6/licenses/599a120c-2dd5-11e8-b467-0ed5f89f718b");
   }
 
   @Test

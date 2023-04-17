@@ -3,10 +3,10 @@ package de.digitalcollections.cudami.server.controller.identifiable.entity.geo.l
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ConflictException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
-import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifiableService;
+import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.EntityService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.geo.location.HumanSettlementService;
+import de.digitalcollections.cudami.server.controller.AbstractEntityController;
 import de.digitalcollections.cudami.server.controller.ParameterHelper;
-import de.digitalcollections.cudami.server.controller.identifiable.AbstractIdentifiableController;
 import de.digitalcollections.model.identifiable.entity.geo.location.HumanSettlement;
 import de.digitalcollections.model.list.filtering.FilterCriterion;
 import de.digitalcollections.model.list.paging.PageResponse;
@@ -19,8 +19,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -36,9 +34,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @Tag(name = "Human settlement controller")
-public class HumanSettlementController extends AbstractIdentifiableController<HumanSettlement> {
-
-  private static final Logger LOGGER = LoggerFactory.getLogger(HumanSettlementController.class);
+public class HumanSettlementController extends AbstractEntityController<HumanSettlement> {
 
   private final HumanSettlementService service;
 
@@ -54,15 +50,7 @@ public class HumanSettlementController extends AbstractIdentifiableController<Hu
       @Parameter(example = "", description = "UUID of the human settlement") @PathVariable("uuid")
           UUID uuid)
       throws ConflictException {
-    boolean successful;
-    try {
-      successful = service.delete(HumanSettlement.builder().uuid(uuid).build());
-    } catch (ServiceException e) {
-      return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-    return successful
-        ? new ResponseEntity<>(HttpStatus.NO_CONTENT)
-        : new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    return super.delete(uuid);
   }
 
   @Operation(summary = "Get all human settlements as (paged, sorted, filtered) list")
@@ -146,7 +134,7 @@ public class HumanSettlementController extends AbstractIdentifiableController<Hu
   }
 
   @Override
-  protected IdentifiableService<HumanSettlement> getService() {
+  protected EntityService<HumanSettlement> getService() {
     return service;
   }
 

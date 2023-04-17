@@ -2,13 +2,13 @@ package de.digitalcollections.cudami.server.controller.identifiable.entity.work;
 
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
-import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifiableService;
+import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.EntityService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.agent.AgentService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.work.ItemService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.work.ManifestationService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.work.WorkService;
+import de.digitalcollections.cudami.server.controller.AbstractEntityController;
 import de.digitalcollections.cudami.server.controller.ParameterHelper;
-import de.digitalcollections.cudami.server.controller.identifiable.AbstractIdentifiableController;
 import de.digitalcollections.model.identifiable.entity.agent.Agent;
 import de.digitalcollections.model.identifiable.entity.manifestation.Manifestation;
 import de.digitalcollections.model.identifiable.entity.work.Work;
@@ -26,8 +26,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -42,9 +40,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @Tag(name = "Work controller")
-public class WorkController extends AbstractIdentifiableController<Work> {
-
-  private static final Logger LOGGER = LoggerFactory.getLogger(WorkController.class);
+public class WorkController extends AbstractEntityController<Work> {
 
   private final AgentService agentService;
   private final ItemService itemService;
@@ -67,7 +63,7 @@ public class WorkController extends AbstractIdentifiableController<Work> {
       value = {"/v6/works/count", "/v5/works/count", "/v2/works/count", "/latest/works/count"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public long count() throws ServiceException {
-    return service.count();
+    return super.count();
   }
 
   @Operation(summary = "Get all works as (paged, sorted, filtered) list")
@@ -98,7 +94,7 @@ public class WorkController extends AbstractIdentifiableController<Work> {
       Sorting sorting = new Sorting(sortBy);
       pageRequest.setSorting(sorting);
     }
-    return service.findEmbeddedWorks(Work.builder().uuid(uuid).build(), pageRequest);
+    return service.findEmbeddedWorks(buildExampleWithUuid(uuid), pageRequest);
   }
 
   @Operation(summary = "Find all manifestations of a work")
@@ -116,8 +112,7 @@ public class WorkController extends AbstractIdentifiableController<Work> {
       Sorting sorting = new Sorting(sortBy);
       pageRequest.setSorting(sorting);
     }
-    return manifestationService.findManifestationsByWork(
-        Work.builder().uuid(uuid).build(), pageRequest);
+    return manifestationService.findManifestationsByWork(buildExampleWithUuid(uuid), pageRequest);
   }
 
   @Override
@@ -196,7 +191,7 @@ public class WorkController extends AbstractIdentifiableController<Work> {
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public List<Agent> getCreators(@PathVariable UUID uuid) throws ServiceException {
-    return agentService.getCreatorsForWork(Work.builder().uuid(uuid).build());
+    return agentService.getCreatorsForWork(buildExampleWithUuid(uuid));
   }
 
   @Operation(
@@ -207,7 +202,7 @@ public class WorkController extends AbstractIdentifiableController<Work> {
       value = {"/v6/works/languages"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public List<Locale> getLanguages() throws ServiceException {
-    return service.getLanguages();
+    return super.getLanguages();
   }
 
   @Operation(
@@ -220,12 +215,11 @@ public class WorkController extends AbstractIdentifiableController<Work> {
   public List<Locale> getLanguagesOfManifestations(
       @Parameter(name = "uuid", description = "UUID of the work") @PathVariable UUID uuid)
       throws ServiceException {
-    return manifestationService.getLanguagesOfManifestationsForWork(
-        Work.builder().uuid(uuid).build());
+    return manifestationService.getLanguagesOfManifestationsForWork(buildExampleWithUuid(uuid));
   }
 
   @Override
-  protected IdentifiableService<Work> getService() {
+  protected EntityService<Work> getService() {
     return service;
   }
 

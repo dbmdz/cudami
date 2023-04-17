@@ -26,7 +26,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -54,7 +53,7 @@ public class HeadwordController extends AbstractUniqueObjectController<Headword>
       value = {"/v6/headwords/count", "/v5/headwords/count"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public long count() throws ServiceException {
-    return service.count();
+    return super.count();
   }
 
   @Operation(summary = "Delete an headword with all its relations")
@@ -67,11 +66,8 @@ public class HeadwordController extends AbstractUniqueObjectController<Headword>
   public ResponseEntity delete(
       @Parameter(example = "", description = "UUID of the headword") @PathVariable("uuid")
           UUID uuid)
-      throws ConflictException, ServiceException {
-    boolean successful = service.delete(Headword.builder().uuid(uuid).build());
-    return successful
-        ? new ResponseEntity<>(HttpStatus.NO_CONTENT)
-        : new ResponseEntity<>(HttpStatus.NOT_FOUND);
+      throws ConflictException {
+    return super.delete(uuid);
   }
 
   @Operation(summary = "Get all headwords as (filtered, sorted, paged) list")
@@ -163,7 +159,7 @@ public class HeadwordController extends AbstractUniqueObjectController<Headword>
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize)
       throws ServiceException {
     PageRequest pageRequest = new PageRequest(pageNumber, pageSize);
-    return service.findRelatedEntities(Headword.builder().uuid(uuid).build(), pageRequest);
+    return service.findRelatedEntities(buildExampleWithUuid(uuid), pageRequest);
   }
 
   @Operation(summary = "Get related file resources of an headword")
@@ -180,7 +176,7 @@ public class HeadwordController extends AbstractUniqueObjectController<Headword>
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize)
       throws ServiceException {
     PageRequest pageRequest = new PageRequest(pageNumber, pageSize);
-    return service.findRelatedFileResources(Headword.builder().uuid(uuid).build(), pageRequest);
+    return service.findRelatedFileResources(buildExampleWithUuid(uuid), pageRequest);
   }
 
   @Operation(summary = "Get an headword by uuid")
@@ -225,7 +221,7 @@ public class HeadwordController extends AbstractUniqueObjectController<Headword>
           UUID uuid,
       @RequestBody List<Entity> entities)
       throws ServiceException {
-    return service.setRelatedEntities(Headword.builder().uuid(uuid).build(), entities);
+    return service.setRelatedEntities(buildExampleWithUuid(uuid), entities);
   }
 
   @Operation(summary = "Save list of related fileresources for a given headword")
@@ -240,7 +236,7 @@ public class HeadwordController extends AbstractUniqueObjectController<Headword>
           UUID uuid,
       @RequestBody List<FileResource> fileResources)
       throws ServiceException {
-    return service.setRelatedFileResources(Headword.builder().uuid(uuid).build(), fileResources);
+    return service.setRelatedFileResources(buildExampleWithUuid(uuid), fileResources);
   }
 
   @Operation(summary = "Update an headword")

@@ -19,8 +19,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -38,8 +36,6 @@ import org.springframework.web.bind.annotation.RestController;
 @Tag(name = "Geo location controller")
 public class GeoLocationController extends AbstractIdentifiableController<GeoLocation> {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(GeoLocationController.class);
-
   private final GeoLocationService<GeoLocation> service;
 
   public GeoLocationController(GeoLocationService<GeoLocation> geoLocationservice) {
@@ -56,7 +52,7 @@ public class GeoLocationController extends AbstractIdentifiableController<GeoLoc
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public long count() throws ServiceException {
-    return service.count();
+    return super.count();
   }
 
   @Operation(summary = "Delete a geolocation")
@@ -67,15 +63,7 @@ public class GeoLocationController extends AbstractIdentifiableController<GeoLoc
       @Parameter(example = "", description = "UUID of the geolocation") @PathVariable("uuid")
           UUID uuid)
       throws ConflictException {
-    boolean successful;
-    try {
-      successful = service.delete(GeoLocation.builder().uuid(uuid).build());
-    } catch (ServiceException e) {
-      return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-    return successful
-        ? new ResponseEntity<>(HttpStatus.NO_CONTENT)
-        : new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    return super.delete(uuid);
   }
 
   @Operation(summary = "Get all geo locations as (paged, sorted, filtered) list")
@@ -168,7 +156,7 @@ public class GeoLocationController extends AbstractIdentifiableController<GeoLoc
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public List<Locale> getLanguages() throws ServiceException {
-    return service.getLanguages();
+    return super.getLanguages();
   }
 
   @Override

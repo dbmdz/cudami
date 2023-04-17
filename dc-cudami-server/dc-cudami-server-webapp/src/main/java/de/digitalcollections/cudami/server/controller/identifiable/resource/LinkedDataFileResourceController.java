@@ -16,8 +16,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -33,9 +31,6 @@ import org.springframework.web.bind.annotation.RestController;
 @Tag(name = "LinkedData Fileresource controller")
 public class LinkedDataFileResourceController
     extends AbstractIdentifiableController<LinkedDataFileResource> {
-
-  private static final Logger LOGGER =
-      LoggerFactory.getLogger(LinkedDataFileResourceController.class);
 
   private final LinkedDataFileResourceService service;
 

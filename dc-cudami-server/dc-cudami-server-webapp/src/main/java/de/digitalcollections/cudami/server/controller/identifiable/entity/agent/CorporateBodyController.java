@@ -3,10 +3,10 @@ package de.digitalcollections.cudami.server.controller.identifiable.entity.agent
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ConflictException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
-import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifiableService;
+import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.EntityService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.agent.CorporateBodyService;
+import de.digitalcollections.cudami.server.controller.AbstractEntityController;
 import de.digitalcollections.cudami.server.controller.ParameterHelper;
-import de.digitalcollections.cudami.server.controller.identifiable.AbstractIdentifiableController;
 import de.digitalcollections.model.identifiable.entity.agent.CorporateBody;
 import de.digitalcollections.model.list.filtering.FilterCriterion;
 import de.digitalcollections.model.list.paging.PageResponse;
@@ -34,7 +34,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @Tag(name = "Corporate body controller")
-public class CorporateBodyController extends AbstractIdentifiableController<CorporateBody> {
+public class CorporateBodyController extends AbstractEntityController<CorporateBody> {
 
   private static final Pattern GNDID_PATTERN = Pattern.compile("(\\d+(-.)?)|(\\d+X)");
 
@@ -52,19 +52,11 @@ public class CorporateBodyController extends AbstractIdentifiableController<Corp
       @Parameter(example = "", description = "UUID of the corporate body") @PathVariable("uuid")
           UUID uuid)
       throws ConflictException {
-    boolean successful;
-    try {
-      successful = service.delete(CorporateBody.builder().uuid(uuid).build());
-    } catch (ServiceException e) {
-      return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-    return successful
-        ? new ResponseEntity<>(HttpStatus.NO_CONTENT)
-        : new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    return super.delete(uuid);
   }
 
   @Override
-  protected IdentifiableService<CorporateBody> getService() {
+  protected EntityService<CorporateBody> getService() {
     return service;
   }
 
@@ -134,9 +126,7 @@ public class CorporateBodyController extends AbstractIdentifiableController<Corp
   public ResponseEntity<CorporateBody> getByRefId(
       @Parameter(example = "", description = "reference id") @PathVariable("refId") long refId)
       throws ServiceException {
-    CorporateBody corporateBody = service.getByRefId(refId);
-    return new ResponseEntity<>(
-        corporateBody, corporateBody != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
+    return super.getByRefId(refId);
   }
 
   @Operation(summary = "Get a corporate body by uuid")
@@ -179,7 +169,7 @@ public class CorporateBodyController extends AbstractIdentifiableController<Corp
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public List<Locale> getLanguages() throws ServiceException {
-    return service.getLanguages();
+    return super.getLanguages();
   }
 
   @Operation(summary = "Save a newly created corporate body")

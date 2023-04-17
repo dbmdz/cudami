@@ -3,11 +3,11 @@ package de.digitalcollections.cudami.server.controller.identifiable.entity.agent
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ConflictException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
-import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifiableService;
+import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.EntityService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.agent.PersonService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.work.WorkService;
+import de.digitalcollections.cudami.server.controller.AbstractEntityController;
 import de.digitalcollections.cudami.server.controller.ParameterHelper;
-import de.digitalcollections.cudami.server.controller.identifiable.AbstractIdentifiableController;
 import de.digitalcollections.model.identifiable.entity.agent.Person;
 import de.digitalcollections.model.identifiable.entity.digitalobject.DigitalObject;
 import de.digitalcollections.model.identifiable.entity.geo.location.GeoLocation;
@@ -26,8 +26,6 @@ import java.util.Locale;
 import java.util.Set;
 import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -43,9 +41,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @Tag(name = "Person controller")
-public class PersonController extends AbstractIdentifiableController<Person> {
-
-  private static final Logger LOGGER = LoggerFactory.getLogger(PersonController.class);
+public class PersonController extends AbstractEntityController<Person> {
 
   private final PersonService service;
   private final WorkService workService;
@@ -75,15 +71,7 @@ public class PersonController extends AbstractIdentifiableController<Person> {
   public ResponseEntity delete(
       @Parameter(example = "", description = "UUID of the person") @PathVariable("uuid") UUID uuid)
       throws ConflictException {
-    boolean successful;
-    try {
-      successful = service.delete(Person.builder().uuid(uuid).build());
-    } catch (ServiceException e) {
-      return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-    return successful
-        ? new ResponseEntity<>(HttpStatus.NO_CONTENT)
-        : new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    return super.delete(uuid);
   }
 
   @Operation(summary = "get all persons as (paged, sorted, filtered) list")
@@ -223,7 +211,7 @@ public class PersonController extends AbstractIdentifiableController<Person> {
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Set<DigitalObject> getDigitalObjects(@PathVariable("uuid") UUID uuid)
       throws ServiceException {
-    return service.getDigitalObjects(Person.builder().uuid(uuid).build());
+    return service.getDigitalObjects(buildExampleWithUuid(uuid));
   }
 
   @Operation(summary = "Get languages of all persons")
@@ -236,11 +224,11 @@ public class PersonController extends AbstractIdentifiableController<Person> {
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public List<Locale> getLanguages() throws ServiceException {
-    return service.getLanguages();
+    return super.getLanguages();
   }
 
   @Override
-  protected IdentifiableService<Person> getService() {
+  protected EntityService<Person> getService() {
     return service;
   }
 
@@ -254,7 +242,7 @@ public class PersonController extends AbstractIdentifiableController<Person> {
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Set<Work> getWorks(@PathVariable("uuid") UUID uuid) throws ServiceException {
-    return workService.getByPerson(Person.builder().uuid(uuid).build());
+    return workService.getByPerson(buildExampleWithUuid(uuid));
   }
 
   @Operation(summary = "save a newly created person")

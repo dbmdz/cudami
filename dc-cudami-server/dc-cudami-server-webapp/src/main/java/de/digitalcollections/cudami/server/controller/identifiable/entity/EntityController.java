@@ -2,12 +2,10 @@ package de.digitalcollections.cudami.server.controller.identifiable.entity;
 
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
-import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifiableService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.EntityService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.relation.EntityToEntityRelationService;
+import de.digitalcollections.cudami.server.controller.AbstractEntityController;
 import de.digitalcollections.cudami.server.controller.ParameterHelper;
-import de.digitalcollections.cudami.server.controller.identifiable.AbstractIdentifiableController;
-import de.digitalcollections.model.identifiable.Identifier;
 import de.digitalcollections.model.identifiable.entity.Entity;
 import de.digitalcollections.model.identifiable.entity.relation.EntityRelation;
 import de.digitalcollections.model.identifiable.resource.FileResource;
@@ -22,7 +20,6 @@ import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -32,7 +29,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @Tag(name = "Entity controller")
-public class EntityController<E extends Entity> extends AbstractIdentifiableController<Entity> {
+public class EntityController<E extends Entity> extends AbstractEntityController<Entity> {
 
   private final EntityToEntityRelationService entityRelationService;
   private final EntityService<Entity> service;
@@ -54,7 +51,7 @@ public class EntityController<E extends Entity> extends AbstractIdentifiableCont
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public long count() throws ServiceException {
-    return service.count();
+    return super.count();
   }
 
   @Operation(summary = "Get all entities as (paged, sorted, filtered) list")
@@ -91,14 +88,7 @@ public class EntityController<E extends Entity> extends AbstractIdentifiableCont
       throw new ValidationException(
           "No namespace and/or id were provided in a colon separated manner");
     }
-
-    Entity entity =
-        service.getByIdentifier(
-            Identifier.builder()
-                .namespace(namespaceAndId.getLeft())
-                .id(namespaceAndId.getRight())
-                .build());
-    return new ResponseEntity<>(entity, entity != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
+    return super.getByIdentifier(request);
   }
 
   @Operation(summary = "Get entity by reference id")
@@ -110,16 +100,7 @@ public class EntityController<E extends Entity> extends AbstractIdentifiableCont
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<Entity> getByRefId(@PathVariable long refId) throws ServiceException {
-    Entity entity = service.getByRefId(refId);
-    return new ResponseEntity<>(entity, entity != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
-    // routing should be done in frontend webapp (second call will be sent on entity
-    // type)
-    // EntityType entityType = entity.getEntityType();
-    // UUID uuid = entity.getUuid();
-    // switch (entityType) {
-    // case PERSON:
-    // return personService.getByIdentifier(uuid);
-    // }
+    return super.getByRefId(refId);
   }
 
   @Operation(summary = "Get entity by uuid")
@@ -162,7 +143,7 @@ public class EntityController<E extends Entity> extends AbstractIdentifiableCont
   public PageResponse<FileResource> findRelatedFileResources(@PathVariable UUID uuid)
       throws ServiceException {
     PageRequest pageRequest = PageRequest.builder().pageNumber(0).pageSize(25).build();
-    return service.findRelatedFileResources(Entity.builder().uuid(uuid).build(), pageRequest);
+    return service.findRelatedFileResources(buildExampleWithUuid(uuid), pageRequest);
   }
 
   @Operation(summary = "Get relations for an entity (being the subject)")
@@ -177,11 +158,11 @@ public class EntityController<E extends Entity> extends AbstractIdentifiableCont
   public PageResponse<EntityRelation> findRelations(@PathVariable UUID uuid)
       throws ServiceException {
     PageRequest pageRequest = PageRequest.builder().pageNumber(0).pageSize(25).build();
-    return entityRelationService.findBySubject(Entity.builder().uuid(uuid).build(), pageRequest);
+    return entityRelationService.findBySubject(buildExampleWithUuid(uuid), pageRequest);
   }
 
   @Override
-  protected IdentifiableService<Entity> getService() {
+  protected EntityService<Entity> getService() {
     return service;
   }
 }

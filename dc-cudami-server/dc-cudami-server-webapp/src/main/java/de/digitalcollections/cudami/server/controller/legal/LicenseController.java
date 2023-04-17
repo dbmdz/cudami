@@ -21,7 +21,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Collectors;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -52,7 +51,7 @@ public class LicenseController extends AbstractUniqueObjectController<License> {
       value = {"/v6/licenses/count", "/v5/licenses/count"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public long count() throws ServiceException {
-    return service.count();
+    return super.count();
   }
 
   @Operation(summary = "Delete license by given url")
@@ -80,8 +79,7 @@ public class LicenseController extends AbstractUniqueObjectController<License> {
   public ResponseEntity<Void> deleteByUuid(
       @Parameter(example = "", description = "UUID of the license") @PathVariable("uuid") UUID uuid)
       throws ConflictException, ServiceException {
-    service.delete(License.builder().uuid(uuid).build());
-    return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    return super.delete(uuid);
   }
 
   @Operation(summary = "Delete licenses by given uuid list")
@@ -94,9 +92,7 @@ public class LicenseController extends AbstractUniqueObjectController<License> {
     // FIXME: How to implement deleteByUrl (also with body? how to distinguish these
     // both methods?
     // give param?)
-    service.delete(
-        uuids.stream().map(u -> License.builder().uuid(u).build()).collect(Collectors.toSet()));
-    return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    return super.delete(uuids);
   }
 
   // No need for a v5 controller, since the v5 url were never actually used

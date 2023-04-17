@@ -47,7 +47,7 @@ public class ArticleController extends AbstractIdentifiableController<Article> {
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public long count() throws ServiceException {
-    return service.count();
+    return super.count();
   }
 
   @Operation(summary = "Get all articles as (paged, sorted, filtered) list")
@@ -103,7 +103,7 @@ public class ArticleController extends AbstractIdentifiableController<Article> {
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public List<Locale> getLanguages() throws ServiceException {
-    return this.service.getLanguages();
+    return super.getLanguages();
   }
 
   @Override

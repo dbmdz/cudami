@@ -52,11 +52,8 @@ public class PredicateController extends AbstractUniqueObjectController<Predicat
                   "UUID of the predicate, e.g. <tt>599a120c-2dd5-11e8-b467-0ed5f89f718b</tt>")
           @PathVariable("uuid")
           UUID uuid)
-      throws ConflictException, ServiceException {
-    boolean successful = service.delete(Predicate.builder().uuid(uuid).build());
-    return successful
-        ? new ResponseEntity<>(HttpStatus.NO_CONTENT)
-        : new ResponseEntity<>(HttpStatus.NOT_FOUND);
+      throws ConflictException {
+    return super.delete(uuid);
   }
 
   @Operation(summary = "Get all predicates as (paged, sorted, filtered) list")
@@ -81,7 +78,7 @@ public class PredicateController extends AbstractUniqueObjectController<Predicat
     Predicate result;
     if (valueOrUuid.matches(ParameterHelper.UUID_PATTERN)) {
       UUID uuid = UUID.fromString(valueOrUuid);
-      result = service.getByExample(Predicate.builder().uuid(uuid).build());
+      result = service.getByExample(buildExampleWithUuid(uuid));
     } else {
       result = service.getByValue(valueOrUuid);
     }

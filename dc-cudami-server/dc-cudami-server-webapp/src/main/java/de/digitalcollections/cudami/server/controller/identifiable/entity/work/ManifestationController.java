@@ -3,11 +3,11 @@ package de.digitalcollections.cudami.server.controller.identifiable.entity.work;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ConflictException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
-import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifiableService;
+import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.EntityService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.work.ItemService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.work.ManifestationService;
+import de.digitalcollections.cudami.server.controller.AbstractEntityController;
 import de.digitalcollections.cudami.server.controller.ParameterHelper;
-import de.digitalcollections.cudami.server.controller.identifiable.AbstractIdentifiableController;
 import de.digitalcollections.model.identifiable.entity.item.Item;
 import de.digitalcollections.model.identifiable.entity.manifestation.Manifestation;
 import de.digitalcollections.model.list.filtering.FilterCriterion;
@@ -23,7 +23,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -38,7 +37,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @Tag(name = "Manifestation controller")
-public class ManifestationController extends AbstractIdentifiableController<Manifestation> {
+public class ManifestationController extends AbstractEntityController<Manifestation> {
 
   private ItemService itemService;
   private ManifestationService service;
@@ -54,7 +53,7 @@ public class ManifestationController extends AbstractIdentifiableController<Mani
       value = {"/v6/manifestations/count"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public long count() throws ServiceException {
-    return service.count();
+    return super.count();
   }
 
   @Operation(summary = "Delete a manifestation")
@@ -65,15 +64,7 @@ public class ManifestationController extends AbstractIdentifiableController<Mani
       @Parameter(example = "", description = "UUID of the manifestation") @PathVariable("uuid")
           UUID uuid)
       throws ConflictException {
-    boolean successful;
-    try {
-      successful = service.delete(Manifestation.builder().uuid(uuid).build());
-    } catch (ServiceException e) {
-      return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-    return successful
-        ? new ResponseEntity<>(HttpStatus.NO_CONTENT)
-        : new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    return super.delete(uuid);
   }
 
   @Operation(summary = "Get all manifestations as (paged, sorted, filtered) list")
@@ -105,8 +96,7 @@ public class ManifestationController extends AbstractIdentifiableController<Mani
       Sorting sorting = new Sorting(sortBy);
       pageRequest.setSorting(sorting);
     }
-    return itemService.findItemsByManifestation(
-        Manifestation.builder().uuid(uuid).build(), pageRequest);
+    return itemService.findItemsByManifestation(buildExampleWithUuid(uuid), pageRequest);
   }
 
   @Operation(summary = "Find all children of a manifestation")
@@ -125,7 +115,7 @@ public class ManifestationController extends AbstractIdentifiableController<Mani
       Sorting sorting = new Sorting(sortBy);
       pageRequest.setSorting(sorting);
     }
-    return service.findSubParts(Manifestation.builder().uuid(uuid).build(), pageRequest);
+    return service.findSubParts(buildExampleWithUuid(uuid), pageRequest);
   }
 
   @Operation(
@@ -171,7 +161,7 @@ public class ManifestationController extends AbstractIdentifiableController<Mani
       value = {"/v6/manifestations/languages"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public List<Locale> getLanguages() throws ServiceException {
-    return service.getLanguages();
+    return super.getLanguages();
   }
 
   @Operation(
@@ -184,12 +174,11 @@ public class ManifestationController extends AbstractIdentifiableController<Mani
   public List<Locale> getLanguagesOfItems(
       @Parameter(name = "uuid", description = "UUID of the manifestation") @PathVariable UUID uuid)
       throws ServiceException {
-    return itemService.getLanguagesOfItemsForManifestation(
-        Manifestation.builder().uuid(uuid).build());
+    return itemService.getLanguagesOfItemsForManifestation(buildExampleWithUuid(uuid));
   }
 
   @Override
-  protected IdentifiableService<Manifestation> getService() {
+  protected EntityService<Manifestation> getService() {
     return service;
   }
 

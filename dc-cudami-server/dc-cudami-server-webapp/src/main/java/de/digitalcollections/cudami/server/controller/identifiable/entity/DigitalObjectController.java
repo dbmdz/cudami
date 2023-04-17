@@ -3,10 +3,10 @@ package de.digitalcollections.cudami.server.controller.identifiable.entity;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ConflictException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
-import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifiableService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.DigitalObjectService;
+import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.EntityService;
+import de.digitalcollections.cudami.server.controller.AbstractEntityController;
 import de.digitalcollections.cudami.server.controller.ParameterHelper;
-import de.digitalcollections.cudami.server.controller.identifiable.AbstractIdentifiableController;
 import de.digitalcollections.model.identifiable.Identifier;
 import de.digitalcollections.model.identifiable.entity.Collection;
 import de.digitalcollections.model.identifiable.entity.Project;
@@ -41,7 +41,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @Tag(name = "Digital object controller")
-public class DigitalObjectController extends AbstractIdentifiableController<DigitalObject> {
+public class DigitalObjectController extends AbstractEntityController<DigitalObject> {
 
   private final DigitalObjectService service;
 
@@ -59,7 +59,7 @@ public class DigitalObjectController extends AbstractIdentifiableController<Digi
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public long count() throws ServiceException {
-    return service.count();
+    return super.count();
   }
 
   @Operation(summary = "Delete a digital object with all its relations")
@@ -75,15 +75,7 @@ public class DigitalObjectController extends AbstractIdentifiableController<Digi
       @Parameter(example = "", description = "UUID of the digital object") @PathVariable("uuid")
           UUID uuid)
       throws ConflictException {
-    boolean successful;
-    try {
-      successful = service.delete(DigitalObject.builder().uuid(uuid).build());
-    } catch (ServiceException e) {
-      return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-    return successful
-        ? new ResponseEntity<>(HttpStatus.NO_CONTENT)
-        : new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    return super.delete(uuid);
   }
 
   @Operation(summary = "Get all digital objects as (paged, sorted, filtered) list")
@@ -113,9 +105,7 @@ public class DigitalObjectController extends AbstractIdentifiableController<Digi
       throws ServiceException {
     PageRequest pageRequest =
         createPageRequest(Project.class, pageNumber, pageSize, sortBy, filterCriteria);
-    DigitalObject digitalObject = new DigitalObject();
-    digitalObject.setUuid(uuid);
-    return service.findProjects(digitalObject, pageRequest);
+    return service.findProjects(buildExampleWithUuid(uuid), pageRequest);
   }
 
   @Operation(
@@ -156,9 +146,7 @@ public class DigitalObjectController extends AbstractIdentifiableController<Digi
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<DigitalObject> getByRefId(@PathVariable long refId)
       throws ServiceException {
-    DigitalObject digitalObject = service.getByRefId(refId);
-    return new ResponseEntity<>(
-        digitalObject, digitalObject != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
+    return super.getByRefId(refId);
   }
 
   @Operation(summary = "Get a digital object by uuid")
@@ -191,12 +179,11 @@ public class DigitalObjectController extends AbstractIdentifiableController<Digi
       throws ServiceException {
     PageRequest pageRequest =
         createPageRequest(Collection.class, pageNumber, pageSize, sortBy, filterCriteria);
-    DigitalObject digitalObject = new DigitalObject();
-    digitalObject.setUuid(uuid);
+    DigitalObject example = buildExampleWithUuid(uuid);
     if (active != null) {
-      return service.findActiveCollections(digitalObject, pageRequest);
+      return service.findActiveCollections(example, pageRequest);
     }
-    return service.findCollections(digitalObject, pageRequest);
+    return service.findCollections(example, pageRequest);
   }
 
   @Operation(summary = "Get file resources of a digital object")
@@ -209,7 +196,7 @@ public class DigitalObjectController extends AbstractIdentifiableController<Digi
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public List<FileResource> getFileResources(@PathVariable UUID uuid) throws ServiceException {
-    return service.getFileResources(DigitalObject.builder().uuid(uuid).build());
+    return service.getFileResources(buildExampleWithUuid(uuid));
   }
 
   @Operation(summary = "Get image file resources of a digital object")
@@ -223,7 +210,7 @@ public class DigitalObjectController extends AbstractIdentifiableController<Digi
       produces = MediaType.APPLICATION_JSON_VALUE)
   public List<ImageFileResource> getImageFileResources(@PathVariable UUID uuid)
       throws ServiceException {
-    return service.getImageFileResources(DigitalObject.builder().uuid(uuid).build());
+    return service.getImageFileResources(buildExampleWithUuid(uuid));
   }
 
   @Operation(summary = "Get item for digital object by digital object uuid")
@@ -236,7 +223,7 @@ public class DigitalObjectController extends AbstractIdentifiableController<Digi
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Item getItem(@PathVariable UUID uuid) throws ServiceException {
-    return service.getItem(DigitalObject.builder().uuid(uuid).build());
+    return service.getItem(buildExampleWithUuid(uuid));
   }
 
   @Operation(summary = "Get languages of all digital objects")
@@ -254,9 +241,9 @@ public class DigitalObjectController extends AbstractIdentifiableController<Digi
       throws ServiceException {
     if (parentUuidFilterCriterion != null) {
       return service.getLanguagesOfContainedDigitalObjects(
-          DigitalObject.builder().uuid((UUID) parentUuidFilterCriterion.getValue()).build());
+          buildExampleWithUuid((UUID) parentUuidFilterCriterion.getValue()));
     }
-    return service.getLanguages();
+    return super.getLanguages();
   }
 
   @Operation(summary = "Get all languages of a digital object's collections")
@@ -267,7 +254,7 @@ public class DigitalObjectController extends AbstractIdentifiableController<Digi
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public List<Locale> getLanguagesOfCollections(@PathVariable UUID uuid) throws ServiceException {
-    return this.service.getLanguagesOfCollections(DigitalObject.builder().uuid(uuid).build());
+    return this.service.getLanguagesOfCollections(buildExampleWithUuid(uuid));
   }
 
   @Operation(summary = "Get all languages of a digital object's projects")
@@ -278,7 +265,7 @@ public class DigitalObjectController extends AbstractIdentifiableController<Digi
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public List<Locale> getLanguagesOfProjects(@PathVariable UUID uuid) throws ServiceException {
-    return this.service.getLanguagesOfProjects(DigitalObject.builder().uuid(uuid).build());
+    return this.service.getLanguagesOfProjects(buildExampleWithUuid(uuid));
   }
 
   @Operation(summary = "Find limited amount of random digital objects")
@@ -297,7 +284,7 @@ public class DigitalObjectController extends AbstractIdentifiableController<Digi
   }
 
   @Override
-  protected IdentifiableService<DigitalObject> getService() {
+  protected EntityService<DigitalObject> getService() {
     return service;
   }
 
@@ -329,7 +316,7 @@ public class DigitalObjectController extends AbstractIdentifiableController<Digi
           UUID uuid,
       @RequestBody List<FileResource> fileResources)
       throws ServiceException {
-    return service.setFileResources(DigitalObject.builder().uuid(uuid).build(), fileResources);
+    return service.setFileResources(buildExampleWithUuid(uuid), fileResources);
   }
 
   @Operation(summary = "Update a digital object")
