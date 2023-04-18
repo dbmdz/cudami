@@ -93,6 +93,17 @@ public class HeadwordRepositoryImpl extends UniqueObjectRepositoryImpl<Headword>
   }
 
   @Override
+  public void deleteByLabelAndLocale(String label, Locale locale) throws RepositoryException {
+    dbi.withHandle(
+        h ->
+            h.createUpdate(
+                    "DELETE FROM " + tableName + " WHERE label = :label AND locale = :locale")
+                .bind("label", label)
+                .bind("locale", locale)
+                .execute());
+  }
+
+  @Override
   public int deleteByUuids(List<UUID> uuids) throws RepositoryException {
     // delete related data
     uuids.stream()
@@ -111,17 +122,6 @@ public class HeadwordRepositoryImpl extends UniqueObjectRepositoryImpl<Headword>
             });
 
     return super.deleteByUuids(uuids);
-  }
-
-  @Override
-  public void deleteByLabelAndLocale(String label, Locale locale) throws RepositoryException {
-    dbi.withHandle(
-        h ->
-            h.createUpdate(
-                    "DELETE FROM " + tableName + " WHERE label = :label AND locale = :locale")
-                .bind("label", label)
-                .bind("locale", locale)
-                .execute());
   }
 
   @Override
@@ -425,7 +425,7 @@ public class HeadwordRepositoryImpl extends UniqueObjectRepositoryImpl<Headword>
   }
 
   @Override
-  protected String getSqlSelectReducedFields(String tableAlias, String mappingPrefix) {
+  public String getSqlSelectReducedFields(String tableAlias, String mappingPrefix) {
     return super.getSqlSelectReducedFields(tableAlias, mappingPrefix)
         + ", "
         + tableAlias
@@ -439,7 +439,7 @@ public class HeadwordRepositoryImpl extends UniqueObjectRepositoryImpl<Headword>
   }
 
   @Override
-  public String getSqlUpdateFieldValues() {
+  protected String getSqlUpdateFieldValues() {
     return super.getSqlUpdateFieldValues() + ", label=:label, locale=:locale";
   }
 

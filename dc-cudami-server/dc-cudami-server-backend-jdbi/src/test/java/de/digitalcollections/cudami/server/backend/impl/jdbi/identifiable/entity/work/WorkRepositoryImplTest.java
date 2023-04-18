@@ -5,7 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.alias.UrlAliasRepository;
-import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.semantic.SubjectRepository;
+import de.digitalcollections.cudami.server.backend.api.repository.identifiable.semantic.SubjectRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.relation.PredicateRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.AbstractIdentifiableRepositoryImplTest;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.EntityRepositoryImpl;
@@ -23,8 +23,8 @@ import de.digitalcollections.model.identifiable.entity.item.Item;
 import de.digitalcollections.model.identifiable.entity.manifestation.Manifestation;
 import de.digitalcollections.model.identifiable.entity.relation.EntityRelation;
 import de.digitalcollections.model.identifiable.entity.work.Work;
+import de.digitalcollections.model.identifiable.semantic.Subject;
 import de.digitalcollections.model.relation.Predicate;
-import de.digitalcollections.model.semantic.Subject;
 import de.digitalcollections.model.text.LocalizedText;
 import de.digitalcollections.model.text.Title;
 import de.digitalcollections.model.text.TitleType;
@@ -143,15 +143,18 @@ class WorkRepositoryImplTest extends AbstractIdentifiableRepositoryImplTest<Work
     repo.save(parentWork2);
 
     Subject subject1 =
-        Subject.builder().type("Test").label(new LocalizedText(Locale.GERMAN, "Test")).build();
+        Subject.builder()
+            .subjectType("Test")
+            .label(new LocalizedText(Locale.GERMAN, "Test"))
+            .build();
     Subject subject2 =
         Subject.builder()
-            .type("Test")
+            .subjectType("Test")
             .identifier(Identifier.builder().namespace("foo").id("bar").build())
             .build();
     Subject subject3 =
         Subject.builder()
-            .type("Test")
+            .subjectType("Test")
             .identifier(Identifier.builder().namespace("bla").id("baz").build())
             .build();
     subjectRepository.save(subject1);

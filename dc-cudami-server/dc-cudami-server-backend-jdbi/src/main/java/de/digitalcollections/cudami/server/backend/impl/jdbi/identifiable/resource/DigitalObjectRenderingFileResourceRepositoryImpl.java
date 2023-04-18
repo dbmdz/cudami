@@ -100,7 +100,7 @@ public class DigitalObjectRenderingFileResourceRepositoryImpl extends JdbiReposi
   @Override
   public List<FileResource> getRenderingFileResources(UUID digitalObjectUuid)
       throws RepositoryException {
-    final String fieldsSql = fileResourceMetadataRepositoryImpl.getSqlSelectAllFields("f", "fr");
+    final String fieldsSql = fileResourceMetadataRepositoryImpl.getSqlSelectAllFields();
 
     StringBuilder innerQuery =
         new StringBuilder(

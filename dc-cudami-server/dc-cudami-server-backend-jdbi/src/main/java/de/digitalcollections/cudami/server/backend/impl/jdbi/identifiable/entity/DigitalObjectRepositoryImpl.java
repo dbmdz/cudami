@@ -494,7 +494,7 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
   }
 
   @Override
-  public String getSqlInsertFields() {
+  protected String getSqlInsertFields() {
     return super.getSqlInsertFields()
         + ", creation_geolocation_uuid"
         + ", creation_date"
@@ -507,7 +507,7 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
 
   /* Do not change order! Must match order in getSqlInsertFields!!! */
   @Override
-  public String getSqlInsertValues() {
+  protected String getSqlInsertValues() {
     return super.getSqlInsertValues()
         + ", :creationInfo?.geoLocation?.uuid"
         + ", :creationInfo?.date"
@@ -520,7 +520,7 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
 
   @Override
   public String getSqlSelectAllFields(String tableAlias, String mappingPrefix) {
-    return getSqlSelectReducedFields(tableAlias, mappingPrefix)
+    return super.getSqlSelectAllFields(tableAlias, mappingPrefix)
         + ", "
         + LicenseRepositoryImpl.TABLE_ALIAS
         + ".uuid "
@@ -595,7 +595,7 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
   }
 
   @Override
-  public String getSqlUpdateFieldValues() {
+  protected String getSqlUpdateFieldValues() {
     return super.getSqlUpdateFieldValues()
         + ", creation_geolocation_uuid=:creationInfo?.geoLocation?.uuid"
         + ", creation_date=:creationInfo?.date"

@@ -47,6 +47,47 @@ public class UrlAliasRepositoryImpl extends UniqueObjectRepositoryImpl<UrlAlias>
   public static final String TABLE_ALIAS = "ua";
   public static final String TABLE_NAME = "url_aliases";
 
+  public static String sqlSelectAllFields(String tableAlias, String mappingPrefix) {
+    return sqlSelectReducedFields(tableAlias, mappingPrefix);
+  }
+
+  public static String sqlSelectReducedFields(String tableAlias, String mappingPrefix) {
+    return UniqueObjectRepositoryImpl.sqlSelectReducedFields(tableAlias, mappingPrefix)
+        + ", "
+        + tableAlias
+        + ".last_published "
+        + mappingPrefix
+        + "_lastPublished, "
+        + tableAlias
+        + ".primary "
+        + mappingPrefix
+        + "_primary, "
+        + tableAlias
+        + ".slug "
+        + mappingPrefix
+        + "_slug, "
+        + tableAlias
+        + ".target_language "
+        + mappingPrefix
+        + "_targetLanguage, "
+
+        // target object fields without registered mappingPrefix
+        // because they can not be mapped automatically by JDBI to UrlAlias fields - see
+        // mapRowToUrlAlias (use unregistered mapping-prefix "uaidf_" to make it unique
+        // to read)
+        + tableAlias
+        + ".target_identifiable_objecttype uaidf_identifiableObjectType, "
+        + tableAlias
+        + ".target_identifiable_type uaidf_identifiableType, "
+        + tableAlias
+        + ".target_uuid uaidf_uuid, "
+
+        // joined website fields
+        + "uawebs.uuid uawebs_uuid, "
+        + "uawebs.label uawebs_label, "
+        + "uawebs.url uawebs_url";
+  }
+
   public UrlAliasRepositoryImpl(Jdbi dbi, CudamiConfig cudamiConfig) {
     super(
         dbi,
@@ -61,11 +102,6 @@ public class UrlAliasRepositoryImpl extends UniqueObjectRepositoryImpl<UrlAlias>
   @Override
   public UrlAlias create() throws RepositoryException {
     return new UrlAlias();
-  }
-
-  @Override
-  protected BiConsumer<Map<UUID, UrlAlias>, RowView> createFullReduceRowsBiConcumer() {
-    return createBasicReduceRowsBiConsumer();
   }
 
   @Override
@@ -113,6 +149,11 @@ public class UrlAliasRepositoryImpl extends UniqueObjectRepositoryImpl<UrlAlias>
         urlAlias.setWebsite(website);
       }
     };
+  }
+
+  @Override
+  protected BiConsumer<Map<UUID, UrlAlias>, RowView> createFullReduceRowsBiConcumer() {
+    return createBasicReduceRowsBiConsumer();
   }
 
   @Override
@@ -375,45 +416,12 @@ public class UrlAliasRepositoryImpl extends UniqueObjectRepositoryImpl<UrlAlias>
 
   @Override
   public String getSqlSelectAllFields(String tableAlias, String mappingPrefix) {
-    return getSqlSelectReducedFields(tableAlias, mappingPrefix);
+    return sqlSelectAllFields(tableAlias, mappingPrefix);
   }
 
   @Override
-  protected String getSqlSelectReducedFields(String tableAlias, String mappingPrefix) {
-    return super.getSqlSelectReducedFields(tableAlias, mappingPrefix)
-        + ", "
-        + tableAlias
-        + ".last_published "
-        + mappingPrefix
-        + "_lastPublished, "
-        + tableAlias
-        + ".primary "
-        + mappingPrefix
-        + "_primary, "
-        + tableAlias
-        + ".slug "
-        + mappingPrefix
-        + "_slug, "
-        + tableAlias
-        + ".target_language "
-        + mappingPrefix
-        + "_targetLanguage, "
-
-        // target object fields without registered mappingPrefix
-        // because they can not be mapped automatically by JDBI to UrlAlias fields - see
-        // mapRowToUrlAlias (use unregistered mapping-prefix "uaidf_" to make it unique
-        // to read)
-        + tableAlias
-        + ".target_identifiable_objecttype uaidf_identifiableObjectType, "
-        + tableAlias
-        + ".target_identifiable_type uaidf_identifiableType, "
-        + tableAlias
-        + ".target_uuid uaidf_uuid, "
-
-        // joined website fields
-        + "uawebs.uuid uawebs_uuid, "
-        + "uawebs.label uawebs_label, "
-        + "uawebs.url uawebs_url";
+  public String getSqlSelectReducedFields(String tableAlias, String mappingPrefix) {
+    return sqlSelectReducedFields(tableAlias, mappingPrefix);
   }
 
   @Override

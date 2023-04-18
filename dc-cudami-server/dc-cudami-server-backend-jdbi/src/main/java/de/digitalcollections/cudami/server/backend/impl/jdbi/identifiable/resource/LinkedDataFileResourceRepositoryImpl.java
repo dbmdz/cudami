@@ -64,19 +64,19 @@ public class LinkedDataFileResourceRepositoryImpl
   }
 
   @Override
-  public String getSqlInsertFields() {
+  protected String getSqlInsertFields() {
     return super.getSqlInsertFields() + ", context, object_type";
   }
 
   /* Do not change order! Must match order in getSqlInsertFields!!! */
   @Override
-  public String getSqlInsertValues() {
+  protected String getSqlInsertValues() {
     return super.getSqlInsertValues() + ", :context, :objectType";
   }
 
   @Override
   public String getSqlSelectAllFields(String tableAlias, String mappingPrefix) {
-    return getSqlSelectReducedFields(tableAlias, mappingPrefix)
+    return super.getSqlSelectAllFields(tableAlias, mappingPrefix)
         + ", "
         + tableAlias
         + ".context "
@@ -89,7 +89,7 @@ public class LinkedDataFileResourceRepositoryImpl
   }
 
   @Override
-  public String getSqlUpdateFieldValues() {
+  protected String getSqlUpdateFieldValues() {
     return super.getSqlUpdateFieldValues() + ", context=:context, object_type=:objectType";
   }
 }

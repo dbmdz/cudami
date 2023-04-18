@@ -68,7 +68,7 @@ public class CorporateBodyRepositoryImpl extends AgentRepositoryImpl<CorporateBo
 
   @Override
   public String getSqlSelectAllFields(String tableAlias, String mappingPrefix) {
-    return getSqlSelectReducedFields(tableAlias, mappingPrefix)
+    return super.getSqlSelectAllFields(tableAlias, mappingPrefix)
         + ", "
         + tableAlias
         + ".text "

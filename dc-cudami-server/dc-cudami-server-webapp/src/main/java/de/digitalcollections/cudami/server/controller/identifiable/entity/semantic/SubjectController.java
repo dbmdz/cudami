@@ -7,13 +7,14 @@ import de.digitalcollections.cudami.server.business.api.service.identifiable.ent
 import de.digitalcollections.cudami.server.controller.AbstractUniqueObjectController;
 import de.digitalcollections.cudami.server.controller.ParameterHelper;
 import de.digitalcollections.model.identifiable.Identifier;
+import de.digitalcollections.model.identifiable.semantic.Subject;
 import de.digitalcollections.model.list.filtering.FilterCriterion;
 import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.list.sorting.Order;
-import de.digitalcollections.model.semantic.Subject;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.tuple.Triple;
@@ -85,6 +86,17 @@ public class SubjectController extends AbstractUniqueObjectController<Subject> {
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<Subject> getByUuid(@PathVariable UUID uuid) throws ServiceException {
     return super.getByUuid(uuid);
+  }
+
+  @Operation(summary = "Get languages of all subjects")
+  @GetMapping(
+      value = {"/v6/subjects/languages"},
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  public List<Locale> getLanguages(
+      @RequestParam(name = "parent.uuid", required = false)
+          FilterCriterion<UUID> parentUuidFilterCriterion)
+      throws ServiceException {
+    return service.getLanguages();
   }
 
   @Override

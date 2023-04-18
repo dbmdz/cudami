@@ -75,19 +75,19 @@ public class GeoLocationRepositoryImpl<G extends GeoLocation> extends EntityRepo
   }
 
   @Override
-  public String getSqlInsertFields() {
+  protected String getSqlInsertFields() {
     return super.getSqlInsertFields() + ", coordinate_location, geolocation_type";
   }
 
   /* Do not change order! Must match order in getSqlInsertFields!!! */
   @Override
-  public String getSqlInsertValues() {
+  protected String getSqlInsertValues() {
     return super.getSqlInsertValues() + ", :coordinateLocation::JSONB, :geoLocationType";
   }
 
   @Override
   public String getSqlSelectAllFields(String tableAlias, String mappingPrefix) {
-    return getSqlSelectReducedFields(tableAlias, mappingPrefix)
+    return super.getSqlSelectAllFields(tableAlias, mappingPrefix)
         + ", "
         + tableAlias
         + ".coordinate_location "
@@ -106,7 +106,7 @@ public class GeoLocationRepositoryImpl<G extends GeoLocation> extends EntityRepo
   }
 
   @Override
-  public String getSqlUpdateFieldValues() {
+  protected String getSqlUpdateFieldValues() {
     return super.getSqlUpdateFieldValues() + ", coordinate_location=:coordinateLocation::JSONB";
   }
 }

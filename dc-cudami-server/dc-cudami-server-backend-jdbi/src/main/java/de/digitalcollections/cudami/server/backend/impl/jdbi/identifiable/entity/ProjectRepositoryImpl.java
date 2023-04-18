@@ -135,19 +135,19 @@ public class ProjectRepositoryImpl extends EntityRepositoryImpl<Project>
   }
 
   @Override
-  public String getSqlInsertFields() {
+  protected String getSqlInsertFields() {
     return super.getSqlInsertFields() + ", end_date, start_date, text";
   }
 
   /* Do not change order! Must match order in getSqlInsertFields!!! */
   @Override
-  public String getSqlInsertValues() {
+  protected String getSqlInsertValues() {
     return super.getSqlInsertValues() + ", :endDate, :startDate, :text::JSONB";
   }
 
   @Override
   public String getSqlSelectAllFields(String tableAlias, String mappingPrefix) {
-    return getSqlSelectReducedFields(tableAlias, mappingPrefix)
+    return super.getSqlSelectAllFields(tableAlias, mappingPrefix)
         + ", "
         + tableAlias
         + ".text "
@@ -156,8 +156,8 @@ public class ProjectRepositoryImpl extends EntityRepositoryImpl<Project>
   }
 
   @Override
-  public String getSqlSelectReducedFields(String tableAlias, String mappingPrefix) {
-    return super.getSqlSelectReducedFields(tableAlias, mappingPrefix)
+  public String getSqlSelectReducedFields() {
+    return super.getSqlSelectReducedFields()
         + ", "
         + tableAlias
         + ".end_date "
@@ -170,7 +170,7 @@ public class ProjectRepositoryImpl extends EntityRepositoryImpl<Project>
   }
 
   @Override
-  public String getSqlUpdateFieldValues() {
+  protected String getSqlUpdateFieldValues() {
     return super.getSqlUpdateFieldValues()
         + ", end_date=:endDate, start_date=:startDate, text=:text::JSONB";
   }

@@ -127,12 +127,7 @@ public class LicenseRepositoryImpl extends UniqueObjectRepositoryImpl<License>
   }
 
   @Override
-  public String getSqlSelectAllFields(String tableAlias, String mappingPrefix) {
-    return getSqlSelectReducedFields(tableAlias, mappingPrefix);
-  }
-
-  @Override
-  protected String getSqlSelectReducedFields(String tableAlias, String mappingPrefix) {
+  public String getSqlSelectReducedFields(String tableAlias, String mappingPrefix) {
     return super.getSqlSelectReducedFields(tableAlias, mappingPrefix)
         + ", "
         + tableAlias
@@ -150,7 +145,7 @@ public class LicenseRepositoryImpl extends UniqueObjectRepositoryImpl<License>
   }
 
   @Override
-  public String getSqlUpdateFieldValues() {
+  protected String getSqlUpdateFieldValues() {
     return super.getSqlUpdateFieldValues() + ", acronym=:acronym, label=:label::JSONB, url=:url";
   }
 

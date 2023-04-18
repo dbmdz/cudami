@@ -223,7 +223,12 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
   }
 
   @Override
-  public String getSqlInsertFields() {
+  public String getSqlSelectAllFields(String tableAlias, String mappingPrefix) {
+    return getSqlSelectReducedFields(tableAlias, mappingPrefix);
+  }
+
+  @Override
+  protected String getSqlInsertFields() {
     return super.getSqlInsertFields()
         + ", custom_attrs"
         + ", navdate"
@@ -233,7 +238,7 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
 
   /* Do not change order! Must match order in getSqlInsertFields!!! */
   @Override
-  public String getSqlInsertValues() {
+  protected String getSqlInsertValues() {
     // refid is generated as serial, DO NOT SET!
     return super.getSqlInsertValues()
         + ", :customAttributes::JSONB"
@@ -242,11 +247,6 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
         + (isRepoForNamedEntity()
             ? ", :name::JSONB, :nameLocalesOfOriginalScripts::varchar[], :split_name::varchar[]"
             : "");
-  }
-
-  @Override
-  public String getSqlSelectAllFields(String tableAlias, String mappingPrefix) {
-    return getSqlSelectReducedFields(tableAlias, mappingPrefix);
   }
 
   @Override
@@ -277,7 +277,7 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
   }
 
   @Override
-  public String getSqlUpdateFieldValues() {
+  protected String getSqlUpdateFieldValues() {
     // do not update/left out from statement (not changed since insert):
     // uuid, created, identifiable_type, identifiable_objecttype, refid
     return super.getSqlUpdateFieldValues()

@@ -1,9 +1,9 @@
-package de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.semantic;
+package de.digitalcollections.cudami.server.backend.api.repository.identifiable.semantic;
 
 import de.digitalcollections.cudami.server.backend.api.repository.UniqueObjectRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
 import de.digitalcollections.model.identifiable.Identifier;
-import de.digitalcollections.model.semantic.Subject;
+import de.digitalcollections.model.identifiable.semantic.Subject;
 
 public interface SubjectRepository extends UniqueObjectRepository<Subject> {
 

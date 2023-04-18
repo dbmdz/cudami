@@ -1,15 +1,15 @@
-package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.semantic;
+package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.semantic;
 
 import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
-import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.semantic.SubjectRepository;
+import de.digitalcollections.cudami.server.backend.api.repository.identifiable.semantic.SubjectRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.UniqueObjectRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.type.DbIdentifierMapper;
 import de.digitalcollections.model.identifiable.Identifier;
+import de.digitalcollections.model.identifiable.semantic.Subject;
 import de.digitalcollections.model.list.filtering.FilterCriterion;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
-import de.digitalcollections.model.semantic.Subject;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -19,7 +19,6 @@ import java.util.Optional;
 import java.util.function.Function;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.core.mapper.reflect.BeanMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -30,17 +29,27 @@ public class SubjectRepositoryImpl extends UniqueObjectRepositoryImpl<Subject>
   public static final String TABLE_ALIAS = "subj";
   public static final String TABLE_NAME = "subjects";
 
-  private static SubjectRepositoryImpl SINGLETON_INSTANCE = new SubjectRepositoryImpl();
-
-  /**
-   * constructor for static methods to make access possible to instance fields that do not use
-   * further dependencies, see {@link #getSqlSelectAllFieldsStatic()}
-   */
-  private SubjectRepositoryImpl() {
-    super();
+  public static String sqlSelectAllFields(String tableAlias, String mappingPrefix) {
+    return sqlSelectReducedFields(tableAlias, mappingPrefix);
   }
 
-  @Autowired
+  public static String sqlSelectReducedFields(String tableAlias, String mappingPrefix) {
+    return UniqueObjectRepositoryImpl.sqlSelectReducedFields(tableAlias, mappingPrefix)
+        + ", "
+        + tableAlias
+        + ".identifiers "
+        + mappingPrefix
+        + "_identifiers, "
+        + tableAlias
+        + ".label "
+        + mappingPrefix
+        + "_label, "
+        + tableAlias
+        + ".type "
+        + mappingPrefix
+        + "_subjectType";
+  }
+
   public SubjectRepositoryImpl(
       Jdbi dbi, CudamiConfig cudamiConfig, DbIdentifierMapper dbIdentifierMapper) {
     super(
@@ -99,12 +108,12 @@ public class SubjectRepositoryImpl extends UniqueObjectRepositoryImpl<Subject>
   @Override
   protected List<String> getAllowedOrderByFields() {
     List<String> allowedOrderByFields = super.getAllowedOrderByFields();
-    allowedOrderByFields.addAll(Arrays.asList("label", "type"));
+    allowedOrderByFields.addAll(Arrays.asList("label", "subjectType"));
     return allowedOrderByFields;
   }
 
   @Override
-  public Subject getByTypeAndIdentifier(String type, String namespace, String id)
+  public Subject getByTypeAndIdentifier(String subjectType, String namespace, String id)
       throws RepositoryException {
     final String sql =
         "SELECT "
@@ -116,14 +125,14 @@ public class SubjectRepositoryImpl extends UniqueObjectRepositoryImpl<Subject>
             + " left join UNNEST("
             + tableAlias
             + ".identifiers) subjids on true "
-            + String.format(" WHERE %s.type = :type", tableAlias)
+            + String.format(" WHERE %s.type = :subjectType", tableAlias)
             + " AND subjids.namespace = :namespace"
             + " AND subjids.id = :id";
 
     return dbi.withHandle(
         h ->
             h.createQuery(sql)
-                .bind("type", type)
+                .bind("subjectType", subjectType)
                 .bind("namespace", namespace)
                 .bind("id", id)
                 .mapTo(Subject.class)
@@ -139,7 +148,7 @@ public class SubjectRepositoryImpl extends UniqueObjectRepositoryImpl<Subject>
     switch (modelProperty) {
       case "label":
         return tableAlias + ".label";
-      case "type":
+      case "subjectType":
         return tableAlias + ".type";
       default:
         return super.getColumnName(modelProperty);
@@ -166,38 +175,17 @@ public class SubjectRepositoryImpl extends UniqueObjectRepositoryImpl<Subject>
 
   @Override
   protected String getSqlInsertValues() {
-    return super.getSqlInsertValues() + ", :identifiers, :label::JSONB, :split_label, :type";
+    return super.getSqlInsertValues() + ", :identifiers, :label::JSONB, :split_label, :subjectType";
   }
 
   @Override
-  protected String getSqlSelectAllFields(String tableAlias, String mappingPrefix) {
-    return getSqlSelectReducedFields(tableAlias, mappingPrefix);
-  }
-
-  public static String getSqlSelectAllFieldsStatic() {
-    return SINGLETON_INSTANCE.getSqlSelectAllFields(TABLE_ALIAS, MAPPING_PREFIX);
+  public String getSqlSelectAllFields(String tableAlias, String mappingPrefix) {
+    return sqlSelectAllFields(tableAlias, mappingPrefix);
   }
 
   @Override
-  protected String getSqlSelectReducedFields(String tableAlias, String mappingPrefix) {
-    return super.getSqlSelectReducedFields(tableAlias, mappingPrefix)
-        + ", "
-        + tableAlias
-        + ".identifiers "
-        + mappingPrefix
-        + "_identifiers, "
-        + tableAlias
-        + ".label "
-        + mappingPrefix
-        + "_label, "
-        + tableAlias
-        + ".type "
-        + mappingPrefix
-        + "_type";
-  }
-
-  public static String getSqlSelectReducedFieldsStatic() {
-    return SINGLETON_INSTANCE.getSqlSelectReducedFields(TABLE_ALIAS, MAPPING_PREFIX);
+  public String getSqlSelectReducedFields(String tableAlias, String mappingPrefix) {
+    return sqlSelectReducedFields(tableAlias, mappingPrefix);
   }
 
   @Override
@@ -205,7 +193,7 @@ public class SubjectRepositoryImpl extends UniqueObjectRepositoryImpl<Subject>
     // do not update/left out from statement (not changed since insert):
     // uuid, created
     return super.getSqlUpdateFieldValues()
-        + ", identifiers=:identifiers, label=:label::JSONB, split_label=:split_label, type=:type";
+        + ", identifiers=:identifiers, label=:label::JSONB, split_label=:split_label, type=:subjectType";
     // TODO?: in IdentifiableRepoImpl it is "split_label=:split_label::TEXT[]"...?
   }
 
@@ -240,7 +228,7 @@ public class SubjectRepositoryImpl extends UniqueObjectRepositoryImpl<Subject>
 
     switch (modelProperty) {
       case "identifiers_namespace":
-      case "type":
+      case "subjectType":
         return true;
       default:
         return false;

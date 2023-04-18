@@ -179,13 +179,13 @@ public class PersonRepositoryImpl extends AgentRepositoryImpl<Person> implements
   }
 
   @Override
-  public String getSqlInsertFields() {
+  protected String getSqlInsertFields() {
     return super.getSqlInsertFields()
         + ", dateofbirth, dateofdeath, gender, locationofbirth, locationofdeath, timevalueofbirth, timevalueofdeath";
   }
 
   @Override
-  public String getSqlInsertValues() {
+  protected String getSqlInsertValues() {
     return super.getSqlInsertValues()
         + ", :dateOfBirth, :dateOfDeath, :gender, :locationOfBirth, :locationOfDeath, :timeValueOfBirth::JSONB, :timeValueOfDeath::JSONB";
   }
@@ -194,7 +194,7 @@ public class PersonRepositoryImpl extends AgentRepositoryImpl<Person> implements
   public String getSqlSelectAllFields(String tableAlias, String mappingPrefix) {
     final String familyNameMappingPrefix = FamilyNameRepositoryImpl.MAPPING_PREFIX;
     final String givenNameMappingPrefix = GivenNameRepositoryImpl.MAPPING_PREFIX;
-    return getSqlSelectReducedFields(tableAlias, mappingPrefix)
+    return super.getSqlSelectAllFields(tableAlias, mappingPrefix)
         + ", "
         + "glbirth.uuid glbirth_uuid, glbirth.refId glbirth_refid, glbirth.label glbirth_label, glbirth.geolocation_type glbirth_geoLocationType, "
         + "gldeath.uuid gldeath_uuid, gldeath.refId gldeath_refid, gldeath.label gldeath_label, gldeath.geolocation_type gldeath_geoLocationType, "

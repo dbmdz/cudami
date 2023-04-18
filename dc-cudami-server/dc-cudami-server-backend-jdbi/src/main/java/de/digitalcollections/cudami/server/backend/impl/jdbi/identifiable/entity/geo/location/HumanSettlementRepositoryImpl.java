@@ -43,13 +43,13 @@ public class HumanSettlementRepositoryImpl extends GeoLocationRepositoryImpl<Hum
   }
 
   @Override
-  public String getSqlInsertFields() {
+  protected String getSqlInsertFields() {
     return super.getSqlInsertFields() + ", settlement_type";
   }
 
   /* Do not change order! Must match order in getSqlInsertFields!!! */
   @Override
-  public String getSqlInsertValues() {
+  protected String getSqlInsertValues() {
     return super.getSqlInsertValues() + ", :humanSettlementType";
   }
 
@@ -64,7 +64,7 @@ public class HumanSettlementRepositoryImpl extends GeoLocationRepositoryImpl<Hum
   }
 
   @Override
-  public String getSqlUpdateFieldValues() {
+  protected String getSqlUpdateFieldValues() {
     return super.getSqlUpdateFieldValues() + ", settlement_type=:humanSettlementType";
   }
 }

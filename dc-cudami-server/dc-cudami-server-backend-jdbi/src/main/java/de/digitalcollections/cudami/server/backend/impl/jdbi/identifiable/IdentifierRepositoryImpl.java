@@ -15,7 +15,6 @@ import java.util.Set;
 import java.util.UUID;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.core.mapper.reflect.BeanMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -23,28 +22,30 @@ public class IdentifierRepositoryImpl extends UniqueObjectRepositoryImpl<Identif
     implements IdentifierRepository {
 
   public static final String MAPPING_PREFIX = "id";
-  private static IdentifierRepositoryImpl SINGLETON_INSTANCE = new IdentifierRepositoryImpl();
   public static final String TABLE_ALIAS = "id";
-
   public static final String TABLE_NAME = "identifiers";
 
-  public static String getSqlSelectAllFieldsStatic() {
-    return SINGLETON_INSTANCE.getSqlSelectAllFields(TABLE_ALIAS, MAPPING_PREFIX);
+  public static String sqlSelectAllFields(String tableAlias, String mappingPrefix) {
+    return sqlSelectReducedFields(tableAlias, mappingPrefix);
   }
 
-  public static String getSqlSelectReducedFieldsStatic() {
-    return SINGLETON_INSTANCE.getSqlSelectReducedFields(TABLE_ALIAS, MAPPING_PREFIX);
+  public static String sqlSelectReducedFields(String tableAlias, String mappingPrefix) {
+    return UniqueObjectRepositoryImpl.sqlSelectReducedFields(tableAlias, mappingPrefix)
+        + ", "
+        + tableAlias
+        + ".identifiable "
+        + mappingPrefix
+        + "_identifiable, "
+        + tableAlias
+        + ".namespace "
+        + mappingPrefix
+        + "_namespace, "
+        + tableAlias
+        + ".identifier "
+        + mappingPrefix
+        + "_id";
   }
 
-  /**
-   * constructor for static methods to make access possible to instance fields that do not use
-   * further dependencies, see {@link #getSqlSelectAllFieldsStatic()}
-   */
-  private IdentifierRepositoryImpl() {
-    super();
-  }
-
-  @Autowired
   public IdentifierRepositoryImpl(Jdbi dbi, CudamiConfig cudamiConfig) {
     super(
         dbi,
@@ -124,26 +125,13 @@ public class IdentifierRepositoryImpl extends UniqueObjectRepositoryImpl<Identif
   }
 
   @Override
-  protected String getSqlSelectAllFields(String tableAlias, String mappingPrefix) {
-    return getSqlSelectReducedFields(tableAlias, mappingPrefix);
+  public String getSqlSelectAllFields(String tableAlias, String mappingPrefix) {
+    return sqlSelectAllFields(tableAlias, mappingPrefix);
   }
 
   @Override
-  protected String getSqlSelectReducedFields(String tableAlias, String mappingPrefix) {
-    return super.getSqlSelectReducedFields(tableAlias, mappingPrefix)
-        + ", "
-        + tableAlias
-        + ".identifiable "
-        + mappingPrefix
-        + "_identifiable, "
-        + tableAlias
-        + ".namespace "
-        + mappingPrefix
-        + "_namespace, "
-        + tableAlias
-        + ".identifier "
-        + mappingPrefix
-        + "_id";
+  public String getSqlSelectReducedFields(String tableAlias, String mappingPrefix) {
+    return sqlSelectReducedFields(tableAlias, mappingPrefix);
   }
 
   @Override

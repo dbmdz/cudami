@@ -99,7 +99,12 @@ public class IdentifierTypeRepositoryImpl extends UniqueObjectRepositoryImpl<Ide
   }
 
   @Override
-  protected String getSqlSelectReducedFields(String tableAlias, String mappingPrefix) {
+  public String getSqlSelectAllFields(String tableAlias, String mappingPrefix) {
+    return getSqlSelectReducedFields(tableAlias, mappingPrefix);
+  }
+
+  @Override
+  public String getSqlSelectReducedFields(String tableAlias, String mappingPrefix) {
     return super.getSqlSelectReducedFields(tableAlias, mappingPrefix)
         + ", "
         + tableAlias

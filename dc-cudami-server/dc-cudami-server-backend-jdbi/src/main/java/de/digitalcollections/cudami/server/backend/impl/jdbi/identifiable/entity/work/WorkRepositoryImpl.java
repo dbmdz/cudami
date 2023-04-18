@@ -305,7 +305,7 @@ public class WorkRepositoryImpl extends EntityRepositoryImpl<Work> implements Wo
   }
 
   @Override
-  public String getSqlInsertFields() {
+  protected String getSqlInsertFields() {
     return super.getSqlInsertFields()
         + ", creation_daterange"
         + ", creation_timevalue"
@@ -317,7 +317,7 @@ public class WorkRepositoryImpl extends EntityRepositoryImpl<Work> implements Wo
 
   /* Do not change order! Must match order in getSqlInsertFields!!! */
   @Override
-  public String getSqlInsertValues() {
+  protected String getSqlInsertValues() {
     return super.getSqlInsertValues()
         + ", :creationDateRange::daterange"
         + ", :creationTimeValue::JSONB"
@@ -379,7 +379,7 @@ public class WorkRepositoryImpl extends EntityRepositoryImpl<Work> implements Wo
   }
 
   @Override
-  public String getSqlUpdateFieldValues() {
+  protected String getSqlUpdateFieldValues() {
     return super.getSqlUpdateFieldValues()
         + ", creation_daterange=:creationDateRange::daterange"
         + ", creation_timevalue=:creationTimeValue::JSONB"

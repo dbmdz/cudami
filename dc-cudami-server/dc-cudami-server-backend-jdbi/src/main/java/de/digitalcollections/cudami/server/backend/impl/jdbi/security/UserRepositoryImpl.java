@@ -186,7 +186,8 @@ public class UserRepositoryImpl extends UniqueObjectRepositoryImpl<User> impleme
   }
 
   @Override
-  protected String getSqlSelectReducedFields(String tableAlias, String mappingPrefix) {
+  public String getSqlSelectReducedFields(String tableAlias, String mappingPrefix) {
+    //    return super.getSqlSelectReducedFields(tableAlias, mappingPrefix)
     // FIXME: Why does mapping prefix not work for User? ???
     //    return super.getSqlSelectReducedFields(tableAlias, mappingPrefix)
     //    + ", "
@@ -230,7 +231,7 @@ public class UserRepositoryImpl extends UniqueObjectRepositoryImpl<User> impleme
   }
 
   @Override
-  public String getSqlUpdateFieldValues() {
+  protected String getSqlUpdateFieldValues() {
     return super.getSqlUpdateFieldValues()
         + ", email=:email, enabled=:enabled, firstname=:firstname, lastname=:lastname, passwordhash=:passwordHash, roles=:roles";
   }

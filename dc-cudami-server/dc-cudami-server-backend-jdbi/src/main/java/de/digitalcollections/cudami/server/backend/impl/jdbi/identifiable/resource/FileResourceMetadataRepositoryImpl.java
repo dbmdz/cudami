@@ -103,19 +103,14 @@ public class FileResourceMetadataRepositoryImpl<F extends FileResource>
   }
 
   @Override
-  public String getSqlInsertFields() {
+  protected String getSqlInsertFields() {
     return super.getSqlInsertFields() + ", filename, http_base_url, mimetype, size_in_bytes, uri";
   }
 
   /* Do not change order! Must match order in getSqlInsertFields!!! */
   @Override
-  public String getSqlInsertValues() {
+  protected String getSqlInsertValues() {
     return super.getSqlInsertValues() + ", :filename, :httpBaseUrl, :mimeType, :sizeInBytes, :uri";
-  }
-
-  @Override
-  public String getSqlSelectAllFields(String tableAlias, String mappingPrefix) {
-    return getSqlSelectReducedFields(tableAlias, mappingPrefix);
   }
 
   @Override
@@ -145,7 +140,7 @@ public class FileResourceMetadataRepositoryImpl<F extends FileResource>
   }
 
   @Override
-  public String getSqlUpdateFieldValues() {
+  protected String getSqlUpdateFieldValues() {
     return super.getSqlUpdateFieldValues()
         + ", filename=:filename, http_base_url=:httpBaseUrl, mimetype=:mimeType, size_in_bytes=:sizeInBytes, uri=:uri";
   }

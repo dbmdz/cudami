@@ -29,6 +29,15 @@ class IdentifierTypeRepositoryImplTest extends AbstractRepositoryImplTest {
   }
 
   @Test
+  @DisplayName("can create correct SQL snippets")
+  void providesCorrectSql() throws RepositoryException {
+    String sql = repo.getSqlSelectReducedFields();
+    assertThat(sql)
+        .isEqualTo(
+            " idt.uuid idt_uuid, idt.created idt_created, idt.last_modified idt_lastModified, idt.label idt_label, idt.namespace idt_namespace, idt.pattern idt_pattern");
+  }
+
+  @Test
   @DisplayName("can save a new identifier type")
   void saveNewIdentifierType() throws RepositoryException {
     IdentifierType actual = new IdentifierType();

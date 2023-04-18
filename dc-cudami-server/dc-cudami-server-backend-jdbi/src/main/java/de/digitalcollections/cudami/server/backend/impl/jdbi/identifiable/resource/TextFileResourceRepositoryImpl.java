@@ -38,9 +38,4 @@ public class TextFileResourceRepositoryImpl
   public TextFileResource create() throws RepositoryException {
     return new TextFileResource();
   }
-
-  @Override
-  public String getSqlSelectAllFields(String tableAlias, String mappingPrefix) {
-    return getSqlSelectReducedFields(tableAlias, mappingPrefix);
-  }
 }

@@ -271,16 +271,13 @@ public class WebpageRepositoryImpl extends IdentifiableRepositoryImpl<Webpage>
     if (modelProperty == null) {
       return null;
     }
-    if (super.getColumnName(modelProperty) != null) {
-      return super.getColumnName(modelProperty);
-    }
     switch (modelProperty) {
       case "publicationEnd":
         return tableAlias + ".publication_end";
       case "publicationStart":
         return tableAlias + ".publication_start";
       default:
-        return null;
+        return super.getColumnName(modelProperty);
     }
   }
 
@@ -341,21 +338,21 @@ public class WebpageRepositoryImpl extends IdentifiableRepositoryImpl<Webpage>
   }
 
   @Override
-  public String getSqlInsertFields() {
+  protected String getSqlInsertFields() {
     return super.getSqlInsertFields()
         + ", publication_end, publication_start, rendering_hints, text";
   }
 
   /* Do not change order! Must match order in getSqlInsertFields!!! */
   @Override
-  public String getSqlInsertValues() {
+  protected String getSqlInsertValues() {
     return super.getSqlInsertValues()
         + ", :publicationEnd, :publicationStart, :renderingHints::JSONB, :text::JSONB";
   }
 
   @Override
   public String getSqlSelectAllFields(String tableAlias, String mappingPrefix) {
-    return getSqlSelectReducedFields(tableAlias, mappingPrefix)
+    return super.getSqlSelectAllFields(tableAlias, mappingPrefix)
         + ", "
         + tableAlias
         + ".text "
@@ -382,7 +379,7 @@ public class WebpageRepositoryImpl extends IdentifiableRepositoryImpl<Webpage>
   }
 
   @Override
-  public String getSqlUpdateFieldValues() {
+  protected String getSqlUpdateFieldValues() {
     return super.getSqlUpdateFieldValues()
         + ", publication_end=:publicationEnd, publication_start=:publicationStart, rendering_hints=:renderingHints::JSONB, text=:text::JSONB";
   }

@@ -399,7 +399,7 @@ public class ManifestationRepositoryImpl extends EntityRepositoryImpl<Manifestat
   }
 
   @Override
-  public String getSqlInsertFields() {
+  protected String getSqlInsertFields() {
     return super.getSqlInsertFields()
         + """
         , composition, dimensions, expressiontypes,
@@ -414,7 +414,7 @@ public class ManifestationRepositoryImpl extends EntityRepositoryImpl<Manifestat
   }
 
   @Override
-  public String getSqlInsertValues() {
+  protected String getSqlInsertValues() {
     return super.getSqlInsertValues()
         + """
         , :composition, :dimensions, :expressionTypes::mainsubtype[],
@@ -430,7 +430,7 @@ public class ManifestationRepositoryImpl extends EntityRepositoryImpl<Manifestat
 
   @Override
   public String getSqlSelectAllFields(String tableAlias, String mappingPrefix) {
-    return getSqlSelectReducedFields(tableAlias, mappingPrefix)
+    return super.getSqlSelectAllFields(tableAlias, mappingPrefix)
         + """
         , %1$s.composition %2$s_composition, %1$s.dimensions %2$s_dimensions, %1$s.otherlanguages %2$s_otherLanguages,
         %1$s.scale %2$s_scale, %1$s.version %2$s_version,

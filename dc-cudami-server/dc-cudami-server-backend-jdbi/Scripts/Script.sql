@@ -1,19 +1,17 @@
 select
-  c.uuid cb_uuid,
-  c.created cb_created,
-  c.last_modified cb_lastModified,
-  c.description cb_description,
-  c.identifiable_objecttype cb_identifiableObjectType,
-  c.identifiable_type cb_type,
-  c.label cb_label,
-  c.preview_hints cb_previewImageRenderingHints,
-  c.custom_attrs cb_customAttributes,
-  c.navdate cb_navDate,
-  c.refid cb_refId,
-  c.notes cb_notes,
-  c.name cb_name,
-  c.name_locales_original_scripts cb_nameLocalesOfOriginalScripts,
-  c.homepage_url cb_homepageUrl,
+  f.uuid fr_uuid,
+  f.created fr_created,
+  f.last_modified fr_lastModified,
+  f.description fr_description,
+  f.identifiable_objecttype fr_identifiableObjectType,
+  f.identifiable_type fr_type,
+  f.label fr_label,
+  f.preview_hints fr_previewImageRenderingHints,
+  f.filename fr_filename,
+  f.http_base_url fr_httpBaseUrl,
+  f.mimetype fr_mimeType,
+  f.size_in_bytes fr_sizeInBytes,
+  f.uri fr_uri,
   id.uuid id_uuid,
   id.created id_created,
   id.last_modified id_lastModified,
@@ -41,21 +39,24 @@ select
 from
   (
   select
-    c.*
+    xtable.sortindex as idx,
+    *
   from
-    corporatebodies as c
+    fileresources as f
+  inner join topic_fileresources as xtable on
+    f.uuid = xtable.fileresource_uuid
   where
-    c.split_name::text[] @> ?::text[]
+    xtable.topic_uuid = :uuid
   order by
-    lower(c.label) asc
-  limit 100000 offset 0) as c
+    lower(coalesce(f.label->>'en', f.label->>'')) collate "ucs_basic" asc
+  limit 10 offset 0) as f
 left join identifiers as id on
-  c.uuid = id.identifiable
+  f.uuid = id.identifiable
 left join fileresources_image as file on
-  c.previewfileresource = file.uuid
+  f.previewfileresource = file.uuid
 left join url_aliases as ua on
-  c.uuid = ua.target_uuid
+  f.uuid = ua.target_uuid
 left join websites as uawebs on
   uawebs.uuid = ua.website_uuid
 order by
-  lower(c.label) asc;
+  lower(coalesce(f.label->>'en', f.label->>'')) collate "ucs_basic" asc

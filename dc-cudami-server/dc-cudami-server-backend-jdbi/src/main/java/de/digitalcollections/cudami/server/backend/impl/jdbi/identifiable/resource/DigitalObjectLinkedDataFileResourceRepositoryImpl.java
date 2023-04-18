@@ -80,7 +80,8 @@ public class DigitalObjectLinkedDataFileResourceRepositoryImpl extends JdbiRepos
   @Override
   public List<LinkedDataFileResource> getLinkedDataFileResources(UUID digitalObjectUuid)
       throws RepositoryException {
-    final String fieldsSql = linkedDataFileResourceRepositoryImpl.getSqlSelectAllFields("f", "fr");
+    // TABLE_ALIAS=f, MAPPING_PREFIX=fr
+    final String fieldsSql = linkedDataFileResourceRepositoryImpl.getSqlSelectAllFields();
     StringBuilder innerQuery =
         new StringBuilder(
             "SELECT "

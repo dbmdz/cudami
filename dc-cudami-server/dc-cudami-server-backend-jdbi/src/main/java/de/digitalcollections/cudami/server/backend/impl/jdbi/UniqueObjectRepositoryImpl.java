@@ -34,13 +34,23 @@ public abstract class UniqueObjectRepositoryImpl<U extends UniqueObject>
 
   private static final Logger LOGGER = LoggerFactory.getLogger(UniqueObjectRepositoryImpl.class);
 
+  public static String sqlSelectReducedFields(String tableAlias, String mappingPrefix) {
+    return " "
+        + """
+        {{alias}}.uuid {{prefix}}_uuid, {{alias}}.created {{prefix}}_created, {{alias}}.last_modified {{prefix}}_lastModified"""
+            .replace("{{alias}}", tableAlias)
+            .replace("{{prefix}}", mappingPrefix);
+  }
+
   /*
    * BiFunction for reducing rows (related objects) of joins not already part of
    * uniqueobject.
    */
   protected final BiConsumer<Map<UUID, U>, RowView> additionalReduceRowsBiConsumer;
   protected final BiConsumer<Map<UUID, U>, RowView> basicReduceRowsBiConsumer;
+
   protected final BiConsumer<Map<UUID, U>, RowView> fullReduceRowsBiConsumer;
+
   protected final Class<? extends UniqueObject> uniqueObjectImplClass;
 
   protected UniqueObjectRepositoryImpl() {
@@ -332,24 +342,18 @@ public abstract class UniqueObjectRepositoryImpl<U extends UniqueObject>
   }
 
   /**
-   * @return SQL for fields of full field set of {@code UniqueObject}
+   * SQL-snippet for fields to be returned for complete field request.<br>
+   * If already all fields are returned with reduced fields request: just return reduced field set
+   * here, otherwise add additional fields to reduced set to get all fields.
+   *
+   * @return SQL snippet
    */
   public String getSqlSelectAllFields() {
     return getSqlSelectAllFields(tableAlias, mappingPrefix);
   }
 
-  /**
-   * SQL-snippet for fields to be returned for complete field request.<br>
-   * If already all fields are returned with reduced fields request: just return reduced field set
-   * here, otherwise add additional fields to reduced set to get all fields.
-   *
-   * @param tableAlias alias for database table
-   * @param mappingPrefix jdbi mapping prefix for fields
-   * @return SQL snippet
-   */
-  protected String getSqlSelectAllFields(String tableAlias, String mappingPrefix) {
-    // reduced contains already all fields (otherwise override this method):
-    return getSqlSelectReducedFields(tableAlias, mappingPrefix);
+  public String getSqlSelectAllFields(String tableAlias, String mappingPrefix) {
+    return sqlSelectReducedFields(tableAlias, mappingPrefix);
   }
 
   /**
@@ -360,27 +364,12 @@ public abstract class UniqueObjectRepositoryImpl<U extends UniqueObject>
     return "";
   }
 
-  /**
-   * @return SQL for fields of reduced field set of {@code UniqueObject}
-   */
   public String getSqlSelectReducedFields() {
     return getSqlSelectReducedFields(tableAlias, mappingPrefix);
   }
 
-  protected String getSqlSelectReducedFields(String tableAlias, String mappingPrefix) {
-    return " "
-        + tableAlias
-        + ".uuid "
-        + mappingPrefix
-        + "_uuid, "
-        + tableAlias
-        + ".created "
-        + mappingPrefix
-        + "_created, "
-        + tableAlias
-        + ".last_modified "
-        + mappingPrefix
-        + "_lastModified";
+  public String getSqlSelectReducedFields(String tableAlias, String mappingPrefix) {
+    return sqlSelectReducedFields(tableAlias, mappingPrefix);
   }
 
   /**

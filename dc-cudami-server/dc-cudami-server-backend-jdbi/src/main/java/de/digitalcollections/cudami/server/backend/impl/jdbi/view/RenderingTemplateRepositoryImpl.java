@@ -105,7 +105,7 @@ public class RenderingTemplateRepositoryImpl extends UniqueObjectRepositoryImpl<
   }
 
   @Override
-  protected String getSqlSelectReducedFields(String tableAlias, String mappingPrefix) {
+  public String getSqlSelectReducedFields(String tableAlias, String mappingPrefix) {
     return super.getSqlSelectReducedFields(tableAlias, mappingPrefix)
         + ", "
         + tableAlias
@@ -123,7 +123,7 @@ public class RenderingTemplateRepositoryImpl extends UniqueObjectRepositoryImpl<
   }
 
   @Override
-  public String getSqlUpdateFieldValues() {
+  protected String getSqlUpdateFieldValues() {
     return super.getSqlUpdateFieldValues()
         + ", description=:description::JSONB, label=:label::JSONB, name=:name";
   }

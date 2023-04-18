@@ -245,47 +245,8 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
   }
 
   @Override
-  public List<Topic> getTopicsOfEntity(UUID entityUuid) throws RepositoryException {
-    StringBuilder innerQuery =
-        new StringBuilder(
-            "SELECT * FROM "
-                + tableName
-                + " AS "
-                + tableAlias
-                + " INNER JOIN topic_entities te ON "
-                + tableAlias
-                + ".uuid = te.topic_uuid"
-                + " WHERE te.entity_uuid = :uuid");
-    Map<String, Object> argumentMappings = new HashMap<>();
-    argumentMappings.put("uuid", entityUuid);
-
-    List<Topic> result =
-        retrieveList(getSqlSelectReducedFields(), innerQuery, argumentMappings, null);
-    return result;
-  }
-
-  @Override
   public PageResponse<Topic> findTopicsOfEntity(UUID entityUuid, PageRequest pageRequest) {
     throw new UnsupportedOperationException(); // TODO: not yet implemented
-  }
-
-  @Override
-  public List<Topic> getTopicsOfFileResource(UUID fileResourceUuid) throws RepositoryException {
-    StringBuilder innerQuery =
-        new StringBuilder(
-            "SELECT * FROM "
-                + tableName
-                + " AS "
-                + tableAlias
-                + " INNER JOIN topic_fileresources tf ON "
-                + tableAlias
-                + ".uuid = tf.topic_uuid"
-                + " WHERE tf.fileresource_uuid = :uuid");
-    Map<String, Object> argumentMappings = new HashMap<>();
-    argumentMappings.put("uuid", fileResourceUuid);
-    List<Topic> result =
-        retrieveList(getSqlSelectReducedFields(), innerQuery, argumentMappings, null);
-    return result;
   }
 
   @Override
@@ -482,6 +443,45 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
             + tableAlias
             + ".uuid)";
     List<Locale> result = dbi.withHandle(h -> h.createQuery(query).mapTo(Locale.class).list());
+    return result;
+  }
+
+  @Override
+  public List<Topic> getTopicsOfEntity(UUID entityUuid) throws RepositoryException {
+    StringBuilder innerQuery =
+        new StringBuilder(
+            "SELECT * FROM "
+                + tableName
+                + " AS "
+                + tableAlias
+                + " INNER JOIN topic_entities te ON "
+                + tableAlias
+                + ".uuid = te.topic_uuid"
+                + " WHERE te.entity_uuid = :uuid");
+    Map<String, Object> argumentMappings = new HashMap<>();
+    argumentMappings.put("uuid", entityUuid);
+
+    List<Topic> result =
+        retrieveList(getSqlSelectReducedFields(), innerQuery, argumentMappings, null);
+    return result;
+  }
+
+  @Override
+  public List<Topic> getTopicsOfFileResource(UUID fileResourceUuid) throws RepositoryException {
+    StringBuilder innerQuery =
+        new StringBuilder(
+            "SELECT * FROM "
+                + tableName
+                + " AS "
+                + tableAlias
+                + " INNER JOIN topic_fileresources tf ON "
+                + tableAlias
+                + ".uuid = tf.topic_uuid"
+                + " WHERE tf.fileresource_uuid = :uuid");
+    Map<String, Object> argumentMappings = new HashMap<>();
+    argumentMappings.put("uuid", fileResourceUuid);
+    List<Topic> result =
+        retrieveList(getSqlSelectReducedFields(), innerQuery, argumentMappings, null);
     return result;
   }
 

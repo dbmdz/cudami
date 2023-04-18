@@ -1,4 +1,4 @@
-package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.semantic;
+package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.semantic;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -6,6 +6,7 @@ import de.digitalcollections.cudami.server.backend.api.repository.exceptions.Rep
 import de.digitalcollections.cudami.server.backend.impl.jdbi.AbstractRepositoryImplTest;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.type.DbIdentifierMapper;
 import de.digitalcollections.model.identifiable.Identifier;
+import de.digitalcollections.model.identifiable.semantic.Subject;
 import de.digitalcollections.model.list.filtering.FilterCriterion;
 import de.digitalcollections.model.list.filtering.Filtering;
 import de.digitalcollections.model.list.paging.PageRequest;
@@ -13,7 +14,6 @@ import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.list.sorting.Direction;
 import de.digitalcollections.model.list.sorting.Order;
 import de.digitalcollections.model.list.sorting.Sorting;
-import de.digitalcollections.model.semantic.Subject;
 import de.digitalcollections.model.text.LocalizedText;
 import java.util.Locale;
 import java.util.Set;
@@ -53,7 +53,7 @@ class SubjectRepositoryImplTest extends AbstractRepositoryImplTest {
     final Identifier identifier2 = Identifier.builder().namespace("namespace2").id("id2").build();
     Subject subject =
         Subject.builder()
-            .type("test")
+            .subjectType("test")
             .label(label)
             .identifier(identifier1)
             .identifier(identifier2)
@@ -63,7 +63,7 @@ class SubjectRepositoryImplTest extends AbstractRepositoryImplTest {
     assertThat(subject.getUuid()).isNotNull();
     assertThat(subject.getCreated()).isNotNull();
     assertThat(subject.getLastModified()).isNotNull();
-    assertThat(subject.getType()).isEqualTo("test");
+    assertThat(subject.getSubjectType()).isEqualTo("test");
     assertThat(subject.getLabel()).isEqualTo(label);
     assertThat(subject.getIdentifiers()).containsExactlyInAnyOrder(identifier1, identifier2);
 
@@ -136,7 +136,11 @@ class SubjectRepositoryImplTest extends AbstractRepositoryImplTest {
                 .pageSize(99)
                 .sorting(
                     Sorting.builder()
-                        .order(Order.builder().property("type").direction(Direction.ASC).build())
+                        .order(
+                            Order.builder()
+                                .property("subjectType")
+                                .direction(Direction.ASC)
+                                .build())
                         .build())
                 .build());
     assertThat(pageResponse.getContent()).containsExactly(savedSubject2, savedSubject1);
@@ -167,7 +171,7 @@ class SubjectRepositoryImplTest extends AbstractRepositoryImplTest {
                                 .build())
                         .add(
                             FilterCriterion.builder()
-                                .withExpression("type")
+                                .withExpression("subjectType")
                                 .isEquals("type")
                                 .build())
                         .build())
@@ -274,7 +278,7 @@ class SubjectRepositoryImplTest extends AbstractRepositoryImplTest {
                 labelLocale != null && labelText != null
                     ? new LocalizedText(labelLocale, labelText)
                     : null)
-            .type(type)
+            .subjectType(type)
             .build();
 
     if ((namespace != null) && (id != null)) {

@@ -9,8 +9,8 @@ import de.digitalcollections.cudami.server.backend.api.repository.identifiable.I
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.alias.UrlAliasRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.UniqueObjectRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.alias.UrlAliasRepositoryImpl;
-import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.semantic.SubjectRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.resource.ImageFileResourceRepositoryImpl;
+import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.semantic.SubjectRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.semantic.TagRepositoryImpl;
 import de.digitalcollections.model.file.MimeType;
 import de.digitalcollections.model.identifiable.Identifiable;
@@ -23,6 +23,7 @@ import de.digitalcollections.model.identifiable.entity.Entity;
 import de.digitalcollections.model.identifiable.entity.Website;
 import de.digitalcollections.model.identifiable.resource.FileResource;
 import de.digitalcollections.model.identifiable.resource.ImageFileResource;
+import de.digitalcollections.model.identifiable.semantic.Subject;
 import de.digitalcollections.model.list.filtering.FilterCriterion;
 import de.digitalcollections.model.list.filtering.Filtering;
 import de.digitalcollections.model.list.paging.PageRequest;
@@ -30,7 +31,6 @@ import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.list.sorting.Direction;
 import de.digitalcollections.model.list.sorting.Order;
 import de.digitalcollections.model.list.sorting.Sorting;
-import de.digitalcollections.model.semantic.Subject;
 import de.digitalcollections.model.semantic.Tag;
 import de.digitalcollections.model.text.LocalizedText;
 import java.net.URI;
@@ -73,6 +73,7 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
   public static final String TABLE_NAME = "identifiables";
 
   private final IdentifierRepository identifierRepository;
+
   private final UrlAliasRepositoryImpl urlAliasRepository;
 
   @Autowired
@@ -242,6 +243,15 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
     return true;
   }
 
+  // FIXME delete
+  // @Override
+  // protected String addSearchTermMappings(String searchTerm, Map<String, Object>
+  // argumentMappings) {
+  // argumentMappings.put(SearchTermTemplates.ARRAY_CONTAINS.placeholder,
+  // splitToArray(searchTerm));
+  // return super.addSearchTermMappings(searchTerm, argumentMappings);
+  // }
+
   /**
    * Extend the reduced Identifiable by the contents of the provided RowView
    *
@@ -265,15 +275,6 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
 
     return pageResponse;
   }
-
-  // FIXME delete
-  // @Override
-  // protected String addSearchTermMappings(String searchTerm, Map<String, Object>
-  // argumentMappings) {
-  // argumentMappings.put(SearchTermTemplates.ARRAY_CONTAINS.placeholder,
-  // splitToArray(searchTerm));
-  // return super.addSearchTermMappings(searchTerm, argumentMappings);
-  // }
 
   @Override
   @Deprecated
@@ -495,39 +496,37 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
         """;
   }
 
+  /**
+   * SQL-snippet for fields to be returned for complete field request.<br>
+   * If already all fields are returned with reduced fields request: just return reduced field set
+   * here, otherwise add additional fields to reduced set to get all fields.
+   *
+   * @return SQL snippet
+   */
   @Override
-  protected String getSqlSelectAllFields(String tableAlias, String mappingPrefix) {
+  public String getSqlSelectAllFields(String tableAlias, String mappingPrefix) {
     return getSqlSelectReducedFields(tableAlias, mappingPrefix);
   }
 
+  /**
+   * @return SQL for fields of reduced field set of {@code UniqueObject}
+   */
   @Override
-  protected String getSqlSelectReducedFields(String tableAlias, String mappingPrefix) {
+  public String getSqlSelectReducedFields(String tableAlias, String mappingPrefix) {
     return super.getSqlSelectReducedFields(tableAlias, mappingPrefix)
         + ", "
-        + tableAlias
-        + ".description "
-        + mappingPrefix
-        + "_description, "
-        + tableAlias
-        + ".identifiable_objecttype "
-        + mappingPrefix
-        + "_identifiableObjectType, "
-        + tableAlias
-        + ".identifiable_type "
-        + mappingPrefix
-        + "_type, "
-        + tableAlias
-        + ".label "
-        + mappingPrefix
-        + "_label, "
-        + tableAlias
-        + ".preview_hints "
-        + mappingPrefix
-        + "_previewImageRenderingHints";
+        + """
+        {{alias}}.description {{prefix}}_description,
+        {{alias}}.identifiable_objecttype {{prefix}}_identifiableObjectType,
+        {{alias}}.identifiable_type {{prefix}}_type,
+        {{alias}}.label {{prefix}}_label,
+        {{alias}}.preview_hints {{prefix}}_previewImageRenderingHints"""
+            .replace("{{alias}}", tableAlias)
+            .replace("{{prefix}}", mappingPrefix);
   }
 
   @Override
-  public String getSqlUpdateFieldValues() {
+  protected String getSqlUpdateFieldValues() {
     // do not update/left out from statement (not changed since insert):
     // identifiable_type
     return super.getSqlUpdateFieldValues()
@@ -540,15 +539,6 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
   protected boolean hasSplitColumn(String propertyName) {
     // only label for now
     return "label".equals(propertyName);
-  }
-
-  public List<I> retrieveList(
-      String fieldsSql,
-      StringBuilder innerQuery,
-      final Map<String, Object> argumentMappings,
-      String orderBy)
-      throws RepositoryException {
-    return retrieveList(fieldsSql, null, innerQuery, argumentMappings, orderBy);
   }
 
   @Override
@@ -567,11 +557,13 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
         "SELECT "
             + fieldsSql
             + ","
-            + IdentifierRepositoryImpl.getSqlSelectAllFieldsStatic()
+            + IdentifierRepositoryImpl.sqlSelectAllFields(
+                IdentifierRepositoryImpl.TABLE_ALIAS, IdentifierRepositoryImpl.MAPPING_PREFIX)
             + ","
             + SQL_PREVIEW_IMAGE_FIELDS_PI
             + ", "
-            + urlAliasRepository.getSqlSelectReducedFields()
+            + UrlAliasRepositoryImpl.sqlSelectReducedFields(
+                UrlAliasRepositoryImpl.TABLE_ALIAS, UrlAliasRepositoryImpl.MAPPING_PREFIX)
             + " FROM "
             + (innerQuery != null ? "(" + innerQuery + ")" : tableName)
             + " AS "
@@ -629,6 +621,15 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
     return result;
   }
 
+  public List<I> retrieveList(
+      String fieldsSql,
+      StringBuilder innerQuery,
+      final Map<String, Object> argumentMappings,
+      String orderBy)
+      throws RepositoryException {
+    return retrieveList(fieldsSql, null, innerQuery, argumentMappings, orderBy);
+  }
+
   @Override
   /**
    * Override super.retrieveOne because of always joining identifiers, preview image, url aliases,
@@ -646,15 +647,19 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
             "SELECT"
                 + fieldsSql
                 + ","
-                + IdentifierRepositoryImpl.getSqlSelectAllFieldsStatic()
+                + IdentifierRepositoryImpl.sqlSelectAllFields(
+                    IdentifierRepositoryImpl.TABLE_ALIAS, IdentifierRepositoryImpl.MAPPING_PREFIX)
                 + ","
                 + ImageFileResourceRepositoryImpl.SQL_PREVIEW_IMAGE_FIELDS_PI
                 + ", "
-                + urlAliasRepository.getSqlSelectReducedFields()
+                + UrlAliasRepositoryImpl.sqlSelectReducedFields(
+                    UrlAliasRepositoryImpl.TABLE_ALIAS, UrlAliasRepositoryImpl.MAPPING_PREFIX)
                 + ", "
-                + TagRepositoryImpl.getSqlSelectReducedFieldsStatic()
+                + TagRepositoryImpl.sqlSelectReducedFields(
+                    TagRepositoryImpl.TABLE_ALIAS, TagRepositoryImpl.MAPPING_PREFIX)
                 + ", "
-                + SubjectRepositoryImpl.getSqlSelectReducedFieldsStatic()
+                + SubjectRepositoryImpl.sqlSelectReducedFields(
+                    SubjectRepositoryImpl.TABLE_ALIAS, SubjectRepositoryImpl.MAPPING_PREFIX)
                 + " FROM "
                 + (StringUtils.hasText(innerSelect) ? innerSelect : tableName)
                 + " AS "
