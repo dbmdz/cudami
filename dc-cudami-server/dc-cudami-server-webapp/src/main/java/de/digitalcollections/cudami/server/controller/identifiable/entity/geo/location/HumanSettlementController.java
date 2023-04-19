@@ -23,14 +23,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @Tag(name = "Human settlement controller")
@@ -49,7 +42,7 @@ public class HumanSettlementController extends AbstractEntityController<HumanSet
   public ResponseEntity delete(
       @Parameter(example = "", description = "UUID of the human settlement") @PathVariable("uuid")
           UUID uuid)
-      throws ConflictException {
+      throws ConflictException, ServiceException {
     return super.delete(uuid);
   }
 

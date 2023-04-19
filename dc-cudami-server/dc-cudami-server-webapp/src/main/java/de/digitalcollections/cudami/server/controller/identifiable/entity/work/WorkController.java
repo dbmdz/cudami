@@ -1,5 +1,6 @@
 package de.digitalcollections.cudami.server.controller.identifiable.entity.work;
 
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ConflictException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.EntityService;
@@ -30,13 +31,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @Tag(name = "Work controller")
@@ -64,6 +59,16 @@ public class WorkController extends AbstractEntityController<Work> {
       produces = MediaType.APPLICATION_JSON_VALUE)
   public long count() throws ServiceException {
     return super.count();
+  }
+
+  @Operation(summary = "Delete a work")
+  @DeleteMapping(
+      value = {"/v6/works/{uuid:" + ParameterHelper.UUID_PATTERN + "}"},
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity delete(
+      @Parameter(example = "", description = "UUID of the work") @PathVariable("uuid") UUID uuid)
+      throws ConflictException, ServiceException {
+    return super.delete(uuid);
   }
 
   @Operation(summary = "Get all works as (paged, sorted, filtered) list")

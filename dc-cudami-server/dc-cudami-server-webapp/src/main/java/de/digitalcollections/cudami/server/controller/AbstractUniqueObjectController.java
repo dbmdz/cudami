@@ -41,11 +41,20 @@ public abstract class AbstractUniqueObjectController<U extends UniqueObject>
     return getService().count();
   }
 
-  protected ResponseEntity delete(UUID uuid) throws ConflictException {
+  protected ResponseEntity delete(UUID uuid) throws ConflictException, ServiceException {
+    U example = buildExampleWithUuid(uuid);
     boolean successful;
     try {
-      successful = getService().delete(buildExampleWithUuid(uuid));
+      successful = getService().delete(example);
     } catch (ServiceException e) {
+      LOGGER.error(
+          "Cannot delete "
+              + (example != null ? example.getClass().getSimpleName() : "anything")
+              + " with uuid="
+              + uuid
+              + ": "
+              + e,
+          e);
       return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
     }
     return successful
