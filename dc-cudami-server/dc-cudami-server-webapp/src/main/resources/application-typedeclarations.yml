@@ -24,9 +24,11 @@ cudami:
       - INST
       - MEETING
       - PERSON
+      - SHELFGROUP
       - TIME
       - TITLE
       - TOPIC
+      - UNSPECIFIED
 
     expressionTypes:
       - mainType: TEXT
