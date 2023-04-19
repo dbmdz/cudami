@@ -5,21 +5,18 @@
       layout:decorate="~{base}">
 
   <head>
-    <title th:text="|#{page.title.predicates}: #{predicate} &quot;${predicate.value}&quot;|">...</title>
+    <title th:text="|#{page.title.subjects}: #{lbl.subject}">Subjects: Subject</title>
   </head>
 
   <body>
-    <th:block layout:fragment="content" th:object="${predicate}">
+    <th:block layout:fragment="content" th:object="${subject}">
       <div class="content">
         <div class="container-fluid">
           <div id="content-header">
             <div class="row">
-              <div class="col-6">
-                <h1 th:text="|#{predicate} &quot;*{value}&quot;|">...</h1>
-              </div>
-              <div class="col-6">
-                <div class="float-right">
-                  <a class="btn btn-danger mr-2" th:title="#{tooltip.delete}" th:data-href="@{*{uuid} + '/delete'}" th:data-message="#{modal.msg.confirm_delete_obj(#{predicate}, ${predicate.value})}" th:data-title="#{modal.title.warning}" data-target="#confirmYesNoDialog" data-toggle="modal" th:text="#{btn.delete}">Delete</a>
+              <div class="col d-flex justify-content-between">
+                <h1 th:text="#{lbl.subject}">...</h1>
+                <div>
                   <a class="btn btn-primary" id="edit-button" th:href="@{*{uuid} + '/edit'}" th:text="#{edit}">edit</a>
                 </div>
               </div>
@@ -35,7 +32,7 @@
               </div>
             </th:block>
 
-            <th:block th:insert="fragments/uniqueobject::renderFields(${predicate})"></th:block>
+            <th:block th:insert="fragments/uniqueobject::renderFields(${subject})"></th:block>
 
             <hr />
 
@@ -52,8 +49,8 @@
               </div>
             </div>
             <div class="row">
-              <div class="col-md-3"><label th:text="#{lbl.value}">Value</label></div>
-              <div class="col-md-9"><span th:text="*{value}">is_author_of</span></div>
+              <div class="col-md-3"><label th:text="#{lbl.subject_type}">Type of subject</label></div>
+              <div class="col-md-9"><span th:with="subjectTypeLabel=${#messages.msgOrNull('subjecttype.' + #strings.toLowerCase(subject.subjectType))}" th:text="${subjectTypeLabel != null ? subjectTypeLabel : subject.subjectType}">Genre</span></div>
             </div>
 
           </div>

@@ -5,18 +5,18 @@
       layout:decorate="~{base-form}">
 
   <head>
-    <title th:text="|#{predicates}: | + (${mode} == 'edit' ? #{predicates_edit} : #{predicates_create})">Relation types: Create a new / Edit relation type</title>
+    <title th:text="|#{page.title.subjects}: | + (${mode} == 'edit' ? #{page.title.subject.edit} : #{page.title.subject.create})">Subjects: Create a new subject / Edit subject</title>
   </head>
 
   <body>
     <th:block layout:fragment="content">
       <div class="content">
         <div class="container-fluid">
-          <form action="#" th:action="@{#}" th:object="${predicate}" method="post" role="form">
+          <form action="#" th:action="@{#}" th:object="${subject}" method="post" role="form">
             <div id="content-header">
               <div class="row">
                 <div class="col-6">
-                  <h1 th:text="${mode} == 'edit' ? #{predicates_edit} : #{predicates_create}">Relation types: Create a new / Edit relation type</h1>
+                  <h1 th:text="${mode} == 'edit' ? #{page.title.subject.edit} : #{page.title.subject.create}">Subjects: Create a new subject / Edit subject</h1>
                 </div>
                 <div class="col-6">
                   <div class="float-right">
@@ -53,27 +53,30 @@
                     </ul>
                     <div class="tab-content">
                       <th:block th:each="language, iter : ${existingLanguages}">
-                        <div th:replace="fragments/forms/label-description-form :: html(fieldLanguage=${language},active=${iter.index == 0},beanName='predicate')"></div>
+                        <div th:replace="fragments/forms/label-description-form :: html(fieldLanguage=${language},active=${iter.index == 0},beanName='subject')"></div>
                       </th:block>
                     </div>
                   </div>
+                </div>
+              </div>
 
-                  <th:block th:if="${mode} == 'create'">
-                    <div class="form-group" th:classappend="${#fields.hasErrors('value')}? has-error">
-                      <label for="value" th:text="#{lbl.value}" class="required">Value</label>
-                      <input th:field="*{value}" id="value" type="text" class="form-control" value="">
-                      <p th:if="${#fields.hasErrors('value')}" th:errors="*{value}">...</p>
-                    </div>
-                  </th:block>
+              <div class="row">
+                <div class="col-md-3"><label for="subjectType" th:text="#{lbl.subject_type}" class="font-weight-bold mb-0 required">Subject type</label></div>
+                <div class="col-md-9">
+                  <!--/* We need to use "name" attribute instead of th:field. otherwise th:selected does not work */-->
+                  <select id="subjectType" name="subjectType" class="form-select">
+                    <th:block th:each="subjectType, iter : ${subjectTypes}">
+                      <span th:text="${subjectType}"></span>
+                      <th:block th:with="subjectTypeLabel=${#messages.msgOrNull('subjecttype.' + #strings.toLowerCase(subjectType))}">
+                        <option th:value="${subjectType}" th:selected="*{subjectType} != null ? ${subjectType} == *{subjectType} : ${#strings.equals(subjectType, 'UNSPECIFIED')}" th:text="${subjectTypeLabel != null ? subjectTypeLabel : subjectType}">Genre</option>
+                      </th:block>
+                    </th:block>
+                  </select>
                 </div>
               </div>
 
               <th:block th:if="${mode} == 'edit'">
-                <th:block th:insert="fragments/uniqueobject::renderFields(${predicate})"></th:block>
-                <div class="row">
-                  <div class="col-md-3"><label class="font-weight-bold mb-0" th:text="#{lbl.value}">Value</label></div>
-                  <div class="col-md-9"><span th:text="*{value}">is_author_of</span></div>
-                </div>
+                <th:block th:insert="fragments/uniqueobject::renderFields(${subject})"></th:block>
               </th:block>
             </div>
           </form>

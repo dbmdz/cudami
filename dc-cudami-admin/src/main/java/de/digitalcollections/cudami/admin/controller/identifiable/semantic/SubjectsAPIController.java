@@ -1,4 +1,4 @@
-package de.digitalcollections.cudami.admin.controller.identifiable.entity.semantic;
+package de.digitalcollections.cudami.admin.controller.identifiable.semantic;
 
 import de.digitalcollections.cudami.admin.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.admin.business.i18n.LanguageService;

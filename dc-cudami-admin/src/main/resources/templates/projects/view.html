@@ -16,11 +16,9 @@
         <div class="container-fluid">
           <div id="content-header">
             <div class="row">
-              <div class="col-sm-6">
+              <div class="col d-flex justify-content-between">
                 <h1 th:text="#{lbl.project}">Project</h1>
-              </div>
-              <div class="col-sm-6">
-                <div class="float-right">
+                <div>
                   <a class="btn btn-primary" id="edit-button" th:href="@{*{uuid} + '/edit'}" th:text="#{edit}">edit</a>
                 </div>
               </div>

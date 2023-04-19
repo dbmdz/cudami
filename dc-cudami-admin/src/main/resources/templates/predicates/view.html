@@ -14,11 +14,9 @@
         <div class="container-fluid">
           <div id="content-header">
             <div class="row">
-              <div class="col-6">
+              <div class="col d-flex justify-content-between">
                 <h1 th:text="|#{predicate} &quot;*{value}&quot;|">...</h1>
-              </div>
-              <div class="col-6">
-                <div class="float-right">
+                <div>
                   <a class="btn btn-danger mr-2" th:title="#{tooltip.delete}" th:data-href="@{*{uuid} + '/delete'}" th:data-message="#{modal.msg.confirm_delete_obj(#{predicate}, ${predicate.value})}" th:data-title="#{modal.title.warning}" data-target="#confirmYesNoDialog" data-toggle="modal" th:text="#{btn.delete}">Delete</a>
                   <a class="btn btn-primary" id="edit-button" th:href="@{*{uuid} + '/edit'}" th:text="#{edit}">edit</a>
                 </div>

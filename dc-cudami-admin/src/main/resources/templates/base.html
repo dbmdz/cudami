@@ -336,6 +336,15 @@
                   <ul class="nav nav-treeview">
                     <li class="nav-item">
                       <a class="nav-link"
+                         th:classappend="${menu == 'subjects'} ? active"
+                         th:href="@{/subjects}"
+                         th:title="#{tooltip.subjects}">
+                        <i class="fas fa-inbox nav-icon"></i>
+                        <p th:text="#{menu.subjects}">Subjects</p>
+                      </a>
+                    </li>
+                    <li class="nav-item">
+                      <a class="nav-link"
                          th:classappend="${menu == 'headwords'} ? active"
                          th:href="@{/headwords}"
                          th:title="#{tooltip.headwords}">

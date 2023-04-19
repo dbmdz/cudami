@@ -14,11 +14,9 @@
         <div class="container-fluid">
           <div id="content-header">
             <div class="row">
-              <div class="col-sm-8">
+              <div class="col d-flex justify-content-between">
                 <h1 th:text="|#{user} &quot;*{email}&quot;|">User "email@email.de"</h1>
-              </div>
-              <div class="col-sm-4">
-                <div class="float-right">
+                <div>
                   <input
                          class="btn btn-danger user-status-toggle"
                          th:if="*{enabled}"

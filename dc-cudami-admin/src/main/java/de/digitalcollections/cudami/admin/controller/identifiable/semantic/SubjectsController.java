@@ -1,10 +1,11 @@
-package de.digitalcollections.cudami.admin.controller.identifiable.entity.semantic;
+package de.digitalcollections.cudami.admin.controller.identifiable.semantic;
 
 import de.digitalcollections.cudami.admin.business.i18n.LanguageService;
 import de.digitalcollections.cudami.admin.business.impl.validator.LabelNotBlankValidator;
 import de.digitalcollections.cudami.admin.controller.AbstractUniqueObjectController;
 import de.digitalcollections.cudami.admin.controller.ParameterHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
+import de.digitalcollections.cudami.client.config.CudamiConfigClient;
 import de.digitalcollections.cudami.client.identifiable.entity.semantic.CudamiSubjectsClient;
 import de.digitalcollections.model.exception.ResourceNotFoundException;
 import de.digitalcollections.model.exception.TechnicalException;
@@ -42,12 +43,15 @@ public class SubjectsController extends AbstractUniqueObjectController<Subject> 
   private final LabelNotBlankValidator labelNotBlankValidator;
   private final MessageSource messageSource;
 
+  private CudamiConfigClient cudamiConfigClient;
+
   public SubjectsController(
       CudamiClient client,
       LanguageService languageService,
       MessageSource messageSource,
       LabelNotBlankValidator labelNotBlankValidator) {
     super(client.forSubjects(), languageService);
+    this.cudamiConfigClient = client.forConfig();
     this.labelNotBlankValidator = labelNotBlankValidator;
     this.messageSource = messageSource;
   }
@@ -65,6 +69,10 @@ public class SubjectsController extends AbstractUniqueObjectController<Subject> 
     List<Locale> sortedLanguages = languageService.getAllLanguages();
     model.addAttribute("allLanguages", sortedLanguages);
     model.addAttribute("activeLanguage", defaultLanguage);
+
+    List<String> subjectTypes =
+        cudamiConfigClient.getConfig().getTypeDeclarations().getSubjectTypes();
+    model.addAttribute("subjectTypes", subjectTypes);
 
     model.addAttribute("mode", "create");
     return "subjects/create-or-edit";
@@ -92,6 +100,10 @@ public class SubjectsController extends AbstractUniqueObjectController<Subject> 
 
     List<Locale> sortedLanguages = languageService.getAllLanguages();
     model.addAttribute("allLanguages", sortedLanguages);
+
+    List<String> subjectTypes =
+        cudamiConfigClient.getConfig().getTypeDeclarations().getSubjectTypes();
+    model.addAttribute("subjectTypes", subjectTypes);
 
     model.addAttribute("mode", "edit");
     return "subjects/create-or-edit";
@@ -133,6 +145,7 @@ public class SubjectsController extends AbstractUniqueObjectController<Subject> 
     // data set,
     // but do not remove hashmap entry (language, if tab is removed)
     subject.setLabel(subjectFormData.getLabel());
+    subject.setSubjectType(subjectFormData.getSubjectType());
 
     validate(subject, results);
     // TODO: move validate() to service layer on server side using new
@@ -144,6 +157,9 @@ public class SubjectsController extends AbstractUniqueObjectController<Subject> 
           languageService.getExistingLanguages(defaultLanguage, subject.getLabel()));
       model.addAttribute("allLanguages", languageService.getAllLanguages());
       model.addAttribute("activeLanguage", defaultLanguage);
+      List<String> subjectTypes =
+          cudamiConfigClient.getConfig().getTypeDeclarations().getSubjectTypes();
+      model.addAttribute("subjectTypes", subjectTypes);
       return "subjects/create-or-edit";
     }
     Subject subjectDB = null;
@@ -186,6 +202,7 @@ public class SubjectsController extends AbstractUniqueObjectController<Subject> 
     // attributes just get data set,
     // but do not remove hashmap entry (language, if tab is removed)
     subject.setLabel(subjectFormData.getLabel());
+    subject.setSubjectType(subjectFormData.getSubjectType());
 
     validate(subject, results);
     // TODO: move validate() to service layer on server side using new
@@ -197,6 +214,9 @@ public class SubjectsController extends AbstractUniqueObjectController<Subject> 
           languageService.getExistingLanguages(defaultLanguage, subject.getLabel()));
       model.addAttribute("allLanguages", languageService.getAllLanguages());
       model.addAttribute("activeLanguage", defaultLanguage);
+      List<String> subjectTypes =
+          cudamiConfigClient.getConfig().getTypeDeclarations().getSubjectTypes();
+      model.addAttribute("subjectTypes", subjectTypes);
       return "subjects/create-or-edit";
     }
 
