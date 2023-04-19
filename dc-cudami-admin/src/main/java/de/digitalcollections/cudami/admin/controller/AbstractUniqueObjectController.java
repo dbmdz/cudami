@@ -7,12 +7,14 @@ import de.digitalcollections.cudami.client.CudamiRestClient;
 import de.digitalcollections.model.UniqueObject;
 import de.digitalcollections.model.exception.TechnicalException;
 import de.digitalcollections.model.list.paging.PageResponse;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 public class AbstractUniqueObjectController<U extends UniqueObject>
     extends AbstractPagingAndSortingController {
 
   protected final CudamiRestClient<U> service;
 
+  @SuppressFBWarnings
   public AbstractUniqueObjectController(
       CudamiRestClient<U> service, LanguageService languageService) {
     super(languageService);

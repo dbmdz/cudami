@@ -4,6 +4,8 @@ import de.digitalcollections.cudami.server.backend.api.repository.UniqueObjectRe
 import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
 import de.digitalcollections.model.identifiable.Identifier;
 import de.digitalcollections.model.identifiable.semantic.Subject;
+import java.util.List;
+import java.util.Locale;
 
 public interface SubjectRepository extends UniqueObjectRepository<Subject> {
 
@@ -17,4 +19,6 @@ public interface SubjectRepository extends UniqueObjectRepository<Subject> {
 
   Subject getByTypeAndIdentifier(String type, String namespace, String id)
       throws RepositoryException;
+
+  List<Locale> getLanguages() throws RepositoryException;
 }

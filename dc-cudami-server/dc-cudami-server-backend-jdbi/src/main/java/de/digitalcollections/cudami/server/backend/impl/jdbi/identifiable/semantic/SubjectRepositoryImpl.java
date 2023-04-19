@@ -14,6 +14,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
@@ -161,6 +162,20 @@ public class SubjectRepositoryImpl extends UniqueObjectRepositoryImpl<Subject>
         super.getJsonbFields();
     linkedHashMap.put("label", i -> Optional.ofNullable(i.getLabel()));
     return linkedHashMap;
+  }
+
+  // TODO: duplicate code to IdentifiableRepositoryImpl as we do not inherit...
+  @Override
+  public List<Locale> getLanguages() throws RepositoryException {
+    String query =
+        "SELECT DISTINCT jsonb_object_keys("
+            + tableAlias
+            + ".label) as languages FROM "
+            + tableName
+            + " AS "
+            + tableAlias;
+    List<Locale> result = dbi.withHandle(h -> h.createQuery(query).mapTo(Locale.class).list());
+    return result;
   }
 
   @Override
