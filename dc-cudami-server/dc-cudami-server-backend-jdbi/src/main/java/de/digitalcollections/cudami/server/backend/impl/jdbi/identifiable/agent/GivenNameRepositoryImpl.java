@@ -54,6 +54,11 @@ public class GivenNameRepositoryImpl extends IdentifiableRepositoryImpl<GivenNam
   }
 
   @Override
+  public String getSqlSelectAllFields(String tableAlias, String mappingPrefix) {
+    return getSqlSelectReducedFields(tableAlias, mappingPrefix);
+  }
+
+  @Override
   public String getSqlSelectReducedFields(String tableAlias, String mappingPrefix) {
     return super.getSqlSelectReducedFields(tableAlias, mappingPrefix)
         + ", "

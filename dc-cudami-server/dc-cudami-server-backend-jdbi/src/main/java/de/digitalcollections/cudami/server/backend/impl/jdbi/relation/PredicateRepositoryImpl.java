@@ -140,7 +140,7 @@ public class PredicateRepositoryImpl extends UniqueObjectRepositoryImpl<Predicat
 
   @Override
   public String getSqlSelectAllFields(String tableAlias, String mappingPrefix) {
-    return super.getSqlSelectAllFields(tableAlias, mappingPrefix)
+    return getSqlSelectReducedFields(tableAlias, mappingPrefix)
         + ", "
         + tableAlias
         + ".description "

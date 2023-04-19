@@ -353,7 +353,7 @@ public abstract class UniqueObjectRepositoryImpl<U extends UniqueObject>
   }
 
   public String getSqlSelectAllFields(String tableAlias, String mappingPrefix) {
-    return sqlSelectReducedFields(tableAlias, mappingPrefix);
+    return getSqlSelectReducedFields(tableAlias, mappingPrefix);
   }
 
   /**
