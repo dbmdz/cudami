@@ -243,7 +243,7 @@ public class DigitalObjectController extends AbstractEntityController<DigitalObj
               .findAny();
       if (parentUuidCriterion.isPresent()) {
         return service.getLanguagesOfContainedDigitalObjects(
-            buildExampleWithUuid((UUID) parentUuidCriterion.get().getValue()));
+            buildExampleWithUuid(UUID.fromString((String) parentUuidCriterion.get().getValue())));
       }
     }
     return super.getLanguages();
