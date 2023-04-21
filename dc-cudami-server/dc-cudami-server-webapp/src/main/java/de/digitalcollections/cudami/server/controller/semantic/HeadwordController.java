@@ -9,7 +9,11 @@ import de.digitalcollections.cudami.server.controller.AbstractUniqueObjectContro
 import de.digitalcollections.cudami.server.controller.ParameterHelper;
 import de.digitalcollections.model.identifiable.entity.Entity;
 import de.digitalcollections.model.identifiable.resource.FileResource;
-import de.digitalcollections.model.list.buckets.*;
+import de.digitalcollections.model.list.buckets.Bucket;
+import de.digitalcollections.model.list.buckets.BucketObjectsRequest;
+import de.digitalcollections.model.list.buckets.BucketObjectsResponse;
+import de.digitalcollections.model.list.buckets.BucketsRequest;
+import de.digitalcollections.model.list.buckets.BucketsResponse;
 import de.digitalcollections.model.list.filtering.FilterCriterion;
 import de.digitalcollections.model.list.filtering.Filtering;
 import de.digitalcollections.model.list.paging.PageRequest;
@@ -21,11 +25,19 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 import java.util.UUID;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @Tag(name = "Headword controller")
@@ -67,23 +79,19 @@ public class HeadwordController extends AbstractUniqueObjectController<Headword>
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
-      @RequestParam(name = "label", required = false) FilterCriterion<String> labelCriterion,
-      @RequestParam(name = "locale", required = false) FilterCriterion<String> localeCriterion)
+      @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria)
       throws ServiceException {
-    PageRequest pageRequest = new PageRequest(pageNumber, pageSize, sortBy);
-    if (labelCriterion != null || localeCriterion != null) {
-      Filtering filtering = new Filtering();
-      if (labelCriterion != null) {
-        filtering.add("label", labelCriterion);
+    PageRequest pageRequest =
+        createPageRequest(Headword.class, pageNumber, pageSize, sortBy, filterCriteria);
+    if (filterCriteria != null) {
+      Optional<FilterCriterion> localeCriterionOpt =
+          filterCriteria.stream().filter(p -> "locale".equals(p.getExpression())).findAny();
+      if (localeCriterionOpt.isPresent()) {
+        FilterCriterion localeCriterion = localeCriterionOpt.get();
+        String value = (String) localeCriterion.getValue();
+        localeCriterion.setValue(Locale.forLanguageTag(value));
       }
-      if (localeCriterion != null) {
-        filtering.add(
-            new FilterCriterion<Locale>(
-                "locale",
-                localeCriterion.getOperation(),
-                Locale.forLanguageTag(localeCriterion.getValue().toString())));
-      }
-      pageRequest.setFiltering(filtering);
+      pageRequest.setFiltering(new Filtering(filterCriteria));
     }
     return service.find(pageRequest);
   }

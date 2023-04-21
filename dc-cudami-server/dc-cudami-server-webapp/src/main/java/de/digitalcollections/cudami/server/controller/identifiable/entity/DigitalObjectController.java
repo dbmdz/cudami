@@ -15,6 +15,7 @@ import de.digitalcollections.model.identifiable.entity.item.Item;
 import de.digitalcollections.model.identifiable.resource.FileResource;
 import de.digitalcollections.model.identifiable.resource.ImageFileResource;
 import de.digitalcollections.model.list.filtering.FilterCriterion;
+import de.digitalcollections.model.list.filtering.FilterOperation;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.list.sorting.Order;
@@ -23,6 +24,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.tuple.Pair;
@@ -229,12 +231,20 @@ public class DigitalObjectController extends AbstractEntityController<DigitalObj
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public List<Locale> getLanguages(
-      @RequestParam(name = "parent.uuid", required = false)
-          FilterCriterion<UUID> parentUuidFilterCriterion)
+      @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria)
       throws ServiceException {
-    if (parentUuidFilterCriterion != null) {
-      return service.getLanguagesOfContainedDigitalObjects(
-          buildExampleWithUuid((UUID) parentUuidFilterCriterion.getValue()));
+    if (filterCriteria != null) {
+      Optional<FilterCriterion> parentUuidCriterion =
+          filterCriteria.stream()
+              .filter(
+                  p ->
+                      "parent.uuid".equals(p.getExpression())
+                          && p.getOperation() == FilterOperation.EQUALS)
+              .findAny();
+      if (parentUuidCriterion.isPresent()) {
+        return service.getLanguagesOfContainedDigitalObjects(
+            buildExampleWithUuid((UUID) parentUuidCriterion.get().getValue()));
+      }
     }
     return super.getLanguages();
   }

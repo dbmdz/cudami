@@ -242,10 +242,10 @@ public class CollectionController extends AbstractEntityController<Collection> {
   public List<CorporateBody> findRelatedCorporateBodies(
       @Parameter(example = "", description = "UUID of the collection") @PathVariable("uuid")
           UUID uuid,
-      @RequestParam(name = "predicate", required = true) FilterCriterion<String> predicate)
+      @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria)
       throws ServiceException {
-    Filtering filtering = Filtering.builder().add("predicate", predicate).build();
-    return service.findRelatedCorporateBodies(buildExampleWithUuid(uuid), filtering);
+    return service.findRelatedCorporateBodies(
+        buildExampleWithUuid(uuid), new Filtering(filterCriteria));
   }
 
   @Operation(

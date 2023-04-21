@@ -48,12 +48,7 @@ public abstract class AbstractUniqueObjectController<U extends UniqueObject>
       successful = getService().delete(example);
     } catch (ServiceException e) {
       LOGGER.error(
-          "Cannot delete "
-              + (example != null ? example.getClass().getSimpleName() : "anything")
-              + " with uuid="
-              + uuid
-              + ": "
-              + e,
+          "Cannot delete " + example.getClass().getSimpleName() + " with uuid=" + uuid + ": " + e,
           e);
       return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
     }

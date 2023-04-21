@@ -92,10 +92,7 @@ public class SubjectController extends AbstractUniqueObjectController<Subject> {
   @GetMapping(
       value = {"/v6/subjects/languages"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public List<Locale> getLanguages(
-      @RequestParam(name = "parent.uuid", required = false)
-          FilterCriterion<UUID> parentUuidFilterCriterion)
-      throws ServiceException {
+  public List<Locale> getLanguages() throws ServiceException {
     return service.getLanguages();
   }
 
