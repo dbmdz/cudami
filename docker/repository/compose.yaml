@@ -23,7 +23,7 @@ services:
   iiif:
     build:
       args:
-        HYMIR_VERSION: "5.1.5"
+        HYMIR_VERSION: "5.1.10"
       context: .
       dockerfile: Dockerfile-iiif
     ports:
@@ -35,7 +35,7 @@ services:
   media:
     build:
       args:
-        EUPHORIA_VERSION: "4.0.4"
+        EUPHORIA_VERSION: "4.0.5"
       context: .
       dockerfile: Dockerfile-media
     ports:
