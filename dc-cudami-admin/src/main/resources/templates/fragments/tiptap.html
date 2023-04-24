@@ -28,13 +28,13 @@
       &nbsp;
       <div class="btn-group" role="group" aria-label="...">
         <button id="btnBold" type="button" class="btn btn-default" tabindex="-1" title="Bold"
-                data-value="bold" onclick="editor.chain().focus().toggleBold().run()"><span class="fa fa-bold"></span></button>
+                data-value="strong" onclick="editor.chain().focus().toggleBold().run()"><span class="fa fa-bold"></span></button>
         <button type="button" class="btn btn-default" tabindex="-1" title="Italic"
-                data-value="italic" onclick="editor.chain().focus().toggleItalic().run()"><span class="fa fa-italic"></span></button>
+                data-value="em" onclick="editor.chain().focus().toggleItalic().run()"><span class="fa fa-italic"></span></button>
         <button type="button" class="btn btn-default" tabindex="-1" title="Underline"
                 data-value="underline" onclick="editor.chain().focus().toggleUnderline().run()"><span class="fa fa-underline"></span></button>
         <button type="button" class="btn btn-default" tabindex="-1" data-action="text"
-                data-value="strike" data-original-title="" title="" onclick="editor.chain().focus().toggleStrike().run()"><span class="fa fa-strikethrough"></span></button>
+                data-value="strikethrough" data-original-title="" title="" onclick="editor.chain().focus().toggleStrike().run()"><span class="fa fa-strikethrough"></span></button>
         <button type="button" class="btn btn-default" tabindex="-1" data-action="text"
                 data-value="subscript" data-original-title="" title=""><span class="fa fa-subscript"></span></button>
         <button type="button" class="btn btn-default" tabindex="-1" data-action="text"
@@ -42,10 +42,10 @@
       </div>
       &nbsp;
       <div class="btn-group" role="group" aria-label="...">
-        <button type="button" class="btn btn-default" tabindex="-1" data-action="lists" data-value="bulletList" data-original-title="" title=""
+        <button type="button" class="btn btn-default" tabindex="-1" data-action="lists" data-value="bullet_list" data-original-title="" title=""
                 onclick="editor.chain().focus().toggleBulletList().run()"><span class="fa fa-list-ul"></span></button>
 
-        <button type="button" class="btn btn-default" tabindex="-1" data-action="lists" data-value="orderedList" data-original-title="" title=""
+        <button type="button" class="btn btn-default" tabindex="-1" data-action="lists" data-value="ordered_list" data-original-title="" title=""
                 onclick="editor.chain().focus().toggleOrderedList().run()"><span class="fa fa-list-ol"></span></button>
         <button type="button" class="btn btn-default" tabindex="-1" data-action="lists" data-value="indent" data-original-title="" title=""><span class="fa fa-indent"></span></button>
         <button type="button" class="btn btn-default" tabindex="-1" data-action="lists" data-value="outdent" data-original-title="" title=""><span class="fa fa-outdent"></span></button>
@@ -75,12 +75,12 @@
     </div>
     &nbsp;
     <div class="btn-group" role="group" aria-label="...">
-      <button type="button" class="btn btn-default" tabindex="-1" th:title="#{tooltip.bold}" data-value="bold"
+      <button type="button" class="btn btn-default" tabindex="-1" th:title="#{tooltip.bold}" data-value="strong"
               th:onclick="|editors.get('__${editorId}__').chain().focus().toggleBold().run()|">
         <i class="fa fa-bold"></i>
       </button>
 
-      <button type="button" class="btn btn-default" tabindex="-1" th:title="#{tooltip.italic}" data-value="italic"
+      <button type="button" class="btn btn-default" tabindex="-1" th:title="#{tooltip.italic}" data-value="em"
               th:onclick="|editors.get('__${editorId}__').chain().focus().toggleItalic().run()|">
         <i class="fa fa-italic"></i>
       </button>
@@ -90,7 +90,7 @@
         <i class="fa fa-underline"></i>
       </button>
 
-      <button type="button" class="btn btn-default" tabindex="-1" th:title="#{tooltip.strike}" data-value="strike"
+      <button type="button" class="btn btn-default" tabindex="-1" th:title="#{tooltip.strike}" data-value="strikethrough"
               th:onclick="|editors.get('__${editorId}__').chain().focus().toggleStrike().run()|">
         <i class="fa fa-strikethrough"></i>
       </button>
