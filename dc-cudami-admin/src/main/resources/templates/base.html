@@ -111,9 +111,9 @@
                       <a class="nav-link"
                          th:classappend="${menu == 'users'} ? active"
                          th:href="@{/users}"
-                         th:title="#{users}">
+                         th:title="#{menu.users}">
                         <i class="fas fa-users nav-icon"></i>
-                        <p th:text="#{users}">Users</p>
+                        <p th:text="#{menu.users}">Users</p>
                       </a>
                     </li>
                     <li class="nav-item">

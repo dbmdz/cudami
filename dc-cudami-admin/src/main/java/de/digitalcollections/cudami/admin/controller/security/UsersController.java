@@ -19,6 +19,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -60,8 +61,36 @@ public class UsersController extends AbstractController {
   }
 
   @GetMapping("/users/new")
-  public String create() {
-    return "users/create";
+  public String create(Model model) throws ServiceException {
+    model.addAttribute("mode", "create");
+    model.addAttribute("user", service.create());
+    return "users/create-or-edit";
+  }
+
+  @PostMapping("/users/new")
+  public String create(
+      @RequestParam(value = "pwd1", required = false) String password1,
+      @RequestParam(value = "pwd2", required = false) String password2,
+      @ModelAttribute(name = "user") @Valid User user,
+      BindingResult results,
+      Model model,
+      SessionStatus status,
+      RedirectAttributes redirectAttributes)
+      throws ServiceException {
+    model.addAttribute("mode", "create");
+    verifyBinding(results);
+    if (results.hasErrors()) {
+      return "users/create-or-edit";
+    }
+    User userDb = service.create(user, password1, password2, (Errors) results);
+    if (results.hasErrors()) {
+      return "users/create-or-edit";
+    }
+    status.setComplete();
+    String message =
+        messageSource.getMessage("msg.created_successfully", null, LocaleContextHolder.getLocale());
+    redirectAttributes.addFlashAttribute("success_message", message);
+    return "redirect:/users/" + userDb.getUuid().toString();
   }
 
   @GetMapping("/users/{uuid:" + ParameterHelper.UUID_PATTERN + "}/deactivate")
@@ -83,8 +112,37 @@ public class UsersController extends AbstractController {
 
   @GetMapping("/users/{uuid:" + ParameterHelper.UUID_PATTERN + "}/edit")
   public String edit(@PathVariable UUID uuid, Model model) throws ServiceException {
+    model.addAttribute("mode", "edit");
     model.addAttribute("user", service.getByUuid(uuid));
-    return "users/edit";
+    return "users/create-or-edit";
+  }
+
+  @PostMapping("/users/{uuid:" + ParameterHelper.UUID_PATTERN + "}/edit")
+  public String edit(
+      @PathVariable UUID uuid,
+      @RequestParam(name = "pwd1", required = false) String password1,
+      @RequestParam(name = "pwd2", required = false) String password2,
+      @ModelAttribute(name = "user") @Valid User user,
+      BindingResult results,
+      Model model,
+      SessionStatus status,
+      RedirectAttributes redirectAttributes)
+      throws ServiceException {
+    model.addAttribute("mode", "edit");
+    verifyBinding(results);
+    if (results.hasErrors()) {
+      return "users/create-or-edit";
+    }
+    service.update(user, password1, password2, (Errors) results);
+    if (results.hasErrors()) {
+      return "users/create-or-edit";
+    }
+    status.setComplete();
+    String message =
+        messageSource.getMessage(
+            "msg.changes_saved_successfully", null, LocaleContextHolder.getLocale());
+    redirectAttributes.addFlashAttribute("success_message", message);
+    return "redirect:/users/" + uuid;
   }
 
   @GetMapping("/users")
@@ -110,7 +168,6 @@ public class UsersController extends AbstractController {
     return "users/edit-password";
   }
 
-  // TODO: Simplify user management
   @PostMapping("/users/updatePassword")
   public String updatePassword(
       @RequestParam("pwd1") String password1,

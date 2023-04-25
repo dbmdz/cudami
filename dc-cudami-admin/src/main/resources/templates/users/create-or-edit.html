@@ -1,0 +1,112 @@
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="https://github.com/thymeleaf/thymeleaf-extras-springsecurity"
+      xmlns:data="https://github.com/mxab/thymeleaf-extras-data-attribute"
+      layout:decorate="~{base}">
+
+  <head>
+    <title th:text="|#{page.title.users}: | + (${mode} == 'create' ? #{page.title.user.create} : #{page.title.user.edit(${user.email})})">Users: Create a new user / Edit user "admin@unknown.org"</title>
+  </head>
+
+  <body>
+    <th:block layout:fragment="content">
+      <div class="content">
+        <div class="container-fluid">
+
+          <form th:object="${user}" th:action="@{#}" method="post" role="form">
+            <div id="content-header">
+              <div class="row">
+                <div class="col d-flex justify-content-between">
+                  <h1 th:text="${mode} == 'create' ? #{page.title.user.create} : #{page.title.user.edit(*{email})}">Create a new user / Edit user "admin@unknown.org"</h1>
+                  <div>
+                    <button type="submit" class="btn btn-primary" th:text="#{save}">Save</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div id="content-body" class="rows-striped">
+              <div th:replace="fragments/feedback-messages :: form"></div>
+
+              <th:block th:if="${mode} == 'edit'">
+                <th:block th:insert="fragments/uniqueobject::renderFields(${user})"></th:block>
+                <hr>
+              </th:block>
+
+              <div class="row">
+                <div class="col-sm-12">
+                  <div class="form-group">
+                    <label class="font-weight-bold" for="email" th:text="#{lbl.username}">Username / Email</label>
+                    <div th:classappend="${#fields.hasErrors('email')}? has-error">
+                      <input id="email" th:field="*{email}" type="text" class="form-control" th:placeholder="#{lbl.username}" autofocus="autofocus" />
+                      <p th:if="${#fields.hasErrors('email')}" th:errors="*{email}">...</p>
+                    </div>
+                  </div>
+
+                  <div class="form-row">
+                    <div class="form-group col-md-6">
+                      <label class="font-weight-bold" for="lastname" th:text="#{lbl.lastname}">Lastname</label>
+
+                      <div th:classappend="${#fields.hasErrors('lastname')}? has-error">
+                        <input id="lastname" th:field="*{lastname}" type="text" class="form-control" th:placeholder="#{lbl.lastname}" />
+                        <p th:if="${#fields.hasErrors('lastname')}" th:errors="*{lastname}">...</p>
+                      </div>
+                    </div>
+                    <div class="form-group col-md-6">
+                      <label class="font-weight-bold" for="firstname" th:text="#{lbl.firstname}">Firstname</label>
+
+                      <div th:classappend="${#fields.hasErrors('firstname')}? has-error">
+                        <input id="firstname" th:field="*{firstname}" type="text" class="form-control" th:placeholder="#{lbl.firstname}" />
+                        <p th:if="${#fields.hasErrors('firstname')}" th:errors="*{firstname}">...</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <th:block th:unless="${createAdmin}">
+                    <div class="form-group">
+                      <label class="font-weight-bold" for="role" th:text="#{lbl.roles}">Role(s)</label>
+
+                      <div th:classappend="${#fields.hasErrors('roles')}? has-error">
+                        <ul class="list-group">
+                          <li th:each="userRole : ${allRoles}" class="list-group-item">
+                            <div class="form-check">
+                              <input class="form-check-input" type="checkbox" th:field="*{roles}" th:value="${userRole}" />
+                              <label class="font-weight-bold form-check-label" th:for="${#ids.prev('roles')}" th:text="#{enum.userRoles.__${userRole}__}">Administrator</label>
+                            </div>
+                          </li>
+                        </ul>
+                      </div>
+                    </div>
+                    <div class="form-group">
+                      <label class="font-weight-bold" th:text="#{lbl.status}">Status</label>
+                      <div class="form-check" th:classappend="${#fields.hasErrors('enabled')}? has-error">
+                        <input class="form-check-input" type="checkbox" th:field="*{enabled}" />
+                        <label class="font-weight-bold form-check-label" th:text="#{active}">active</label>
+                      </div>
+                    </div>
+
+                    <div th:if="${mode} == 'edit'" class="alert alert-info" th:text="#{alert.info.password_change}">
+                      If you want to change the user's password, fill the following two fields, please.
+                    </div>
+                  </th:block>
+
+                  <div class="form-row">
+                    <div class="form-group col-md-6">
+                      <label class="font-weight-bold" for="pwd1" th:text="#{lbl.new_password}">New password</label>
+                      <input id="pwd1" name="pwd1" type="password" class="form-control" autocomplete="new-password" />
+                    </div>
+                    <div class="form-group col-md-6">
+                      <label class="font-weight-bold" for="pwd2" th:text="#{lbl.verify_password}">Verify password</label>
+                      <input id="pwd2" name="pwd2" type="password" class="form-control" autocomplete="new-password" />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </th:block>
+  </body>
+
+</html>
