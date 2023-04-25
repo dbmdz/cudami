@@ -5,7 +5,7 @@
       layout:decorate="~{base-form}">
 
   <head>
-    <title th:text="|#{page.title.familynames}: | + (${mode} == 'edit' ? #{page.title.familyname.edit} : #{page.title.familyname.create})">Family names: Create a new family name / Edit family name</title>
+    <title th:text="|#{page.title.familynames}: | + (${mode} == 'create' ? #{page.title.familyname.create} : #{page.title.familyname.edit})">Family names: Create a new family name / Edit family name</title>
   </head>
 
   <body>
@@ -16,7 +16,7 @@
             <div id="content-header">
               <div class="row">
                 <div class="col-6">
-                  <h1 th:text="${mode} == 'edit' ? #{page.title.familyname.edit} : #{page.title.familyname.create}">Create a new family name / Edit family name</h1>
+                  <h1 th:text="${mode} == 'create' ? #{page.title.familyname.create} : #{page.title.familyname.edit}">Create a new family name / Edit family name</h1>
                 </div>
                 <div class="col-6">
                   <div class="float-right">
