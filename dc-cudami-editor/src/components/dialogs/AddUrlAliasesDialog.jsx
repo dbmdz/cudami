@@ -45,12 +45,13 @@ const AddUrlAliasesDialog = ({
   const initialUrlAlias = {
     hasEmptySlug: true,
     isDuplicate: false,
+    objectType: 'URL_ALIAS',
     slug: '',
+    target,
     targetLanguage: activeLanguage,
     website:
       parentWebsite &&
       pick(parentWebsite, ['identifiableObjectType', 'type', 'url', 'uuid']),
-    ...target,
   }
   const {apiContextPath, dispatch} = useContext(Context)
   const {defaultLanguage} = useContextReact(AppContext)

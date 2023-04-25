@@ -231,10 +231,12 @@ class IdentifiableForm extends Component {
       objectType: 'URL_ALIAS',
       primary: true,
       slug,
-      targetIdentifiableObjectType: identifiableObjectType,
-      targetIdentifiableType: type,
+      target: {
+        identifiableObjectType,
+        type,
+        uuid,
+      },
       targetLanguage: language,
-      targetUuid: uuid,
       website:
         website &&
         pick(website, ['identifiableObjectType', 'type', 'url', 'uuid']),
@@ -535,9 +537,9 @@ class IdentifiableForm extends Component {
             onSubmit={this.addUrlAlias}
             parentWebsite={parentWebsite}
             target={{
-              targetIdentifiableObjectType: identifiable.identifiableObjectType,
-              targetIdentifiableType: identifiable.type,
-              targetUuid: uuid,
+              identifiableObjectType: identifiable.identifiableObjectType,
+              type: identifiable.type,
+              uuid,
             }}
             toggle={() => this.toggleDialog('addUrlAliases')}
           />
