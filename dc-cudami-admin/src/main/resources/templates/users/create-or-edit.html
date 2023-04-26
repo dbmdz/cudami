@@ -35,69 +35,80 @@
 
               <div class="row">
                 <div class="col-sm-12">
-                  <div class="form-group">
-                    <label class="font-weight-bold" for="email" th:text="#{lbl.username}">Username / Email</label>
-                    <div th:classappend="${#fields.hasErrors('email')}? has-error">
-                      <input id="email" th:field="*{email}" type="text" class="form-control" th:placeholder="#{lbl.username}" autofocus="autofocus" />
-                      <p th:if="${#fields.hasErrors('email')}" th:errors="*{email}">...</p>
-                    </div>
+                  <div class="form-group" th:classappend="${#fields.hasErrors('email')}? has-error">
+                    <label for="email" class="required" th:text="#{lbl.username}">Username / Email</label>
+                    <input id="email" type="text" class="form-control" autofocus="autofocus" required="" value=""
+                           th:field="*{email}"
+                           th:classappend="${#fields.hasErrors('email')}? 'is-invalid'">
+                    <p th:if="${#fields.hasErrors('email')}" th:errors="*{email}">...</p>
                   </div>
 
                   <div class="form-row">
-                    <div class="form-group col-md-6">
-                      <label class="font-weight-bold" for="lastname" th:text="#{lbl.lastname}">Lastname</label>
-
-                      <div th:classappend="${#fields.hasErrors('lastname')}? has-error">
-                        <input id="lastname" th:field="*{lastname}" type="text" class="form-control" th:placeholder="#{lbl.lastname}" />
+                    <div class="col">
+                      <div class="form-group" th:classappend="${#fields.hasErrors('lastname')}? has-error">
+                        <label for="lastname" class="required" th:text="#{lbl.lastname}">Lastname</label>
+                        <input id="lastname" type="text" class="form-control" required="" value=""
+                               th:field="*{lastname}"
+                               th:classappend="${#fields.hasErrors('lastname')}? 'is-invalid'">
                         <p th:if="${#fields.hasErrors('lastname')}" th:errors="*{lastname}">...</p>
                       </div>
                     </div>
-                    <div class="form-group col-md-6">
-                      <label class="font-weight-bold" for="firstname" th:text="#{lbl.firstname}">Firstname</label>
-
-                      <div th:classappend="${#fields.hasErrors('firstname')}? has-error">
-                        <input id="firstname" th:field="*{firstname}" type="text" class="form-control" th:placeholder="#{lbl.firstname}" />
+                    <div class="col">
+                      <div class="form-group" th:classappend="${#fields.hasErrors('firstname')}? has-error">
+                        <label for="firstname" class="required" th:text="#{lbl.firstname}">Firstname</label>
+                        <input id="firstname" type="text" class="form-control" required="" value=""
+                               th:field="*{firstname}"
+                               th:classappend="${#fields.hasErrors('firstname')}? 'is-invalid'">
                         <p th:if="${#fields.hasErrors('firstname')}" th:errors="*{firstname}">...</p>
                       </div>
                     </div>
                   </div>
 
                   <th:block th:unless="${createAdmin}">
-                    <div class="form-group">
-                      <label class="font-weight-bold" for="role" th:text="#{lbl.roles}">Role(s)</label>
-
-                      <div th:classappend="${#fields.hasErrors('roles')}? has-error">
-                        <ul class="list-group">
-                          <li th:each="userRole : ${allRoles}" class="list-group-item">
-                            <div class="form-check">
-                              <input class="form-check-input" type="checkbox" th:field="*{roles}" th:value="${userRole}" />
-                              <label class="font-weight-bold form-check-label" th:for="${#ids.prev('roles')}" th:text="#{enum.userRoles.__${userRole}__}">Administrator</label>
-                            </div>
-                          </li>
-                        </ul>
+                    <div class="form-row">
+                      <div class="col">
+                        <div class="form-group">
+                          <label th:text="#{lbl.roles}">Role(s)</label>
+                          <ul class="list-group">
+                            <li th:each="userRole : ${allRoles}" class="list-group-item">
+                              <div class="form-check">
+                                <input class="form-check-input" type="checkbox" th:field="*{roles}" th:value="${userRole}" />
+                                <label class="font-weight-bold form-check-label" th:for="${#ids.prev('roles')}" th:text="#{enum.userRoles.__${userRole}__}">Administrator</label>
+                              </div>
+                            </li>
+                          </ul>
+                        </div>
                       </div>
-                    </div>
-                    <div class="form-group">
-                      <label class="font-weight-bold" th:text="#{lbl.status}">Status</label>
-                      <div class="form-check" th:classappend="${#fields.hasErrors('enabled')}? has-error">
-                        <input class="form-check-input" type="checkbox" th:field="*{enabled}" />
-                        <label class="font-weight-bold form-check-label" th:text="#{active}">active</label>
+                      <div class="col">
+                        <div class="form-group">
+                          <label th:text="#{lbl.status}">Status</label>
+                          <div class="form-check">
+                            <input class="form-check-input" type="checkbox" th:field="*{enabled}" />
+                            <label class="font-weight-bold form-check-label" th:text="#{active}">active</label>
+                          </div>
+                        </div>
                       </div>
-                    </div>
-
-                    <div th:if="${mode} == 'edit'" class="alert alert-info" th:text="#{alert.info.password_change}">
-                      If you want to change the user's password, fill the following two fields, please.
                     </div>
                   </th:block>
 
+                  <div th:if="${mode} == 'edit'" class="alert alert-info" th:text="#{alert.info.password_change}">
+                    If you want to change the user's password, fill the following two fields, please.
+                  </div>
+                  
                   <div class="form-row">
-                    <div class="form-group col-md-6">
-                      <label class="font-weight-bold" for="pwd1" th:text="#{lbl.new_password}">New password</label>
-                      <input id="pwd1" name="pwd1" type="password" class="form-control" autocomplete="new-password" />
+                    <div class="col">
+                      <div class="form-group">
+                        <label for="pwd1" th:classappend="${mode} == 'create'? 'required'"
+                               th:text="#{lbl.new_password}">New password</label>
+                        <input id="pwd1" name="pwd1" type="password" class="form-control" autocomplete="new-password" />
+                      </div>
                     </div>
-                    <div class="form-group col-md-6">
-                      <label class="font-weight-bold" for="pwd2" th:text="#{lbl.verify_password}">Verify password</label>
-                      <input id="pwd2" name="pwd2" type="password" class="form-control" autocomplete="new-password" />
+                    <div class="col">
+                      <div class="form-group">
+                        <label for="pwd2" th:classappend="${mode} == 'create'? 'required'"
+                               th:text="#{lbl.verify_password}">Verify password</label>
+                        <input id="pwd2" name="pwd2" type="password" class="form-control" autocomplete="new-password" />
+                      </div>
                     </div>
                   </div>
                 </div>

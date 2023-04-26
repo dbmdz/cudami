@@ -37,8 +37,9 @@
                 <div class="col-sm-12">
                   <div class="form-group" th:classappend="${#fields.hasErrors('label')}? has-error">
                     <label for="label" class="required" th:text="#{lbl.label}">Value</label>
-                    <input id="label" type="text" class="form-control" required="" value=""
-                           th:classappend="${#fields.hasErrors('label')}? 'is-invalid'" th:field="*{label}">
+                    <input id="label" type="text" class="form-control"autofocus="autofocus" required="" value=""
+                           th:field="*{label}"
+                           th:classappend="${#fields.hasErrors('label')}? 'is-invalid'">
                     <p th:if="${#fields.hasErrors('label')}" th:errors="*{label}">...</p>
                   </div>
                 </div>

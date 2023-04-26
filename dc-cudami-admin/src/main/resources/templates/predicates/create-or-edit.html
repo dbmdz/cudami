@@ -65,7 +65,9 @@
                   <th:block th:if="${mode} == 'create'">
                     <div class="form-group" th:classappend="${#fields.hasErrors('value')}? has-error">
                       <label for="value" th:text="#{lbl.value}" class="required">Value</label>
-                      <input th:field="*{value}" id="value" type="text" class="form-control" value="">
+                      <input id="value" type="text" class="form-control" required="" value=""
+                             th:classappend="${#fields.hasErrors('value')}? 'is-invalid'"
+                             th:field="*{value}">
                       <p th:if="${#fields.hasErrors('value')}" th:errors="*{value}">...</p>
                     </div>
                   </th:block>
@@ -74,7 +76,7 @@
 
               <th:block th:if="${mode} == 'edit'">
                 <div class="row">
-                  <div class="col-md-3"><label class="font-weight-bold mb-0" th:text="#{lbl.value}">Value</label></div>
+                  <div class="col-md-3"><label class="mb-0" th:text="#{lbl.value}">Value</label></div>
                   <div class="col-md-9"><span th:text="*{value}">is_author_of</span></div>
                 </div>
               </th:block>
