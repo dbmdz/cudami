@@ -83,8 +83,11 @@ public class PredicatesController extends AbstractUniqueObjectController<Predica
       @PathVariable UUID uuid,
       @RequestParam(name = "activeLanguage", required = false) Locale activeLanguage,
       Model model)
-      throws TechnicalException {
+      throws TechnicalException, ResourceNotFoundException {
     Predicate predicate = service.getByUuid(uuid);
+    if (predicate == null) {
+      throw new ResourceNotFoundException();
+    }
     model.addAttribute("predicate", predicate);
 
     List<Locale> existingLanguages =

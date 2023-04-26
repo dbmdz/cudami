@@ -5,21 +5,20 @@
       layout:decorate="~{base-form}">
 
   <head>
-    <title th:text="|#{predicates}: | + (${mode} == 'edit' ? #{predicates_edit} : #{predicates_create})">Relation types: Create a new / Edit relation type</title>
+    <title th:text="|#{page.title.predicates}: | + (${mode} == 'create' ? #{page.title.predicate.create} : #{page.title.predicate.edit})">Relation types: Create a new relation type / Edit relation type</title>
   </head>
 
   <body>
     <th:block layout:fragment="content">
       <div class="content">
         <div class="container-fluid">
+
           <form action="#" th:action="@{#}" th:object="${predicate}" method="post" role="form">
             <div id="content-header">
               <div class="row">
-                <div class="col-6">
-                  <h1 th:text="${mode} == 'edit' ? #{predicates_edit} : #{predicates_create}">Relation types: Create a new / Edit relation type</h1>
-                </div>
-                <div class="col-6">
-                  <div class="float-right">
+                <div class="col d-flex justify-content-between">
+                  <h1 th:text="${mode} == 'create' ? #{page.title.predicate.create} : #{page.title.predicate.edit}">Create a new relation type / Edit relation type</h1>
+                  <div>
                     <button type="submit" class="btn btn-primary" th:text="#{save}">Save</button>
                   </div>
                 </div>
@@ -28,6 +27,11 @@
 
             <div id="content-body" class="rows-striped">
               <div th:replace="fragments/feedback-messages :: form"></div>
+
+              <th:block th:if="${mode} == 'edit'">
+                <th:block th:insert="fragments/uniqueobject::renderFields(${predicate})"></th:block>
+                <hr>
+              </th:block>
 
               <div class="row">
                 <div class="col-sm-12">
@@ -69,7 +73,6 @@
               </div>
 
               <th:block th:if="${mode} == 'edit'">
-                <th:block th:insert="fragments/uniqueobject::renderFields(${predicate})"></th:block>
                 <div class="row">
                   <div class="col-md-3"><label class="font-weight-bold mb-0" th:text="#{lbl.value}">Value</label></div>
                   <div class="col-md-9"><span th:text="*{value}">is_author_of</span></div>
