@@ -56,10 +56,9 @@ public class PredicatesController extends AbstractUniqueObjectController<Predica
     Locale defaultLanguage = languageService.getDefaultLanguage();
     predicate.setLabel(new LocalizedText(defaultLanguage, ""));
     model.addAttribute("predicate", predicate);
+
     List<Locale> existingLanguages = List.of(defaultLanguage);
-
     List<Locale> sortedLanguages = languageService.getAllLanguages();
-
     model.addAttribute("existingLanguages", existingLanguages);
     model.addAttribute("allLanguages", sortedLanguages);
     model.addAttribute("activeLanguage", defaultLanguage);
@@ -178,9 +177,9 @@ public class PredicatesController extends AbstractUniqueObjectController<Predica
     return "redirect:/predicates/" + predicateDB.getUuid().toString();
   }
 
-  @PostMapping(value = "/predicates/{pathUuid}/edit")
+  @PostMapping(value = "/predicates/{uuid:" + ParameterHelper.UUID_PATTERN + "}/edit")
   public String update(
-      @PathVariable UUID pathUuid,
+      @PathVariable UUID uuid,
       @ModelAttribute("formData") Predicate predicateFormData,
       @ModelAttribute Predicate predicate,
       BindingResult results,
@@ -214,12 +213,12 @@ public class PredicatesController extends AbstractUniqueObjectController<Predica
     }
 
     try {
-      service.update(pathUuid, predicate);
+      service.update(uuid, predicate);
     } catch (TechnicalException e) {
-      String message = "Cannot update predicate with uuid=" + pathUuid + ": " + e;
+      String message = "Cannot update predicate with uuid=" + uuid + ": " + e;
       LOGGER.error(message, e);
       redirectAttributes.addFlashAttribute("error_message", message);
-      return "redirect:/predicates/" + pathUuid + "/edit";
+      return "redirect:/predicates/" + uuid + "/edit";
     }
 
     status.setComplete();
@@ -227,7 +226,7 @@ public class PredicatesController extends AbstractUniqueObjectController<Predica
         messageSource.getMessage(
             "msg.changes_saved_successfully", null, LocaleContextHolder.getLocale());
     redirectAttributes.addFlashAttribute("success_message", message);
-    return "redirect:/predicates/" + pathUuid;
+    return "redirect:/predicates/" + uuid;
   }
 
   private void validate(Predicate predicate, BindingResult results) {

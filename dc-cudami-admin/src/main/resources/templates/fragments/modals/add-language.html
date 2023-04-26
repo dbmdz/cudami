@@ -93,14 +93,19 @@
            let uiLocale = [[${#locale.language}]];
            +]*/
           let tabContent = $(targetLocalizedForm).find('.tab-content').first();
-
-          fetch(fragmentBaseUrl + '?language=' + uiLocale + '&fieldLanguage=' + languageAcronym, {method: "GET"})
-            .then(handleFetchErrors)
-            .then(function (html) {
-              $(tabContent).append(html);
+          let url = fragmentBaseUrl + '?language=' + uiLocale + '&fieldLanguage=' + languageAcronym;
+          fetch(url)
+            .then((response) => {
+              if (!response.ok) {
+                throw new Error(`HTTP error: ${response.status}`);
+              }
+              return response.text();
             })
-            .catch(function (error) {
-              alert(errorMessage);
+            .then((text) => {
+              $(tabContent).append(text);
+            })
+            .catch((error) => {
+              alert(`Could not fetch verse: ${error}`);
             });
         }
 

@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.Locale;
 import java.util.Set;
 import java.util.stream.Collectors;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,6 +14,16 @@ import org.springframework.web.bind.annotation.RequestParam;
 @Controller
 public class FragmentsController {
 
+  @GetMapping(value = "/fragments/forms/label", produces = MediaType.TEXT_HTML_VALUE)
+  public String getFormFragmentLabel(
+      @RequestParam(name = "fieldLanguage", required = true) String fieldLanguage, Model model) {
+    model.addAttribute("identifiable", new Identifiable());
+    model.addAttribute("beanName", "identifiable");
+    model.addAttribute("fieldLanguage", fieldLanguage);
+    model.addAttribute("active", true);
+    return "fragments/forms/multilanguage-label-form";
+  }
+
   @GetMapping(value = "/fragments/forms/label-description")
   public String getFormFragmentLabelDescription(
       @RequestParam(name = "fieldLanguage", required = true) String fieldLanguage, Model model) {
@@ -20,7 +31,7 @@ public class FragmentsController {
     model.addAttribute("beanName", "identifiable");
     model.addAttribute("fieldLanguage", fieldLanguage);
     model.addAttribute("active", true);
-    return "fragments/forms/label-description-form";
+    return "fragments/forms/multilanguage-label-description-form";
   }
 
   public static final String getDisplayLanguages(Locale displayLocale, Collection<Locale> locales) {
