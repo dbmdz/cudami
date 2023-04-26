@@ -27,10 +27,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service("identifiableService")
-@Transactional(rollbackFor = {Exception.class})
+// @Transactional(rollbackFor = {Exception.class}) //is set on super class
 public class IdentifiableServiceImpl<I extends Identifiable, R extends IdentifiableRepository<I>>
     extends UniqueObjectServiceImpl<I, R> implements IdentifiableService<I> {
 

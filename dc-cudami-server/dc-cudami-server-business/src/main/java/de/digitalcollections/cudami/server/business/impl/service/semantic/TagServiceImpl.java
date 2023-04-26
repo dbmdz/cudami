@@ -7,10 +7,9 @@ import de.digitalcollections.cudami.server.business.api.service.semantic.TagServ
 import de.digitalcollections.cudami.server.business.impl.service.UniqueObjectServiceImpl;
 import de.digitalcollections.model.semantic.Tag;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
-@Transactional(rollbackFor = Exception.class)
+// @Transactional(rollbackFor = Exception.class) //is set on super class
 public class TagServiceImpl extends UniqueObjectServiceImpl<Tag, TagRepository>
     implements TagService {
 

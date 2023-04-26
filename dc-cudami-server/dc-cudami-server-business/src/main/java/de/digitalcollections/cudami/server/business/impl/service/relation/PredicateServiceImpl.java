@@ -13,11 +13,10 @@ import de.digitalcollections.model.relation.Predicate;
 import java.util.List;
 import java.util.Locale;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 /** Service for managing predicates */
 @Service
-@Transactional(rollbackFor = {Exception.class})
+// @Transactional(rollbackFor = {Exception.class}) //is set on super class
 public class PredicateServiceImpl extends UniqueObjectServiceImpl<Predicate, PredicateRepository>
     implements PredicateService {
 

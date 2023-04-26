@@ -35,7 +35,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 /** Service implementation for UrlAlias handling. */
 @Service
-@Transactional(rollbackFor = {Exception.class})
+// @Transactional(rollbackFor = {Exception.class}) //is set on super class
 public class UrlAliasServiceImpl extends UniqueObjectServiceImpl<UrlAlias, UrlAliasRepository>
     implements UrlAliasService {
 

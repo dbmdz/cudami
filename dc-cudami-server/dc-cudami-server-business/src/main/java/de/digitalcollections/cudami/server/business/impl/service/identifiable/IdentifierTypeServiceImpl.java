@@ -16,10 +16,9 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service("identifierTypeService")
-@Transactional(rollbackFor = {Exception.class})
+// @Transactional(rollbackFor = {Exception.class}) //is set on super class
 public class IdentifierTypeServiceImpl
     extends UniqueObjectServiceImpl<IdentifierType, IdentifierTypeRepository>
     implements IdentifierTypeService {

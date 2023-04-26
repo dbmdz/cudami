@@ -14,10 +14,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service("identifierService")
-@Transactional(rollbackFor = {Exception.class})
+// @Transactional(rollbackFor = {Exception.class}) //is set on super class
 public class IdentifierServiceImpl extends UniqueObjectServiceImpl<Identifier, IdentifierRepository>
     implements IdentifierService {
   private final IdentifierTypeService identifierTypeService;

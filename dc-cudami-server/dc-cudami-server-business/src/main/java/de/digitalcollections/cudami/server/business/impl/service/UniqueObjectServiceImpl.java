@@ -16,7 +16,9 @@ import de.digitalcollections.model.list.sorting.Sorting;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import org.springframework.transaction.annotation.Transactional;
 
+@Transactional(rollbackFor = Exception.class)
 public abstract class UniqueObjectServiceImpl<
         U extends UniqueObject, R extends UniqueObjectRepository<U>>
     implements UniqueObjectService<U> {
