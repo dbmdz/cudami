@@ -34,6 +34,16 @@ public class FragmentsController {
     return "fragments/forms/multilanguage-label-description-form";
   }
 
+  @GetMapping(value = "/fragments/forms/label-loctextdescription")
+  public String getFormFragmentLabelLocalizedTextDescription(
+      @RequestParam(name = "fieldLanguage", required = true) String fieldLanguage, Model model) {
+    model.addAttribute("identifiable", new Identifiable());
+    model.addAttribute("beanName", "identifiable");
+    model.addAttribute("fieldLanguage", fieldLanguage);
+    model.addAttribute("active", true);
+    return "fragments/forms/multilanguage-label-loctextdescription-form";
+  }
+
   public static final String getDisplayLanguages(Locale displayLocale, Collection<Locale> locales) {
     if (locales == null || locales.isEmpty()) {
       return "";
