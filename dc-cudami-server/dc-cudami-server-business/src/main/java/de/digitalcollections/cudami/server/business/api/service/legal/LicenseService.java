@@ -1,58 +1,30 @@
 package de.digitalcollections.cudami.server.business.api.service.legal;
 
+import de.digitalcollections.cudami.server.business.api.service.UniqueObjectService;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.model.legal.License;
-import de.digitalcollections.model.list.paging.PageRequest;
-import de.digitalcollections.model.list.paging.PageResponse;
 import java.net.URL;
 import java.util.List;
 import java.util.Locale;
-import java.util.UUID;
+import java.util.Set;
 
 /** Service for licence handling. */
-public interface LicenseService {
-
-  /**
-   * Return count of licenses.
-   *
-   * @return the count of licenses
-   */
-  long count();
+public interface LicenseService extends UniqueObjectService<License> {
 
   /**
    * Delete a license by url
    *
    * @param url unique url of license
+   * @throws ServiceException
    */
-  void deleteByUrl(URL url);
-
-  /**
-   * Delete a license by UUID
-   *
-   * @param uuid unique uuid of license
-   */
-  void deleteByUuid(UUID uuid);
-
-  /**
-   * Delete licenses by their UUIDs
-   *
-   * @param uuids list of uuids of licenses
-   */
-  void deleteByUuids(List<UUID> uuids);
-
-  /**
-   * Return all licenses paged.
-   *
-   * @param pageRequest the paging parameters
-   * @return Paged list of all licenses
-   */
-  PageResponse<License> find(PageRequest pageRequest);
+  void deleteByUrl(URL url) throws ServiceException;
 
   /**
    * Return list of all licenses
    *
    * @return list of all licenses
    */
-  List<License> getAll();
+  Set<License> getAll() throws ServiceException;
 
   /**
    * Return license with url
@@ -60,36 +32,12 @@ public interface LicenseService {
    * @param url the url of the license
    * @return The found license
    */
-  License getByUrl(URL url);
-
-  /**
-   * Return license with uuid
-   *
-   * @param uuid the uuid of the license
-   * @return The found license
-   */
-  License getByUuid(UUID uuid);
+  License getByUrl(URL url) throws ServiceException;
 
   /**
    * Return list of languages of all licenses
    *
    * @return list of languages
    */
-  List<Locale> getLanguages();
-
-  /**
-   * Save a license.
-   *
-   * @param license the license to be saved
-   * @return the saved license
-   */
-  License save(License license);
-
-  /**
-   * Update a license.
-   *
-   * @param license the license to be updated
-   * @return the updated license
-   */
-  License update(License license);
+  List<Locale> getLanguages() throws ServiceException;
 }

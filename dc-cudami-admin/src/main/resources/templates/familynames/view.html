@@ -1,0 +1,50 @@
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="https://github.com/thymeleaf/thymeleaf-extras-springsecurity"
+      xmlns:data="https://github.com/mxab/thymeleaf-extras-data-attribute"
+      layout:decorate="~{base}">
+
+  <head>
+    <title th:text="|#{page.title.familynames}: #{lbl.familyname}|">Family names: Family name</title>
+  </head>
+
+  <body>
+    <th:block layout:fragment="content" th:object="${familyName}">
+      <div class="content">
+        <div class="container-fluid">
+          <div id="content-header">
+            <div class="row">
+              <div class="col d-flex justify-content-between">
+                <h1 th:text="#{lbl.familyname}">Family name</h1>
+                <div>
+                  <a class="btn btn-primary" id="edit-button" th:href="@{*{uuid} + '/edit'}" th:text="#{edit}">edit</a>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div id="content-body" class="rows-striped">
+            <!-- TODO it always contains "und" undefined language? -->
+            <th:block th:if="${not #lists.isEmpty(existingLanguages)}">
+              <div class="language-selection">
+                <span th:text="#{lbl.data_language}">Show language dependent values in</span>&nbsp;
+                <select th:replace="fragments/components/select-language-dropdown::render('data-languages', ${existingLanguages}, ${dataLanguage})">English</select>
+              </div>
+            </th:block>
+
+            <th:block th:insert="fragments/uniqueobject::renderFields(${familyName})"></th:block>
+
+            <th:block th:insert="fragments/identifiable::renderFields(${familyName})"></th:block>
+
+          </div>
+        </div>
+      </div>
+    </th:block>
+    <section layout:fragment="beforeBodyEnds">
+      <script type="text/javascript">
+        $(addDataLanguageChangeHandler());
+      </script>
+    </section>
+  </body>
+
+</html>

@@ -1,6 +1,8 @@
 package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.geo.location;
 
 import de.digitalcollections.cudami.model.config.CudamiConfig;
+import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
+import de.digitalcollections.cudami.server.backend.api.repository.identifiable.alias.UrlAliasRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.geo.location.GeoLocationRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.EntityRepositoryImpl;
 import de.digitalcollections.model.identifiable.entity.geo.location.GeoLocation;
@@ -20,20 +22,72 @@ public class GeoLocationRepositoryImpl<G extends GeoLocation> extends EntityRepo
   public static final String TABLE_ALIAS = "g";
   public static final String TABLE_NAME = "geolocations";
 
+  @Autowired
+  public GeoLocationRepositoryImpl(
+      Jdbi dbi,
+      CudamiConfig cudamiConfig,
+      IdentifierRepository identifierRepository,
+      UrlAliasRepository urlAliasRepository) {
+    this(
+        dbi,
+        TABLE_NAME,
+        TABLE_ALIAS,
+        MAPPING_PREFIX,
+        GeoLocation.class,
+        cudamiConfig.getOffsetForAlternativePaging(),
+        identifierRepository,
+        urlAliasRepository);
+  }
+
+  public GeoLocationRepositoryImpl(
+      Jdbi dbi,
+      String tableName,
+      String tableAlias,
+      String mappingPrefix,
+      Class<? extends GeoLocation> geoLocationImplClass,
+      int offsetForAlternativePaging,
+      IdentifierRepository identifierRepository,
+      UrlAliasRepository urlAliasRepository) {
+    super(
+        dbi,
+        tableName,
+        tableAlias,
+        mappingPrefix,
+        geoLocationImplClass,
+        offsetForAlternativePaging,
+        identifierRepository,
+        urlAliasRepository);
+  }
+
   @Override
-  public String getSqlInsertFields() {
+  public String getColumnName(String modelProperty) {
+    if (modelProperty == null) {
+      return null;
+    }
+    switch (modelProperty) {
+      case "coordinateLocation":
+        return tableAlias + ".coordinate_location";
+      case "geoLocationType":
+        return tableAlias + ".geolocation_type";
+      default:
+        return super.getColumnName(modelProperty);
+    }
+  }
+
+  @Override
+  protected String getSqlInsertFields() {
     return super.getSqlInsertFields() + ", coordinate_location, geolocation_type";
   }
 
   /* Do not change order! Must match order in getSqlInsertFields!!! */
   @Override
-  public String getSqlInsertValues() {
+  protected String getSqlInsertValues() {
     return super.getSqlInsertValues() + ", :coordinateLocation::JSONB, :geoLocationType";
   }
 
   @Override
   public String getSqlSelectAllFields(String tableAlias, String mappingPrefix) {
-    return getSqlSelectReducedFields(tableAlias, mappingPrefix)
+    return super.getSqlSelectAllFields(tableAlias, mappingPrefix)
         + ", "
         + tableAlias
         + ".coordinate_location "
@@ -52,28 +106,7 @@ public class GeoLocationRepositoryImpl<G extends GeoLocation> extends EntityRepo
   }
 
   @Override
-  public String getSqlUpdateFieldValues() {
+  protected String getSqlUpdateFieldValues() {
     return super.getSqlUpdateFieldValues() + ", coordinate_location=:coordinateLocation::JSONB";
-  }
-
-  @Autowired
-  public GeoLocationRepositoryImpl(Jdbi dbi, CudamiConfig cudamiConfig) {
-    this(
-        dbi,
-        TABLE_NAME,
-        TABLE_ALIAS,
-        MAPPING_PREFIX,
-        GeoLocation.class,
-        cudamiConfig.getOffsetForAlternativePaging());
-  }
-
-  public GeoLocationRepositoryImpl(
-      Jdbi dbi,
-      String tableName,
-      String tableAlias,
-      String mappingPrefix,
-      Class<? extends GeoLocation> entityImplClass,
-      int offsetForAlternativePaging) {
-    super(dbi, tableName, tableAlias, mappingPrefix, entityImplClass, offsetForAlternativePaging);
   }
 }

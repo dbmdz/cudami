@@ -8,25 +8,24 @@ import de.digitalcollections.cudami.server.business.api.service.exceptions.Servi
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifierService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.alias.UrlAliasService;
-import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.relation.EntityRelationService;
+import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.relation.EntityToEntityRelationService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.work.ManifestationService;
 import de.digitalcollections.cudami.server.business.impl.service.identifiable.entity.EntityServiceImpl;
 import de.digitalcollections.cudami.server.config.HookProperties;
-import de.digitalcollections.model.identifiable.Identifier;
 import de.digitalcollections.model.identifiable.entity.manifestation.Manifestation;
 import de.digitalcollections.model.identifiable.entity.relation.EntityRelation;
+import de.digitalcollections.model.identifiable.entity.work.Work;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import java.util.List;
 import java.util.Locale;
-import java.util.UUID;
 import org.springframework.stereotype.Service;
 
 @Service
 public class ManifestationServiceImpl extends EntityServiceImpl<Manifestation>
     implements ManifestationService {
 
-  private EntityRelationService entityRelationService;
+  private EntityToEntityRelationService entityRelationService;
 
   public ManifestationServiceImpl(
       ManifestationRepository repository,
@@ -34,7 +33,7 @@ public class ManifestationServiceImpl extends EntityServiceImpl<Manifestation>
       UrlAliasService urlAliasService,
       HookProperties hookProperties,
       LocaleService localeService,
-      EntityRelationService entityRealationService,
+      EntityToEntityRelationService entityRealationService,
       CudamiConfig cudamiConfig) {
     super(
         repository,
@@ -47,42 +46,33 @@ public class ManifestationServiceImpl extends EntityServiceImpl<Manifestation>
   }
 
   @Override
-  public PageResponse<Manifestation> findChildren(UUID uuid, PageRequest pageRequest) {
-    return ((ManifestationRepository) repository).findChildren(uuid, pageRequest);
-  }
-
-  @Override
-  public PageResponse<Manifestation> findManifestationsByWork(
-      UUID workUuid, PageRequest pageRequest) throws ServiceException {
+  public PageResponse<Manifestation> findManifestationsByWork(Work work, PageRequest pageRequest)
+      throws ServiceException {
     try {
-      return ((ManifestationRepository) repository).findManifestationsByWork(workUuid, pageRequest);
+      return ((ManifestationRepository) repository).findManifestationsByWork(work, pageRequest);
     } catch (RepositoryException e) {
       throw new ServiceException(
-          "Cannot retrieve manifestations for work with uuid=" + workUuid + ": " + e, e);
+          "Cannot retrieve manifestations for work with uuid=" + work + ": " + e, e);
     }
   }
 
   @Override
-  public Manifestation getByUuid(UUID uuid) throws ServiceException {
-    Manifestation manifestation = super.getByUuid(uuid);
-    return manifestation;
+  public PageResponse<Manifestation> findSubParts(
+      Manifestation manifestation, PageRequest pageRequest) throws ServiceException {
+    try {
+      return ((ManifestationRepository) repository).findSubParts(manifestation, pageRequest);
+    } catch (RepositoryException e) {
+      throw new ServiceException("Backend failure", e);
+    }
   }
 
   @Override
-  public Manifestation getByIdentifier(Identifier identifier) {
-    // TODO Auto-generated method stub
-    return super.getByIdentifier(identifier);
-  }
-
-  @Override
-  public Manifestation getByRefId(long refId) {
-    // TODO Auto-generated method stub
-    return super.getByRefId(refId);
-  }
-
-  @Override
-  public List<Locale> getLanguagesOfManifestationsForWork(UUID workUuid) {
-    return ((ManifestationRepository) repository).getLanguagesOfManifestationsForWork(workUuid);
+  public List<Locale> getLanguagesOfManifestationsForWork(Work work) throws ServiceException {
+    try {
+      return ((ManifestationRepository) repository).getLanguagesOfManifestationsForWork(work);
+    } catch (RepositoryException e) {
+      throw new ServiceException("Backend failure", e);
+    }
   }
 
   @Override
@@ -90,7 +80,7 @@ public class ManifestationServiceImpl extends EntityServiceImpl<Manifestation>
     super.save(manifestation);
     try {
       List<EntityRelation> entityRelations = manifestation.getRelations();
-      entityRelationService.persistEntityRelations(manifestation, entityRelations, true);
+      entityRelationService.setEntityRelations(manifestation, entityRelations, true);
     } catch (ServiceException e) {
       throw new ServiceException("Cannot save Manifestation=" + manifestation + ": " + e, e);
     }
@@ -101,7 +91,7 @@ public class ManifestationServiceImpl extends EntityServiceImpl<Manifestation>
     super.update(manifestation);
     try {
       List<EntityRelation> entityRelations = manifestation.getRelations();
-      entityRelationService.persistEntityRelations(manifestation, entityRelations, false);
+      entityRelationService.setEntityRelations(manifestation, entityRelations, false);
     } catch (ServiceException e) {
       throw new ServiceException("Cannot update Manifestation=" + manifestation + ": " + e, e);
     }

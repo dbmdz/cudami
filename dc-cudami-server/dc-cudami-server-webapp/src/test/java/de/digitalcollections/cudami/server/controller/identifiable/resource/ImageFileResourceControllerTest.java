@@ -11,6 +11,7 @@ import static org.mockito.Mockito.when;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.resource.ImageFileResourceService;
 import de.digitalcollections.cudami.server.controller.BaseControllerTest;
 import de.digitalcollections.model.file.MimeType;
+import de.digitalcollections.model.identifiable.Identifier;
 import de.digitalcollections.model.identifiable.resource.ImageFileResource;
 import de.digitalcollections.model.list.filtering.FilterCriterion;
 import de.digitalcollections.model.list.filtering.FilterOperation;
@@ -21,7 +22,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.List;
 import java.util.Locale;
-import java.util.UUID;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -51,7 +51,7 @@ class ImageFileResourceControllerTest extends BaseControllerTest {
             .filename("baz.jpg")
             .build();
 
-    when(imageFileResourceService.getByUuid(any(UUID.class))).thenReturn(expected);
+    when(imageFileResourceService.getByExample(any(ImageFileResource.class))).thenReturn(expected);
 
     testJson(path, "/v6/imagefileresources/12345678-abcd-1234-abcd-123456789012.json");
   }
@@ -86,7 +86,9 @@ class ImageFileResourceControllerTest extends BaseControllerTest {
   @DisplayName("can return a filtered and paged list of ImageFileResources")
   @ParameterizedTest
   @ValueSource(
-      strings = {"/v6/imagefileresources/search?pageNumber=0&pageSize=1&filename=eq:bla.jpg"})
+      strings = {
+        "/v6/imagefileresources/search?pageNumber=0&pageSize=1&filter=filename:eq:bla.jpg"
+      })
   public void find(String path) throws Exception {
     PageResponse<ImageFileResource> expected =
         (PageResponse)
@@ -202,11 +204,14 @@ class ImageFileResourceControllerTest extends BaseControllerTest {
   void testGetByIdentifierWithPlaintextId(String path) throws Exception {
     ImageFileResource expected = ImageFileResource.builder().build();
 
-    when(imageFileResourceService.getByIdentifier(eq("foo"), eq("bar"))).thenReturn(expected);
+    when(imageFileResourceService.getByIdentifier(
+            eq(Identifier.builder().namespace("foo").id("bar").build())))
+        .thenReturn(expected);
 
     testHttpGet(path);
 
-    verify(imageFileResourceService, times(1)).getByIdentifier(eq("foo"), eq("bar"));
+    verify(imageFileResourceService, times(1))
+        .getByIdentifier(eq(Identifier.builder().namespace("foo").id("bar").build()));
   }
 
   @DisplayName("can retrieve by identifier with base 64 encoded data")
@@ -215,13 +220,16 @@ class ImageFileResourceControllerTest extends BaseControllerTest {
   void testGetByIdentifierWithBase64EncodedData(String basePath) throws Exception {
     ImageFileResource expected = ImageFileResource.builder().build();
 
-    when(imageFileResourceService.getByIdentifier(eq("foo"), eq("bar/bla"))).thenReturn(expected);
+    when(imageFileResourceService.getByIdentifier(
+            eq(Identifier.builder().namespace("foo").id("bar/bla").build())))
+        .thenReturn(expected);
 
     testHttpGet(
         basePath
             + Base64.getEncoder().encodeToString("foo:bar/bla".getBytes(StandardCharsets.UTF_8)));
 
-    verify(imageFileResourceService, times(1)).getByIdentifier(eq("foo"), eq("bar/bla"));
+    verify(imageFileResourceService, times(1))
+        .getByIdentifier(eq(Identifier.builder().namespace("foo").id("bar/bla").build()));
   }
 
   // ------------------------------------------------------------

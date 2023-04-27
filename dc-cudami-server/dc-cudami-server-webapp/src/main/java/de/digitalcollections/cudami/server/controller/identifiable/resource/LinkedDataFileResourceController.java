@@ -8,23 +8,14 @@ import de.digitalcollections.cudami.server.controller.ParameterHelper;
 import de.digitalcollections.cudami.server.controller.identifiable.AbstractIdentifiableController;
 import de.digitalcollections.model.identifiable.resource.LinkedDataFileResource;
 import de.digitalcollections.model.list.filtering.FilterCriterion;
-import de.digitalcollections.model.list.filtering.Filtering;
-import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.list.sorting.Order;
-import de.digitalcollections.model.list.sorting.Sorting;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Locale;
-import java.util.Objects;
 import java.util.UUID;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -41,80 +32,23 @@ import org.springframework.web.bind.annotation.RestController;
 public class LinkedDataFileResourceController
     extends AbstractIdentifiableController<LinkedDataFileResource> {
 
-  private static final Logger LOGGER =
-      LoggerFactory.getLogger(LinkedDataFileResourceController.class);
-
   private final LinkedDataFileResourceService service;
 
   public LinkedDataFileResourceController(LinkedDataFileResourceService service) {
     this.service = service;
   }
 
-  @Override
-  protected IdentifiableService<LinkedDataFileResource> getService() {
-    return service;
-  }
-
-  @Operation(summary = "Get a paged list of all linkedDataFileResources")
+  @Operation(summary = "Get all linkedDataFileResources as (paged, sorted, filtered) list")
   @GetMapping(
-      value = {"/v6/linkeddatafileresources"},
+      value = {"/v6/linkeddatafileresources", "/v6/linkeddatafileresources/search"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public PageResponse<LinkedDataFileResource> find(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
-      @RequestParam(name = "label", required = false) String labelTerm,
-      @RequestParam(name = "labelLanguage", required = false) Locale labelLanguage,
-      @RequestParam(name = "uri", required = false)
-          FilterCriterion<String> encodedUriFilterCriterion) {
-
-    PageRequest pageRequest = new PageRequest(pageNumber, pageSize);
-    if (sortBy != null) {
-      Sorting sorting = new Sorting(sortBy);
-      pageRequest.setSorting(sorting);
-    }
-    if (encodedUriFilterCriterion != null) {
-      FilterCriterion<String> uri =
-          new FilterCriterion<>(
-              "uri",
-              encodedUriFilterCriterion.getOperation(),
-              URLDecoder.decode(
-                  (String) encodedUriFilterCriterion.getValue(), StandardCharsets.UTF_8));
-      Filtering filtering = Filtering.builder().add("uri", uri).build();
-      pageRequest.setFiltering(filtering);
-    }
-    addLabelFilter(pageRequest, labelTerm, labelLanguage);
-    return service.find(pageRequest);
-  }
-
-  @Operation(summary = "Find a limited and filtered amount of LinkedDataFileResources")
-  @GetMapping(
-      value = {"/v6/linkeddatafileresources/search"},
-      produces = MediaType.APPLICATION_JSON_VALUE)
-  public PageResponse<LinkedDataFileResource> find(
-      @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
-      @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
-      @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
-      @RequestParam(name = "searchTerm", required = false) String searchTerm,
-      @RequestParam(name = "uri", required = false)
-          FilterCriterion<String> encodedUriFilterCriterion) {
-    PageRequest searchPageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
-    if (sortBy != null) {
-      Sorting sorting = new Sorting(sortBy);
-      searchPageRequest.setSorting(sorting);
-    }
-    if (encodedUriFilterCriterion != null) {
-      FilterCriterion<String> uri =
-          new FilterCriterion<>(
-              "uri",
-              encodedUriFilterCriterion.getOperation(),
-              URLDecoder.decode(
-                  (String) encodedUriFilterCriterion.getValue(), StandardCharsets.UTF_8));
-      Filtering filtering = Filtering.builder().add("uri", uri).build();
-      searchPageRequest.setFiltering(filtering);
-    }
-
-    return service.find(searchPageRequest);
+      @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria)
+      throws ServiceException {
+    return super.find(pageNumber, pageSize, sortBy, filterCriteria);
   }
 
   @Operation(summary = "Get a linkedDataFileResource by uuid")
@@ -138,23 +72,26 @@ public class LinkedDataFileResourceController
           @RequestParam(name = "pLocale", required = false)
           Locale pLocale)
       throws ServiceException {
-    LinkedDataFileResource result;
     if (pLocale == null) {
-      result = service.getByUuid(uuid);
+      return super.getByUuid(uuid);
     } else {
-      result = service.getByUuidAndLocale(uuid, pLocale);
+      return super.getByUuidAndLocale(uuid, pLocale);
     }
-    return new ResponseEntity<>(result, result != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
+  }
+
+  @Override
+  protected IdentifiableService<LinkedDataFileResource> getService() {
+    return service;
   }
 
   @Operation(summary = "Save a newly created linkedDataFileResource")
   @PostMapping(
       value = {"/v6/linkeddatafileresources", "/v5/linkeddatafileresources"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public LinkedDataFileResource save(@RequestBody LinkedDataFileResource linkedDataFileResource)
+  public LinkedDataFileResource save(
+      @RequestBody LinkedDataFileResource linkedDataFileResource, BindingResult bindingResult)
       throws ServiceException, ValidationException {
-    service.save(linkedDataFileResource);
-    return linkedDataFileResource;
+    return super.save(linkedDataFileResource, bindingResult);
   }
 
   @Operation(summary = "Update a linkedDataFileResource")
@@ -169,8 +106,6 @@ public class LinkedDataFileResourceController
       @RequestBody LinkedDataFileResource linkedDataFileResource,
       BindingResult errors)
       throws ServiceException, ValidationException {
-    assert Objects.equals(uuid, linkedDataFileResource.getUuid());
-    service.update(linkedDataFileResource);
-    return linkedDataFileResource;
+    return super.update(uuid, linkedDataFileResource, errors);
   }
 }

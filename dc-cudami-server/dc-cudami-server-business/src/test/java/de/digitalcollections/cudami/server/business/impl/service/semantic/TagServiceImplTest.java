@@ -5,12 +5,14 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
 import de.digitalcollections.cudami.server.backend.api.repository.semantic.TagRepository;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
+import de.digitalcollections.model.identifiable.semantic.Subject;
 import de.digitalcollections.model.list.filtering.FilterCriterion;
 import de.digitalcollections.model.list.filtering.Filtering;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
-import de.digitalcollections.model.semantic.Subject;
 import de.digitalcollections.model.semantic.Tag;
 import de.digitalcollections.model.text.LocalizedText;
 import java.util.List;
@@ -33,7 +35,7 @@ class TagServiceImplTest {
 
   @DisplayName("can find tags")
   @Test
-  public void find() {
+  public void find() throws RepositoryException, ServiceException {
     PageRequest expectedPageRequest =
         PageRequest.builder()
             .pageSize(25)

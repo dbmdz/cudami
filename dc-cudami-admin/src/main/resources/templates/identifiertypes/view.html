@@ -3,52 +3,52 @@
       xmlns:sec="https://github.com/thymeleaf/thymeleaf-extras-springsecurity"
       xmlns:data="https://github.com/mxab/thymeleaf-extras-data-attribute"
       layout:decorate="~{base}">
+
   <head>
     <title th:text="|#{page.title.identifier_types}: #{lbl.identifier_type} &quot;${identifierType.namespace}&quot;|">...</title>
   </head>
+
   <body>
-  <th:block layout:fragment="content" th:object="${identifierType}">
-    <div class="content">
-      <div class="container-fluid">
-        <div id="content-header">
-          <div class="row">
-            <div class="col-sm-6">
-              <h1 th:text="|#{lbl.identifier_type} &quot;*{namespace}&quot;|">...</h1>
-            </div>
-            <div class="col-sm-6">
-              <div class="float-right">
-                <a class="btn btn-primary" id="edit-button" th:href="@{*{uuid} + '/edit'}" th:text="#{edit}">edit</a>
+    <th:block layout:fragment="content" th:object="${identifierType}">
+      <div class="content">
+        <div class="container-fluid">
+          <div id="content-header">
+            <div class="row">
+              <div class="col d-flex justify-content-between">
+                <h1 th:text="|#{lbl.identifier_type} &quot;*{namespace}&quot;|">...</h1>
+                <div>
+                  <a class="btn btn-primary" id="edit-button" th:href="@{*{uuid} + '/edit'}" th:text="#{edit}">edit</a>
+                </div>
               </div>
             </div>
           </div>
-        </div>
 
-        <div id="content-body" class="rows-striped">
+          <div id="content-body" class="rows-striped">
 
-          <th:block th:insert="fragments/uniqueobject::renderFields(${identifierType})"></th:block>
+            <th:block th:insert="fragments/uniqueobject::renderFields(${identifierType})"></th:block>
 
-          <hr/>
+            <hr />
 
-          <div class="row">
-            <div class="col-md-3"><label th:text="#{lbl.label}">Label</label></div>
-            <div class="col-md-9"><span th:text="*{label}">bla bla</span></div>
+            <div class="row">
+              <div class="col-md-3"><label th:text="#{lbl.label}">Label</label></div>
+              <div class="col-md-9"><span th:text="*{label}">bla bla</span></div>
+            </div>
+            <div class="row">
+              <div class="col-md-3"><label th:text="#{lbl.namespace}">Namespace</label></div>
+              <div class="col-md-9"><span th:text="*{namespace}">gnd</span></div>
+            </div>
+            <div class="row">
+              <div class="col-md-3"><label th:text="#{lbl.pattern}">Pattern</label></div>
+              <div class="col-md-9"><span th:text="*{pattern}">xyz[0-9]*</span></div>
+            </div>
+
           </div>
-          <div class="row">
-            <div class="col-md-3"><label th:text="#{lbl.namespace}">Namespace</label></div>
-            <div class="col-md-9"><span th:text="*{namespace}">gnd</span></div>
-          </div>
-          <div class="row">
-            <div class="col-md-3"><label th:text="#{lbl.pattern}">Pattern</label></div>
-            <div class="col-md-9"><span th:text="*{pattern}">xyz[0-9]*</span></div>
-          </div>
-
         </div>
       </div>
-    </div>
-  </th:block>
+    </th:block>
 
-  <section layout:fragment="beforeBodyEnds">
-    <div th:replace="fragments/modals/confirm-yes-no :: confirm-yes-no-dialog"></div>
-  </section>
-</body>
+    <section layout:fragment="beforeBodyEnds">
+    </section>
+  </body>
+
 </html>

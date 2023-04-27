@@ -1,15 +1,15 @@
 package de.digitalcollections.cudami.admin.controller.identifiable.entity;
 
+import de.digitalcollections.cudami.admin.business.i18n.LanguageService;
 import de.digitalcollections.cudami.admin.controller.ParameterHelper;
+import de.digitalcollections.cudami.admin.model.bootstraptable.BTRequest;
 import de.digitalcollections.cudami.admin.model.bootstraptable.BTResponse;
-import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
 import de.digitalcollections.cudami.client.identifiable.entity.CudamiTopicsClient;
 import de.digitalcollections.model.exception.TechnicalException;
 import de.digitalcollections.model.identifiable.entity.Entity;
 import de.digitalcollections.model.identifiable.entity.Topic;
 import de.digitalcollections.model.identifiable.resource.FileResource;
-import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.UUID;
@@ -32,8 +32,8 @@ public class TopicsAPIController extends AbstractEntitiesController<Topic, Cudam
 
   private static final Logger LOGGER = LoggerFactory.getLogger(TopicsAPIController.class);
 
-  public TopicsAPIController(LanguageSortingHelper languageSortingHelper, CudamiClient client) {
-    super(client.forTopics(), languageSortingHelper, client.forLocales());
+  public TopicsAPIController(CudamiClient client, LanguageService languageService) {
+    super(client.forTopics(), languageService);
   }
 
   @GetMapping("/api/topics/new")
@@ -42,20 +42,55 @@ public class TopicsAPIController extends AbstractEntitiesController<Topic, Cudam
     return service.create();
   }
 
-  @SuppressFBWarnings
-  @GetMapping("/api/topics")
+  @GetMapping("/api/topics/{uuid:" + ParameterHelper.UUID_PATTERN + "}/entities")
   @ResponseBody
-  public BTResponse<Topic> findTop(
+  public BTResponse<Entity> findRelatedEntities(
+      @PathVariable UUID uuid,
       @RequestParam(name = "offset", required = false, defaultValue = "0") int offset,
-      @RequestParam(name = "limit", required = false, defaultValue = "1") int limit,
+      @RequestParam(name = "limit", required = false, defaultValue = "10") int limit,
       @RequestParam(name = "search", required = false) String searchTerm,
-      @RequestParam(name = "sort", required = false, defaultValue = "label") String sort,
-      @RequestParam(name = "order", required = false, defaultValue = "asc") String order,
+      @RequestParam(name = "sort", required = false, defaultValue = "label") String sortProperty,
+      @RequestParam(name = "order", required = false, defaultValue = "asc") String sortOrder,
       @RequestParam(name = "dataLanguage", required = false) String dataLanguage)
       throws TechnicalException {
-    PageResponse<Topic> pageResponse =
-        service.findTopTopics(
-            createPageRequest(sort, order, dataLanguage, localeService, offset, limit, searchTerm));
+    BTRequest btRequest =
+        createBTRequest(
+            Entity.class,
+            offset,
+            limit,
+            sortProperty,
+            sortOrder,
+            "label",
+            searchTerm,
+            dataLanguage);
+    PageResponse<Entity> pageResponse =
+        ((CudamiTopicsClient) service).findEntities(uuid, btRequest);
+    return new BTResponse<>(pageResponse);
+  }
+
+  @GetMapping("/api/topics/{uuid:" + ParameterHelper.UUID_PATTERN + "}/fileresources")
+  @ResponseBody
+  public BTResponse<FileResource> findRelatedFileResources(
+      @PathVariable UUID uuid,
+      @RequestParam(name = "offset", required = false, defaultValue = "0") int offset,
+      @RequestParam(name = "limit", required = false, defaultValue = "10") int limit,
+      @RequestParam(name = "search", required = false) String searchTerm,
+      @RequestParam(name = "sort", required = false, defaultValue = "label") String sortProperty,
+      @RequestParam(name = "order", required = false, defaultValue = "asc") String sortOrder,
+      @RequestParam(name = "dataLanguage", required = false) String dataLanguage)
+      throws TechnicalException {
+    BTRequest btRequest =
+        createBTRequest(
+            FileResource.class,
+            offset,
+            limit,
+            sortProperty,
+            sortOrder,
+            "label",
+            searchTerm,
+            dataLanguage);
+    PageResponse<FileResource> pageResponse =
+        ((CudamiTopicsClient) service).findFileResources(uuid, btRequest);
     return new BTResponse<>(pageResponse);
   }
 
@@ -64,32 +99,35 @@ public class TopicsAPIController extends AbstractEntitiesController<Topic, Cudam
   public BTResponse<Topic> findSubtopic(
       @PathVariable UUID uuid,
       @RequestParam(name = "offset", required = false, defaultValue = "0") int offset,
-      @RequestParam(name = "limit", required = false, defaultValue = "1") int limit,
+      @RequestParam(name = "limit", required = false, defaultValue = "10") int limit,
       @RequestParam(name = "search", required = false) String searchTerm,
-      @RequestParam(name = "sort", required = false, defaultValue = "label") String sort,
-      @RequestParam(name = "order", required = false, defaultValue = "asc") String order,
+      @RequestParam(name = "sort", required = false, defaultValue = "label") String sortProperty,
+      @RequestParam(name = "order", required = false, defaultValue = "asc") String sortOrder,
       @RequestParam(name = "dataLanguage", required = false) String dataLanguage)
       throws TechnicalException {
-    PageRequest pageRequest =
-        createPageRequest(sort, order, dataLanguage, localeService, offset, limit, searchTerm);
-    PageResponse<Topic> pageResponse = service.findSubtopics(uuid, pageRequest);
+    BTRequest btRequest =
+        createBTRequest(
+            Topic.class, offset, limit, sortProperty, sortOrder, "label", searchTerm, dataLanguage);
+    PageResponse<Topic> pageResponse =
+        ((CudamiTopicsClient) service).findSubtopics(uuid, btRequest);
     return new BTResponse<>(pageResponse);
   }
 
-  @GetMapping("/api/topics/{uuid:" + ParameterHelper.UUID_PATTERN + "}/entities")
+  @SuppressFBWarnings
+  @GetMapping("/api/topics")
   @ResponseBody
-  public BTResponse<Entity> findRelatedEntities(
-      @PathVariable UUID uuid,
+  public BTResponse<Topic> findTop(
       @RequestParam(name = "offset", required = false, defaultValue = "0") int offset,
-      @RequestParam(name = "limit", required = false, defaultValue = "1") int limit,
+      @RequestParam(name = "limit", required = false, defaultValue = "10") int limit,
       @RequestParam(name = "search", required = false) String searchTerm,
-      @RequestParam(name = "sort", required = false, defaultValue = "label") String sort,
-      @RequestParam(name = "order", required = false, defaultValue = "asc") String order,
+      @RequestParam(name = "sort", required = false, defaultValue = "label") String sortProperty,
+      @RequestParam(name = "order", required = false, defaultValue = "asc") String sortOrder,
       @RequestParam(name = "dataLanguage", required = false) String dataLanguage)
       throws TechnicalException {
-    PageRequest pageRequest =
-        createPageRequest(sort, order, dataLanguage, localeService, offset, limit, searchTerm);
-    PageResponse<Entity> pageResponse = service.findEntities(uuid, pageRequest);
+    BTRequest btRequest =
+        createBTRequest(
+            Topic.class, offset, limit, sortProperty, sortOrder, "label", searchTerm, dataLanguage);
+    PageResponse<Topic> pageResponse = ((CudamiTopicsClient) service).findTopTopics(btRequest);
     return new BTResponse<>(pageResponse);
   }
 
@@ -97,23 +135,6 @@ public class TopicsAPIController extends AbstractEntitiesController<Topic, Cudam
   @ResponseBody
   public Topic getByUuid(@PathVariable UUID uuid) throws TechnicalException {
     return service.getByUuid(uuid);
-  }
-
-  @GetMapping("/api/topics/{uuid:" + ParameterHelper.UUID_PATTERN + "}/fileresources")
-  @ResponseBody
-  public BTResponse<FileResource> findRelatedFileResources(
-      @PathVariable UUID uuid,
-      @RequestParam(name = "offset", required = false, defaultValue = "0") int offset,
-      @RequestParam(name = "limit", required = false, defaultValue = "1") int limit,
-      @RequestParam(name = "search", required = false) String searchTerm,
-      @RequestParam(name = "sort", required = false, defaultValue = "label") String sort,
-      @RequestParam(name = "order", required = false, defaultValue = "asc") String order,
-      @RequestParam(name = "dataLanguage", required = false) String dataLanguage)
-      throws TechnicalException {
-    PageRequest pageRequest =
-        createPageRequest(sort, order, dataLanguage, localeService, offset, limit, searchTerm);
-    PageResponse<FileResource> pageResponse = service.findFileResources(uuid, pageRequest);
-    return new BTResponse<>(pageResponse);
   }
 
   @PostMapping("/api/topics")
@@ -125,7 +146,7 @@ public class TopicsAPIController extends AbstractEntitiesController<Topic, Cudam
       if (parentUuid == null) {
         topicDb = service.save(topic);
       } else {
-        topicDb = service.saveWithParentTopic(topic, parentUuid);
+        topicDb = ((CudamiTopicsClient) service).saveWithParentTopic(topic, parentUuid);
       }
       return ResponseEntity.status(HttpStatus.CREATED).body(topicDb);
     } catch (TechnicalException e) {

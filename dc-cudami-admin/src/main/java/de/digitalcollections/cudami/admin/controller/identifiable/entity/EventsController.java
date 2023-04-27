@@ -1,7 +1,7 @@
 package de.digitalcollections.cudami.admin.controller.identifiable.entity;
 
+import de.digitalcollections.cudami.admin.business.i18n.LanguageService;
 import de.digitalcollections.cudami.admin.controller.ParameterHelper;
-import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
 import de.digitalcollections.cudami.client.identifiable.entity.CudamiEventsClient;
 import de.digitalcollections.model.exception.ResourceNotFoundException;
@@ -22,13 +22,13 @@ import org.springframework.web.bind.annotation.RequestParam;
 @Controller
 public class EventsController extends AbstractEntitiesController<Event, CudamiEventsClient> {
 
-  public EventsController(LanguageSortingHelper languageSortingHelper, CudamiClient client) {
-    super(client.forEvents(), languageSortingHelper, client.forLocales());
+  public EventsController(CudamiClient client, LanguageService languageService) {
+    super(client.forEvents(), languageService);
   }
 
   @GetMapping("/events/new")
   public String create(Model model) throws TechnicalException {
-    model.addAttribute("activeLanguage", localeService.getDefaultLanguage());
+    model.addAttribute("activeLanguage", languageService.getDefaultLanguage());
     return "events/create";
   }
 
@@ -41,7 +41,7 @@ public class EventsController extends AbstractEntitiesController<Event, CudamiEv
     final Locale displayLocale = LocaleContextHolder.getLocale();
     Event event = service.getByUuid(uuid);
     List<Locale> existingLanguages =
-        languageSortingHelper.sortLanguages(displayLocale, event.getLabel().getLocales());
+        languageService.sortLanguages(displayLocale, event.getLabel().getLocales());
 
     if (activeLanguage != null && existingLanguages.contains(activeLanguage)) {
       model.addAttribute("activeLanguage", activeLanguage);
@@ -52,6 +52,21 @@ public class EventsController extends AbstractEntitiesController<Event, CudamiEv
     model.addAttribute("uuid", event.getUuid());
 
     return "events/edit";
+  }
+
+  @GetMapping("/events")
+  public String list(Model model) throws TechnicalException {
+    model.addAttribute("existingLanguages", getExistingLanguagesFromService());
+
+    String dataLanguage = getDataLanguage(null, languageService);
+    model.addAttribute("dataLanguage", dataLanguage);
+
+    return "events/list";
+  }
+
+  @ModelAttribute("menu")
+  protected String module() {
+    return "events";
   }
 
   @GetMapping("/events/{uuid:" + ParameterHelper.UUID_PATTERN + "}")
@@ -67,26 +82,11 @@ public class EventsController extends AbstractEntitiesController<Event, CudamiEv
     model.addAttribute("event", event);
 
     List<Locale> existingLanguages = getExistingLanguagesFromIdentifiable(event);
-    String dataLanguage = getDataLanguage(targetDataLanguage, localeService);
+    String dataLanguage = getDataLanguage(targetDataLanguage, languageService);
     model
         .addAttribute("existingLanguages", existingLanguages)
         .addAttribute("dataLanguage", dataLanguage);
 
     return "events/view";
-  }
-
-  @GetMapping("/events")
-  public String list(Model model) throws TechnicalException {
-    model.addAttribute("existingLanguages", getExistingLanguagesFromService());
-
-    String dataLanguage = getDataLanguage(null, localeService);
-    model.addAttribute("dataLanguage", dataLanguage);
-
-    return "events/list";
-  }
-
-  @ModelAttribute("menu")
-  protected String module() {
-    return "events";
   }
 }

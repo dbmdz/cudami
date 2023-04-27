@@ -1,16 +1,16 @@
 package de.digitalcollections.cudami.admin.controller.identifiable.entity.work;
 
 import de.digitalcollections.cudami.admin.business.api.service.exceptions.ServiceException;
+import de.digitalcollections.cudami.admin.business.i18n.LanguageService;
 import de.digitalcollections.cudami.admin.controller.ParameterHelper;
 import de.digitalcollections.cudami.admin.controller.identifiable.entity.AbstractEntitiesController;
+import de.digitalcollections.cudami.admin.model.bootstraptable.BTRequest;
 import de.digitalcollections.cudami.admin.model.bootstraptable.BTResponse;
-import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
 import de.digitalcollections.cudami.client.identifiable.entity.work.CudamiWorksClient;
 import de.digitalcollections.model.exception.TechnicalException;
 import de.digitalcollections.model.identifiable.entity.manifestation.Manifestation;
 import de.digitalcollections.model.identifiable.entity.work.Work;
-import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.UUID;
@@ -24,8 +24,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class WorksAPIController extends AbstractEntitiesController<Work, CudamiWorksClient> {
 
-  public WorksAPIController(LanguageSortingHelper languageSortingHelper, CudamiClient client) {
-    super(client.forWorks(), languageSortingHelper, client.forLocales());
+  public WorksAPIController(CudamiClient client, LanguageService languageService) {
+    super(client.forWorks(), languageService);
   }
 
   @SuppressFBWarnings
@@ -33,15 +33,14 @@ public class WorksAPIController extends AbstractEntitiesController<Work, CudamiW
   @ResponseBody
   public BTResponse<Work> find(
       @RequestParam(name = "offset", required = false, defaultValue = "0") int offset,
-      @RequestParam(name = "limit", required = false, defaultValue = "1") int limit,
+      @RequestParam(name = "limit", required = false, defaultValue = "10") int limit,
       @RequestParam(name = "search", required = false) String searchTerm,
-      @RequestParam(name = "sort", required = false, defaultValue = "url") String sort,
-      @RequestParam(name = "order", required = false, defaultValue = "asc") String order,
+      @RequestParam(name = "sort", required = false, defaultValue = "label") String sortProperty,
+      @RequestParam(name = "order", required = false, defaultValue = "asc") String sortOrder,
       @RequestParam(name = "dataLanguage", required = false) String dataLanguage)
       throws TechnicalException, ServiceException {
-    PageResponse<Work> pageResponse =
-        super.find(localeService, service, offset, limit, searchTerm, sort, order, dataLanguage);
-    return new BTResponse<>(pageResponse);
+    return find(
+        Work.class, offset, limit, sortProperty, sortOrder, "label", searchTerm, dataLanguage);
   }
 
   /*
@@ -52,15 +51,16 @@ public class WorksAPIController extends AbstractEntitiesController<Work, CudamiW
   public BTResponse<Work> findChildWorks(
       @PathVariable UUID uuid,
       @RequestParam(name = "offset", required = false, defaultValue = "0") int offset,
-      @RequestParam(name = "limit", required = false, defaultValue = "1") int limit,
+      @RequestParam(name = "limit", required = false, defaultValue = "10") int limit,
       @RequestParam(name = "search", required = false) String searchTerm,
-      @RequestParam(name = "sort", required = false, defaultValue = "label") String sort,
-      @RequestParam(name = "order", required = false, defaultValue = "asc") String order,
+      @RequestParam(name = "sort", required = false, defaultValue = "label") String sortProperty,
+      @RequestParam(name = "order", required = false, defaultValue = "asc") String sortOrder,
       @RequestParam(name = "dataLanguage", required = false) String dataLanguage)
       throws TechnicalException {
-    PageRequest pageRequest =
-        createPageRequest(sort, order, dataLanguage, localeService, offset, limit, searchTerm);
-    PageResponse<Work> pageResponse = service.findChildren(uuid, pageRequest);
+    BTRequest btRequest =
+        createBTRequest(
+            Work.class, offset, limit, sortProperty, sortOrder, "label", searchTerm, dataLanguage);
+    PageResponse<Work> pageResponse = ((CudamiWorksClient) service).findChildren(uuid, btRequest);
     return new BTResponse<>(pageResponse);
   }
 
@@ -72,16 +72,24 @@ public class WorksAPIController extends AbstractEntitiesController<Work, CudamiW
   public BTResponse<Manifestation> findManifestations(
       @PathVariable UUID uuid,
       @RequestParam(name = "offset", required = false, defaultValue = "0") int offset,
-      @RequestParam(name = "limit", required = false, defaultValue = "1") int limit,
+      @RequestParam(name = "limit", required = false, defaultValue = "10") int limit,
       @RequestParam(name = "search", required = false) String searchTerm,
-      @RequestParam(name = "sort", required = false, defaultValue = "label") String sort,
-      @RequestParam(name = "order", required = false, defaultValue = "asc") String order,
+      @RequestParam(name = "sort", required = false, defaultValue = "label") String sortProperty,
+      @RequestParam(name = "order", required = false, defaultValue = "asc") String sortOrder,
       @RequestParam(name = "dataLanguage", required = false) String dataLanguage)
       throws TechnicalException {
-    // FIXME: sorting crashes (maybe because of "label_de.asc.ignoreCase" / locale problem
-    PageRequest pageRequest =
-        createPageRequest(null, null, dataLanguage, localeService, offset, limit, searchTerm);
-    PageResponse<Manifestation> pageResponse = service.findManifestations(uuid, pageRequest);
+    BTRequest btRequest =
+        createBTRequest(
+            Manifestation.class,
+            offset,
+            limit,
+            sortProperty,
+            sortOrder,
+            "label",
+            searchTerm,
+            dataLanguage);
+    PageResponse<Manifestation> pageResponse =
+        ((CudamiWorksClient) service).findManifestations(uuid, btRequest);
     return new BTResponse<>(pageResponse);
   }
 }

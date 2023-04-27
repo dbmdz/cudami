@@ -5,6 +5,7 @@ import static org.mockito.Mockito.when;
 
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.ProjectService;
 import de.digitalcollections.cudami.server.controller.BaseControllerTest;
+import de.digitalcollections.model.identifiable.Identifier;
 import de.digitalcollections.model.identifiable.entity.Project;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
@@ -34,7 +35,11 @@ public class V2ProjectControllerTest extends BaseControllerTest {
                     Project.builder()
                         .created("2020-09-30T16:25:10.609465")
                         .identifier(
-                            "mdz-proj", "1467037957", "898947e9-0d61-4572-b87e-05a01868001d")
+                            Identifier.builder()
+                                .namespace("mdz-proj")
+                                .id("1467037957")
+                                .uuid("898947e9-0d61-4572-b87e-05a01868001d")
+                                .build())
                         .label(Locale.GERMAN, "100(0) Dokumente")
                         .lastModified("2021-04-13T04:15:01.274821")
                         .uuid("ae2a0a61-5255-46d4-8acf-cfddd3527338")

@@ -1,6 +1,8 @@
 package de.digitalcollections.cudami.server.controller.legal;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.when;
 
 import de.digitalcollections.cudami.server.business.api.service.legal.LicenseService;
@@ -67,7 +69,10 @@ public class LicenseControllerTest extends BaseControllerTest {
 
   @Test
   public void testDeleteByUuid() throws Exception {
+    License example = License.builder().uuid("599a120c-2dd5-11e8-b467-0ed5f89f718b").build();
+    when(licenseService.delete(eq(example))).thenReturn(true);
     testDeleteSuccessful("/v5/licenses/599a120c-2dd5-11e8-b467-0ed5f89f718b");
+    testDeleteSuccessful("/v6/licenses/599a120c-2dd5-11e8-b467-0ed5f89f718b");
   }
 
   @Test
@@ -112,7 +117,7 @@ public class LicenseControllerTest extends BaseControllerTest {
   @Test
   public void testGetByUuid() throws Exception {
     License license = createTestLicenseSaved();
-    when(licenseService.getByUuid(any(UUID.class))).thenReturn(license);
+    when(licenseService.getByExample(any(License.class))).thenReturn(license);
 
     testJson(
         "/v5/licenses/2780bee1-eeec-4b50-a95b-bba90793fc6a",
@@ -131,7 +136,17 @@ public class LicenseControllerTest extends BaseControllerTest {
             + "  \"url\": \"http://rightsstatements.org/vocab/InC-NC/1.0/\"\n"
             + "}";
     License savedLicense = createTestLicenseSaved();
-    when(licenseService.save(any(License.class))).thenReturn(savedLicense);
+    doAnswer(
+            invocation -> {
+              Object[] args = invocation.getArguments();
+              License license = (License) args[0];
+              license.setUuid(savedLicense.getUuid());
+              license.setCreated(savedLicense.getCreated());
+              license.setLastModified(savedLicense.getLastModified());
+              return null;
+            })
+        .when(licenseService)
+        .save(any(License.class));
 
     testPostJson("/v5/licenses", jsonBody, "/v5/legal/licenses/license_response.json");
   }
@@ -149,7 +164,17 @@ public class LicenseControllerTest extends BaseControllerTest {
             + "  \"uuid\": \"2780bee1-eeec-4b50-a95b-bba90793fc6a\"\n"
             + "}";
     License savedLicense = createTestLicenseSaved();
-    when(licenseService.update(any(License.class))).thenReturn(savedLicense);
+    doAnswer(
+            invocation -> {
+              Object[] args = invocation.getArguments();
+              License license = (License) args[0];
+              license.setUuid(savedLicense.getUuid());
+              license.setCreated(savedLicense.getCreated());
+              license.setLastModified(savedLicense.getLastModified());
+              return null;
+            })
+        .when(licenseService)
+        .update(any(License.class));
 
     testPutJson(
         "/v5/licenses/2780bee1-eeec-4b50-a95b-bba90793fc6a",

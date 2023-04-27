@@ -51,7 +51,7 @@ public class V5ItemController {
       @RequestParam(name = "language", required = false, defaultValue = "de") String language,
       @RequestParam(name = "searchTerm", required = false) String searchTerm,
       @RequestParam(name = "initial", required = false) String initial)
-      throws CudamiControllerException {
+      throws CudamiControllerException, ServiceException {
     PageRequest pageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
     if (sortBy != null) {
       Sorting sorting = new Sorting(sortBy);
@@ -93,9 +93,9 @@ public class V5ItemController {
 
     Item result;
     if (pLocale == null) {
-      result = itemService.getByUuid(uuid);
+      result = itemService.getByExample(Item.builder().uuid(uuid).build());
     } else {
-      result = itemService.getByUuidAndLocale(uuid, pLocale);
+      result = itemService.getByExampleAndLocale(Item.builder().uuid(uuid).build(), pLocale);
     }
     return new ResponseEntity<>(result, HttpStatus.OK);
   }
@@ -105,11 +105,13 @@ public class V5ItemController {
       value = {"/v2/items/{uuid}/digitalobjects", "/latest/items/{uuid}/digitalobjects"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Set<DigitalObject> getDigitalObjects(
-      @Parameter(name = "uuid", description = "UUID of the item") @PathVariable UUID uuid) {
+      @Parameter(name = "uuid", description = "UUID of the item") @PathVariable UUID uuid)
+      throws ServiceException {
     return new HashSet<>(
         itemService
             .findDigitalObjects(
-                uuid, PageRequest.builder().pageNumber(0).pageSize(Integer.MAX_VALUE).build())
+                Item.builder().uuid(uuid).build(),
+                PageRequest.builder().pageNumber(0).pageSize(Integer.MAX_VALUE).build())
             .getContent());
   }
 }

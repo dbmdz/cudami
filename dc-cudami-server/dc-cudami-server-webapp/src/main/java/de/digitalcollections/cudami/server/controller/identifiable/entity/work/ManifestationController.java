@@ -3,11 +3,11 @@ package de.digitalcollections.cudami.server.controller.identifiable.entity.work;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ConflictException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
-import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifiableService;
+import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.EntityService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.work.ItemService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.work.ManifestationService;
+import de.digitalcollections.cudami.server.controller.AbstractEntityController;
 import de.digitalcollections.cudami.server.controller.ParameterHelper;
-import de.digitalcollections.cudami.server.controller.identifiable.AbstractIdentifiableController;
 import de.digitalcollections.model.identifiable.entity.item.Item;
 import de.digitalcollections.model.identifiable.entity.manifestation.Manifestation;
 import de.digitalcollections.model.list.filtering.FilterCriterion;
@@ -23,23 +23,14 @@ import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
-import org.apache.commons.lang3.tuple.Pair;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @Tag(name = "Manifestation controller")
-public class ManifestationController extends AbstractIdentifiableController<Manifestation> {
+public class ManifestationController extends AbstractEntityController<Manifestation> {
 
   private ItemService itemService;
   private ManifestationService service;
@@ -50,17 +41,12 @@ public class ManifestationController extends AbstractIdentifiableController<Mani
     this.itemService = itemService;
   }
 
-  @Override
-  protected IdentifiableService<Manifestation> getService() {
-    return service;
-  }
-
   @Operation(summary = "Count all manifestations")
   @GetMapping(
       value = {"/v6/manifestations/count"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public long count() {
-    return service.count();
+  public long count() throws ServiceException {
+    return super.count();
   }
 
   @Operation(summary = "Delete a manifestation")
@@ -70,19 +56,11 @@ public class ManifestationController extends AbstractIdentifiableController<Mani
   public ResponseEntity delete(
       @Parameter(example = "", description = "UUID of the manifestation") @PathVariable("uuid")
           UUID uuid)
-      throws ConflictException {
-    boolean successful;
-    try {
-      successful = service.delete(uuid);
-    } catch (ServiceException e) {
-      return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-    return successful
-        ? new ResponseEntity<>(HttpStatus.NO_CONTENT)
-        : new ResponseEntity<>(HttpStatus.NOT_FOUND);
+      throws ConflictException, ServiceException {
+    return super.delete(uuid);
   }
 
-  @Operation(summary = "Get all manifestations")
+  @Operation(summary = "Get all manifestations as (paged, sorted, filtered) list")
   @GetMapping(
       value = {"/v6/manifestations"},
       produces = MediaType.APPLICATION_JSON_VALUE)
@@ -90,37 +68,9 @@ public class ManifestationController extends AbstractIdentifiableController<Mani
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
-      @RequestParam(name = "searchTerm", required = false) String searchTerm,
-      @RequestParam(name = "label", required = false) String labelTerm,
-      @RequestParam(name = "labelLanguage", required = false) Locale labelLanguage,
-      @RequestParam(name = "parent.uuid", required = false)
-          FilterCriterion<UUID> parentUuidFilterCriterion) {
-    return super.find(
-        pageNumber,
-        pageSize,
-        sortBy,
-        searchTerm,
-        labelTerm,
-        labelLanguage,
-        Pair.of("parent.uuid", parentUuidFilterCriterion));
-  }
-
-  @Operation(summary = "Find all children of a manifestation")
-  @GetMapping(
-      value = {"/v6/manifestations/{uuid:" + ParameterHelper.UUID_PATTERN + "}/children"},
-      produces = MediaType.APPLICATION_JSON_VALUE)
-  public PageResponse<Manifestation> findSubcollections(
-      @Parameter(example = "", description = "UUID of the manifestation") @PathVariable("uuid")
-          UUID uuid,
-      @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
-      @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
-      @RequestParam(name = "sortBy", required = false) List<Order> sortBy) {
-    PageRequest pageRequest = new PageRequest(null, pageNumber, pageSize);
-    if (sortBy != null) {
-      Sorting sorting = new Sorting(sortBy);
-      pageRequest.setSorting(sorting);
-    }
-    return service.findChildren(uuid, pageRequest);
+      @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria)
+      throws ServiceException {
+    return super.find(pageNumber, pageSize, sortBy, filterCriteria);
   }
 
   @Operation(summary = "Find all items of a manifestation")
@@ -139,7 +89,26 @@ public class ManifestationController extends AbstractIdentifiableController<Mani
       Sorting sorting = new Sorting(sortBy);
       pageRequest.setSorting(sorting);
     }
-    return itemService.findItemsByManifestation(uuid, pageRequest);
+    return itemService.findItemsByManifestation(buildExampleWithUuid(uuid), pageRequest);
+  }
+
+  @Operation(summary = "Find all children of a manifestation")
+  @GetMapping(
+      value = {"/v6/manifestations/{uuid:" + ParameterHelper.UUID_PATTERN + "}/children"},
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  public PageResponse<Manifestation> findSubcollections(
+      @Parameter(example = "", description = "UUID of the manifestation") @PathVariable("uuid")
+          UUID uuid,
+      @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
+      @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
+      @RequestParam(name = "sortBy", required = false) List<Order> sortBy)
+      throws ServiceException {
+    PageRequest pageRequest = new PageRequest(null, pageNumber, pageSize);
+    if (sortBy != null) {
+      Sorting sorting = new Sorting(sortBy);
+      pageRequest.setSorting(sorting);
+    }
+    return service.findSubParts(buildExampleWithUuid(uuid), pageRequest);
   }
 
   @Operation(
@@ -173,22 +142,19 @@ public class ManifestationController extends AbstractIdentifiableController<Mani
           @RequestParam(name = "pLocale", required = false)
           Locale pLocale)
       throws ServiceException {
-
-    Manifestation result;
     if (pLocale == null) {
-      result = service.getByUuid(uuid);
+      return super.getByUuid(uuid);
     } else {
-      result = service.getByUuidAndLocale(uuid, pLocale);
+      return super.getByUuidAndLocale(uuid, pLocale);
     }
-    return new ResponseEntity<>(result, result != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
   }
 
   @Operation(summary = "Get languages of all manifestations")
   @GetMapping(
       value = {"/v6/manifestations/languages"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public List<Locale> getLanguages() {
-    return service.getLanguages();
+  public List<Locale> getLanguages() throws ServiceException {
+    return super.getLanguages();
   }
 
   @Operation(
@@ -199,9 +165,14 @@ public class ManifestationController extends AbstractIdentifiableController<Mani
       value = {"/v6/manifestations/{uuid:" + ParameterHelper.UUID_PATTERN + "}/items/languages"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public List<Locale> getLanguagesOfItems(
-      @Parameter(name = "uuid", description = "UUID of the manifestation") @PathVariable
-          UUID uuid) {
-    return itemService.getLanguagesOfItemsForManifestation(uuid);
+      @Parameter(name = "uuid", description = "UUID of the manifestation") @PathVariable UUID uuid)
+      throws ServiceException {
+    return itemService.getLanguagesOfItemsForManifestation(buildExampleWithUuid(uuid));
+  }
+
+  @Override
+  protected EntityService<Manifestation> getService() {
+    return service;
   }
 
   @Operation(summary = "Save a newly created manifestation")
@@ -210,8 +181,7 @@ public class ManifestationController extends AbstractIdentifiableController<Mani
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Manifestation save(@RequestBody Manifestation manifestation, BindingResult errors)
       throws ServiceException, ValidationException {
-    service.save(manifestation);
-    return manifestation;
+    return super.save(manifestation, errors);
   }
 
   @Operation(summary = "update an manifestation")
@@ -221,11 +191,6 @@ public class ManifestationController extends AbstractIdentifiableController<Mani
   public Manifestation update(
       @PathVariable UUID uuid, @RequestBody Manifestation manifestation, BindingResult errors)
       throws ServiceException, ValidationException {
-    if (uuid == null || manifestation == null || !uuid.equals(manifestation.getUuid())) {
-      throw new IllegalArgumentException("UUID mismatch of new and existing manifestation");
-    }
-
-    service.update(manifestation);
-    return manifestation;
+    return super.update(uuid, manifestation, errors);
   }
 }

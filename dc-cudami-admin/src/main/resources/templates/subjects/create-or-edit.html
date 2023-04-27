@@ -1,0 +1,88 @@
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="https://github.com/thymeleaf/thymeleaf-extras-springsecurity"
+      xmlns:data="https://github.com/mxab/thymeleaf-extras-data-attribute"
+      layout:decorate="~{base-form}">
+
+  <head>
+    <title th:text="|#{page.title.subjects}: | + (${mode} == 'edit' ? #{page.title.subject.edit} : #{page.title.subject.create})">Subjects: Create a new subject / Edit subject</title>
+  </head>
+
+  <body>
+    <th:block layout:fragment="content">
+      <div class="content">
+        <div class="container-fluid">
+          <form action="#" th:action="@{#}" th:object="${subject}" method="post" role="form">
+            <div id="content-header">
+              <div class="row">
+                <div class="col-6">
+                  <h1 th:text="${mode} == 'edit' ? #{page.title.subject.edit} : #{page.title.subject.create}">Subjects: Create a new subject / Edit subject</h1>
+                </div>
+                <div class="col-6">
+                  <div class="float-right">
+                    <button type="submit" class="btn btn-primary" th:text="#{save}">Save</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div id="content-body" class="rows-striped">
+              <div th:replace="fragments/feedback-messages :: form"></div>
+
+              <div class="row">
+                <div class="col-sm-12">
+                  <div class="localized-form" data-tabid-prefix="lbl-desc-">
+                    <ul class="nav nav-tabs" role="tablist">
+                      <li class="nav-tab language-tab" th:each="language,iter : ${existingLanguages}" th:classappend="${iter.index} == 0 ? active">
+                        <a
+                           class="language-switcher nav-link"
+                           th:classappend="${iter.index} == 0 ? active"
+                           data-toggle="tab"
+                           role="tab"
+                           th:href="${'#lbl-desc-' + language}"
+                           th:with="languageToDisplay=${language.getDisplayName(#locale)}"
+                           th:text="${#strings.isEmpty(languageToDisplay)} ? #{language_not_specified} : ${languageToDisplay}">
+                          language
+                        </a>
+                      </li>
+                      <li class="nav-tab">
+                        <a th:title="#{tooltip.add_new_language}" class="nav-link" data-toggle="modal" data-target="#addLanguageDialog" data-fragment="label-description">
+                          <i class="fa fa-plus"></i>
+                        </a>
+                      </li>
+                    </ul>
+                    <div class="tab-content">
+                      <th:block th:each="language, iter : ${existingLanguages}">
+                        <div th:replace="fragments/forms/label-description-form :: html(fieldLanguage=${language},active=${iter.index == 0},beanName='subject')"></div>
+                      </th:block>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col-md-3"><label for="subjectType" th:text="#{lbl.subject_type}" class="font-weight-bold mb-0 required">Subject type</label></div>
+                <div class="col-md-9">
+                  <!--/* We need to use "name" attribute instead of th:field. otherwise th:selected does not work */-->
+                  <select id="subjectType" name="subjectType" class="form-select">
+                    <th:block th:each="subjectType, iter : ${subjectTypes}">
+                      <span th:text="${subjectType}"></span>
+                      <th:block th:with="subjectTypeLabel=${#messages.msgOrNull('subjecttype.' + #strings.toLowerCase(subjectType))}">
+                        <option th:value="${subjectType}" th:selected="*{subjectType} != null ? ${subjectType} == *{subjectType} : ${#strings.equals(subjectType, 'UNSPECIFIED')}" th:text="${subjectTypeLabel != null ? subjectTypeLabel : subjectType}">Genre</option>
+                      </th:block>
+                    </th:block>
+                  </select>
+                </div>
+              </div>
+
+              <th:block th:if="${mode} == 'edit'">
+                <th:block th:insert="fragments/uniqueobject::renderFields(${subject})"></th:block>
+              </th:block>
+            </div>
+          </form>
+        </div>
+      </div>
+    </th:block>
+  </body>
+
+</html>

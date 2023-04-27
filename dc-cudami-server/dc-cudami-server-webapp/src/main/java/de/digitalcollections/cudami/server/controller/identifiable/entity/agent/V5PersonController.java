@@ -2,10 +2,12 @@ package de.digitalcollections.cudami.server.controller.identifiable.entity.agent
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.agent.PersonService;
 import de.digitalcollections.cudami.server.controller.CudamiControllerException;
 import de.digitalcollections.cudami.server.controller.legacy.V5MigrationHelper;
 import de.digitalcollections.model.identifiable.entity.agent.Person;
+import de.digitalcollections.model.identifiable.entity.geo.location.GeoLocation;
 import de.digitalcollections.model.list.filtering.FilterCriterion;
 import de.digitalcollections.model.list.filtering.Filtering;
 import de.digitalcollections.model.list.paging.PageRequest;
@@ -55,7 +57,7 @@ public class V5PersonController {
       @RequestParam(name = "previewImage", required = false)
           FilterCriterion<UUID> previewImageFilter,
       @RequestParam(name = "searchTerm", required = false) String searchTerm)
-      throws CudamiControllerException {
+      throws CudamiControllerException, ServiceException {
     PageRequest searchPageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
     if (sortBy != null) {
       Sorting sorting = new Sorting(V5MigrationHelper.migrate(sortBy));
@@ -99,13 +101,15 @@ public class V5PersonController {
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy)
-      throws CudamiControllerException {
+      throws CudamiControllerException, ServiceException {
     PageRequest pageRequest = new PageRequest(pageNumber, pageSize);
     if (sortBy != null) {
       Sorting sorting = new Sorting(sortBy);
       pageRequest.setSorting(sorting);
     }
-    PageResponse<Person> pageResponse = personService.findByGeoLocationOfBirth(pageRequest, uuid);
+    PageResponse<Person> pageResponse =
+        personService.findByGeoLocationOfBirth(
+            GeoLocation.builder().uuid(uuid).build(), pageRequest);
     try {
       String result = V5MigrationHelper.migrate(pageResponse, objectMapper);
       return new ResponseEntity<>(result, HttpStatus.OK);
@@ -132,13 +136,15 @@ public class V5PersonController {
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy)
-      throws CudamiControllerException {
+      throws CudamiControllerException, ServiceException {
     PageRequest pageRequest = new PageRequest(pageNumber, pageSize);
     if (sortBy != null) {
       Sorting sorting = new Sorting(sortBy);
       pageRequest.setSorting(sorting);
     }
-    PageResponse<Person> pageResponse = personService.findByGeoLocationOfDeath(pageRequest, uuid);
+    PageResponse<Person> pageResponse =
+        personService.findByGeoLocationOfDeath(
+            GeoLocation.builder().uuid(uuid).build(), pageRequest);
     try {
       String result = V5MigrationHelper.migrate(pageResponse, objectMapper);
       return new ResponseEntity<>(result, HttpStatus.OK);

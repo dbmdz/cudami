@@ -5,6 +5,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.CollectionRepository;
 import de.digitalcollections.cudami.server.business.api.service.LocaleService;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ConflictException;
@@ -16,7 +17,6 @@ import de.digitalcollections.model.identifiable.entity.Collection;
 import de.digitalcollections.model.identifiable.entity.digitalobject.DigitalObject;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
-import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
@@ -33,7 +33,8 @@ class CollectionServiceImplTest extends AbstractServiceImplTest {
   private LocaleService localeService;
 
   @BeforeEach
-  public void beforeEach() {
+  public void beforeEach() throws Exception {
+    super.beforeEach();
     collectionRepository = mock(CollectionRepository.class);
     identifierService = mock(IdentifierService.class);
     urlAliasService = mock(UrlAliasService.class);
@@ -51,24 +52,24 @@ class CollectionServiceImplTest extends AbstractServiceImplTest {
 
   @DisplayName("throws an exception, when a collection with children shall be deleted")
   @Test
-  public void execeptionOnDeletionOfCollectionWithChildren() {
+  public void execeptionOnDeletionOfCollectionWithChildren() throws RepositoryException {
     PageResponse<Collection> pageResponse = mock(PageResponse.class);
     when(pageResponse.getTotalElements()).thenReturn(1l);
-    when(collectionRepository.findChildren(any(UUID.class), any(PageRequest.class)))
+    when(collectionRepository.findChildren(any(Collection.class), any(PageRequest.class)))
         .thenReturn(pageResponse);
-    assertThrows(ConflictException.class, () -> collectionService.delete(UUID.randomUUID()));
+    assertThrows(ConflictException.class, () -> collectionService.delete(createCollection()));
   }
 
   @DisplayName(
       "throws an exception, when a collection with attached DigitalObjects shall be deleted")
   @Test
   @Disabled("cannot work, since the service works with unmockable typecasted repositories")
-  public void execeptionOnDeletionOfFilledCollection() {
+  public void execeptionOnDeletionOfFilledCollection() throws RepositoryException {
     PageResponse<DigitalObject> pageResponse = mock(PageResponse.class);
     when(pageResponse.getTotalElements()).thenReturn(1l);
-    when(collectionRepository.findDigitalObjects(any(UUID.class), any(PageRequest.class)))
+    when(collectionRepository.findDigitalObjects(any(Collection.class), any(PageRequest.class)))
         .thenReturn(pageResponse);
 
-    assertThrows(ConflictException.class, () -> collectionService.delete(UUID.randomUUID()));
+    assertThrows(ConflictException.class, () -> collectionService.delete(createCollection()));
   }
 }

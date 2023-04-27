@@ -1,34 +1,18 @@
 package de.digitalcollections.cudami.server.business.api.service.identifiable;
 
+import de.digitalcollections.cudami.server.business.api.service.UniqueObjectService;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.model.identifiable.IdentifierType;
-import de.digitalcollections.model.list.paging.PageRequest;
-import de.digitalcollections.model.list.paging.PageResponse;
-import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
-public interface IdentifierTypeService {
+public interface IdentifierTypeService extends UniqueObjectService<IdentifierType> {
 
-  long count();
+  IdentifierType getByNamespace(String namespace) throws ServiceException;
 
-  default void delete(UUID uuid) {
-    delete(List.of(uuid)); // same performance as "where uuid = :uuid"
-  }
-
-  void delete(List<UUID> uuids);
-
-  PageResponse<IdentifierType> find(PageRequest pageRequest);
-
-  IdentifierType getByNamespace(String namespace);
-
-  IdentifierType getByUuid(UUID uuid);
-
-  IdentifierType save(IdentifierType identifierType) throws ServiceException;
-
-  IdentifierType update(IdentifierType identifierType) throws ServiceException;
-
-  Map<String, String> getIdentifierTypeCache();
+  // FIXME: move as internal implementation to IdentifierTypeRepositoryImpl or IdentifierServiceImpl
+  // (for validation only)
+  // get all identifierTypes using count and paging (maybe introduce a getAll() in repo?)
+  Map<String, String> getIdentifierTypeCache() throws ServiceException;
 
   Map<String, String> updateIdentifierTypeCache() throws ServiceException;
 }

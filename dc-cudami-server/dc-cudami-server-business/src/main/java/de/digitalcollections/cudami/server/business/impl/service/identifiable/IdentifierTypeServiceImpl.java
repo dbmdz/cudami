@@ -3,84 +3,61 @@ package de.digitalcollections.cudami.server.business.impl.service.identifiable;
 import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierTypeRepository;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifierTypeService;
+import de.digitalcollections.cudami.server.business.impl.service.UniqueObjectServiceImpl;
 import de.digitalcollections.model.identifiable.IdentifierType;
 import de.digitalcollections.model.list.paging.PageRequest;
-import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.list.sorting.Direction;
 import de.digitalcollections.model.list.sorting.Sorting;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.UUID;
+import java.util.Set;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service("identifierTypeService")
-@Transactional(rollbackFor = {Exception.class})
-public class IdentifierTypeServiceImpl implements IdentifierTypeService {
+// @Transactional(rollbackFor = {Exception.class}) //is set on super class
+public class IdentifierTypeServiceImpl
+    extends UniqueObjectServiceImpl<IdentifierType, IdentifierTypeRepository>
+    implements IdentifierTypeService {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(IdentifierTypeServiceImpl.class);
 
-  private final IdentifierTypeRepository repository;
   private Map<String, String> identifierTypeCache;
 
-  @Autowired
   public IdentifierTypeServiceImpl(IdentifierTypeRepository repository) throws ServiceException {
-    this.repository = repository;
-    updateIdentifierTypeCache();
+    super(repository);
   }
 
   @Override
-  public long count() {
-    return repository.count();
+  public IdentifierType getByNamespace(String namespace) throws ServiceException {
+    try {
+      return repository.getByNamespace(namespace);
+    } catch (RepositoryException e) {
+      throw new ServiceException("Backend failure", e);
+    }
   }
 
   @Override
-  public void delete(List<UUID> uuids) {
-    repository.delete(uuids);
-  }
-
-  @Override
-  public PageResponse<IdentifierType> find(PageRequest pageRequest) {
-    setDefaultSorting(pageRequest);
-    return repository.find(pageRequest);
-  }
-
-  @Override
-  public IdentifierType getByNamespace(String namespace) {
-    return repository.getByNamespace(namespace);
-  }
-
-  @Override
-  public IdentifierType getByUuid(UUID uuid) {
-    return repository.getByUuid(uuid);
-  }
-
-  @Override
-  public Map<String, String> getIdentifierTypeCache() {
+  public Map<String, String> getIdentifierTypeCache() throws ServiceException {
+    if (identifierTypeCache == null) {
+      updateIdentifierTypeCache();
+    }
     return identifierTypeCache;
   }
 
   @Override
-  public IdentifierType save(IdentifierType identifierType) throws ServiceException {
-    IdentifierType saved;
-    try {
-      saved = repository.save(identifierType);
-    } catch (RepositoryException e) {
-      throw new ServiceException("Cannot save IdentifierType: " + identifierType.toString(), e);
+  public void save(IdentifierType identifierType) throws ServiceException, ValidationException {
+    super.save(identifierType);
+    if (identifierType != null) {
+      getIdentifierTypeCache().put(identifierType.getNamespace(), identifierType.getPattern());
     }
-    if (saved != null) {
-      identifierTypeCache.put(saved.getNamespace(), saved.getPattern());
-    }
-    return saved;
   }
 
-  private void setDefaultSorting(PageRequest pageRequest) {
+  @Override
+  protected void setDefaultSorting(PageRequest pageRequest) {
     if (!pageRequest.hasSorting()) {
       Sorting sorting = new Sorting(Direction.ASC, "namespace", "uuid");
       pageRequest.setSorting(sorting);
@@ -88,35 +65,21 @@ public class IdentifierTypeServiceImpl implements IdentifierTypeService {
   }
 
   @Override
-  public IdentifierType update(IdentifierType identifierType) throws ServiceException {
-    IdentifierType updated;
-    try {
-      updated = repository.update(identifierType);
-    } catch (RepositoryException e) {
-      throw new ServiceException("Cannot update IdentifierType: " + identifierType.toString(), e);
+  public void update(IdentifierType identifierType) throws ServiceException, ValidationException {
+    super.update(identifierType);
+    if (identifierType != null) {
+      getIdentifierTypeCache().put(identifierType.getNamespace(), identifierType.getPattern());
     }
-    if (updated != null) {
-      identifierTypeCache.put(updated.getNamespace(), updated.getPattern());
-    }
-    return updated;
   }
 
   @Override
   public Map<String, String> updateIdentifierTypeCache() throws ServiceException {
-    try {
-      identifierTypeCache =
-          repository.findAll().stream()
-              .collect(
-                  Collectors.toConcurrentMap(
-                      IdentifierType::getNamespace, IdentifierType::getPattern));
-    } catch (RepositoryException e) {
-      if (e.getMessage().contains("relation \"identifiertypes\" does not exist")) {
-        LOGGER.warn(
-            "The identifier type cache could not be initialised, because the corresponding relation in the DB does not yet exist - please restart the application after the migrations have run.");
-        return new HashMap<>(0);
-      }
-      throw new ServiceException(e);
-    }
+    Set<IdentifierType> allIdentifierTypes = getAll();
+    identifierTypeCache =
+        allIdentifierTypes.stream()
+            .collect(
+                Collectors.toConcurrentMap(
+                    IdentifierType::getNamespace, IdentifierType::getPattern));
     return identifierTypeCache;
   }
 }

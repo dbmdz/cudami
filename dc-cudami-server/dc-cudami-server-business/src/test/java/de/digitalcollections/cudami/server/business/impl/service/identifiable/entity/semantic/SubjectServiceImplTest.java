@@ -8,13 +8,14 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
-import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.semantic.SubjectRepository;
+import de.digitalcollections.cudami.server.backend.api.repository.identifiable.semantic.SubjectRepository;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
+import de.digitalcollections.model.identifiable.Identifier;
+import de.digitalcollections.model.identifiable.semantic.Subject;
 import de.digitalcollections.model.list.filtering.FilterCriterion;
 import de.digitalcollections.model.list.filtering.Filtering;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
-import de.digitalcollections.model.semantic.Subject;
 import de.digitalcollections.model.text.LocalizedText;
 import java.util.List;
 import java.util.Locale;
@@ -38,17 +39,19 @@ class SubjectServiceImplTest {
       "throws a ServiceException at getByTypeAndIdentifier when an exception happens in the repository")
   @Test
   public void testCudamiServiceExceptionAtGetByTypeAndIdentifier() throws RepositoryException {
-    when(subjectRepository.getByTypeAndIdentifier(any(), any(), any()))
+    when(subjectRepository.getByTypeAndIdentifier(any(), any()))
         .thenThrow(new RepositoryException("boo"));
 
     assertThrows(
         ServiceException.class,
-        () -> subjectService.getByTypeAndIdentifier("type", "namespace", "id"));
+        () ->
+            subjectService.getByTypeAndIdentifier(
+                "type", Identifier.builder().namespace("namespace").id("id").build()));
   }
 
   @DisplayName("can find exact subjects")
   @Test
-  public void findExact() {
+  public void findExact() throws RepositoryException, ServiceException {
     PageRequest expectedPageRequest =
         PageRequest.builder()
             .pageSize(25)
@@ -81,7 +84,7 @@ class SubjectServiceImplTest {
 
   @DisplayName("can find 'like' subjects")
   @Test
-  public void findLike() {
+  public void findLike() throws RepositoryException, ServiceException {
     PageRequest expectedPageRequest =
         PageRequest.builder()
             .pageSize(25)
@@ -129,7 +132,7 @@ class SubjectServiceImplTest {
 
   @DisplayName("can find 'like' subjects with partially matching contents")
   @Test
-  public void findLikeWithPartiallyMatchingContents() {
+  public void findLikeWithPartiallyMatchingContents() throws RepositoryException, ServiceException {
     PageRequest expectedPageRequest =
         PageRequest.builder()
             .pageSize(25)

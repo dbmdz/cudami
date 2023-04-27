@@ -1,10 +1,13 @@
 package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.resource;
 
 import de.digitalcollections.cudami.model.config.CudamiConfig;
+import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.resource.DigitalObjectRenderingFileResourceRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.JdbiRepositoryImpl;
 import de.digitalcollections.model.identifiable.resource.FileResource;
 import de.digitalcollections.model.identifiable.resource.FileResourceType;
+import de.digitalcollections.model.list.paging.PageRequest;
+import de.digitalcollections.model.list.paging.PageResponse;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -14,7 +17,6 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.core.statement.PreparedBatch;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -27,7 +29,6 @@ public class DigitalObjectRenderingFileResourceRepositoryImpl extends JdbiReposi
 
   private final FileResourceMetadataRepositoryImpl<FileResource> fileResourceMetadataRepositoryImpl;
 
-  @Autowired
   public DigitalObjectRenderingFileResourceRepositoryImpl(
       Jdbi dbi,
       CudamiConfig cudamiConfig,
@@ -35,6 +36,26 @@ public class DigitalObjectRenderingFileResourceRepositoryImpl extends JdbiReposi
     super(
         dbi, TABLE_NAME, TABLE_ALIAS, MAPPING_PREFIX, cudamiConfig.getOffsetForAlternativePaging());
     this.fileResourceMetadataRepositoryImpl = fileResourceMetadataRepositoryImpl;
+  }
+
+  @Override
+  public int countDigitalObjectsForResource(UUID uuid) {
+    return dbi.withHandle(
+        h ->
+            h.createQuery("SELECT count(*) FROM " + tableName + " WHERE fileresource_uuid = :uuid")
+                .bind("uuid", uuid)
+                .mapTo(Integer.class)
+                .findOne()
+                .get());
+  }
+
+  @Override
+  public int delete(List<UUID> uuids) {
+    return dbi.withHandle(
+        h ->
+            h.createUpdate("DELETE FROM " + tableName + " WHERE fileresource_uuid in (<uuids>)")
+                .bindList("uuids", uuids)
+                .execute());
   }
 
   private FileResource fillResourceType(FileResource untypedFileResource) {
@@ -61,6 +82,12 @@ public class DigitalObjectRenderingFileResourceRepositoryImpl extends JdbiReposi
   }
 
   @Override
+  public PageResponse<FileResource> findRenderingFileResources(
+      UUID digitalObjectUuid, PageRequest pageRequest) {
+    throw new UnsupportedOperationException(); // TODO: not yet implemented
+  }
+
+  @Override
   protected List<String> getAllowedOrderByFields() {
     return new ArrayList<>(Arrays.asList("digitalobject_uuid", "fileresource_uuid", "sortIndex"));
   }
@@ -71,8 +98,9 @@ public class DigitalObjectRenderingFileResourceRepositoryImpl extends JdbiReposi
   }
 
   @Override
-  public List<FileResource> getRenderingFileResources(UUID digitalObjectUuid) {
-    final String fieldsSql = fileResourceMetadataRepositoryImpl.getSqlSelectAllFields("f", "fr");
+  public List<FileResource> getRenderingFileResources(UUID digitalObjectUuid)
+      throws RepositoryException {
+    final String fieldsSql = fileResourceMetadataRepositoryImpl.getSqlSelectAllFields();
 
     StringBuilder innerQuery =
         new StringBuilder(
@@ -118,8 +146,8 @@ public class DigitalObjectRenderingFileResourceRepositoryImpl extends JdbiReposi
   }
 
   @Override
-  public void saveRenderingFileResources(
-      UUID digitalObjectUuid, List<FileResource> renderingResources) {
+  public List<FileResource> setRenderingFileResources(
+      UUID digitalObjectUuid, List<FileResource> renderingResources) throws RepositoryException {
     dbi.useHandle(
         handle -> {
           PreparedBatch preparedBatch =
@@ -139,30 +167,11 @@ public class DigitalObjectRenderingFileResourceRepositoryImpl extends JdbiReposi
           }
           preparedBatch.execute();
         });
+    return getRenderingFileResources(digitalObjectUuid);
   }
 
   @Override
   protected boolean supportsCaseSensitivityForProperty(String modelProperty) {
     return false;
-  }
-
-  @Override
-  public int delete(List<UUID> uuids) {
-    return dbi.withHandle(
-        h ->
-            h.createUpdate("DELETE FROM " + tableName + " WHERE fileresource_uuid in (<uuids>)")
-                .bindList("uuids", uuids)
-                .execute());
-  }
-
-  @Override
-  public int countDigitalObjectsForResource(UUID uuid) {
-    return dbi.withHandle(
-        h ->
-            h.createQuery("SELECT count(*) FROM " + tableName + " WHERE fileresource_uuid = :uuid")
-                .bind("uuid", uuid)
-                .mapTo(Integer.class)
-                .findOne()
-                .get());
   }
 }

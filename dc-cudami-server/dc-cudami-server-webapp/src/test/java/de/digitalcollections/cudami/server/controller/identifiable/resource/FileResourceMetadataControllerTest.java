@@ -10,6 +10,7 @@ import static org.mockito.Mockito.when;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.resource.FileResourceMetadataService;
 import de.digitalcollections.cudami.server.controller.BaseControllerTest;
 import de.digitalcollections.model.file.MimeType;
+import de.digitalcollections.model.identifiable.Identifier;
 import de.digitalcollections.model.identifiable.resource.FileResource;
 import de.digitalcollections.model.identifiable.resource.LinkedDataFileResource;
 import de.digitalcollections.model.list.filtering.FilterCriterion;
@@ -17,6 +18,7 @@ import de.digitalcollections.model.list.filtering.FilterOperation;
 import de.digitalcollections.model.list.filtering.Filtering;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
+import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.List;
@@ -38,7 +40,7 @@ class FileResourceMetadataControllerTest extends BaseControllerTest {
   @DisplayName("can return a filtered and paged list of LinkedDataFileResources")
   @ParameterizedTest
   @ValueSource(
-      strings = {"/v6/fileresources?pageNumber=0&pageSize=1&uri=eq:http%3A%2F%2Ffoo.bar%2Fbla.xml"})
+      strings = {"/v6/fileresources?pageNumber=0&pageSize=1&filter=uri:eq:http://foo.bar/bla.xml"})
   public void find(String path) throws Exception {
     PageResponse<FileResource> expected =
         (PageResponse)
@@ -65,7 +67,7 @@ class FileResourceMetadataControllerTest extends BaseControllerTest {
     expectedPageRequest.setPageSize(1);
     expectedPageRequest.setPageNumber(0);
     FilterCriterion filterCriterion =
-        new FilterCriterion("uri", FilterOperation.EQUALS, "http://foo.bar/bla.xml");
+        new FilterCriterion("uri", FilterOperation.EQUALS, URI.create("http://foo.bar/bla.xml"));
     Filtering filtering = new Filtering(List.of(filterCriterion));
     expectedPageRequest.setFiltering(filtering);
 
@@ -91,11 +93,14 @@ class FileResourceMetadataControllerTest extends BaseControllerTest {
   void testGetByIdentifierWithPlaintextId(String path) throws Exception {
     FileResource expected = FileResource.builder().build();
 
-    when(fileResourceMetadataService.getByIdentifier(eq("foo"), eq("bar"))).thenReturn(expected);
+    when(fileResourceMetadataService.getByIdentifier(
+            eq(Identifier.builder().namespace("foo").id("bar").build())))
+        .thenReturn(expected);
 
     testHttpGet(path);
 
-    verify(fileResourceMetadataService, times(1)).getByIdentifier(eq("foo"), eq("bar"));
+    verify(fileResourceMetadataService, times(1))
+        .getByIdentifier(eq(Identifier.builder().namespace("foo").id("bar").build()));
   }
 
   @DisplayName("can retrieve by identifier with base 64 encoded data")
@@ -110,13 +115,15 @@ class FileResourceMetadataControllerTest extends BaseControllerTest {
   void testGetByIdentifierWithBase64EncodedData(String basePath) throws Exception {
     FileResource expected = FileResource.builder().build();
 
-    when(fileResourceMetadataService.getByIdentifier(eq("foo"), eq("bar/bla")))
+    when(fileResourceMetadataService.getByIdentifier(
+            eq(Identifier.builder().namespace("foo").id("bar/bla").build())))
         .thenReturn(expected);
 
     testHttpGet(
         basePath
             + Base64.getEncoder().encodeToString("foo:bar/bla".getBytes(StandardCharsets.UTF_8)));
 
-    verify(fileResourceMetadataService, times(1)).getByIdentifier(eq("foo"), eq("bar/bla"));
+    verify(fileResourceMetadataService, times(1))
+        .getByIdentifier(eq(Identifier.builder().namespace("foo").id("bar/bla").build()));
   }
 }

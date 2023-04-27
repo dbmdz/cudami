@@ -3,14 +3,16 @@ package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entit
 import static org.assertj.core.api.Assertions.assertThat;
 
 import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
-import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.semantic.SubjectRepository;
+import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
+import de.digitalcollections.cudami.server.backend.api.repository.identifiable.alias.UrlAliasRepository;
+import de.digitalcollections.cudami.server.backend.api.repository.identifiable.semantic.SubjectRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.relation.PredicateRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.AbstractIdentifiableRepositoryImplTest;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.EntityRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.agent.AgentRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.agent.PersonRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.geo.location.HumanSettlementRepositoryImpl;
-import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.relation.EntityRelationRepositoryImpl;
+import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.relation.EntityToEntityRelationRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.type.LocalDateRangeMapper;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.type.TitleMapper;
 import de.digitalcollections.model.identifiable.Identifier;
@@ -21,8 +23,8 @@ import de.digitalcollections.model.identifiable.entity.item.Item;
 import de.digitalcollections.model.identifiable.entity.manifestation.Manifestation;
 import de.digitalcollections.model.identifiable.entity.relation.EntityRelation;
 import de.digitalcollections.model.identifiable.entity.work.Work;
+import de.digitalcollections.model.identifiable.semantic.Subject;
 import de.digitalcollections.model.relation.Predicate;
-import de.digitalcollections.model.semantic.Subject;
 import de.digitalcollections.model.text.LocalizedText;
 import de.digitalcollections.model.text.Title;
 import de.digitalcollections.model.text.TitleType;
@@ -46,6 +48,8 @@ import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 @DisplayName("The Work Repository")
 class WorkRepositoryImplTest extends AbstractIdentifiableRepositoryImplTest<WorkRepositoryImpl> {
 
+  @Autowired private IdentifierRepository identifierRepository;
+  @Autowired private UrlAliasRepository urlAliasRepository;
   @Autowired HumanSettlementRepositoryImpl humanSettlementRepository;
   @Autowired LocalDateRangeMapper localDateRangeMapper;
   @Autowired TitleMapper titleMapper;
@@ -53,7 +57,7 @@ class WorkRepositoryImplTest extends AbstractIdentifiableRepositoryImplTest<Work
   @Autowired AgentRepositoryImpl<Agent> agentRepository;
   @Autowired SubjectRepository subjectRepository;
   @Autowired PersonRepositoryImpl personRepository;
-  @Autowired EntityRelationRepositoryImpl entityRelationRepository;
+  @Autowired EntityToEntityRelationRepositoryImpl entityRelationRepository;
   @Autowired ItemRepositoryImpl itemRepository;
   @Autowired ManifestationRepositoryImpl manifestationRepository;
   @Autowired PredicateRepository predicateRepository;
@@ -64,6 +68,8 @@ class WorkRepositoryImplTest extends AbstractIdentifiableRepositoryImplTest<Work
         new WorkRepositoryImpl(
             jdbi,
             cudamiConfig,
+            identifierRepository,
+            urlAliasRepository,
             localDateRangeMapper,
             titleMapper,
             entityRepository,
@@ -77,13 +83,13 @@ class WorkRepositoryImplTest extends AbstractIdentifiableRepositoryImplTest<Work
 
   @DisplayName("Returns null when retrieve by uuid finds no match")
   @Test
-  public void noRetrieveByUuid() {
+  public void noRetrieveByUuid() throws RepositoryException {
     assertThat(repo.getByUuid(UUID.randomUUID())).isNull();
   }
 
   @DisplayName("Returns null when retrieve by identifier finds no match")
   @Test
-  public void noRetrieveByIdentifier() {
+  public void noRetrieveByIdentifier() throws RepositoryException {
     assertThat(
             repo.getByIdentifier(Identifier.builder().namespace("gnd").id("1234-5678-9").build()))
         .isNull();
@@ -137,15 +143,18 @@ class WorkRepositoryImplTest extends AbstractIdentifiableRepositoryImplTest<Work
     repo.save(parentWork2);
 
     Subject subject1 =
-        Subject.builder().type("Test").label(new LocalizedText(Locale.GERMAN, "Test")).build();
+        Subject.builder()
+            .subjectType("Test")
+            .label(new LocalizedText(Locale.GERMAN, "Test"))
+            .build();
     Subject subject2 =
         Subject.builder()
-            .type("Test")
+            .subjectType("Test")
             .identifier(Identifier.builder().namespace("foo").id("bar").build())
             .build();
     Subject subject3 =
         Subject.builder()
-            .type("Test")
+            .subjectType("Test")
             .identifier(Identifier.builder().namespace("bla").id("baz").build())
             .build();
     subjectRepository.save(subject1);
@@ -195,13 +204,13 @@ class WorkRepositoryImplTest extends AbstractIdentifiableRepositoryImplTest<Work
   @Test
   public void getByItemUuidReturnsNull() throws RepositoryException {
     // First test: Query for nonexisting item must return null
-    assertThat(repo.getByItemUuid(UUID.randomUUID())).isNull();
+    assertThat(repo.getByItem(UUID.randomUUID())).isNull();
 
     // Second test: Query for existing item with no connection to a
     // manifestation must return null;
     Item item = Item.builder().label(Locale.GERMAN, "Item").build();
     itemRepository.save(item);
-    assertThat(repo.getByItemUuid(item.getUuid())).isNull();
+    assertThat(repo.getByItem(item.getUuid())).isNull();
   }
 
   @DisplayName("can return the work, connected to an item")
@@ -226,12 +235,12 @@ class WorkRepositoryImplTest extends AbstractIdentifiableRepositoryImplTest<Work
     // First test: Item with no manifestation must not return any work
     Item item = Item.builder().label(Locale.GERMAN, "Erstexemplar").build();
     itemRepository.save(item);
-    assertThat(repo.getByItemUuid(item.getUuid())).isNull();
+    assertThat(repo.getByItem(item.getUuid())).isNull();
 
     // Second test: Item with existing manifestation->work chain must return the work
     item.setManifestation(manifestation);
     itemRepository.update(item);
-    Work actual = repo.getByItemUuid(item.getUuid());
+    Work actual = repo.getByItem(item.getUuid());
     assertThat(actual).isEqualTo(work);
   }
 
@@ -240,7 +249,7 @@ class WorkRepositoryImplTest extends AbstractIdentifiableRepositoryImplTest<Work
   @Test
   public void getByPersonUuidReturnsEmptySet() throws RepositoryException {
     // First test: Query for nonexisting person must return null
-    assertThat(repo.getByPersonUuid(UUID.randomUUID())).isEmpty();
+    assertThat(repo.getByPerson(UUID.randomUUID())).isEmpty();
 
     // Second test: Query for existing person with no connection to a
     // work must return null;
@@ -251,7 +260,7 @@ class WorkRepositoryImplTest extends AbstractIdentifiableRepositoryImplTest<Work
             .build();
     personRepository.save(person);
 
-    assertThat(repo.getByPersonUuid(person.getUuid())).isEmpty();
+    assertThat(repo.getByPerson(person.getUuid())).isEmpty();
   }
 
   @DisplayName("can return the set of connected persons for a work")
@@ -282,7 +291,7 @@ class WorkRepositoryImplTest extends AbstractIdentifiableRepositoryImplTest<Work
     entityRelationRepository.save(entityRelation);
     entityRelation.setObject(null); // to avoid recursion
 
-    Set<Work> actual = repo.getByPersonUuid(person.getUuid());
+    Set<Work> actual = repo.getByPerson(person.getUuid());
 
     assertThat(actual).containsExactly(work);
   }

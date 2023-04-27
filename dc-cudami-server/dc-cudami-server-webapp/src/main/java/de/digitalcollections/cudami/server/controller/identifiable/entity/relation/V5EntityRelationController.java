@@ -2,7 +2,8 @@ package de.digitalcollections.cudami.server.controller.identifiable.entity.relat
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.relation.EntityRelationService;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
+import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.relation.EntityToEntityRelationService;
 import de.digitalcollections.cudami.server.controller.CudamiControllerException;
 import de.digitalcollections.cudami.server.controller.legacy.V5MigrationHelper;
 import de.digitalcollections.model.identifiable.entity.relation.EntityRelation;
@@ -24,11 +25,11 @@ import org.springframework.web.bind.annotation.RestController;
 @Tag(name = "V5 Entity relation controller")
 public class V5EntityRelationController {
 
-  private final EntityRelationService entityRelationService;
+  private final EntityToEntityRelationService entityRelationService;
   private final ObjectMapper objectMapper;
 
   public V5EntityRelationController(
-      EntityRelationService entityRelationService, ObjectMapper objectMapper) {
+      EntityToEntityRelationService entityRelationService, ObjectMapper objectMapper) {
     this.entityRelationService = entityRelationService;
     this.objectMapper = objectMapper;
   }
@@ -41,7 +42,7 @@ public class V5EntityRelationController {
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
       @RequestParam(name = "predicate", required = false) String predicate)
-      throws CudamiControllerException {
+      throws CudamiControllerException, ServiceException {
     PageRequest pageRequest = new PageRequest(pageNumber, pageSize);
 
     if (StringUtils.hasText(predicate)) {

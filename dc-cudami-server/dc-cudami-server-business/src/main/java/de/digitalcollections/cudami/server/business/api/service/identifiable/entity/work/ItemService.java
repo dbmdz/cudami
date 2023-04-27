@@ -4,21 +4,22 @@ import de.digitalcollections.cudami.server.business.api.service.exceptions.Servi
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.EntityService;
 import de.digitalcollections.model.identifiable.entity.digitalobject.DigitalObject;
 import de.digitalcollections.model.identifiable.entity.item.Item;
+import de.digitalcollections.model.identifiable.entity.manifestation.Manifestation;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import java.util.List;
 import java.util.Locale;
-import java.util.UUID;
 
 public interface ItemService extends EntityService<Item> {
-  PageResponse<DigitalObject> findDigitalObjects(UUID itemUuid, PageRequest pageRequest);
 
-  List<Locale> getLanguagesOfDigitalObjects(UUID uuid);
+  PageResponse<DigitalObject> findDigitalObjects(Item item, PageRequest pageRequest)
+      throws ServiceException;
 
-  List<Locale> getLanguagesOfItemsForManifestation(UUID manifestationUuid);
+  PageResponse<Item> findItemsByManifestation(Manifestation manifestation, PageRequest pageRequest)
+      throws ServiceException;
 
-  List<Item> getItemsForWork(UUID workUuid);
+  List<Locale> getLanguagesOfDigitalObjects(Item item) throws ServiceException;
 
-  PageResponse<Item> findItemsByManifestation(UUID uuid, PageRequest pageRequest)
+  List<Locale> getLanguagesOfItemsForManifestation(Manifestation manifestation)
       throws ServiceException;
 }

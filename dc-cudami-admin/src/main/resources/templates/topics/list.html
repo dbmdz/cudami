@@ -4,136 +4,149 @@
       xmlns:sec="https://github.com/thymeleaf/thymeleaf-extras-springsecurity"
       xmlns:data="https://github.com/mxab/thymeleaf-extras-data-attribute"
       layout:decorate="~{base}">
+
   <head>
     <title th:text="#{topics}">Topics</title>
   </head>
+
   <body>
-  <th:block layout:fragment="content">
-    <div class="content-header">
-      <div class="container-fluid">
+    <th:block layout:fragment="content">
+      <div class="content-header">
+        <div class="container-fluid">
 
-        <div class="row">
-          <div class="col">
-            <h1 th:text="#{page.title.topics}">Topics</h1>
-            <hr>
-          </div>
-        </div>
-
-        <div class="row">
-          <div class="col">
-
-            <div id="toolbar-topics">
-              <!-- TODO it always contains "und" undefined language? -->
-              <th:block th:if="${not #lists.isEmpty(existingLanguages)}">
-                <span th:text="#{lbl.data_language}">Show language dependent values in</span>&nbsp;
-                <select th:replace="fragments/components/select-language-dropdown::render('topics-languages', ${existingLanguages}, ${dataLanguage})">English</select>
-              </th:block>
+          <div class="row">
+            <div class="col">
+              <h1 th:text="#{page.title.topics}">Topics</h1>
+              <hr>
             </div>
-            <table id="table-topics"
-                   data-toggle="table"
-                   th:data-url="@{/api/topics}"
-                   th:data-locale="${#locale}"
-                   data-buttons="buttonsTopics"
-                   data-cookie="true"
-                   data-cookie-id-table="table-topics"
-                   data-id-field="uuid"
-                   data-pagination="true"
-                   data-pagination-v-align="both"
-                   data-query-params="queryParamsTopics"
-                   data-search="true"
-                   data-search-highlight="true"
-                   data-search-on-enter-key="true"
-                   data-server-sort="true"
-                   data-show-search-button="true"
-                   data-show-search-clear-button="true"
-                   data-side-pagination="server"
-                   data-sort-name="label"
-                   data-sort-order="asc"
-                   data-toolbar="#toolbar-topics"
-                   data-unique-id="uuid">
-              <thead>
-                <tr>
-                  <th data-field="index" data-formatter="formatRowNumberTopics" data-halign="right" data-align="right" th:text="#{lbl.row_number}">#</th>
-                  <th data-field="previewImage" data-formatter="renderPreviewImage" data-halign="center" data-align="center"><i class="fas fa-image"></i></th>
-                  <th data-field="label" data-sortable="true" data-formatter="formatLabelTopics" th:text="#{lbl.label}">Label</th>
-
-                  <th data-field="lastModified" data-sortable="true" data-formatter="renderDateTime" th:text="#{lbl.last_modified}">last modified</th>
-                  <th data-field="created" data-sortable="true" data-formatter="renderDateTime" th:text="#{lbl.created}">created</th>
-                  <th data-field="actions" data-formatter="formatActionsTopics" th:text="#{lbl.actions}">Actions</th>
-                </tr>
-              </thead>
-            </table>
-
           </div>
+
+          <div class="row">
+            <div class="col">
+
+              <div id="toolbar-topics">
+                <!-- TODO it always contains "und" undefined language? -->
+                <th:block th:if="${not #lists.isEmpty(existingLanguages)}">
+                  <span th:text="#{lbl.data_language}">Show language dependent values in</span>&nbsp;
+                  <select th:replace="fragments/components/select-language-dropdown::render('topics-languages', ${existingLanguages}, ${dataLanguage})">English</select>
+                </th:block>
+              </div>
+              <table id="table-topics"
+                     data-toggle="table"
+                     th:data-url="@{/api/topics}"
+                     th:data-locale="${#locale}"
+                     data-buttons="buttonsTopics"
+                     data-cookie="true"
+                     data-cookie-id-table="table-topics"
+                     data-id-field="uuid"
+                     data-pagination="true"
+                     data-pagination-v-align="both"
+                     data-query-params="queryParamsTopics"
+                     data-search="true"
+                     data-search-highlight="true"
+                     data-search-on-enter-key="true"
+                     data-server-sort="true"
+                     data-show-search-button="true"
+                     data-show-search-clear-button="true"
+                     data-side-pagination="server"
+                     data-sort-name="label"
+                     data-sort-order="asc"
+                     data-toolbar="#toolbar-topics"
+                     data-unique-id="uuid">
+                <thead>
+                  <tr>
+                    <th data-field="index" data-formatter="formatRowNumberTopics" data-halign="right" data-align="right" th:text="#{lbl.row_number}">#</th>
+                    <th data-field="previewImage" data-formatter="renderPreviewImage" data-halign="center" data-align="center"><i class="fas fa-image"></i></th>
+                    <th data-field="label" data-sortable="true" data-formatter="formatLabelTopics" th:text="#{lbl.label}">Label</th>
+
+                    <th data-field="lastModified" data-sortable="true" data-formatter="renderDateTime" th:text="#{lbl.last_modified}">last modified</th>
+                    <th data-field="created" data-sortable="true" data-formatter="renderDateTime" th:text="#{lbl.created}">created</th>
+                    <th data-field="actions" data-formatter="formatActionsTopics" th:text="#{lbl.actions}">Actions</th>
+                  </tr>
+                </thead>
+              </table>
+
+            </div>
+          </div>
+
         </div>
-
       </div>
-    </div>
-  </th:block>
+    </th:block>
 
-  <th:block layout:fragment="beforeBodyEnds">
-    <div th:replace="fragments/modals/confirm-yes-no :: confirm-yes-no-dialog"></div>
+    <th:block layout:fragment="beforeBodyEnds">
+      <div th:replace="fragments/modals/confirm-yes-no :: confirm-yes-no-dialog"></div>
 
-    <script type="text/javascript">
-      $(function () {
-        $("#topics-languages").change(function () {
-          $('#table-topics').bootstrapTable('refresh');
+      <script type="text/javascript">
+        $(function () {
+          $("#topics-languages").change(function () {
+            $('#table-topics').bootstrapTable('refresh');
+          });
         });
-      });
 
-      function formatRowNumberTopics(value, row, index) {
-        return renderRowNumber($('#table-topics'), index);
-      }
-      
-      function queryParamsTopics(params) {
-        let dataLanguage = $("#topics-languages").val();
-        params.dataLanguage = dataLanguage;
-        return params;
-      }
-    </script>
+        function formatRowNumberTopics(value, row, index) {
+          return renderRowNumber($('#table-topics'), index);
+        }
 
-    <script type="text/javascript" th:inline="javascript">
-      /*<![CDATA[*/
-      function buttonsTopics() {
-        /*[+
-         const baseUrl = [[@{'/topics'}]];
-         const textAdd = [[#{btn.add}]];
-         const tooltipAdd = [[#{tooltip.add_new_table_entry}]];
-         +]*/
-        return {
-          btnAdd: {
-            text: textAdd,
-            icon: 'fa-plus',
-            event: function () {
-              location.href = baseUrl + '/new';
-            },
-            attributes: {
-              title: tooltipAdd
-            }
+        function queryParamsTopics(params) {
+          let dataLanguage = $("#topics-languages").val();
+          params.dataLanguage = dataLanguage;
+          return params;
+        }
+      </script>
+
+      <script type="text/javascript" th:inline="javascript">
+        /*<![CDATA[*/
+        $('#table-topics').bootstrapTable({
+          formatSearch: function () {
+            /*[+
+             let columnName = [[#{lbl.label}]];
+             let placeholder = `[(#{placeholder.search})]`;
+             +]*/
+            return placeholder;
           }
-        };
-      }
+        });
 
-      function formatActionsTopics(value, row) {
-        /*[+
-         const baseUrl = [[@{'/topics'}]] + '/' + row.uuid;
-         +]*/
-        return [
-          renderViewAction(baseUrl),
-          renderEditAction(baseUrl)
-        ].join(' ');
-      }
+        function buttonsTopics() {
+          /*[+
+           const baseUrl = [[@{'/topics'}]];
+           const textAdd = [[#{btn.add}]];
+           const tooltipAdd = [[#{tooltip.add_new_table_entry}]];
+           +]*/
+          return {
+            btnAdd: {
+              text: textAdd,
+              icon: 'fa-plus',
+              event: function () {
+                location.href = baseUrl + '/new';
+              },
+              attributes: {
+                title: tooltipAdd
+              }
+            }
+          };
+        }
 
-      function formatLabelTopics(value, row) {
-        /*[+
-         const baseUrl = [[@{'/topics'}]] + '/' + row.uuid;
-         +]*/
-        const dataLanguage = $("#topics-languages").val();
-        return renderLabel(baseUrl, value, dataLanguage);
-      }
+        function formatActionsTopics(value, row) {
+          /*[+
+           const baseUrl = [[@{'/topics'}]] + '/' + row.uuid;
+           +]*/
+          return [
+            renderViewAction(baseUrl),
+            renderEditAction(baseUrl)
+          ].join(' ');
+        }
+
+        function formatLabelTopics(value, row) {
+          /*[+
+           const baseUrl = [[@{'/topics'}]] + '/' + row.uuid;
+           +]*/
+          const dataLanguage = $("#topics-languages").val();
+          return renderLabel(baseUrl, value, dataLanguage);
+        }
       /*]]>*/
-    </script>
-    <div th:replace="fragments/bootstrap-table :: data-formatter"></div>
-  </th:block>
-</body>
+      </script>
+      <div th:replace="fragments/bootstrap-table :: data-formatter"></div>
+    </th:block>
+  </body>
+
 </html>

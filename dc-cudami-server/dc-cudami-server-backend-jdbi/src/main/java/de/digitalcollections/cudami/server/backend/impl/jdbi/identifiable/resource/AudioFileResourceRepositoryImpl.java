@@ -1,11 +1,13 @@
 package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.resource;
 
 import de.digitalcollections.cudami.model.config.CudamiConfig;
+import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
+import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
+import de.digitalcollections.cudami.server.backend.api.repository.identifiable.alias.UrlAliasRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.resource.AudioFileResourceRepository;
 import de.digitalcollections.model.identifiable.resource.AudioFileResource;
 import java.util.List;
 import org.jdbi.v3.core.Jdbi;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -17,41 +19,25 @@ public class AudioFileResourceRepositoryImpl
   public static final String TABLE_ALIAS = "f";
   public static final String TABLE_NAME = "fileresources_audio";
 
-  @Override
-  public String getSqlInsertFields() {
-    return super.getSqlInsertFields() + ", duration";
-  }
-
-  /* Do not change order! Must match order in getSqlInsertFields!!! */
-  @Override
-  public String getSqlInsertValues() {
-    return super.getSqlInsertValues() + ", :duration";
-  }
-
-  @Override
-  public String getSqlSelectAllFields(String tableAlias, String mappingPrefix) {
-    return getSqlSelectReducedFields(tableAlias, mappingPrefix)
-        + ", "
-        + tableAlias
-        + ".duration "
-        + mappingPrefix
-        + "_duration";
-  }
-
-  @Override
-  public String getSqlUpdateFieldValues() {
-    return super.getSqlUpdateFieldValues() + ", duration=:duration";
-  }
-
-  @Autowired
-  public AudioFileResourceRepositoryImpl(Jdbi dbi, CudamiConfig cudamiConfig) {
+  public AudioFileResourceRepositoryImpl(
+      Jdbi dbi,
+      CudamiConfig cudamiConfig,
+      IdentifierRepository identifierRepository,
+      UrlAliasRepository urlAliasRepository) {
     super(
         dbi,
         TABLE_NAME,
         TABLE_ALIAS,
         MAPPING_PREFIX,
         AudioFileResource.class,
-        cudamiConfig.getOffsetForAlternativePaging());
+        cudamiConfig.getOffsetForAlternativePaging(),
+        identifierRepository,
+        urlAliasRepository);
+  }
+
+  @Override
+  public AudioFileResource create() throws RepositoryException {
+    return new AudioFileResource();
   }
 
   @Override
@@ -75,5 +61,31 @@ public class AudioFileResourceRepositoryImpl
       default:
         return null;
     }
+  }
+
+  @Override
+  protected String getSqlInsertFields() {
+    return super.getSqlInsertFields() + ", duration";
+  }
+
+  /* Do not change order! Must match order in getSqlInsertFields!!! */
+  @Override
+  protected String getSqlInsertValues() {
+    return super.getSqlInsertValues() + ", :duration";
+  }
+
+  @Override
+  public String getSqlSelectAllFields(String tableAlias, String mappingPrefix) {
+    return super.getSqlSelectAllFields(tableAlias, mappingPrefix)
+        + ", "
+        + tableAlias
+        + ".duration "
+        + mappingPrefix
+        + "_duration";
+  }
+
+  @Override
+  public String getSqlUpdateFieldValues() {
+    return super.getSqlUpdateFieldValues() + ", duration=:duration";
   }
 }

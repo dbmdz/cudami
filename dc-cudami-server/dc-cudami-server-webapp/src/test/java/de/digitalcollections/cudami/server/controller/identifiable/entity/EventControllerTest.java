@@ -1,5 +1,6 @@
 package de.digitalcollections.cudami.server.controller.identifiable.entity;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -54,7 +55,8 @@ class EventControllerTest extends BaseControllerTest {
             .label(name)
             .identifier(identifier)
             .build();
-    when(eventService.getByUuid(eq(UUID.fromString("599a120c-2dd5-11e8-b467-0ed5f89f718b"))))
+    when(eventService.getByExample(
+            eq(Event.builder().uuid("599a120c-2dd5-11e8-b467-0ed5f89f718b").build())))
         .thenReturn(event);
     testJson(path);
   }
@@ -68,8 +70,7 @@ class EventControllerTest extends BaseControllerTest {
     final Identifier identifier =
         Identifier.builder().namespace("event-namespace").id("event-id").build();
     Event event = Event.builder().uuid(uuid).name(name).label(name).identifier(identifier).build();
-    when(eventService.getByIdentifier(eq(identifier.getNamespace()), eq(identifier.getId())))
-        .thenReturn(event);
+    when(eventService.getByIdentifier(eq(identifier))).thenReturn(event);
     testJson(path);
   }
 
@@ -78,19 +79,20 @@ class EventControllerTest extends BaseControllerTest {
   @ValueSource(strings = {"/v6/events/09baa24e-0918-4b96-8ab1-f496b02af73a"})
   void deleteEvent(String path) throws Exception {
     UUID uuid = UUID.fromString("09baa24e-0918-4b96-8ab1-f496b02af73a");
-    when(eventService.delete(eq(uuid))).thenReturn(true);
+    Event event = Event.builder().uuid("09baa24e-0918-4b96-8ab1-f496b02af73a").build();
+    when(eventService.delete(eq(event))).thenReturn(true);
 
     testDeleteSuccessful(path);
 
-    verify(eventService, times(1)).delete(eq(uuid));
+    verify(eventService, times(1)).delete(eq(event));
   }
 
   @DisplayName("can not delete an already deleted event")
   @ParameterizedTest
   @ValueSource(strings = {"/v6/events/09baa24e-0918-4b96-8ab1-f496b02af73a"})
   void deleteEventTwice(String path) throws Exception {
-    UUID uuid = UUID.fromString("09baa24e-0918-4b96-8ab1-f496b02af73a");
-    when(eventService.delete(eq(uuid))).thenReturn(false);
+    Event event = Event.builder().uuid("09baa24e-0918-4b96-8ab1-f496b02af73a").build();
+    when(eventService.delete(eq(event))).thenReturn(false);
 
     testDeleteNotFound(path);
   }
@@ -116,8 +118,7 @@ class EventControllerTest extends BaseControllerTest {
           "refId": 0,
           "name": {
             "de": "Test"
-          },
-          "entityType": "EVENT"
+          }
         }
         """;
 
@@ -154,7 +155,6 @@ class EventControllerTest extends BaseControllerTest {
           "name": {
             "de": "Test"
           },
-          "entityType": "EVENT",
           "uuid": "09baa24e-0918-4b96-8ab1-f496b02af73a"
         }
         """;
@@ -184,13 +184,18 @@ class EventControllerTest extends BaseControllerTest {
 
   @DisplayName("shall find a filtered list of events")
   @ParameterizedTest
-  @ValueSource(strings = {"/v6/events/?pageNumber=0&pageSize=10&label=foo"})
+  @ValueSource(strings = {"/v6/events/?pageNumber=0&pageSize=10&filter=label:like:foo"})
   public void relatedByPredicate(String path) throws Exception {
     List<Event> events =
         List.of(
             Event.builder()
                 .created("2020-10-20T14:38:07.757894")
-                .identifier("gnd", "1234567-8", "30b59f1e-aa2f-4ae5-b9a4-fa336e21ad8e")
+                .identifier(
+                    Identifier.builder()
+                        .namespace("gnd")
+                        .id("1234567-8")
+                        .uuid("30b59f1e-aa2f-4ae5-b9a4-fa336e21ad8e")
+                        .build())
                 .label(Locale.GERMAN, "foo")
                 .name(new LocalizedText(Locale.GERMAN, "foo"))
                 .lastModified("2021-02-25T09:05:34.039316")
@@ -208,7 +213,7 @@ class EventControllerTest extends BaseControllerTest {
                     .add(FilterCriterion.builder().withExpression("label").contains("foo").build())
                     .build())
             .build();
-    when(eventService.find(eq(pageRequest))).thenReturn(pageResponse);
+    when(eventService.find(any(PageRequest.class))).thenReturn(pageResponse);
 
     testJson(path, "/v6/events/listresult.json");
   }

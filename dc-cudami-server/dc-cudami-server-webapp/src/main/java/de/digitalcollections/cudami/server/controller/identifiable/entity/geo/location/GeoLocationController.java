@@ -8,6 +8,7 @@ import de.digitalcollections.cudami.server.business.api.service.identifiable.ent
 import de.digitalcollections.cudami.server.controller.ParameterHelper;
 import de.digitalcollections.cudami.server.controller.identifiable.AbstractIdentifiableController;
 import de.digitalcollections.model.identifiable.entity.geo.location.GeoLocation;
+import de.digitalcollections.model.list.filtering.FilterCriterion;
 import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.list.sorting.Order;
 import io.swagger.v3.oas.annotations.Operation;
@@ -16,39 +17,22 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import java.net.URI;
 import java.util.List;
 import java.util.Locale;
-import java.util.Objects;
 import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @Tag(name = "Geo location controller")
 public class GeoLocationController extends AbstractIdentifiableController<GeoLocation> {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(GeoLocationController.class);
-
-  private final GeoLocationService<GeoLocation> geoLocationService;
+  private final GeoLocationService<GeoLocation> service;
 
   public GeoLocationController(GeoLocationService<GeoLocation> geoLocationservice) {
-    this.geoLocationService = geoLocationservice;
-  }
-
-  @Override
-  protected IdentifiableService<GeoLocation> getService() {
-    return geoLocationService;
+    this.service = geoLocationservice;
   }
 
   @Operation(summary = "count all geolocations")
@@ -60,8 +44,8 @@ public class GeoLocationController extends AbstractIdentifiableController<GeoLoc
         "/latest/geolocations/count"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public long count() {
-    return geoLocationService.count();
+  public long count() throws ServiceException {
+    return super.count();
   }
 
   @Operation(summary = "Delete a geolocation")
@@ -71,19 +55,11 @@ public class GeoLocationController extends AbstractIdentifiableController<GeoLoc
   public ResponseEntity delete(
       @Parameter(example = "", description = "UUID of the geolocation") @PathVariable("uuid")
           UUID uuid)
-      throws ConflictException {
-    boolean successful;
-    try {
-      successful = geoLocationService.delete(uuid);
-    } catch (ServiceException e) {
-      return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-    return successful
-        ? new ResponseEntity<>(HttpStatus.NO_CONTENT)
-        : new ResponseEntity<>(HttpStatus.NOT_FOUND);
+      throws ConflictException, ServiceException {
+    return super.delete(uuid);
   }
 
-  @Operation(summary = "get all geo locations")
+  @Operation(summary = "Get all geo locations as (paged, sorted, filtered) list")
   @GetMapping(
       value = {"/v6/geolocations"},
       produces = MediaType.APPLICATION_JSON_VALUE)
@@ -91,13 +67,9 @@ public class GeoLocationController extends AbstractIdentifiableController<GeoLoc
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
-      @RequestParam(name = "searchTerm", required = false) String searchTerm,
-      @RequestParam(name = "label", required = false) String labelTerm,
-      @RequestParam(name = "labelLanguage", required = false) Locale labelLanguage,
-      @RequestParam(name = "name", required = false) String nameTerm,
-      @RequestParam(name = "nameLanguage", required = false) Locale nameLanguage) {
-    return super.find(
-        pageNumber, pageSize, sortBy, searchTerm, labelTerm, labelLanguage, nameTerm, nameLanguage);
+      @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria)
+      throws ServiceException {
+    return super.find(pageNumber, pageSize, sortBy, filterCriteria);
   }
 
   @Override
@@ -160,14 +132,11 @@ public class GeoLocationController extends AbstractIdentifiableController<GeoLoc
           @RequestParam(name = "pLocale", required = false)
           Locale pLocale)
       throws ServiceException {
-
-    GeoLocation result;
     if (pLocale == null) {
-      result = geoLocationService.getByUuid(uuid);
+      return super.getByUuid(uuid);
     } else {
-      result = geoLocationService.getByUuidAndLocale(uuid, pLocale);
+      return super.getByUuidAndLocale(uuid, pLocale);
     }
-    return new ResponseEntity<>(result, result != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
   }
 
   @Operation(summary = "Get languages of all geolocations")
@@ -179,8 +148,13 @@ public class GeoLocationController extends AbstractIdentifiableController<GeoLoc
         "/latest/geolocations/languages"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public List<Locale> getLanguages() {
-    return geoLocationService.getLanguages();
+  public List<Locale> getLanguages() throws ServiceException {
+    return super.getLanguages();
+  }
+
+  @Override
+  protected IdentifiableService<GeoLocation> getService() {
+    return service;
   }
 
   @Operation(summary = "save a newly created geolocation")
@@ -189,8 +163,7 @@ public class GeoLocationController extends AbstractIdentifiableController<GeoLoc
       produces = MediaType.APPLICATION_JSON_VALUE)
   public GeoLocation save(@RequestBody GeoLocation geoLocation, BindingResult errors)
       throws ServiceException, ValidationException {
-    geoLocationService.save(geoLocation);
-    return geoLocation;
+    return super.save(geoLocation, errors);
   }
 
   @Operation(summary = "update a geolocation")
@@ -205,8 +178,6 @@ public class GeoLocationController extends AbstractIdentifiableController<GeoLoc
   public GeoLocation update(
       @PathVariable("uuid") UUID uuid, @RequestBody GeoLocation geoLocation, BindingResult errors)
       throws ServiceException, ValidationException {
-    assert Objects.equals(uuid, geoLocation.getUuid());
-    geoLocationService.update(geoLocation);
-    return geoLocation;
+    return super.update(uuid, geoLocation, errors);
   }
 }

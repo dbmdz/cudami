@@ -73,7 +73,7 @@ public class V3WebsiteController {
           @PathVariable
           UUID uuid)
       throws JsonProcessingException, ServiceException {
-    Website website = websiteService.getByUuid(uuid);
+    Website website = websiteService.getByExample(Website.builder().uuid(uuid).build());
 
     if (website == null) {
       // For compatibility reasons, we must return 200 with empty body
@@ -144,14 +144,15 @@ public class V3WebsiteController {
               schema = @Schema(type = "string"))
           @RequestParam(name = "sortBy", required = false)
           List<Order> sortBy)
-      throws JsonProcessingException {
-    PageRequest searchPageRequest = new PageRequest(null, pageNumber, pageSize);
+      throws JsonProcessingException, ServiceException {
+    PageRequest pageRequest = new PageRequest(null, pageNumber, pageSize);
     if (sortBy != null) {
       Sorting sorting = new Sorting(V5MigrationHelper.migrate(sortBy));
-      searchPageRequest.setSorting(sorting);
+      pageRequest.setSorting(sorting);
     }
 
-    PageResponse<Webpage> response = websiteService.findRootWebpages(uuid, searchPageRequest);
+    PageResponse<Webpage> response =
+        websiteService.findRootWebpages(Website.builder().uuid(uuid).build(), pageRequest);
     if (response == null) {
       return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }

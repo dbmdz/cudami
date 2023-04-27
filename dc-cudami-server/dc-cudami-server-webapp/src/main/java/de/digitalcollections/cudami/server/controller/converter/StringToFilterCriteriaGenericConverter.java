@@ -2,6 +2,8 @@ package de.digitalcollections.cudami.server.controller.converter;
 
 import de.digitalcollections.model.list.filtering.FilterCriterion;
 import de.digitalcollections.model.list.filtering.FilterOperation;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -39,7 +41,12 @@ public class StringToFilterCriteriaGenericConverter<C extends Comparable<C>>
 
   @Override
   public Object convert(Object source, TypeDescriptor sourceType, TypeDescriptor targetType) {
-    Class targetClass = (Class<?>) targetType.getResolvableType().getGeneric(0).getType();
+    Class targetClass;
+    try {
+      targetClass = (Class<?>) targetType.getResolvableType().getGeneric(0).getType();
+    } catch (Exception e) {
+      targetClass = String.class;
+    }
     return convert(source, targetClass);
   }
 
@@ -47,28 +54,87 @@ public class StringToFilterCriteriaGenericConverter<C extends Comparable<C>>
     if (source == null) {
       return null;
     }
-    String operationAndValues = (String) source;
 
-    if (!operationAndValues.contains(":")) {
+    String filter = (String) source;
+    if (!filter.contains(":")) {
       throw new IllegalArgumentException("No separator ':' found");
     }
 
-    int separatorPosition =
-        operationAndValues.indexOf(
-            ':'); // index of the first occurrence of ":" (operation value may contain ":", too...
-    String operationAcronym = operationAndValues.substring(0, separatorPosition);
+    // to support filtercriterion without leading property name (backwards
+    // compatibility)
+    // we do have to detect if it is old (without expression/property (only one ":")
+    // or (new (with expression, two ":") style:
+    // TODO: remove old style, when no longer support is needed
+    boolean newStyle = false;
+    String[] filterParts = filter.split(":");
+    if (filterParts.length > 2) {
+      newStyle = true;
+    } else if (filterParts.length == 2) {
+      // length = 2 could also be new style of no value operations (like "set",
+      // "unset"), check second part:
+      FilterOperation filterOperation = FilterOperation.fromValue(filterParts[1]);
+      if (filterOperation != null
+          && filterOperation.getOperandCount() == FilterOperation.OperandCount.NO_VALUE) {
+        newStyle = true;
+      }
+    }
+
+    String expression = null;
+    boolean isNativeExpression = false;
+    String operationAcronym = null;
+    String operationValue = "";
+    if (newStyle) {
+      expression = filterParts[0];
+      if (expression.startsWith("[") && expression.endsWith("]")) {
+        // native expression marked by surrounding brackets
+        isNativeExpression = true;
+        expression = expression.substring(1, expression.length() - 1);
+      }
+      operationAcronym = filterParts[1];
+      for (int i = 2; i < filterParts.length; i++) {
+        if (i > 2) {
+          // add separator again (was part of value and no filter separator)
+          operationValue = URLDecoder.decode(operationValue, StandardCharsets.UTF_8) + ":";
+        }
+        operationValue = URLDecoder.decode(operationValue, StandardCharsets.UTF_8) + filterParts[i];
+      }
+    } else {
+      // old style without expression part
+      int separatorPosition =
+          filter.indexOf(':'); // index of the first occurrence of ":" (operation value may contain
+      // ":", too...
+      operationAcronym = filter.substring(0, separatorPosition);
+      operationValue = filter.substring(separatorPosition + 1);
+    }
+
+    // Convert the operation acronym to enum
     if (operationAcronym == null) {
       throw new IllegalArgumentException("No operation acronym found");
     }
-
-    String operationValue = operationAndValues.substring(separatorPosition + 1);
-
-    // Convert the operation acronym to enum
     FilterOperation filterOperation = FilterOperation.fromValue(operationAcronym);
 
+    return createFilterCriterion(
+        targetClass,
+        expression,
+        isNativeExpression,
+        filterOperation,
+        operationValue,
+        conversionService);
+  }
+
+  public static FilterCriterion createFilterCriterion(
+      Class<?> targetClass,
+      String expression,
+      boolean isNativeExpression,
+      FilterOperation filterOperation,
+      String operationValue,
+      ConversionService conversionService)
+      throws IllegalArgumentException {
     // no value operand (e.g. "set")
     if (filterOperation.getOperandCount() == FilterOperation.OperandCount.NO_VALUE) {
-      FilterCriterion fc = new FilterCriterion(null, filterOperation, null, null, null, null);
+      FilterCriterion fc =
+          new FilterCriterion(
+              expression, isNativeExpression, filterOperation, null, null, null, null);
       return fc;
     }
 
@@ -78,7 +144,8 @@ public class StringToFilterCriteriaGenericConverter<C extends Comparable<C>>
         throw new IllegalArgumentException("No operation value found");
       }
       Object value = conversionService.convert(operationValue, targetClass);
-      FilterCriterion fc = new FilterCriterion(null, filterOperation, value);
+      FilterCriterion fc =
+          new FilterCriterion(expression, isNativeExpression, filterOperation, value);
       return fc;
     }
 
@@ -98,7 +165,8 @@ public class StringToFilterCriteriaGenericConverter<C extends Comparable<C>>
               .map(s -> conversionService.convert(s, targetClass))
               .collect(Collectors.toList()));
       FilterCriterion fc =
-          new FilterCriterion(null, filterOperation, null, null, null, convertedValues);
+          new FilterCriterion(
+              expression, isNativeExpression, filterOperation, null, null, null, convertedValues);
       return fc;
     }
 
@@ -114,12 +182,12 @@ public class StringToFilterCriteriaGenericConverter<C extends Comparable<C>>
       if (operationValues.length != 2) {
         throw new IllegalArgumentException("For min/max operation two values are expected");
       }
-      C minValue = null;
-      C maxValue = null;
+      Comparable minValue = null;
+      Comparable maxValue = null;
 
       // Convert
-      C value1 = (C) conversionService.convert(operationValues[0], targetClass);
-      C value2 = (C) conversionService.convert(operationValues[1], targetClass);
+      Comparable value1 = (Comparable) conversionService.convert(operationValues[0], targetClass);
+      Comparable value2 = (Comparable) conversionService.convert(operationValues[1], targetClass);
 
       if (value1 != null && value2 != null) {
         // Set min and max values
@@ -132,10 +200,10 @@ public class StringToFilterCriteriaGenericConverter<C extends Comparable<C>>
         }
       }
       FilterCriterion fc =
-          new FilterCriterion(null, filterOperation, null, minValue, maxValue, null);
+          new FilterCriterion(
+              expression, isNativeExpression, filterOperation, null, minValue, maxValue, null);
       return fc;
     }
-
-    throw new IllegalArgumentException("Unknown operation '" + operationAcronym + "'");
+    return null;
   }
 }

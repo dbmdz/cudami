@@ -1,11 +1,9 @@
 package de.digitalcollections.cudami.admin.controller.semantic;
 
-import de.digitalcollections.cudami.admin.controller.AbstractPagingAndSortingController;
+import de.digitalcollections.cudami.admin.business.i18n.LanguageService;
+import de.digitalcollections.cudami.admin.controller.AbstractUniqueObjectController;
 import de.digitalcollections.cudami.admin.controller.ParameterHelper;
-import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
-import de.digitalcollections.cudami.client.CudamiLocalesClient;
-import de.digitalcollections.cudami.client.semantic.CudamiTagsClient;
 import de.digitalcollections.model.exception.ResourceNotFoundException;
 import de.digitalcollections.model.exception.TechnicalException;
 import de.digitalcollections.model.semantic.Tag;
@@ -22,21 +20,17 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 /** Controller for headwords management pages. */
 @Controller
-public class TagsController extends AbstractPagingAndSortingController<Tag> {
+public class TagsController extends AbstractUniqueObjectController<Tag> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(TagsController.class);
-  private final CudamiLocalesClient localeService;
-  private final CudamiTagsClient service;
 
-  public TagsController(LanguageSortingHelper languageSortingHelper, CudamiClient client) {
-    super(languageSortingHelper);
-    this.localeService = client.forLocales();
-    this.service = client.forTags();
+  public TagsController(CudamiClient client, LanguageService languageService) {
+    super(client.forTags(), languageService);
   }
 
   @GetMapping("/tags/new")
   public String create(Model model) throws TechnicalException {
-    model.addAttribute("activeLanguage", localeService.getDefaultLanguage());
+    model.addAttribute("activeLanguage", languageService.getDefaultLanguage());
     return "tags/create";
   }
 

@@ -36,6 +36,33 @@ public interface GeoLocationService<G extends GeoLocation> extends EntityService
   }
 
   /**
+   * Calculates the great circle distance between two points on the Earth. Uses the Haversine
+   * Formula.
+   *
+   * @param latitude1 Latitude of first location in decimal degrees.
+   * @param longitude1 Longitude of first location in decimal degrees.
+   * @param latitude2 Latitude of second location in decimal degrees.
+   * @param longitude2 Longitude of second location in decimal degrees.
+   * @return Distance in meter.
+   */
+  static double distance(
+      final double latitude1,
+      final double longitude1,
+      final double latitude2,
+      final double longitude2) {
+    final double latitudeSin = Math.sin(Math.toRadians(latitude2 - latitude1) / 2);
+    final double longitudeSin = Math.sin(Math.toRadians(longitude2 - longitude1) / 2);
+    final double a =
+        latitudeSin * latitudeSin
+            + Math.cos(Math.toRadians(latitude1))
+                * Math.cos(Math.toRadians(latitude2))
+                * longitudeSin
+                * longitudeSin;
+    final double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return 6378137 * c;
+  }
+
+  /**
    * Calculates distance between to points.
    *
    * <p>latitude: South is negative longitude: West is negative
@@ -66,33 +93,6 @@ public interface GeoLocationService<G extends GeoLocation> extends EntityService
       dist = dist * 0.8684;
     }
     return (dist);
-  }
-
-  /**
-   * Calculates the great circle distance between two points on the Earth. Uses the Haversine
-   * Formula.
-   *
-   * @param latitude1 Latitude of first location in decimal degrees.
-   * @param longitude1 Longitude of first location in decimal degrees.
-   * @param latitude2 Latitude of second location in decimal degrees.
-   * @param longitude2 Longitude of second location in decimal degrees.
-   * @return Distance in meter.
-   */
-  static double distance(
-      final double latitude1,
-      final double longitude1,
-      final double latitude2,
-      final double longitude2) {
-    final double latitudeSin = Math.sin(Math.toRadians(latitude2 - latitude1) / 2);
-    final double longitudeSin = Math.sin(Math.toRadians(longitude2 - longitude1) / 2);
-    final double a =
-        latitudeSin * latitudeSin
-            + Math.cos(Math.toRadians(latitude1))
-                * Math.cos(Math.toRadians(latitude2))
-                * longitudeSin
-                * longitudeSin;
-    final double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-    return 6378137 * c;
   }
 
   static String distanceInPreferredUnit(

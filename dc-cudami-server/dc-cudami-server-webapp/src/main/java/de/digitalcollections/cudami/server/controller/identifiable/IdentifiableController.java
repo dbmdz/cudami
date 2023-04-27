@@ -6,9 +6,11 @@ import de.digitalcollections.cudami.server.business.api.service.identifiable.Ide
 import de.digitalcollections.cudami.server.business.api.service.identifiable.alias.UrlAliasService;
 import de.digitalcollections.cudami.server.controller.CudamiControllerException;
 import de.digitalcollections.cudami.server.controller.ParameterHelper;
-import de.digitalcollections.model.exception.ResourceNotFoundException;
 import de.digitalcollections.model.identifiable.Identifiable;
 import de.digitalcollections.model.identifiable.alias.LocalizedUrlAliases;
+import de.digitalcollections.model.list.filtering.FilterCriterion;
+import de.digitalcollections.model.list.paging.PageResponse;
+import de.digitalcollections.model.list.sorting.Order;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -28,22 +30,17 @@ import org.springframework.web.bind.annotation.RestController;
 @Tag(name = "Identifiable controller")
 public class IdentifiableController extends AbstractIdentifiableController<Identifiable> {
 
-  private final IdentifiableService identifiableService;
+  private final IdentifiableService<Identifiable> service;
   private final UrlAliasService urlAliasService;
 
   public IdentifiableController(
       @Qualifier("identifiableService") IdentifiableService identifiableService,
       UrlAliasService urlAliasService) {
-    this.identifiableService = identifiableService;
+    this.service = identifiableService;
     this.urlAliasService = urlAliasService;
   }
 
-  @Override
-  protected IdentifiableService<Identifiable> getService() {
-    return identifiableService;
-  }
-
-  @Operation(summary = "Find limited amount of identifiables containing searchTerm in label")
+  @Operation(summary = "Get all identifiables as (paged, sorted, filtered) list")
   @GetMapping(
       value = {
         "/v6/identifiables",
@@ -52,41 +49,13 @@ public class IdentifiableController extends AbstractIdentifiableController<Ident
         "/latest/identifiables"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public List<Identifiable> find(
-      @RequestParam(name = "searchTerm") String searchTerm,
-      @RequestParam(name = "maxResults", required = false, defaultValue = "25") int maxResults) {
-    List<Identifiable> identifiables = identifiableService.find(searchTerm, maxResults);
-    return identifiables;
-  }
-
-  @Operation(summary = "Get the LocalizedUrlAliases for an identifiable by its UUID")
-  @GetMapping(
-      value = {
-        "/v6/identifiables/{uuid:" + ParameterHelper.UUID_PATTERN + "}/localizedUrlAliases",
-        "/v5/identifiables/{uuid:" + ParameterHelper.UUID_PATTERN + "}/localizedUrlAliases"
-      },
-      produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<LocalizedUrlAliases> getLocalizedUrlAliases(
-      @Parameter(
-              description =
-                  "UUID of the urlalias, e.g. <tt>599a120c-2dd5-11e8-b467-0ed5f89f718b</tt>")
-          @PathVariable("uuid")
-          UUID uuid)
-      throws CudamiControllerException {
-
-    try {
-      if (identifiableService.getByUuid(uuid) == null) {
-        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-      }
-    } catch (Exception e) {
-      throw new CudamiControllerException(e);
-    }
-
-    try {
-      return new ResponseEntity<>(urlAliasService.getLocalizedUrlAliases(uuid), HttpStatus.OK);
-    } catch (ServiceException e) {
-      throw new CudamiControllerException(e);
-    }
+  public PageResponse<Identifiable> find(
+      @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
+      @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
+      @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
+      @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria)
+      throws ServiceException {
+    return super.find(pageNumber, pageSize, sortBy, filterCriteria);
   }
 
   @Operation(
@@ -116,10 +85,44 @@ public class IdentifiableController extends AbstractIdentifiableController<Ident
         "/latest/identifiables/{uuid:" + ParameterHelper.UUID_PATTERN + "}"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<Identifiable> getByUuid(@PathVariable UUID uuid)
-      throws ResourceNotFoundException, ServiceException {
-    Identifiable identifiable = identifiableService.getByUuid(uuid);
-    return new ResponseEntity<>(
-        identifiable, identifiable != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
+  public ResponseEntity<Identifiable> getByUuid(@PathVariable UUID uuid) throws ServiceException {
+    return super.getByUuid(uuid);
+  }
+
+  @Operation(summary = "Get the LocalizedUrlAliases for an identifiable by its UUID")
+  @GetMapping(
+      value = {
+        "/v6/identifiables/{uuid:" + ParameterHelper.UUID_PATTERN + "}/localizedUrlAliases",
+        "/v5/identifiables/{uuid:" + ParameterHelper.UUID_PATTERN + "}/localizedUrlAliases"
+      },
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity<LocalizedUrlAliases> getLocalizedUrlAliases(
+      @Parameter(
+              description =
+                  "UUID of the urlalias, e.g. <tt>599a120c-2dd5-11e8-b467-0ed5f89f718b</tt>")
+          @PathVariable("uuid")
+          UUID uuid)
+      throws CudamiControllerException {
+
+    try {
+      if (service.getByExample(Identifiable.builder().uuid(uuid).build()) == null) {
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+      }
+    } catch (Exception e) {
+      throw new CudamiControllerException(e);
+    }
+
+    try {
+      return new ResponseEntity<>(
+          urlAliasService.getByIdentifiable(Identifiable.builder().uuid(uuid).build()),
+          HttpStatus.OK);
+    } catch (ServiceException e) {
+      throw new CudamiControllerException(e);
+    }
+  }
+
+  @Override
+  protected IdentifiableService<Identifiable> getService() {
+    return service;
   }
 }

@@ -4,120 +4,133 @@
       xmlns:sec="https://github.com/thymeleaf/thymeleaf-extras-springsecurity"
       xmlns:data="https://github.com/mxab/thymeleaf-extras-data-attribute"
       layout:decorate="~{base}">
+
   <head>
-    <title th:text="#{identifier_types}">Identifier types</title>
+    <title th:text="#{page.title.identifier_types}">Identifier types</title>
   </head>
+
   <body>
-  <th:block layout:fragment="content">
-    <div class="content-header">
-      <div class="container-fluid">
+    <th:block layout:fragment="content">
+      <div class="content-header">
+        <div class="container-fluid">
 
-        <div class="row">
-          <div class="col">
-            <h1 th:text="#{page.title.identifier_types}">Identifier types</h1>
-            <hr>
+          <div class="row">
+            <div class="col">
+              <h1 th:text="#{page.title.identifier_types}">Identifier types</h1>
+              <hr>
+            </div>
           </div>
-        </div>
 
-        <div class="row">
-          <div class="col">
+          <div class="row">
+            <div class="col">
 
-            <div id="toolbar-identifier_types">
+              <div id="toolbar-identifier_types">
+
+              </div>
+              <table id="table-identifier_types"
+                     data-toggle="table"
+                     th:data-url="@{/api/identifiertypes}"
+                     th:data-locale="${#locale}"
+                     data-buttons="buttonsIdentifierTypes"
+                     data-cookie="true"
+                     data-cookie-id-table="table-identifier_types"
+                     data-id-field="uuid"
+                     data-pagination="true"
+                     data-pagination-v-align="both"
+
+                     data-search="true"
+                     data-search-highlight="true"
+                     data-search-on-enter-key="true"
+                     data-server-sort="true"
+                     data-show-search-button="true"
+                     data-show-search-clear-button="true"
+                     data-side-pagination="server"
+                     data-sort-name="namespace"
+                     data-sort-order="asc"
+                     data-toolbar="#toolbar-identifier_types"
+                     data-unique-id="uuid">
+                <thead>
+                  <tr>
+                    <th data-field="index" data-formatter="formatRowNumberIdentifierTypes" data-halign="right" data-align="right" th:text="#{lbl.row_number}">#</th>
+                    <th data-field="label" data-sortable="true" th:text="#{lbl.label}">Label</th>
+                    <th data-field="namespace" data-sortable="true" data-formatter="formatNamespaceIdentifierTypes" th:text="#{lbl.namespace}">Namespace</th>
+                    <th data-field="pattern" data-sortable="true" th:text="#{lbl.pattern}">Pattern</th>
+
+                    <th data-field="lastModified" data-sortable="true" data-formatter="renderDateTime" th:text="#{lbl.last_modified}">last modified</th>
+                    <th data-field="created" data-sortable="true" data-formatter="renderDateTime" th:text="#{lbl.created}">created</th>
+                    <th data-field="actions" data-formatter="formatActionsIdentifierTypes" th:text="#{lbl.actions}">Actions</th>
+                  </tr>
+                </thead>
+              </table>
 
             </div>
-            <table id="table-identifier_types"
-                   data-toggle="table"
-                   th:data-url="@{/api/identifiertypes}"
-                   th:data-locale="${#locale}"
-                   data-buttons="buttonsIdentifierTypes"
-                   data-cookie="true"
-                   data-cookie-id-table="table-identifier_types"
-                   data-id-field="uuid"
-                   data-pagination="true"
-                   data-pagination-v-align="both"
-                   
-                   data-search="true"
-                   data-search-highlight="true"
-                   data-search-on-enter-key="true"
-                   data-server-sort="true"
-                   data-show-search-button="true"
-                   data-show-search-clear-button="true"
-                   data-side-pagination="server"
-                   data-sort-name="namespace"
-                   data-sort-order="asc"
-                   data-toolbar="#toolbar-identifier_types"
-                   data-unique-id="uuid">
-              <thead>
-                <tr>
-                  <th data-field="index" data-formatter="formatRowNumberIdentifierTypes" data-halign="right" data-align="right" th:text="#{lbl.row_number}">#</th>
-                  <th data-field="label" data-sortable="true" th:text="#{lbl.label}">Label</th>
-                  <th data-field="namespace" data-sortable="true" data-formatter="formatNamespaceIdentifierTypes" th:text="#{lbl.namespace}">Namespace</th>
-                  <th data-field="pattern" data-sortable="true" th:text="#{lbl.pattern}">Pattern</th>
-
-                  <th data-field="lastModified" data-sortable="true" data-formatter="renderDateTime" th:text="#{lbl.last_modified}">last modified</th>
-                  <th data-field="created" data-sortable="true" data-formatter="renderDateTime" th:text="#{lbl.created}">created</th>
-                  <th data-field="actions" data-formatter="formatActionsIdentifierTypes" th:text="#{lbl.actions}">Actions</th>
-                </tr>
-              </thead>
-            </table>
-
           </div>
+
         </div>
-
       </div>
-    </div>
-  </th:block>
+    </th:block>
 
-  <th:block layout:fragment="beforeBodyEnds">
-    <div th:replace="fragments/modals/confirm-yes-no :: confirm-yes-no-dialog"></div>
-    <div th:replace="fragments/bootstrap-table :: data-formatter"></div>
+    <th:block layout:fragment="beforeBodyEnds">
+      <div th:replace="fragments/modals/confirm-yes-no :: confirm-yes-no-dialog"></div>
+      <div th:replace="fragments/bootstrap-table :: data-formatter"></div>
 
-    <script type="text/javascript">
-      function formatRowNumberIdentifierTypes(value, row, index) {
-        return renderRowNumber($('#table-identifier_types'), index);
-      }
-    </script>
+      <script type="text/javascript">
+        function formatRowNumberIdentifierTypes(value, row, index) {
+          return renderRowNumber($('#table-identifier_types'), index);
+        }
+      </script>
 
-    <script type="text/javascript" th:inline="javascript">
-      /*<![CDATA[*/
-      function buttonsIdentifierTypes() {
-        /*[+
-         const baseUrl = [[@{'/identifiertypes'}]];
-         const textAdd = [[#{btn.add}]];
-         const tooltipAdd = [[#{tooltip.add_new_table_entry}]];
-         +]*/
-        return {
-          btnAdd: {
-            text: textAdd,
-            icon: 'fa-plus',
-            event: function () {
-              location.href = baseUrl + '/new';
-            },
-            attributes: {
-              title: tooltipAdd
-            }
+      <script type="text/javascript" th:inline="javascript">
+        /*<![CDATA[*/
+        $('#table-identifier_types').bootstrapTable({
+          formatSearch: function () {
+            /*[+
+             let columnName = [[#{lbl.namespace}]];
+             let placeholder = `[(#{placeholder.search})]`;
+             +]*/
+            return placeholder;
           }
-        };
-      }
-      
-      function formatActionsIdentifierTypes(value, row) {
-        /*[+
-         const baseUrl = [[@{'/identifiertypes'}]] + '/' + row.uuid;
-         +]*/
-        return [
-          renderViewAction(baseUrl),
-          renderEditAction(baseUrl)
-        ].join(' ');
-      }
-      
-      function formatNamespaceIdentifierTypes(value, row) {
-        /*[+
-         const baseUrl = [[@{'/identifiertypes'}]] + '/' + row.uuid;
-         +]*/
-        return '<a href="' + baseUrl + '">' + value + '</a>';
-      }
+        });
+
+        function buttonsIdentifierTypes() {
+          /*[+
+           const baseUrl = [[@{'/identifiertypes'}]];
+           const textAdd = [[#{btn.add}]];
+           const tooltipAdd = [[#{tooltip.add_new_table_entry}]];
+           +]*/
+          return {
+            btnAdd: {
+              text: textAdd,
+              icon: 'fa-plus',
+              event: function () {
+                location.href = baseUrl + '/new';
+              },
+              attributes: {
+                title: tooltipAdd
+              }
+            }
+          };
+        }
+
+        function formatActionsIdentifierTypes(value, row) {
+          /*[+
+           const baseUrl = [[@{'/identifiertypes'}]] + '/' + row.uuid;
+           +]*/
+          return [
+            renderViewAction(baseUrl),
+            renderEditAction(baseUrl)
+          ].join(' ');
+        }
+
+        function formatNamespaceIdentifierTypes(value, row) {
+          /*[+
+           const baseUrl = [[@{'/identifiertypes'}]] + '/' + row.uuid;
+           +]*/
+          return '<a href="' + baseUrl + '">' + value + '</a>';
+        }
       /*]]>*/
-    </script>
-  </th:block>
-</body>
+      </script>
+    </th:block>
+  </body>
+
 </html>

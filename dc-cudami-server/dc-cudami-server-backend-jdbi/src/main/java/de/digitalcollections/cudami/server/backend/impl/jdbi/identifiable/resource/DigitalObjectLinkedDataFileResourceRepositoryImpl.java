@@ -5,6 +5,8 @@ import de.digitalcollections.cudami.server.backend.api.repository.exceptions.Rep
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.resource.DigitalObjectLinkedDataFileResourceRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.JdbiRepositoryImpl;
 import de.digitalcollections.model.identifiable.resource.LinkedDataFileResource;
+import de.digitalcollections.model.list.paging.PageRequest;
+import de.digitalcollections.model.list.paging.PageResponse;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -13,7 +15,6 @@ import java.util.Map;
 import java.util.UUID;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.core.statement.PreparedBatch;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -26,7 +27,6 @@ public class DigitalObjectLinkedDataFileResourceRepositoryImpl extends JdbiRepos
 
   private final LinkedDataFileResourceRepositoryImpl linkedDataFileResourceRepositoryImpl;
 
-  @Autowired
   public DigitalObjectLinkedDataFileResourceRepositoryImpl(
       Jdbi dbi,
       CudamiConfig cudamiConfig,
@@ -34,6 +34,36 @@ public class DigitalObjectLinkedDataFileResourceRepositoryImpl extends JdbiRepos
     super(
         dbi, TABLE_NAME, TABLE_ALIAS, MAPPING_PREFIX, cudamiConfig.getOffsetForAlternativePaging());
     this.linkedDataFileResourceRepositoryImpl = linkedDataFileResourceRepository;
+  }
+
+  @Override
+  public int countDigitalObjectsForResource(UUID uuid) {
+    return dbi.withHandle(
+        h ->
+            h.createQuery(
+                    "SELECT count(*) FROM "
+                        + tableName
+                        + " WHERE linkeddata_fileresource_uuid = :uuid")
+                .bind("uuid", uuid)
+                .mapTo(Integer.class)
+                .findOne()
+                .get());
+  }
+
+  @Override
+  public int delete(List<UUID> uuids) {
+    return dbi.withHandle(
+        h ->
+            h.createUpdate(
+                    "DELETE FROM " + tableName + " WHERE linkeddata_fileresource_uuid in (<uuids>)")
+                .bindList("uuids", uuids)
+                .execute());
+  }
+
+  @Override
+  public PageResponse<LinkedDataFileResource> findLinkedDataFileResources(
+      UUID digitalObjectUuid, PageRequest pageRequest) {
+    throw new UnsupportedOperationException(); // TODO: not yet implemented
   }
 
   @Override
@@ -48,8 +78,10 @@ public class DigitalObjectLinkedDataFileResourceRepositoryImpl extends JdbiRepos
   }
 
   @Override
-  public List<LinkedDataFileResource> getLinkedDataFileResources(UUID digitalObjectUuid) {
-    final String fieldsSql = linkedDataFileResourceRepositoryImpl.getSqlSelectAllFields("f", "fr");
+  public List<LinkedDataFileResource> getLinkedDataFileResources(UUID digitalObjectUuid)
+      throws RepositoryException {
+    // TABLE_ALIAS=f, MAPPING_PREFIX=fr
+    final String fieldsSql = linkedDataFileResourceRepositoryImpl.getSqlSelectAllFields();
     StringBuilder innerQuery =
         new StringBuilder(
             "SELECT "
@@ -126,29 +158,5 @@ public class DigitalObjectLinkedDataFileResourceRepositoryImpl extends JdbiRepos
   @Override
   protected boolean supportsCaseSensitivityForProperty(String modelProperty) {
     return false;
-  }
-
-  @Override
-  public int delete(List<UUID> uuids) {
-    return dbi.withHandle(
-        h ->
-            h.createUpdate(
-                    "DELETE FROM " + tableName + " WHERE linkeddata_fileresource_uuid in (<uuids>)")
-                .bindList("uuids", uuids)
-                .execute());
-  }
-
-  @Override
-  public int countDigitalObjectsForResource(UUID uuid) {
-    return dbi.withHandle(
-        h ->
-            h.createQuery(
-                    "SELECT count(*) FROM "
-                        + tableName
-                        + " WHERE linkeddata_fileresource_uuid = :uuid")
-                .bind("uuid", uuid)
-                .mapTo(Integer.class)
-                .findOne()
-                .get());
   }
 }

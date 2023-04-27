@@ -6,6 +6,7 @@ import static org.mockito.Mockito.when;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.ProjectService;
 import de.digitalcollections.cudami.server.controller.BaseControllerTest;
 import de.digitalcollections.model.file.MimeType;
+import de.digitalcollections.model.identifiable.Identifier;
 import de.digitalcollections.model.identifiable.entity.Project;
 import de.digitalcollections.model.identifiable.entity.digitalobject.DigitalObject;
 import de.digitalcollections.model.list.paging.PageRequest;
@@ -39,7 +40,11 @@ public class V3ProjectControllerTest extends BaseControllerTest {
                     DigitalObject.builder()
                         .created("2020-09-29T12:18:04.059448")
                         .identifier(
-                            "mdz-obj", "bsb00057492", "68a7fbc6-52de-462e-a2a2-913f9d4c9aca")
+                            Identifier.builder()
+                                .namespace("mdz-obj")
+                                .id("bsb00057492")
+                                .uuid("68a7fbc6-52de-462e-a2a2-913f9d4c9aca")
+                                .build())
                         .label(
                             "Stammens-Beschreibung des des Hainhoferischen Geschlechts - SuStB Augsburg 2°Cod Aug 14")
                         .lastModified("2020-09-29T12:18:04.05945")

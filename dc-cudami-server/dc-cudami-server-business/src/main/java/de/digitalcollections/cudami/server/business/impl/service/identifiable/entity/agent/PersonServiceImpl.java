@@ -1,21 +1,20 @@
 package de.digitalcollections.cudami.server.business.impl.service.identifiable.entity.agent;
 
 import de.digitalcollections.cudami.model.config.CudamiConfig;
+import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.agent.PersonRepository;
 import de.digitalcollections.cudami.server.business.api.service.LocaleService;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifierService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.alias.UrlAliasService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.agent.PersonService;
 import de.digitalcollections.cudami.server.config.HookProperties;
 import de.digitalcollections.model.identifiable.entity.agent.Person;
-import de.digitalcollections.model.identifiable.entity.digitalobject.DigitalObject;
-import de.digitalcollections.model.identifiable.entity.work.Work;
+import de.digitalcollections.model.identifiable.entity.geo.location.GeoLocation;
 import de.digitalcollections.model.list.filtering.FilterCriterion;
 import de.digitalcollections.model.list.filtering.Filtering;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
-import java.util.Set;
-import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -44,41 +43,39 @@ public class PersonServiceImpl extends AgentServiceImpl<Person> implements Perso
 
   @Override
   public PageResponse<Person> findByGeoLocationOfBirth(
-      PageRequest pageRequest, UUID uuidGeoLocation) {
+      GeoLocation geoLocation, PageRequest pageRequest) throws ServiceException {
     Filtering filtering =
         Filtering.builder()
             .add(
                 FilterCriterion.builder()
                     .withExpression("placeOfBirth")
-                    .isEquals(uuidGeoLocation.toString())
+                    .isEquals(geoLocation.getUuid().toString())
                     .build())
             .build();
     pageRequest.setFiltering(filtering);
-    return ((PersonRepository) repository).find(pageRequest);
+    try {
+      return ((PersonRepository) repository).find(pageRequest);
+    } catch (RepositoryException e) {
+      throw new ServiceException("Backend failure", e);
+    }
   }
 
   @Override
   public PageResponse<Person> findByGeoLocationOfDeath(
-      PageRequest pageRequest, UUID uuidGeoLocation) {
+      GeoLocation geoLocation, PageRequest pageRequest) throws ServiceException {
     Filtering filtering =
         Filtering.builder()
             .add(
                 FilterCriterion.builder()
                     .withExpression("placeOfDeath")
-                    .isEquals(uuidGeoLocation.toString())
+                    .isEquals(geoLocation.getUuid().toString())
                     .build())
             .build();
     pageRequest.setFiltering(filtering);
-    return ((PersonRepository) repository).find(pageRequest);
-  }
-
-  @Override
-  public Set<DigitalObject> getDigitalObjects(UUID uuidPerson) {
-    return ((PersonRepository) repository).getDigitalObjects(uuidPerson);
-  }
-
-  @Override
-  public Set<Work> getWorks(UUID uuidPerson) {
-    return ((PersonRepository) repository).getWorks(uuidPerson);
+    try {
+      return ((PersonRepository) repository).find(pageRequest);
+    } catch (RepositoryException e) {
+      throw new ServiceException("Backend failure", e);
+    }
   }
 }

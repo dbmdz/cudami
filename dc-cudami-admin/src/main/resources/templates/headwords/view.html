@@ -3,47 +3,48 @@
       xmlns:sec="https://github.com/thymeleaf/thymeleaf-extras-springsecurity"
       xmlns:data="https://github.com/mxab/thymeleaf-extras-data-attribute"
       layout:decorate="~{base}">
+
   <head>
     <title th:text="|#{page.title.headwords}: #{lbl.headword}|">Headwords: Headword</title>
   </head>
+
   <body>
-  <th:block layout:fragment="content" th:object="${headword}">
-    <div class="content">
-      <div class="container-fluid">
-        <div id="content-header">
-          <div class="row">
-            <div class="col-sm-6">
-              <h1 th:text="#{lbl.headword}">Headword</h1>
-            </div>
-            <div class="col-sm-6">
-              <div class="float-right">
-                <!--              <a class="btn btn-primary" id="edit-button" th:href="@{*{uuid} + '/edit'}" th:text="#{edit}">edit</a>-->
+    <th:block layout:fragment="content" th:object="${headword}">
+      <div class="content">
+        <div class="container-fluid">
+          <div id="content-header">
+            <div class="row">
+              <div class="col d-flex justify-content-between">
+                <h1 th:text="#{lbl.headword}">Headword</h1>
+                <div>
+                  <!--              <a class="btn btn-primary" id="edit-button" th:href="@{*{uuid} + '/edit'}" th:text="#{edit}">edit</a>-->
+                </div>
               </div>
             </div>
           </div>
-        </div>
 
-        <div id="content-body" class="rows-striped">
-          <th:block th:insert="fragments/uniqueobject::renderFields(${headword})"></th:block>
+          <div id="content-body" class="rows-striped">
+            <th:block th:insert="fragments/uniqueobject::renderFields(${headword})"></th:block>
 
-          <hr/>
-          
-          <div class="row">
-            <div class="col-md-3"><label th:text="#{lbl.label}">Label</label></div>
-            <div class="align-items-center col-md-9 d-flex">
-              <span th:text="*{label}">...</span>
+            <hr />
+
+            <div class="row">
+              <div class="col-md-3"><label th:text="#{lbl.label}">Label</label></div>
+              <div class="align-items-center col-md-9 d-flex">
+                <span th:text="*{label}">...</span>
+              </div>
             </div>
-          </div>
-          <div class="row">
-            <div class="col-md-3"><label th:text="#{lbl.language}">Language</label></div>
-            <div class="align-items-center col-md-9 d-flex" th:text="${T(de.digitalcollections.cudami.admin.controller.fragments.FragmentsController).getDisplayLanguage(#locale, headword.locale)}" >...</div>
-          </div>
+            <div class="row">
+              <div class="col-md-3"><label th:text="#{lbl.language}">Language</label></div>
+              <div class="align-items-center col-md-9 d-flex" th:text="${T(de.digitalcollections.cudami.admin.controller.fragments.FragmentsController).getDisplayLanguage(#locale, headword.locale)}">...</div>
+            </div>
 
+          </div>
         </div>
       </div>
-    </div>
-  </th:block>
-  <section layout:fragment="beforeBodyEnds">
-  </section>
-</body>
+    </th:block>
+    <section layout:fragment="beforeBodyEnds">
+    </section>
+  </body>
+
 </html>

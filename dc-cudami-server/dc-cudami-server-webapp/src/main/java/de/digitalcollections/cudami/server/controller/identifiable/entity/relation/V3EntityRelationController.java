@@ -4,7 +4,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.openjson.JSONArray;
 import com.github.openjson.JSONObject;
-import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.relation.EntityRelationService;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
+import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.relation.EntityToEntityRelationService;
 import de.digitalcollections.model.identifiable.entity.relation.EntityRelation;
 import de.digitalcollections.model.list.filtering.FilterCriterion;
 import de.digitalcollections.model.list.filtering.Filtering;
@@ -30,11 +31,11 @@ import org.springframework.web.bind.annotation.RestController;
 @Tag(name = "Entity relation controller")
 public class V3EntityRelationController {
 
-  private final EntityRelationService entityRelationService;
+  private final EntityToEntityRelationService entityRelationService;
   private final ObjectMapper objectMapper;
 
   public V3EntityRelationController(
-      EntityRelationService entityRelationservice, ObjectMapper objectMapper) {
+      EntityToEntityRelationService entityRelationservice, ObjectMapper objectMapper) {
     this.entityRelationService = entityRelationservice;
     this.objectMapper = objectMapper;
   }
@@ -84,7 +85,7 @@ public class V3EntityRelationController {
               schema = @Schema(type = "string"))
           @RequestParam(name = "predicate", required = false)
           String predicate)
-      throws JsonProcessingException {
+      throws JsonProcessingException, ServiceException {
     PageRequest pageRequest = new PageRequest(pageNumber, pageSize);
 
     if (StringUtils.hasText(predicate)) {

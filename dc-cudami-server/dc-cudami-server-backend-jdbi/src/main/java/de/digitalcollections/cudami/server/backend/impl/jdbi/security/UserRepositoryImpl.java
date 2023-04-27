@@ -1,8 +1,9 @@
 package de.digitalcollections.cudami.server.backend.impl.jdbi.security;
 
 import de.digitalcollections.cudami.model.config.CudamiConfig;
+import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
 import de.digitalcollections.cudami.server.backend.api.repository.security.UserRepository;
-import de.digitalcollections.cudami.server.backend.impl.jdbi.JdbiRepositoryImpl;
+import de.digitalcollections.cudami.server.backend.impl.jdbi.UniqueObjectRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.SearchTermTemplates;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
@@ -16,30 +17,25 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import org.jdbi.v3.core.Jdbi;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class UserRepositoryImpl extends JdbiRepositoryImpl implements UserRepository {
+public class UserRepositoryImpl extends UniqueObjectRepositoryImpl<User> implements UserRepository {
 
-  public static final String MAPPING_PREFIX = "u";
-
-  public static final String SQL_INSERT_FIELDS =
-      " email, enabled, firstname, lastname, passwordhash, roles, uuid";
-  public static final String SQL_INSERT_VALUES =
-      " :email, :enabled, :firstname, :lastname, :passwordHash, :roles, :uuid";
+  public static final String MAPPING_PREFIX = "us";
   public static final String TABLE_ALIAS = "u";
-  public static final String SQL_REDUCED_FIELDS_US =
-      String.format(
-          " %1$s.uuid, %1$s.created, %1$s.email, %1$s.enabled, %1$s.firstname, %1$s.lastname, %1$s.last_modified, %1$s.passwordhash, %1$s.roles",
-          TABLE_ALIAS);
-  public static final String SQL_FULL_FIELDS_US = SQL_REDUCED_FIELDS_US;
   public static final String TABLE_NAME = "users";
 
-  @Autowired
   public UserRepositoryImpl(Jdbi dbi, CudamiConfig cudamiConfig) {
     super(
-        dbi, TABLE_NAME, TABLE_ALIAS, MAPPING_PREFIX, cudamiConfig.getOffsetForAlternativePaging());
+        dbi,
+        TABLE_NAME,
+        TABLE_ALIAS,
+        MAPPING_PREFIX,
+        User.class,
+        cudamiConfig.getOffsetForAlternativePaging());
+
+    this.dbi.registerArrayType(Role.class, "varchar");
   }
 
   @Override
@@ -47,16 +43,17 @@ public class UserRepositoryImpl extends JdbiRepositoryImpl implements UserReposi
     return new User();
   }
 
+  // FIXME: had to override because mapping_prefix usage (seems to be always empty prefix in
+  // jdbi-rowmapper) in super class does not work
   @Override
-  public PageResponse<User> find(PageRequest pageRequest) {
+  public PageResponse<User> find(PageRequest pageRequest) throws RepositoryException {
     StringBuilder commonSql = new StringBuilder(" FROM " + tableName + " AS " + tableAlias);
-
     Map<String, Object> argumentMappings = new HashMap<>(0);
-    String executedSearchTerm = addSearchTerm(pageRequest, commonSql, argumentMappings);
+    addFiltering(pageRequest, commonSql, argumentMappings);
 
     // Actually "*" should be used in select, but here we don't need it as there is no outer select
-    StringBuilder query = new StringBuilder("SELECT " + SQL_REDUCED_FIELDS_US + commonSql);
-    addPageRequestParams(pageRequest, query);
+    StringBuilder query = new StringBuilder("SELECT " + getSqlSelectReducedFields() + commonSql);
+    addPagingAndSorting(pageRequest, query);
     List<User> result =
         dbi.withHandle(
             h ->
@@ -66,31 +63,32 @@ public class UserRepositoryImpl extends JdbiRepositoryImpl implements UserReposi
                     .list());
 
     long total = count(commonSql.toString(), argumentMappings);
-    return new PageResponse<>(result, pageRequest, total, executedSearchTerm);
+    return new PageResponse<>(result, pageRequest, total, null);
   }
 
   @Override
   public List<User> getActiveAdminUsers() {
     return dbi.withHandle(
-        h ->
-            h.createQuery(
-                    "SELECT "
-                        + SQL_REDUCED_FIELDS_US
-                        + " FROM "
-                        + tableName
-                        + " AS "
-                        + tableAlias
-                        + " WHERE '"
-                        + Role.ADMIN.name()
-                        + "' = any(roles)")
-                .mapToBean(User.class)
-                .list());
+        h -> {
+          String sql =
+              "SELECT "
+                  + getSqlSelectReducedFields()
+                  + " FROM "
+                  + tableName
+                  + " AS "
+                  + tableAlias
+                  + " WHERE '"
+                  + Role.ADMIN.name()
+                  + "' = any(roles)";
+          return h.createQuery(sql).mapToBean(User.class).list();
+        });
   }
 
   @Override
   protected List<String> getAllowedOrderByFields() {
-    return new ArrayList<>(
-        Arrays.asList("created", "email", "firstname", "lastname", "lastModified"));
+    List<String> allowedOrderByFields = super.getAllowedOrderByFields();
+    allowedOrderByFields.addAll(Arrays.asList("email", "firstname", "lastname"));
+    return allowedOrderByFields;
   }
 
   @Override
@@ -100,7 +98,7 @@ public class UserRepositoryImpl extends JdbiRepositoryImpl implements UserReposi
             h ->
                 h.createQuery(
                         "SELECT "
-                            + SQL_FULL_FIELDS_US
+                            + getSqlSelectAllFields()
                             + " FROM "
                             + tableName
                             + " AS "
@@ -115,6 +113,8 @@ public class UserRepositoryImpl extends JdbiRepositoryImpl implements UserReposi
     return users.get(0);
   }
 
+  // FIXME: had to override because mapping_prefix usage (seems to be always empty prefix in
+  // jdbi-rowmapper) in super class does not work
   @Override
   public User getByUuid(UUID uuid) {
     List<User> users =
@@ -122,7 +122,7 @@ public class UserRepositoryImpl extends JdbiRepositoryImpl implements UserReposi
             h ->
                 h.createQuery(
                         "SELECT "
-                            + SQL_FULL_FIELDS_US
+                            + getSqlSelectAllFields()
                             + " FROM "
                             + tableName
                             + " AS "
@@ -143,21 +143,20 @@ public class UserRepositoryImpl extends JdbiRepositoryImpl implements UserReposi
       return null;
     }
     switch (modelProperty) {
-      case "created":
-        return tableAlias + ".created";
       case "email":
         return tableAlias + ".email";
       case "lastname":
         return tableAlias + ".lastname";
       case "firstname":
         return tableAlias + ".firstname";
-      case "lastModified":
-        return tableAlias + ".last_modified";
-      case "uuid":
-        return tableAlias + ".uuid";
       default:
-        return null;
+        return super.getColumnName(modelProperty);
     }
+  }
+
+  @Override
+  public List<User> getRandom(int count) throws RepositoryException {
+    throw new UnsupportedOperationException(); // TODO: not yet implemented
   }
 
   @Override
@@ -170,38 +169,100 @@ public class UserRepositoryImpl extends JdbiRepositoryImpl implements UserReposi
   }
 
   @Override
-  protected String getUniqueField() {
-    return "uuid";
+  protected String getSqlInsertFields() {
+    return super.getSqlInsertFields()
+        + ", email, enabled, firstname, lastname, passwordhash, roles";
   }
 
   @Override
-  public User save(User user) {
-    user.setUuid(UUID.randomUUID());
-    user.setCreated(LocalDateTime.now());
-    user.setLastModified(LocalDateTime.now());
-
-    final String sql =
-        "INSERT INTO "
-            + tableName
-            + "("
-            + SQL_INSERT_FIELDS
-            + ")"
-            + " VALUES ("
-            + SQL_INSERT_VALUES
-            + ")"
-            + " RETURNING *";
-
-    User result =
-        dbi.withHandle(
-            h ->
-                h.registerArrayType(Role.class, "varchar")
-                    .createQuery(sql)
-                    .bindBean(user)
-                    .mapToBean(User.class)
-                    .findOne()
-                    .orElse(null));
-    return result;
+  protected String getSqlInsertValues() {
+    return super.getSqlInsertValues()
+        + ", :email, :enabled, :firstname, :lastname, :passwordHash, :roles";
   }
+
+  @Override
+  public String getSqlSelectAllFields(String tableAlias, String mappingPrefix) {
+    return getSqlSelectReducedFields(tableAlias, mappingPrefix);
+  }
+
+  @Override
+  public String getSqlSelectReducedFields(String tableAlias, String mappingPrefix) {
+    //    return super.getSqlSelectReducedFields(tableAlias, mappingPrefix)
+    // FIXME: Why does mapping prefix not work for User? ???
+    //    return super.getSqlSelectReducedFields(tableAlias, mappingPrefix)
+    //    + ", "
+    return " "
+        + tableAlias
+        + ".uuid, "
+        //        + mappingPrefix
+        //        + "_uuid, "
+        + tableAlias
+        + ".created, "
+        //        + mappingPrefix
+        //        + "_created, "
+        + tableAlias
+        + ".last_modified, "
+        //        + mappingPrefix
+        //        + "_lastModified"
+        + tableAlias
+        + ".email, "
+        //        + mappingPrefix
+        //        + "_email, "
+        + tableAlias
+        + ".enabled, "
+        //        + mappingPrefix
+        //        + "_enabled, "
+        + tableAlias
+        + ".firstname, "
+        //        + mappingPrefix
+        //        + "_firstname, "
+        + tableAlias
+        + ".lastname, "
+        //        + mappingPrefix
+        //        + "_lastname, "
+        + tableAlias
+        + ".passwordhash, "
+        //        + mappingPrefix
+        //        + "_passwordhash, "
+        + tableAlias
+        + ".roles ";
+    //        + mappingPrefix
+    //        + "_roles";
+  }
+
+  @Override
+  protected String getSqlUpdateFieldValues() {
+    return super.getSqlUpdateFieldValues()
+        + ", email=:email, enabled=:enabled, firstname=:firstname, lastname=:lastname, passwordhash=:passwordHash, roles=:roles";
+  }
+
+  //  @Override
+  //  public void save(final User user) {
+  //    user.setUuid(UUID.randomUUID());
+  //    user.setCreated(LocalDateTime.now());
+  //    user.setLastModified(LocalDateTime.now());
+  //
+  //    final String sql =
+  //        "INSERT INTO "
+  //            + tableName
+  //            + "("
+  //            + getSqlInsertFields()
+  //            + ")"
+  //            + " VALUES ("
+  //            + getSqlInsertValues()
+  //            + ")"
+  //            + " RETURNING *";
+  //
+  //    //    User result =
+  //    dbi.withHandle(
+  //        h ->
+  //            h.registerArrayType(Role.class, "varchar")
+  //                .createQuery(sql)
+  //                .bindBean(user)
+  //                .mapToBean(User.class)
+  //                .findOne()
+  //                .orElse(null));
+  //  }
 
   @Override
   protected boolean supportsCaseSensitivityForProperty(String modelProperty) {
@@ -214,21 +275,23 @@ public class UserRepositoryImpl extends JdbiRepositoryImpl implements UserReposi
     }
   }
 
+  // FIXME: had to override because mapping_prefix usage (seems to be always empty prefix in
+  // jdbi-rowmapper) in super class does not work
   @Override
-  public User update(User user) {
+  public void update(User user) {
     user.setLastModified(LocalDateTime.now());
-    User result =
-        dbi.withHandle(
-            h ->
-                h.registerArrayType(Role.class, "varchar")
-                    .createQuery(
-                        "UPDATE "
-                            + tableName
-                            + " SET email=:email, enabled=:enabled, firstname=:firstname, lastname=:lastname, last_modified=:lastModified, passwordhash=:passwordHash, roles=:roles WHERE uuid=:uuid RETURNING *")
-                    .bindBean(user)
-                    .mapToBean(User.class)
-                    .findOne()
-                    .orElse(null));
-    return result;
+    //    User result =
+    dbi.withHandle(
+        h ->
+            h.registerArrayType(Role.class, "varchar")
+                .createQuery(
+                    "UPDATE "
+                        + tableName
+                        + " SET email=:email, enabled=:enabled, firstname=:firstname, lastname=:lastname, last_modified=:lastModified, passwordhash=:passwordHash, roles=:roles WHERE uuid=:uuid RETURNING *")
+                .bindBean(user)
+                .mapToBean(User.class)
+                .findOne()
+                .orElse(null));
+    //    return result;
   }
 }

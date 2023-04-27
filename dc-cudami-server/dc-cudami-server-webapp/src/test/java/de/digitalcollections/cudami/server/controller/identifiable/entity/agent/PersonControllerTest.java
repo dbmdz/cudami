@@ -8,6 +8,7 @@ import static org.mockito.Mockito.when;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.agent.PersonService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.work.WorkService;
 import de.digitalcollections.cudami.server.controller.BaseControllerTest;
+import de.digitalcollections.model.identifiable.Identifier;
 import de.digitalcollections.model.identifiable.entity.agent.Person;
 import de.digitalcollections.model.list.filtering.FilterCriterion;
 import de.digitalcollections.model.list.filtering.Filtering;
@@ -43,11 +44,13 @@ class PersonControllerTest extends BaseControllerTest {
   void testGetByIdentifierWithPlaintextId(String path) throws Exception {
     Person expected = Person.builder().build();
 
-    when(personService.getByIdentifier(eq("foo"), eq("bar"))).thenReturn(expected);
+    when(personService.getByIdentifier(eq(Identifier.builder().namespace("foo").id("bar").build())))
+        .thenReturn(expected);
 
     testHttpGet(path);
 
-    verify(personService, times(1)).getByIdentifier(eq("foo"), eq("bar"));
+    verify(personService, times(1))
+        .getByIdentifier(eq(Identifier.builder().namespace("foo").id("bar").build()));
   }
 
   @DisplayName("can retrieve by identifier with base 64 encoded data")
@@ -62,18 +65,21 @@ class PersonControllerTest extends BaseControllerTest {
   void testGetByIdentifierWithBase64EncodedData(String basePath) throws Exception {
     Person expected = Person.builder().build();
 
-    when(personService.getByIdentifier(eq("foo"), eq("bar/bla"))).thenReturn(expected);
+    when(personService.getByIdentifier(
+            eq(Identifier.builder().namespace("foo").id("bar/bla").build())))
+        .thenReturn(expected);
 
     testHttpGet(
         basePath
             + Base64.getEncoder().encodeToString("foo:bar/bla".getBytes(StandardCharsets.UTF_8)));
 
-    verify(personService, times(1)).getByIdentifier(eq("foo"), eq("bar/bla"));
+    verify(personService, times(1))
+        .getByIdentifier(eq(Identifier.builder().namespace("foo").id("bar/bla").build()));
   }
 
   @DisplayName("can retrieve by localized exact label")
   @ParameterizedTest
-  @ValueSource(strings = {"/v6/persons?label=\"Karl Ranseier\"&labelLanguage=und-Latn"})
+  @ValueSource(strings = {"/v6/persons?filter=label_und-Latn:eq:\"Karl Ranseier\""})
   public void findByLocalizedExactLabel(String path) throws Exception {
     testHttpGet(path);
     PageRequest expectedPageRequest =
@@ -84,7 +90,7 @@ class PersonControllerTest extends BaseControllerTest {
                 Filtering.builder()
                     .add(
                         FilterCriterion.builder()
-                            .withExpression("label.und-latn")
+                            .withExpression("label_und-Latn")
                             .isEquals("\"Karl Ranseier\"")
                             .build())
                     .build())
@@ -94,7 +100,7 @@ class PersonControllerTest extends BaseControllerTest {
 
   @DisplayName("can retrieve by localized 'like' label")
   @ParameterizedTest
-  @ValueSource(strings = {"/v6/persons?label=Karl Ranseier&labelLanguage=und-Latn"})
+  @ValueSource(strings = {"/v6/persons?filter=label_und-Latn:like:Karl Ranseier"})
   public void findByLocalizedLikeLabel(String path) throws Exception {
     testHttpGet(path);
     PageRequest expectedPageRequest =
@@ -105,7 +111,7 @@ class PersonControllerTest extends BaseControllerTest {
                 Filtering.builder()
                     .add(
                         FilterCriterion.builder()
-                            .withExpression("label.und-latn")
+                            .withExpression("label_und-Latn")
                             .contains("Karl Ranseier")
                             .build())
                     .build())
@@ -115,7 +121,7 @@ class PersonControllerTest extends BaseControllerTest {
 
   @DisplayName("can retrieve by localized exact name")
   @ParameterizedTest
-  @ValueSource(strings = {"/v6/persons?name=\"Karl Ranseier\"&nameLanguage=de"})
+  @ValueSource(strings = {"/v6/persons?filter=name_de:eq:\"Karl Ranseier\""})
   public void findByLocalizedExactName(String path) throws Exception {
     testHttpGet(path);
     PageRequest expectedPageRequest =
@@ -126,7 +132,7 @@ class PersonControllerTest extends BaseControllerTest {
                 Filtering.builder()
                     .add(
                         FilterCriterion.builder()
-                            .withExpression("name.de")
+                            .withExpression("name_de")
                             .isEquals("\"Karl Ranseier\"")
                             .build())
                     .build())
@@ -136,7 +142,7 @@ class PersonControllerTest extends BaseControllerTest {
 
   @DisplayName("can retrieve by localized 'like' name")
   @ParameterizedTest
-  @ValueSource(strings = {"/v6/persons?name=Karl Ranseier&nameLanguage=und-Latn"})
+  @ValueSource(strings = {"/v6/persons?filter=name_und-Latn:like:Karl Ranseier"})
   public void findByLocalizedLikeName(String path) throws Exception {
     testHttpGet(path);
     PageRequest expectedPageRequest =
@@ -147,7 +153,7 @@ class PersonControllerTest extends BaseControllerTest {
                 Filtering.builder()
                     .add(
                         FilterCriterion.builder()
-                            .withExpression("name.und-latn")
+                            .withExpression("name_und-Latn")
                             .contains("Karl Ranseier")
                             .build())
                     .build())
@@ -157,7 +163,7 @@ class PersonControllerTest extends BaseControllerTest {
 
   @DisplayName("can retrieve by non-localized exact name")
   @ParameterizedTest
-  @ValueSource(strings = {"/v6/persons?name=\"Karl Ranseier\""})
+  @ValueSource(strings = {"/v6/persons?filter=name:eq:\"Karl Ranseier\""})
   public void findByNonLocalizedExactName(String path) throws Exception {
     testHttpGet(path);
     PageRequest expectedPageRequest =
@@ -178,7 +184,7 @@ class PersonControllerTest extends BaseControllerTest {
 
   @DisplayName("can retrieve by non-localized 'like' name")
   @ParameterizedTest
-  @ValueSource(strings = {"/v6/persons?name=Karl Ranseier"})
+  @ValueSource(strings = {"/v6/persons?filter=name:like:Karl Ranseier"})
   public void findByNonLocalizedLikeName(String path) throws Exception {
     testHttpGet(path);
     PageRequest expectedPageRequest =

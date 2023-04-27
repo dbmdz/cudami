@@ -2,6 +2,7 @@ package de.digitalcollections.cudami.server.controller.legal;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.legal.LicenseService;
 import de.digitalcollections.cudami.server.controller.CudamiControllerException;
 import de.digitalcollections.cudami.server.controller.legacy.V5MigrationHelper;
@@ -45,7 +46,7 @@ public class V5LicenseController {
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
       @RequestParam(name = "label", required = false) FilterCriterion<String> labelCriterion,
       @RequestParam(name = "locale", required = false) FilterCriterion<String> localeCriterion)
-      throws CudamiControllerException {
+      throws CudamiControllerException, ServiceException {
     PageRequest pageRequest = new PageRequest(pageNumber, pageSize);
     if (sortBy != null) {
       Sorting sorting = new Sorting(sortBy);

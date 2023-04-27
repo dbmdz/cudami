@@ -1,6 +1,9 @@
 package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.web;
 
 import de.digitalcollections.cudami.model.config.CudamiConfig;
+import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
+import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
+import de.digitalcollections.cudami.server.backend.api.repository.identifiable.alias.UrlAliasRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.web.WebpageRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.IdentifiableRepositoryImpl;
 import de.digitalcollections.model.identifiable.Identifier;
@@ -20,77 +23,34 @@ import java.util.Map;
 import java.util.UUID;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.core.statement.PreparedBatch;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 @Repository
 public class WebpageRepositoryImpl extends IdentifiableRepositoryImpl<Webpage>
     implements WebpageRepository {
 
-  public static final String MAPPING_PREFIX = "wp";
-  public static final String TABLE_ALIAS = "w";
+  public static final String MAPPING_PREFIX = "webp";
+  public static final String TABLE_ALIAS = "webp";
   public static final String TABLE_NAME = "webpages";
 
-  @Override
-  public String getSqlInsertFields() {
-    return super.getSqlInsertFields()
-        + ", publication_end, publication_start, rendering_hints, text";
-  }
-
-  /* Do not change order! Must match order in getSqlInsertFields!!! */
-  @Override
-  public String getSqlInsertValues() {
-    return super.getSqlInsertValues()
-        + ", :publicationEnd, :publicationStart, :renderingHints::JSONB, :text::JSONB";
-  }
-
-  @Override
-  public String getSqlSelectAllFields(String tableAlias, String mappingPrefix) {
-    return getSqlSelectReducedFields(tableAlias, mappingPrefix)
-        + ", "
-        + tableAlias
-        + ".text "
-        + mappingPrefix
-        + "_text";
-  }
-
-  @Override
-  public String getSqlSelectReducedFields(String tableAlias, String mappingPrefix) {
-    return super.getSqlSelectReducedFields(tableAlias, mappingPrefix)
-        + ", "
-        + tableAlias
-        + ".publication_end "
-        + mappingPrefix
-        + "_publicationEnd, "
-        + tableAlias
-        + ".publication_start "
-        + mappingPrefix
-        + "_publicationStart, "
-        + tableAlias
-        + ".rendering_hints "
-        + mappingPrefix
-        + "_renderingHints";
-  }
-
-  @Override
-  public String getSqlUpdateFieldValues() {
-    return super.getSqlUpdateFieldValues()
-        + ", publication_end=:publicationEnd, publication_start=:publicationStart, rendering_hints=:renderingHints::JSONB, text=:text::JSONB";
-  }
-
-  @Autowired
-  public WebpageRepositoryImpl(Jdbi dbi, CudamiConfig cudamiConfig) {
+  public WebpageRepositoryImpl(
+      Jdbi dbi,
+      CudamiConfig cudamiConfig,
+      IdentifierRepository identifierRepository,
+      UrlAliasRepository urlAliasRepository) {
     super(
         dbi,
         TABLE_NAME,
         TABLE_ALIAS,
         MAPPING_PREFIX,
         Webpage.class,
-        cudamiConfig.getOffsetForAlternativePaging());
+        cudamiConfig.getOffsetForAlternativePaging(),
+        identifierRepository,
+        urlAliasRepository);
   }
 
   @Override
-  public boolean addChildren(UUID parentUuid, List<UUID> childrenUuids) {
+  public boolean addChildren(UUID parentUuid, List<UUID> childrenUuids) throws RepositoryException {
     if (parentUuid == null || childrenUuids == null) {
       return false;
     }
@@ -118,7 +78,13 @@ public class WebpageRepositoryImpl extends IdentifiableRepositoryImpl<Webpage>
   }
 
   @Override
-  public PageResponse<Webpage> findChildren(UUID uuid, PageRequest pageRequest) {
+  public Webpage create() throws RepositoryException {
+    return new Webpage();
+  }
+
+  @Override
+  public PageResponse<Webpage> findChildren(UUID uuid, PageRequest pageRequest)
+      throws RepositoryException {
     final String crossTableAlias = "xtable";
 
     StringBuilder commonSql =
@@ -139,12 +105,11 @@ public class WebpageRepositoryImpl extends IdentifiableRepositoryImpl<Webpage>
                 + ".parent_webpage_uuid = :uuid");
     Map<String, Object> argumentMappings = new HashMap<>(0);
     argumentMappings.put("uuid", uuid);
-    String executedSearchTerm = addSearchTerm(pageRequest, commonSql, argumentMappings);
     addFiltering(pageRequest, commonSql, argumentMappings);
 
     StringBuilder innerQuery =
         new StringBuilder("SELECT " + crossTableAlias + ".sortindex AS idx, * " + commonSql);
-    String orderBy = addCrossTablePageRequestParams(pageRequest, innerQuery, crossTableAlias);
+    String orderBy = addCrossTablePagingAndSorting(pageRequest, innerQuery, crossTableAlias);
     List<Webpage> result =
         retrieveList(getSqlSelectReducedFields(), innerQuery, argumentMappings, orderBy);
 
@@ -152,11 +117,11 @@ public class WebpageRepositoryImpl extends IdentifiableRepositoryImpl<Webpage>
         new StringBuilder("SELECT count(" + tableAlias + ".uuid)" + commonSql);
     long total = retrieveCount(countQuery, argumentMappings);
 
-    return new PageResponse<>(result, pageRequest, total, executedSearchTerm);
+    return new PageResponse<>(result, pageRequest, total);
   }
 
   @Override
-  public PageResponse<Webpage> findRootNodes(PageRequest pageRequest) {
+  public PageResponse<Webpage> findRootNodes(PageRequest pageRequest) throws RepositoryException {
     String commonSql =
         " FROM "
             + tableName
@@ -169,7 +134,8 @@ public class WebpageRepositoryImpl extends IdentifiableRepositoryImpl<Webpage>
   }
 
   @Override
-  public PageResponse<Webpage> findRootWebpagesForWebsite(UUID uuid, PageRequest pageRequest) {
+  public PageResponse<Webpage> findRootWebpagesForWebsite(UUID uuid, PageRequest pageRequest)
+      throws RepositoryException {
     final String crossTableAlias = "xtable";
 
     StringBuilder commonSql =
@@ -190,19 +156,18 @@ public class WebpageRepositoryImpl extends IdentifiableRepositoryImpl<Webpage>
                 + ".website_uuid = :uuid");
     Map<String, Object> argumentMappings = new HashMap<>(0);
     argumentMappings.put("uuid", uuid);
-    String executedSearchTerm = addSearchTerm(pageRequest, commonSql, argumentMappings);
     addFiltering(pageRequest, commonSql, argumentMappings);
 
     StringBuilder innerQuery =
         new StringBuilder("SELECT " + crossTableAlias + ".sortindex AS idx, * " + commonSql);
-    String orderBy = addCrossTablePageRequestParams(pageRequest, innerQuery, crossTableAlias);
+    String orderBy = addCrossTablePagingAndSorting(pageRequest, innerQuery, crossTableAlias);
     List<Webpage> result =
         retrieveList(getSqlSelectReducedFields(), innerQuery, argumentMappings, orderBy);
 
     StringBuilder countQuery = new StringBuilder("SELECT count(*)" + commonSql);
     long total = retrieveCount(countQuery, argumentMappings);
 
-    return new PageResponse<>(result, pageRequest, total, executedSearchTerm);
+    return new PageResponse<>(result, pageRequest, total);
   }
 
   @Override
@@ -261,7 +226,7 @@ public class WebpageRepositoryImpl extends IdentifiableRepositoryImpl<Webpage>
   }
 
   @Override
-  public Webpage getByIdentifier(Identifier identifier) {
+  public Webpage getByIdentifier(Identifier identifier) throws RepositoryException {
     Webpage webpage = super.getByIdentifier(identifier);
 
     if (webpage != null) {
@@ -271,7 +236,7 @@ public class WebpageRepositoryImpl extends IdentifiableRepositoryImpl<Webpage>
   }
 
   @Override
-  public Webpage getByUuidAndFiltering(UUID uuid, Filtering filtering) {
+  public Webpage getByUuidAndFiltering(UUID uuid, Filtering filtering) throws RepositoryException {
     Webpage webpage = super.getByUuidAndFiltering(uuid, filtering);
 
     if (webpage != null) {
@@ -281,7 +246,7 @@ public class WebpageRepositoryImpl extends IdentifiableRepositoryImpl<Webpage>
   }
 
   @Override
-  public List<Webpage> getChildren(UUID uuid) {
+  public List<Webpage> getChildren(UUID uuid) throws RepositoryException {
     StringBuilder innerQuery =
         new StringBuilder(
             "SELECT ww.sortindex AS idx, * FROM "
@@ -306,21 +271,18 @@ public class WebpageRepositoryImpl extends IdentifiableRepositoryImpl<Webpage>
     if (modelProperty == null) {
       return null;
     }
-    if (super.getColumnName(modelProperty) != null) {
-      return super.getColumnName(modelProperty);
-    }
     switch (modelProperty) {
       case "publicationEnd":
         return tableAlias + ".publication_end";
       case "publicationStart":
         return tableAlias + ".publication_start";
       default:
-        return null;
+        return super.getColumnName(modelProperty);
     }
   }
 
   @Override
-  public Webpage getParent(UUID uuid) {
+  public Webpage getParent(UUID uuid) throws RepositoryException {
     String sqlAdditionalJoins =
         " INNER JOIN webpage_webpages ww ON " + tableAlias + ".uuid = ww.parent_webpage_uuid";
 
@@ -339,7 +301,7 @@ public class WebpageRepositoryImpl extends IdentifiableRepositoryImpl<Webpage>
   }
 
   @Override
-  public List<Webpage> getParents(UUID uuid) {
+  public List<Webpage> getParents(UUID uuid) throws RepositoryException {
     StringBuilder innerQuery =
         new StringBuilder(
             "SELECT * FROM "
@@ -376,6 +338,53 @@ public class WebpageRepositoryImpl extends IdentifiableRepositoryImpl<Webpage>
   }
 
   @Override
+  protected String getSqlInsertFields() {
+    return super.getSqlInsertFields()
+        + ", publication_end, publication_start, rendering_hints, text";
+  }
+
+  /* Do not change order! Must match order in getSqlInsertFields!!! */
+  @Override
+  protected String getSqlInsertValues() {
+    return super.getSqlInsertValues()
+        + ", :publicationEnd, :publicationStart, :renderingHints::JSONB, :text::JSONB";
+  }
+
+  @Override
+  public String getSqlSelectAllFields(String tableAlias, String mappingPrefix) {
+    return super.getSqlSelectAllFields(tableAlias, mappingPrefix)
+        + ", "
+        + tableAlias
+        + ".text "
+        + mappingPrefix
+        + "_text";
+  }
+
+  @Override
+  public String getSqlSelectReducedFields(String tableAlias, String mappingPrefix) {
+    return super.getSqlSelectReducedFields(tableAlias, mappingPrefix)
+        + ", "
+        + tableAlias
+        + ".publication_end "
+        + mappingPrefix
+        + "_publicationEnd, "
+        + tableAlias
+        + ".publication_start "
+        + mappingPrefix
+        + "_publicationStart, "
+        + tableAlias
+        + ".rendering_hints "
+        + mappingPrefix
+        + "_renderingHints";
+  }
+
+  @Override
+  protected String getSqlUpdateFieldValues() {
+    return super.getSqlUpdateFieldValues()
+        + ", publication_end=:publicationEnd, publication_start=:publicationStart, rendering_hints=:renderingHints::JSONB, text=:text::JSONB";
+  }
+
+  @Override
   public Website getWebsite(UUID rootWebpageUuid) {
     String query =
         "SELECT uuid, refid, label, url"
@@ -407,7 +416,8 @@ public class WebpageRepositoryImpl extends IdentifiableRepositoryImpl<Webpage>
   }
 
   @Override
-  public Webpage saveWithParent(UUID childWebpageUuid, UUID parentWebpageUuid) {
+  public Webpage saveWithParent(UUID childWebpageUuid, UUID parentWebpageUuid)
+      throws RepositoryException {
     Integer nextSortIndex =
         retrieveNextSortIndexForParentChildren(
             dbi, "webpage_webpages", "parent_webpage_uuid", parentWebpageUuid);
@@ -427,7 +437,8 @@ public class WebpageRepositoryImpl extends IdentifiableRepositoryImpl<Webpage>
   }
 
   @Override
-  public Webpage saveWithParentWebsite(UUID webpageUuid, UUID parentWebsiteUuid) {
+  public Webpage saveWithParentWebsite(UUID webpageUuid, UUID parentWebsiteUuid)
+      throws RepositoryException {
     Integer nextSortIndex =
         retrieveNextSortIndexForParentChildren(
             dbi, "website_webpages", "website_uuid", parentWebsiteUuid);
@@ -447,23 +458,23 @@ public class WebpageRepositoryImpl extends IdentifiableRepositoryImpl<Webpage>
   }
 
   @Override
-  public boolean updateChildrenOrder(UUID parentUuid, List<Webpage> children) {
+  public boolean updateChildrenOrder(UUID parentUuid, List<UUID> children) {
     if (parentUuid == null || children == null) {
-      return false;
+      throw new IllegalArgumentException("update failed: given objects must not be null");
     }
     String query =
         "UPDATE webpage_webpages"
             + " SET sortindex = :idx"
-            + " WHERE child_webpage_uuid = :childWebpageUuid AND parent_webpage_uuid = :parentWebpageUuid;";
+            + " WHERE child_webpage_uuid = :childUuid AND parent_webpage_uuid = :parentUuid;";
     dbi.withHandle(
         h -> {
           PreparedBatch batch = h.prepareBatch(query);
           int idx = 0;
-          for (Webpage webpage : children) {
+          for (UUID uuidChild : children) {
             batch
                 .bind("idx", idx++)
-                .bind("childWebpageUuid", webpage.getUuid())
-                .bind("parentWebpageUuid", parentUuid)
+                .bind("childUuid", uuidChild)
+                .bind("parentUuid", parentUuid)
                 .add();
           }
           return batch.execute();

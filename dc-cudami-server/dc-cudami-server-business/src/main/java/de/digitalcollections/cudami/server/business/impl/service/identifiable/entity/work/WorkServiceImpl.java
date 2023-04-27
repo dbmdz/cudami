@@ -1,23 +1,25 @@
 package de.digitalcollections.cudami.server.business.impl.service.identifiable.entity.work;
 
 import de.digitalcollections.cudami.model.config.CudamiConfig;
+import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.work.WorkRepository;
 import de.digitalcollections.cudami.server.business.api.service.LocaleService;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifierService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.alias.UrlAliasService;
-import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.relation.EntityRelationService;
+import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.relation.EntityToEntityRelationService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.work.WorkService;
 import de.digitalcollections.cudami.server.business.impl.service.identifiable.entity.EntityServiceImpl;
 import de.digitalcollections.cudami.server.config.HookProperties;
+import de.digitalcollections.model.identifiable.entity.agent.Person;
+import de.digitalcollections.model.identifiable.entity.item.Item;
 import de.digitalcollections.model.identifiable.entity.relation.EntityRelation;
 import de.digitalcollections.model.identifiable.entity.work.Work;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import java.util.List;
 import java.util.Set;
-import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -28,7 +30,7 @@ import org.springframework.stereotype.Service;
 public class WorkServiceImpl extends EntityServiceImpl<Work> implements WorkService {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(WorkServiceImpl.class);
-  private final EntityRelationService entityRelationService;
+  private final EntityToEntityRelationService entityRelationService;
 
   public WorkServiceImpl(
       @Qualifier("workRepository") WorkRepository repository,
@@ -36,7 +38,7 @@ public class WorkServiceImpl extends EntityServiceImpl<Work> implements WorkServ
       UrlAliasService urlAliasService,
       HookProperties hookProperties,
       LocaleService localeService,
-      EntityRelationService entityRelationService,
+      EntityToEntityRelationService entityRelationService,
       CudamiConfig cudamiConfig) {
     super(
         repository,
@@ -49,18 +51,31 @@ public class WorkServiceImpl extends EntityServiceImpl<Work> implements WorkServ
   }
 
   @Override
-  public PageResponse<Work> findEmbedded(UUID uuid, PageRequest pageRequest) {
-    return ((WorkRepository) repository).findEmbeddedWorks(uuid, pageRequest);
+  public PageResponse<Work> findEmbeddedWorks(Work work, PageRequest pageRequest)
+      throws ServiceException {
+    try {
+      return ((WorkRepository) repository).findEmbeddedWorks(work, pageRequest);
+    } catch (RepositoryException e) {
+      throw new ServiceException("Backend failure", e);
+    }
   }
 
   @Override
-  public Work getForItem(UUID itemUuid) {
-    return ((WorkRepository) repository).getByItemUuid(itemUuid);
+  public Work getByItem(Item item) throws ServiceException {
+    try {
+      return ((WorkRepository) repository).getByItem(item);
+    } catch (RepositoryException e) {
+      throw new ServiceException("Backend failure", e);
+    }
   }
 
   @Override
-  public Set<Work> getForPerson(UUID personUuid) {
-    return ((WorkRepository) repository).getByPersonUuid(personUuid);
+  public Set<Work> getByPerson(Person person) throws ServiceException {
+    try {
+      return ((WorkRepository) repository).getByPerson(person);
+    } catch (RepositoryException e) {
+      throw new ServiceException("Backend failure", e);
+    }
   }
 
   @Override
@@ -68,7 +83,7 @@ public class WorkServiceImpl extends EntityServiceImpl<Work> implements WorkServ
     super.save(work);
     try {
       List<EntityRelation> entityRelations = work.getRelations();
-      entityRelationService.persistEntityRelations(work, entityRelations, true);
+      entityRelationService.setEntityRelations(work, entityRelations, true);
       work.setRelations(entityRelations);
     } catch (ServiceException e) {
       throw new ServiceException("Cannot save Work=" + work + ": " + e, e);
@@ -80,7 +95,7 @@ public class WorkServiceImpl extends EntityServiceImpl<Work> implements WorkServ
     super.update(work);
     try {
       List<EntityRelation> entityRelations = work.getRelations();
-      entityRelationService.persistEntityRelations(work, entityRelations, false);
+      entityRelationService.setEntityRelations(work, entityRelations, false);
       work.setRelations(entityRelations);
     } catch (ServiceException e) {
       throw new ServiceException("Cannot update Work=" + work + ": " + e, e);

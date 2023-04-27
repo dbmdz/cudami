@@ -7,17 +7,15 @@ import de.digitalcollections.cudami.server.business.api.service.identifiable.age
 import de.digitalcollections.cudami.server.controller.ParameterHelper;
 import de.digitalcollections.cudami.server.controller.identifiable.AbstractIdentifiableController;
 import de.digitalcollections.model.identifiable.agent.GivenName;
-import de.digitalcollections.model.list.paging.PageRequest;
+import de.digitalcollections.model.list.filtering.FilterCriterion;
 import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.list.sorting.Order;
-import de.digitalcollections.model.list.sorting.Sorting;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.net.URI;
 import java.util.List;
 import java.util.Locale;
-import java.util.Objects;
 import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
@@ -36,32 +34,23 @@ import org.springframework.web.bind.annotation.RestController;
 @Tag(name = "Given name controller")
 public class GivenNameController extends AbstractIdentifiableController<GivenName> {
 
-  private final GivenNameService givenNameService;
+  private final GivenNameService service;
 
   public GivenNameController(GivenNameService givenNameService) {
-    this.givenNameService = givenNameService;
+    this.service = givenNameService;
   }
 
-  @Override
-  protected IdentifiableService<GivenName> getService() {
-    return givenNameService;
-  }
-
-  @Operation(summary = "get all given names")
+  @Operation(summary = "Get all given names as (paged, sorted, filtered) list")
   @GetMapping(
       value = {"/v6/givennames"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public PageResponse<GivenName> find(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
-      @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
+      @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
-      @RequestParam(name = "searchTerm", required = false) String searchTerm) {
-    PageRequest pageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
-    if (sortBy != null) {
-      Sorting sorting = new Sorting(sortBy);
-      pageRequest.setSorting(sorting);
-    }
-    return givenNameService.find(pageRequest);
+      @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria)
+      throws ServiceException {
+    return super.find(pageNumber, pageSize, sortBy, filterCriteria);
   }
 
   @Operation(
@@ -115,11 +104,23 @@ public class GivenNameController extends AbstractIdentifiableController<GivenNam
 
     GivenName result;
     if (pLocale == null) {
-      result = givenNameService.getByUuid(uuid);
+      return super.getByUuid(uuid);
     } else {
-      result = givenNameService.getByUuidAndLocale(uuid, pLocale);
+      return super.getByUuidAndLocale(uuid, pLocale);
     }
-    return new ResponseEntity<>(result, result != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
+  }
+
+  @Operation(summary = "Get languages of all given names")
+  @GetMapping(
+      value = {"/v6/givennames/languages"},
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  public List<Locale> getLanguages() throws ServiceException {
+    return super.getLanguages();
+  }
+
+  @Override
+  protected IdentifiableService<GivenName> getService() {
+    return service;
   }
 
   @Operation(summary = "save a newly created givenname")
@@ -128,8 +129,7 @@ public class GivenNameController extends AbstractIdentifiableController<GivenNam
       produces = MediaType.APPLICATION_JSON_VALUE)
   public GivenName save(@RequestBody GivenName givenName, BindingResult errors)
       throws ServiceException, ValidationException {
-    givenNameService.save(givenName);
-    return givenName;
+    return super.save(givenName, errors);
   }
 
   @Operation(summary = "update a givenname")
@@ -142,8 +142,6 @@ public class GivenNameController extends AbstractIdentifiableController<GivenNam
   public GivenName update(
       @PathVariable("uuid") UUID uuid, @RequestBody GivenName givenName, BindingResult errors)
       throws ServiceException, ValidationException {
-    assert Objects.equals(uuid, givenName.getUuid());
-    givenNameService.update(givenName);
-    return givenName;
+    return super.update(uuid, givenName, errors);
   }
 }

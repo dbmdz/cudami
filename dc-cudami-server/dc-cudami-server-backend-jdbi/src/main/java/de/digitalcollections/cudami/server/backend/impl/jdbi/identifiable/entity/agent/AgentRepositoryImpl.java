@@ -1,17 +1,20 @@
 package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.agent;
 
 import de.digitalcollections.cudami.model.config.CudamiConfig;
+import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
+import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
+import de.digitalcollections.cudami.server.backend.api.repository.identifiable.alias.UrlAliasRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.agent.AgentRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.EntityRepositoryImpl;
+import de.digitalcollections.model.identifiable.entity.Entity;
 import de.digitalcollections.model.identifiable.entity.agent.Agent;
 import de.digitalcollections.model.identifiable.entity.digitalobject.DigitalObject;
 import de.digitalcollections.model.identifiable.entity.work.Work;
-import java.util.Map;
+import de.digitalcollections.model.list.paging.PageRequest;
+import de.digitalcollections.model.list.paging.PageResponse;
 import java.util.Set;
 import java.util.UUID;
-import java.util.function.BiConsumer;
 import org.jdbi.v3.core.Jdbi;
-import org.jdbi.v3.core.result.RowView;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,15 +32,20 @@ public class AgentRepositoryImpl<A extends Agent> extends EntityRepositoryImpl<A
   public static final String TABLE_NAME = "agents";
 
   @Autowired
-  public AgentRepositoryImpl(Jdbi dbi, CudamiConfig cudamiConfig) {
+  public AgentRepositoryImpl(
+      Jdbi dbi,
+      CudamiConfig cudamiConfig,
+      IdentifierRepository identifierRepository,
+      UrlAliasRepository urlAliasRepository) {
     this(
         dbi,
         TABLE_NAME,
         TABLE_ALIAS,
         MAPPING_PREFIX,
         Agent.class,
-        null,
-        cudamiConfig.getOffsetForAlternativePaging());
+        cudamiConfig.getOffsetForAlternativePaging(),
+        identifierRepository,
+        urlAliasRepository);
   }
 
   public AgentRepositoryImpl(
@@ -45,26 +53,38 @@ public class AgentRepositoryImpl<A extends Agent> extends EntityRepositoryImpl<A
       String tableName,
       String tableAlias,
       String mappingPrefix,
-      Class<? extends Agent> agentImplClass,
-      BiConsumer<Map<UUID, A>, RowView> additionalReduceRowsBiConsumer,
-      int offsetForAlternativePaging) {
+      Class<? extends Entity> entityImplClass,
+      int offsetForAlternativePaging,
+      IdentifierRepository identifierRepository,
+      UrlAliasRepository urlAliasRepository) {
     super(
         dbi,
         tableName,
         tableAlias,
         mappingPrefix,
-        agentImplClass,
-        additionalReduceRowsBiConsumer,
-        offsetForAlternativePaging);
+        entityImplClass,
+        offsetForAlternativePaging,
+        identifierRepository,
+        urlAliasRepository);
   }
 
   @Override
-  public Set<DigitalObject> getDigitalObjects(UUID uuidAgent) {
-    throw new UnsupportedOperationException("Not supported yet.");
+  public PageResponse<DigitalObject> findDigitalObjects(UUID agentUuid, PageRequest pageRequest) {
+    throw new UnsupportedOperationException(); // TODO: not yet implemented
+  }
+
+  @Override
+  public PageResponse<Work> findWorks(UUID agentUuid, PageRequest pageRequest) {
+    throw new UnsupportedOperationException(); // TODO: not yet implemented
+  }
+
+  @Override
+  public Set<DigitalObject> getDigitalObjects(UUID uuidAgent) throws RepositoryException {
+    throw new UnsupportedOperationException(); // TODO: not yet implemented
   }
 
   @Override
   public Set<Work> getWorks(UUID uuidAgent) {
-    throw new UnsupportedOperationException("Not supported yet.");
+    throw new UnsupportedOperationException(); // TODO: not yet implemented
   }
 }

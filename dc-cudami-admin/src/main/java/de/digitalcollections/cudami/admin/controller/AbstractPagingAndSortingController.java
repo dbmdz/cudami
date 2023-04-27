@@ -1,135 +1,209 @@
 package de.digitalcollections.cudami.admin.controller;
 
 import de.digitalcollections.commons.springmvc.controller.AbstractController;
-import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
-import de.digitalcollections.cudami.client.CudamiLocalesClient;
-import de.digitalcollections.cudami.client.CudamiRestClient;
-import de.digitalcollections.model.UniqueObject;
+import de.digitalcollections.cudami.admin.business.i18n.LanguageService;
+import de.digitalcollections.cudami.admin.model.bootstraptable.BTRequest;
 import de.digitalcollections.model.exception.TechnicalException;
+import de.digitalcollections.model.list.filtering.FilterCriterion;
+import de.digitalcollections.model.list.filtering.Filtering;
 import de.digitalcollections.model.list.paging.PageRequest;
-import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.list.sorting.Direction;
 import de.digitalcollections.model.list.sorting.Order;
 import de.digitalcollections.model.list.sorting.Sorting;
+import de.digitalcollections.model.text.LocalizedStructuredContent;
+import de.digitalcollections.model.text.LocalizedText;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.util.Collections;
+import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Locale;
-import org.springframework.context.i18n.LocaleContextHolder;
-import org.springframework.util.CollectionUtils;
+import org.apache.commons.lang3.reflect.FieldUtils;
 
-public abstract class AbstractPagingAndSortingController<T extends UniqueObject>
-    extends AbstractController {
+@SuppressFBWarnings
+public abstract class AbstractPagingAndSortingController extends AbstractController {
 
-  protected final LanguageSortingHelper languageSortingHelper;
+  protected final LanguageService languageService;
 
-  protected AbstractPagingAndSortingController(LanguageSortingHelper languageSortingHelper) {
-    this.languageSortingHelper = languageSortingHelper;
+  public AbstractPagingAndSortingController(LanguageService languageService) {
+    this.languageService = languageService;
   }
 
-  @SuppressFBWarnings
-  protected PageRequest createPageRequest(int offset, int limit, String sort, String order) {
-    Sorting sorting = null;
-    if (sort != null && order != null) {
-      Order sortingOrder =
-          Order.builder().property(sort).direction(Direction.fromString(order)).build();
-      sorting = Sorting.builder().order(sortingOrder).build();
-    }
-    PageRequest pageRequest =
-        PageRequest.builder()
-            .pageNumber((int) Math.ceil(offset / limit))
-            .pageSize(limit)
-            .sorting(sorting)
-            .build();
-    return pageRequest;
-  }
-
-  @SuppressFBWarnings
-  protected PageRequest createPageRequest(
-      int pageNumber, int pageSize, String searchField, String searchTerm, List<Order> sortBy) {
-    PageRequest pageRequest;
-    if (searchField == null) {
-      pageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
-    } else {
-      pageRequest = new PageRequest(pageNumber, pageSize);
-    }
-
-    if (sortBy != null) {
-      Sorting sorting = new Sorting(sortBy);
-      pageRequest.setSorting(sorting);
-    }
-    return pageRequest;
-  }
-
-  @SuppressFBWarnings
-  protected PageRequest createPageRequest(
-      String sort,
-      String order,
-      String dataLanguage,
-      CudamiLocalesClient localeService,
+  protected BTRequest createBTRequest(
+      Class targetClass,
       int offset,
       int limit,
-      String searchTerm)
-      throws TechnicalException {
-    Sorting sorting = null;
-    if (sort != null && order != null) {
-      Order sortingOrder;
-      if ("label".equals(sort) && dataLanguage != null) {
-        String language = getDataLanguage(dataLanguage, localeService);
-        sortingOrder =
-            Order.builder()
-                .property("label")
-                .subProperty(language)
-                .direction(Direction.fromString(order))
-                .build();
-      } else {
-        sortingOrder =
-            Order.builder().property(sort).direction(Direction.fromString(order)).build();
-      }
-      sorting = Sorting.builder().order(sortingOrder).build();
-    }
-    PageRequest pageRequest =
-        PageRequest.builder()
-            .pageNumber((int) Math.ceil(offset / limit))
-            .pageSize(limit)
-            .searchTerm(searchTerm)
-            .sorting(sorting)
-            .build();
-    return pageRequest;
-  }
-
-  public PageResponse<T> find(
-      CudamiLocalesClient localeService,
-      CudamiRestClient<T> service,
-      int offset,
-      int limit,
+      String sortProperty,
+      String sortOrder,
+      String searchProperty,
       String searchTerm,
-      String sort,
-      String order,
+      String dataLanguage)
+      throws TechnicalException, IllegalArgumentException {
+    // create with paging
+    BTRequest btRequest = new BTRequest(offset, limit);
+
+    // add sorting
+    Sorting sorting = createSorting(targetClass, sortProperty, sortOrder, dataLanguage);
+    btRequest.setSorting(sorting);
+
+    // add filtering
+    Filtering filtering = createFiltering(targetClass, searchProperty, searchTerm, dataLanguage);
+    btRequest.setFiltering(filtering);
+    return btRequest;
+  }
+
+  private Filtering createFiltering(
+      Class targetClass, String searchProperty, String searchTerm, String dataLanguage)
+      throws TechnicalException {
+    Filtering filtering = null;
+    if (searchProperty != null && searchTerm != null && targetClass != null) {
+      String expression = searchProperty;
+      if (isMultiLanguageField(targetClass, searchProperty)) {
+        dataLanguage = getDataLanguage(dataLanguage, languageService);
+        // convention: add datalanguage as "sub"-expression to expression (safe, as
+        // properties in Java do not have "_" in name) - to be handled later on
+        // serverside
+        expression = expression + "_" + dataLanguage;
+      }
+      // TODO: default operation is "contains" for now, maybe pass other operators
+      // (controller) if
+      // we want search in non "string" fields....
+      filtering =
+          Filtering.builder()
+              .add(
+                  FilterCriterion.builder().withExpression(expression).contains(searchTerm).build())
+              .build();
+    }
+    return filtering;
+  }
+
+  @SuppressFBWarnings
+  protected PageRequest createPageRequest(
+      Class targetClass,
+      int pageNumber,
+      int pageSize,
+      String sortProperty,
+      String sortOrder,
+      String searchProperty,
+      String searchTerm,
       String dataLanguage)
       throws TechnicalException {
+    // create with paging
+    PageRequest pageRequest = new PageRequest(pageNumber, pageSize);
 
-    PageRequest pageRequest =
-        createPageRequest(sort, order, dataLanguage, localeService, offset, limit, searchTerm);
-    PageResponse<T> pageResponse = service.find(pageRequest);
-    return pageResponse;
+    // add sorting
+    Sorting sorting = createSorting(targetClass, sortProperty, sortOrder, dataLanguage);
+    pageRequest.setSorting(sorting);
+
+    // add filtering
+    Filtering filtering = createFiltering(targetClass, searchProperty, searchTerm, dataLanguage);
+    pageRequest.setFiltering(filtering);
+
+    return pageRequest;
   }
 
-  protected String getDataLanguage(String targetDataLanguage, CudamiLocalesClient localeService)
+  @SuppressFBWarnings
+  protected PageRequest createPageRequest(
+      Class targetClass,
+      int pageNumber,
+      int pageSize,
+      List<Order> sortBy,
+      String searchProperty,
+      String searchTerm,
+      String dataLanguage)
+      throws TechnicalException {
+    // create with paging
+    PageRequest pageRequest = new PageRequest(pageNumber, pageSize);
+
+    // add sorting
+    Sorting sorting = createSorting(targetClass, sortBy, dataLanguage);
+    pageRequest.setSorting(sorting);
+
+    // add filtering
+    Filtering filtering = createFiltering(targetClass, searchProperty, searchTerm, dataLanguage);
+    pageRequest.setFiltering(filtering);
+
+    return pageRequest;
+  }
+
+  private Sorting createSorting(
+      Class targetClass, String sortProperty, String sortOrder, String dataLanguage)
+      throws TechnicalException {
+    String sortLanguage = null;
+    if (isMultiLanguageField(targetClass, sortProperty)) {
+      sortLanguage = getDataLanguage(dataLanguage, languageService);
+    }
+    List<Order> orders =
+        List.of(
+            Order.builder()
+                .property(sortProperty)
+                .subProperty(sortLanguage)
+                .direction(Direction.fromString(sortOrder))
+                .build());
+    Sorting sorting = new Sorting(orders);
+    return sorting;
+  }
+
+  private Sorting createSorting(Class targetClass, List<Order> sortBy, String dataLanguage)
+      throws TechnicalException {
+    if (sortBy != null) {
+      String sortLanguage = getDataLanguage(dataLanguage, languageService);
+      for (Order order : sortBy) {
+        String sortProperty = order.getProperty();
+        if (isMultiLanguageField(targetClass, sortProperty)) {
+          order.setSubProperty(sortLanguage);
+        }
+      }
+      return new Sorting(sortBy);
+    }
+    return null;
+  }
+
+  protected String getDataLanguage(String targetDataLanguage, LanguageService languageService)
+      throws TechnicalException {
+    return getDataLanguage(targetDataLanguage, null, languageService);
+  }
+
+  protected String getDataLanguage(
+      String targetDataLanguage, List<Locale> existingLanguages, LanguageService languageService)
       throws TechnicalException {
     String dataLanguage = targetDataLanguage;
-    if (dataLanguage == null && localeService != null) {
-      dataLanguage = localeService.getDefaultLanguage().getLanguage();
+    if (dataLanguage == null && languageService != null) {
+      dataLanguage = languageService.getDefaultLanguage().getLanguage();
+    }
+    if (existingLanguages != null
+        && !existingLanguages.isEmpty()
+        && !existingLanguages.contains(Locale.forLanguageTag(dataLanguage))) {
+      dataLanguage = existingLanguages.get(0).toLanguageTag();
     }
     return dataLanguage;
   }
 
-  protected List<Locale> getExistingLanguagesForLocales(List<Locale> locales) {
-    List<Locale> existingLanguages = Collections.emptyList();
-    if (!CollectionUtils.isEmpty(locales)) {
-      existingLanguages =
-          languageSortingHelper.sortLanguages(LocaleContextHolder.getLocale(), locales);
+  private boolean isMultiLanguageField(Class clz, String fieldName) throws TechnicalException {
+    Field field;
+    try {
+      Class fieldType = getFieldType(clz, fieldName);
+      if (LocalizedText.class == fieldType || LocalizedStructuredContent.class == fieldType) {
+        return true;
+      }
+      return false;
+    } catch (NoSuchFieldException | SecurityException e) {
+      throw new TechnicalException(
+          "Field " + fieldName + " not found in class " + clz.getSimpleName(), e);
     }
-    return existingLanguages;
+  }
+
+  /**
+   * Get Class of a field of a given class.
+   *
+   * @param clz class to search in
+   * @param fieldName name of field
+   * @return Class/Type of field (if found)
+   * @throws NoSuchFieldException thrown if not found
+   */
+  public static Class getFieldType(Class clz, String fieldName) throws NoSuchFieldException {
+    Field field = FieldUtils.getField(clz, fieldName, true);
+    if (field == null) {
+      throw new NoSuchFieldException();
+    }
+    return field.getType();
   }
 }

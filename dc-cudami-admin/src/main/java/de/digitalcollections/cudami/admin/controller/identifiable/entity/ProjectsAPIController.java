@@ -1,18 +1,17 @@
 package de.digitalcollections.cudami.admin.controller.identifiable.entity;
 
 import de.digitalcollections.cudami.admin.business.api.service.exceptions.ServiceException;
+import de.digitalcollections.cudami.admin.business.i18n.LanguageService;
 import de.digitalcollections.cudami.admin.controller.ParameterHelper;
+import de.digitalcollections.cudami.admin.model.bootstraptable.BTRequest;
 import de.digitalcollections.cudami.admin.model.bootstraptable.BTResponse;
-import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
 import de.digitalcollections.cudami.client.identifiable.entity.CudamiProjectsClient;
 import de.digitalcollections.model.exception.TechnicalException;
 import de.digitalcollections.model.identifiable.entity.Project;
 import de.digitalcollections.model.identifiable.entity.digitalobject.DigitalObject;
-import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
-import de.digitalcollections.model.list.sorting.Order;
-import de.digitalcollections.model.list.sorting.Sorting;
+import de.digitalcollections.model.relation.Predicate;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.UUID;
@@ -37,15 +36,15 @@ public class ProjectsAPIController
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ProjectsAPIController.class);
 
-  public ProjectsAPIController(LanguageSortingHelper languageSortingHelper, CudamiClient client) {
-    super(client.forProjects(), languageSortingHelper, client.forLocales());
+  public ProjectsAPIController(CudamiClient client, LanguageService languageService) {
+    super(client.forProjects(), languageService);
   }
 
   @PostMapping("/api/projects/{uuid:" + ParameterHelper.UUID_PATTERN + "}/digitalobjects")
   public ResponseEntity addDigitalObjects(
       @PathVariable UUID uuid, @RequestBody List<DigitalObject> digitalObjects)
       throws TechnicalException {
-    boolean successful = service.addDigitalObjects(uuid, digitalObjects);
+    boolean successful = ((CudamiProjectsClient) service).addDigitalObjects(uuid, digitalObjects);
     if (successful) {
       return new ResponseEntity<>(successful, HttpStatus.OK);
     }
@@ -59,21 +58,49 @@ public class ProjectsAPIController
   }
 
   /*
-  Used in templates/projects/list.html
-  */
+   * Used in templates/projects/list.html
+   */
   @SuppressFBWarnings
   @GetMapping("/api/projects")
   @ResponseBody
   public BTResponse<Project> find(
       @RequestParam(name = "offset", required = false, defaultValue = "0") int offset,
-      @RequestParam(name = "limit", required = false, defaultValue = "1") int limit,
+      @RequestParam(name = "limit", required = false, defaultValue = "10") int limit,
       @RequestParam(name = "search", required = false) String searchTerm,
-      @RequestParam(name = "sort", required = false, defaultValue = "label") String sort,
-      @RequestParam(name = "order", required = false, defaultValue = "asc") String order,
+      @RequestParam(name = "sort", required = false, defaultValue = "label") String sortProperty,
+      @RequestParam(name = "order", required = false, defaultValue = "asc") String sortOrder,
       @RequestParam(name = "dataLanguage", required = false) String dataLanguage)
       throws TechnicalException, ServiceException {
-    PageResponse<Project> pageResponse =
-        super.find(localeService, service, offset, limit, searchTerm, sort, order, dataLanguage);
+    return find(
+        Predicate.class, offset, limit, sortProperty, sortOrder, "label", searchTerm, dataLanguage);
+  }
+
+  /*
+   * Used in templates/projects/view.html
+   */
+  @GetMapping("/api/projects/{uuid:" + ParameterHelper.UUID_PATTERN + "}/digitalobjects")
+  @ResponseBody
+  public BTResponse<DigitalObject> findDigitalObjects(
+      @PathVariable UUID uuid,
+      @RequestParam(name = "offset", required = false, defaultValue = "0") int offset,
+      @RequestParam(name = "limit", required = false, defaultValue = "10") int limit,
+      @RequestParam(name = "search", required = false) String searchTerm,
+      @RequestParam(name = "sort", required = false, defaultValue = "label") String sortProperty,
+      @RequestParam(name = "order", required = false, defaultValue = "asc") String sortOrder,
+      @RequestParam(name = "dataLanguage", required = false) String dataLanguage)
+      throws TechnicalException {
+    BTRequest btRequest =
+        createBTRequest(
+            DigitalObject.class,
+            offset,
+            limit,
+            sortProperty,
+            sortOrder,
+            "label",
+            searchTerm,
+            dataLanguage);
+    PageResponse<DigitalObject> pageResponse =
+        ((CudamiProjectsClient) service).findDigitalObjects(uuid, btRequest);
     return new BTResponse<>(pageResponse);
   }
 
@@ -84,45 +111,15 @@ public class ProjectsAPIController
   }
 
   /*
-  Used in templates/projects/view.html
-  */
-  @GetMapping("/api/projects/{uuid:" + ParameterHelper.UUID_PATTERN + "}/digitalobjects")
-  @ResponseBody
-  public BTResponse<DigitalObject> findDigitalObjects(
-      @PathVariable UUID uuid,
-      @RequestParam(name = "offset", required = false, defaultValue = "0") int offset,
-      @RequestParam(name = "limit", required = false, defaultValue = "1") int limit,
-      @RequestParam(name = "search", required = false) String searchTerm,
-      @RequestParam(name = "sort", required = false, defaultValue = "label") String sort,
-      @RequestParam(name = "order", required = false, defaultValue = "asc") String order,
-      @RequestParam(name = "dataLanguage", required = false) String dataLanguage)
-      throws TechnicalException {
-    PageRequest pageRequest =
-        createPageRequest(sort, order, dataLanguage, localeService, offset, limit, searchTerm);
-
-    if ("label".equals(sort)) {
-      if (dataLanguage == null) {
-        dataLanguage = localeService.getDefaultLanguage().getLanguage();
-      }
-      Sorting sorting =
-          Sorting.builder()
-              .order(Order.builder().property("label").subProperty(dataLanguage).build())
-              .build();
-      pageRequest.setSorting(sorting);
-    }
-    PageResponse<DigitalObject> pageResponse = service.findDigitalObjects(uuid, pageRequest);
-    return new BTResponse<>(pageResponse);
-  }
-
-  /*
-  Used in templates/projects/view.html
-  */
+   * Used in templates/projects/view.html
+   */
   @DeleteMapping("/api/projects/{projectUuid}/digitalobjects/{digitalobjectUuid}")
   @ResponseBody
   public ResponseEntity removeDigitalObject(
       @PathVariable UUID projectUuid, @PathVariable UUID digitalobjectUuid)
       throws TechnicalException {
-    boolean successful = service.removeDigitalObject(projectUuid, digitalobjectUuid);
+    boolean successful =
+        ((CudamiProjectsClient) service).removeDigitalObject(projectUuid, digitalobjectUuid);
     if (successful) {
       return new ResponseEntity<>(successful, HttpStatus.OK);
     }

@@ -8,6 +8,7 @@ import static org.mockito.Mockito.when;
 
 import de.digitalcollections.cudami.server.business.api.service.identifiable.agent.GivenNameService;
 import de.digitalcollections.cudami.server.controller.BaseControllerTest;
+import de.digitalcollections.model.identifiable.Identifier;
 import de.digitalcollections.model.identifiable.agent.GivenName;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
@@ -57,11 +58,14 @@ class GivenNameControllerTest extends BaseControllerTest {
   void testGetByIdentifierWithPlaintextId(String path) throws Exception {
     GivenName expected = new GivenName();
 
-    when(givenNameService.getByIdentifier(eq("foo"), eq("bar"))).thenReturn(expected);
+    when(givenNameService.getByIdentifier(
+            eq(Identifier.builder().namespace("foo").id("bar").build())))
+        .thenReturn(expected);
 
     testHttpGet(path);
 
-    verify(givenNameService, times(1)).getByIdentifier(eq("foo"), eq("bar"));
+    verify(givenNameService, times(1))
+        .getByIdentifier(eq(Identifier.builder().namespace("foo").id("bar").build()));
   }
 
   @DisplayName("can retrieve by identifier with base 64 encoded data")
@@ -70,12 +74,15 @@ class GivenNameControllerTest extends BaseControllerTest {
   void testGetByIdentifierWithBase64EncodedData(String basePath) throws Exception {
     GivenName expected = new GivenName();
 
-    when(givenNameService.getByIdentifier(eq("foo"), eq("bar/bla"))).thenReturn(expected);
+    when(givenNameService.getByIdentifier(
+            eq(Identifier.builder().namespace("foo").id("bar/bla").build())))
+        .thenReturn(expected);
 
     testHttpGet(
         basePath
             + Base64.getEncoder().encodeToString("foo:bar/bla".getBytes(StandardCharsets.UTF_8)));
 
-    verify(givenNameService, times(1)).getByIdentifier(eq("foo"), eq("bar/bla"));
+    verify(givenNameService, times(1))
+        .getByIdentifier(eq(Identifier.builder().namespace("foo").id("bar/bla").build()));
   }
 }

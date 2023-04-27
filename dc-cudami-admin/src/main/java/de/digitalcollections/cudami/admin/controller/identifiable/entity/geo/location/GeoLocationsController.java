@@ -1,8 +1,8 @@
 package de.digitalcollections.cudami.admin.controller.identifiable.entity.geo.location;
 
+import de.digitalcollections.cudami.admin.business.i18n.LanguageService;
 import de.digitalcollections.cudami.admin.controller.ParameterHelper;
 import de.digitalcollections.cudami.admin.controller.identifiable.entity.AbstractEntitiesController;
-import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
 import de.digitalcollections.cudami.client.identifiable.entity.geo.location.CudamiGeoLocationsClient;
 import de.digitalcollections.model.exception.ResourceNotFoundException;
@@ -27,15 +27,15 @@ public class GeoLocationsController
 
   private static final Logger LOGGER = LoggerFactory.getLogger(GeoLocationsController.class);
 
-  public GeoLocationsController(LanguageSortingHelper languageSortingHelper, CudamiClient client) {
-    super(client.forGeoLocations(), languageSortingHelper, client.forLocales());
+  public GeoLocationsController(CudamiClient client, LanguageService languageService) {
+    super(client.forGeoLocations(), languageService);
   }
 
   @GetMapping("/geolocations")
   public String list(Model model) throws TechnicalException {
     model.addAttribute("existingLanguages", getExistingLanguagesFromService());
 
-    String dataLanguage = getDataLanguage(null, localeService);
+    String dataLanguage = getDataLanguage(null, languageService);
     model.addAttribute("dataLanguage", dataLanguage);
 
     return "geolocations/list";
@@ -59,7 +59,7 @@ public class GeoLocationsController
     model.addAttribute("geoLocation", geoLocation);
 
     List<Locale> existingLanguages = getExistingLanguagesFromIdentifiable(geoLocation);
-    String dataLanguage = getDataLanguage(targetDataLanguage, localeService);
+    String dataLanguage = getDataLanguage(targetDataLanguage, languageService);
     model
         .addAttribute("existingLanguages", existingLanguages)
         .addAttribute("dataLanguage", dataLanguage);

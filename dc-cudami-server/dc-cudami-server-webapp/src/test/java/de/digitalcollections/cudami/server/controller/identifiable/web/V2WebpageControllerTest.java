@@ -6,7 +6,6 @@ import static org.mockito.Mockito.when;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.web.WebpageService;
 import de.digitalcollections.model.identifiable.web.Webpage;
 import java.util.Locale;
-import java.util.UUID;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -28,7 +27,7 @@ public class V2WebpageControllerTest extends BaseWebpageControllerTest {
       })
   public void returnLocalizedWebpageV2Json(String path) throws Exception {
     Webpage expected = createPrefilledWebpage(path);
-    when(webpageService.getByUuidAndLocale(any(UUID.class), any(Locale.class)))
+    when(webpageService.getByExampleAndLocale(any(Webpage.class), any(Locale.class)))
         .thenReturn(expected);
     testJson(path);
   }
@@ -43,7 +42,7 @@ public class V2WebpageControllerTest extends BaseWebpageControllerTest {
       })
   public void returnWebpageV2Json(String path) throws Exception {
     Webpage expected = createPrefilledWebpage(path);
-    when(webpageService.getByUuid(any(UUID.class))).thenReturn(expected);
+    when(webpageService.getByExample(any(Webpage.class))).thenReturn(expected);
     testJson(path);
   }
 }

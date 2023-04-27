@@ -1,8 +1,8 @@
 package de.digitalcollections.cudami.admin.controller.identifiable.entity.work;
 
+import de.digitalcollections.cudami.admin.business.i18n.LanguageService;
 import de.digitalcollections.cudami.admin.controller.ParameterHelper;
 import de.digitalcollections.cudami.admin.controller.identifiable.entity.AbstractEntitiesController;
-import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
 import de.digitalcollections.cudami.client.identifiable.entity.work.CudamiManifestationsClient;
 import de.digitalcollections.model.exception.ResourceNotFoundException;
@@ -24,16 +24,15 @@ import org.springframework.web.bind.annotation.RequestParam;
 public class ManifestationsController
     extends AbstractEntitiesController<Manifestation, CudamiManifestationsClient> {
 
-  public ManifestationsController(
-      LanguageSortingHelper languageSortingHelper, CudamiClient client) {
-    super(client.forManifestations(), languageSortingHelper, client.forLocales());
+  public ManifestationsController(CudamiClient client, LanguageService languageService) {
+    super(client.forManifestations(), languageService);
   }
 
   @GetMapping("/manifestations")
   public String list(Model model) throws TechnicalException {
     model.addAttribute("existingLanguages", getExistingLanguagesFromService());
 
-    String dataLanguage = getDataLanguage(null, localeService);
+    String dataLanguage = getDataLanguage(null, languageService);
     model.addAttribute("dataLanguage", dataLanguage);
 
     return "manifestations/list";
@@ -57,17 +56,18 @@ public class ManifestationsController
     model.addAttribute("manifestation", manifestation);
 
     List<Locale> existingLanguages = getExistingLanguagesFromIdentifiable(manifestation);
-    String dataLanguage = getDataLanguage(targetDataLanguage, localeService);
+    String dataLanguage = getDataLanguage(targetDataLanguage, languageService);
     model
         .addAttribute("existingLanguages", existingLanguages)
         .addAttribute("dataLanguage", dataLanguage);
 
     Locale displayLocale = LocaleContextHolder.getLocale();
     List<Locale> existingItemsLanguages =
-        languageSortingHelper.sortLanguages(displayLocale, service.getLanguagesOfItems(uuid));
+        languageService.sortLanguages(
+            displayLocale, ((CudamiManifestationsClient) service).getLanguagesOfItems(uuid));
     model
         .addAttribute("existingItemsLanguages", existingItemsLanguages)
-        .addAttribute("dataLanguageItems", getDataLanguage(null, localeService));
+        .addAttribute("dataLanguageItems", getDataLanguage(null, languageService));
 
     return "manifestations/view";
   }

@@ -4,137 +4,150 @@
       xmlns:sec="https://github.com/thymeleaf/thymeleaf-extras-springsecurity"
       xmlns:data="https://github.com/mxab/thymeleaf-extras-data-attribute"
       layout:decorate="~{base}">
+
   <head>
     <title th:text="#{digitization_projects}">Projects</title>
   </head>
+
   <body>
-  <th:block layout:fragment="content">
-    <div class="content-header">
-      <div class="container-fluid">
+    <th:block layout:fragment="content">
+      <div class="content-header">
+        <div class="container-fluid">
 
-        <div class="row">
-          <div class="col">
-            <h1 th:text="#{page.title.digitization_projects}">Projects</h1>
-            <hr>
-          </div>
-        </div>
-
-        <div class="row">
-          <div class="col">
-
-            <div id="toolbar-projects">
-              <!-- TODO it always contains "und" undefined language? -->
-              <th:block th:if="${not #lists.isEmpty(existingLanguages)}">
-                <span th:text="#{lbl.data_language}">Show language dependent values in</span>&nbsp;
-                <select th:replace="fragments/components/select-language-dropdown::render('projects-languages', ${existingLanguages}, ${dataLanguage})">English</select>
-              </th:block>
+          <div class="row">
+            <div class="col">
+              <h1 th:text="#{page.title.digitization_projects}">Projects</h1>
+              <hr>
             </div>
-            <table id="table-projects"
-                   data-toggle="table"
-                   th:data-url="@{/api/projects}"
-                   th:data-locale="${#locale}"
-                   data-buttons="buttonsProjects"
-                   data-cookie="true"
-                   data-cookie-id-table="table-projects"
-                   data-id-field="uuid"
-                   data-pagination="true"
-                   data-pagination-v-align="both"
-                   data-query-params="queryParamsProjects"
-                   data-search="true"
-                   data-search-highlight="true"
-                   data-search-on-enter-key="true"
-                   data-server-sort="true"
-                   data-show-search-button="true"
-                   data-show-search-clear-button="true"
-                   data-side-pagination="server"
-                   data-sort-name="label"
-                   data-sort-order="asc"
-                   data-toolbar="#toolbar-projects"
-                   data-unique-id="uuid">
-              <thead>
-                <tr>
-                  <th data-field="index" data-formatter="formatRowNumberProjects" data-halign="right" data-align="right" th:text="#{lbl.row_number}">#</th>
-                  <th data-field="previewImage" data-formatter="renderPreviewImage" data-halign="center" data-align="center"><i class="fas fa-image"></i></th>
-                  <th data-field="label" data-sortable="true" data-formatter="formatLabelProjects" th:text="#{lbl.label}">Label</th>
-                  <th data-field="identifiers" data-sortable="false" data-formatter="renderIdentifiers" th:text="#{identifiers}">Identifiers</th>
-
-                  <th data-field="lastModified" data-sortable="true" data-formatter="renderDateTime" th:text="#{lbl.last_modified}">last modified</th>
-                  <th data-field="created" data-sortable="true" data-formatter="renderDateTime" th:text="#{lbl.created}">created</th>
-                  <th data-field="actions" data-formatter="formatActionsProjects" th:text="#{lbl.actions}">Actions</th>
-                </tr>
-              </thead>
-            </table>
-
           </div>
+
+          <div class="row">
+            <div class="col">
+
+              <div id="toolbar-projects">
+                <!-- TODO it always contains "und" undefined language? -->
+                <th:block th:if="${not #lists.isEmpty(existingLanguages)}">
+                  <span th:text="#{lbl.data_language}">Show language dependent values in</span>&nbsp;
+                  <select th:replace="fragments/components/select-language-dropdown::render('projects-languages', ${existingLanguages}, ${dataLanguage})">English</select>
+                </th:block>
+              </div>
+              <table id="table-projects"
+                     data-toggle="table"
+                     th:data-url="@{/api/projects}"
+                     th:data-locale="${#locale}"
+                     data-buttons="buttonsProjects"
+                     data-cookie="true"
+                     data-cookie-id-table="table-projects"
+                     data-id-field="uuid"
+                     data-pagination="true"
+                     data-pagination-v-align="both"
+                     data-query-params="queryParamsProjects"
+                     data-search="true"
+                     data-search-highlight="true"
+                     data-search-on-enter-key="true"
+                     data-server-sort="true"
+                     data-show-search-button="true"
+                     data-show-search-clear-button="true"
+                     data-side-pagination="server"
+                     data-sort-name="label"
+                     data-sort-order="asc"
+                     data-toolbar="#toolbar-projects"
+                     data-unique-id="uuid">
+                <thead>
+                  <tr>
+                    <th data-field="index" data-formatter="formatRowNumberProjects" data-halign="right" data-align="right" th:text="#{lbl.row_number}">#</th>
+                    <th data-field="previewImage" data-formatter="renderPreviewImage" data-halign="center" data-align="center"><i class="fas fa-image"></i></th>
+                    <th data-field="label" data-sortable="true" data-formatter="formatLabelProjects" th:text="#{lbl.label}">Label</th>
+                    <th data-field="identifiers" data-sortable="false" data-formatter="renderIdentifiers" th:text="#{lbl.identifiers}">Identifiers</th>
+
+                    <th data-field="lastModified" data-sortable="true" data-formatter="renderDateTime" th:text="#{lbl.last_modified}">last modified</th>
+                    <th data-field="created" data-sortable="true" data-formatter="renderDateTime" th:text="#{lbl.created}">created</th>
+                    <th data-field="actions" data-formatter="formatActionsProjects" th:text="#{lbl.actions}">Actions</th>
+                  </tr>
+                </thead>
+              </table>
+
+            </div>
+          </div>
+
         </div>
-
       </div>
-    </div>
-  </th:block>
+    </th:block>
 
-  <th:block layout:fragment="beforeBodyEnds">
-    <div th:replace="fragments/modals/confirm-yes-no :: confirm-yes-no-dialog"></div>
+    <th:block layout:fragment="beforeBodyEnds">
+      <div th:replace="fragments/modals/confirm-yes-no :: confirm-yes-no-dialog"></div>
 
-    <script type="text/javascript">
-      $(function () {
-        $("#projects-languages").change(function () {
-          $('#table-projects').bootstrapTable('refresh');
+      <script type="text/javascript">
+        $(function () {
+          $("#projects-languages").change(function () {
+            $('#table-projects').bootstrapTable('refresh');
+          });
         });
-      });
 
-      function formatRowNumberProjects(value, row, index) {
-        return renderRowNumber($('#table-projects'), index);
-      }
-      
-      function queryParamsProjects(params) {
-        let dataLanguage = $("#projects-languages").val();
-        params.dataLanguage = dataLanguage;
-        return params;
-      }
-    </script>
+        function formatRowNumberProjects(value, row, index) {
+          return renderRowNumber($('#table-projects'), index);
+        }
 
-    <script type="text/javascript" th:inline="javascript">
-      /*<![CDATA[*/
-      function buttonsProjects() {
-        /*[+
-         const baseUrl = [[@{'/projects'}]];
-         const textAdd = [[#{btn.add}]];
-         const tooltipAdd = [[#{tooltip.add_new_table_entry}]];
-         +]*/
-        return {
-          btnAdd: {
-            text: textAdd,
-            icon: 'fa-plus',
-            event: function () {
-              location.href = baseUrl + '/new';
-            },
-            attributes: {
-              title: tooltipAdd
-            }
+        function queryParamsProjects(params) {
+          let dataLanguage = $("#projects-languages").val();
+          params.dataLanguage = dataLanguage;
+          return params;
+        }
+      </script>
+
+      <script type="text/javascript" th:inline="javascript">
+        /*<![CDATA[*/
+        $('#table-projects').bootstrapTable({
+          formatSearch: function () {
+            /*[+
+             let columnName = [[#{lbl.label}]];
+             let placeholder = `[(#{placeholder.search})]`;
+             +]*/
+            return placeholder;
           }
-        };
-      }
+        });
 
-      function formatActionsProjects(value, row) {
-        /*[+
-         const baseUrl = [[@{'/projects'}]] + '/' + row.uuid;
-         +]*/
-        return [
-          renderViewAction(baseUrl),
-          renderEditAction(baseUrl)
-        ].join(' ');
-      }
+        function buttonsProjects() {
+          /*[+
+           const baseUrl = [[@{'/projects'}]];
+           const textAdd = [[#{btn.add}]];
+           const tooltipAdd = [[#{tooltip.add_new_table_entry}]];
+           +]*/
+          return {
+            btnAdd: {
+              text: textAdd,
+              icon: 'fa-plus',
+              event: function () {
+                location.href = baseUrl + '/new';
+              },
+              attributes: {
+                title: tooltipAdd
+              }
+            }
+          };
+        }
 
-      function formatLabelProjects(value, row) {
-        /*[+
-         const baseUrl = [[@{'/projects'}]] + '/' + row.uuid;
-         +]*/
-        const dataLanguage = $("#projects-languages").val();
-        return renderLabel(baseUrl, value, dataLanguage);
-      }
+        function formatActionsProjects(value, row) {
+          /*[+
+           const baseUrl = [[@{'/projects'}]] + '/' + row.uuid;
+           +]*/
+          return [
+            renderViewAction(baseUrl),
+            renderEditAction(baseUrl)
+          ].join(' ');
+        }
+
+        function formatLabelProjects(value, row) {
+          /*[+
+           const baseUrl = [[@{'/projects'}]] + '/' + row.uuid;
+           +]*/
+          const dataLanguage = $("#projects-languages").val();
+          return renderLabel(baseUrl, value, dataLanguage);
+        }
       /*]]>*/
-    </script>
-    <div th:replace="fragments/bootstrap-table :: data-formatter"></div>
-  </th:block>
-</body>
+      </script>
+      <div th:replace="fragments/bootstrap-table :: data-formatter"></div>
+    </th:block>
+  </body>
+
 </html>

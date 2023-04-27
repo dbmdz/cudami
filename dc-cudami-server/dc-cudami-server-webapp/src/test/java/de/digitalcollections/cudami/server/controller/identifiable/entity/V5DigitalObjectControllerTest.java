@@ -8,6 +8,7 @@ import static org.mockito.Mockito.when;
 
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.DigitalObjectService;
 import de.digitalcollections.cudami.server.controller.BaseControllerTest;
+import de.digitalcollections.model.identifiable.Identifier;
 import de.digitalcollections.model.identifiable.entity.Collection;
 import de.digitalcollections.model.identifiable.entity.Project;
 import de.digitalcollections.model.identifiable.entity.digitalobject.DigitalObject;
@@ -57,7 +58,11 @@ class V5DigitalObjectControllerTest extends BaseControllerTest {
                         .uuid("e2e75cd3-87c3-4b70-b29a-58086ce5ad4d")
                         .label(Locale.GERMAN, "Testdigitalisat")
                         .identifier(
-                            "mdz-obj", "bsb12345678", "4bbe38a4-96e9-4200-9360-740da00f104f")
+                            Identifier.builder()
+                                .namespace("mdz-obj")
+                                .id("bsb12345678")
+                                .uuid("4bbe38a4-96e9-4200-9360-740da00f104f")
+                                .build())
                         .refId(37423)
                         .build()))
             .build();
@@ -83,7 +88,11 @@ class V5DigitalObjectControllerTest extends BaseControllerTest {
                         .lastModified("2020-10-15T00:00:00")
                         .label(Locale.GERMAN, "Testprojekt")
                         .identifier(
-                            "mdz-proj", "1245413523", "95545a10-feb2-4a4f-a88d-3124f47f6f06")
+                            Identifier.builder()
+                                .namespace("mdz-proj")
+                                .id("1245413523")
+                                .uuid("95545a10-feb2-4a4f-a88d-3124f47f6f06")
+                                .build())
                         .uuid("5c6b2788-94a5-482a-8471-d78513c905db")
                         .refId(590334)
                         .build()))
@@ -145,7 +154,12 @@ class V5DigitalObjectControllerTest extends BaseControllerTest {
             DigitalObject.builder()
                 .uuid("7593c90e-6fb7-49b4-a70b-032761c9bbcd")
                 .created("2020-08-21T07:49:37.004443")
-                .identifier("mdz-obj", "bsb10000001", "53e3e619-47a3-4110-84f7-acba12a52298")
+                .identifier(
+                    Identifier.builder()
+                        .namespace("mdz-obj")
+                        .id("bsb10000001")
+                        .uuid("53e3e619-47a3-4110-84f7-acba12a52298")
+                        .build())
                 .label("Label")
                 .lastModified("2020-08-21T07:49:37.00445")
                 .previewImage(

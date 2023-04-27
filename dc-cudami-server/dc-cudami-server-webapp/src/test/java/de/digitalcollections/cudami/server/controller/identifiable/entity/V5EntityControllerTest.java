@@ -4,7 +4,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.EntityService;
-import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.relation.EntityRelationService;
+import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.relation.EntityToEntityRelationService;
 import de.digitalcollections.cudami.server.controller.BaseControllerTest;
 import de.digitalcollections.model.identifiable.IdentifiableObjectType;
 import de.digitalcollections.model.identifiable.entity.Entity;
@@ -25,7 +25,7 @@ class V5EntityControllerTest extends BaseControllerTest {
   @MockBean(name = "entityService")
   private EntityService<Entity> entityService;
 
-  @MockBean private EntityRelationService entityRelationService;
+  @MockBean private EntityToEntityRelationService entityRelationService;
 
   @DisplayName("shall return a paged list of all entities")
   @ParameterizedTest

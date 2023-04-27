@@ -4,6 +4,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
+import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
+import de.digitalcollections.cudami.server.backend.api.repository.identifiable.alias.UrlAliasRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.DigitalObjectRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.agent.AgentRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.agent.CorporateBodyRepository;
@@ -13,6 +15,7 @@ import de.digitalcollections.cudami.server.backend.impl.jdbi.AbstractIdentifiabl
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.DigitalObjectRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.agent.AgentRepositoryImpl;
 import de.digitalcollections.model.identifiable.IdentifiableObjectType;
+import de.digitalcollections.model.identifiable.Identifier;
 import de.digitalcollections.model.identifiable.entity.agent.Agent;
 import de.digitalcollections.model.identifiable.entity.agent.CorporateBody;
 import de.digitalcollections.model.identifiable.entity.agent.Gender;
@@ -48,26 +51,35 @@ import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 public class ItemRepositoryImplTest
     extends AbstractIdentifiableRepositoryImplTest<ItemRepositoryImpl> {
 
-  @Autowired CorporateBodyRepository corporateBodyRepository;
+  @Autowired private CorporateBodyRepository corporateBodyRepository;
 
   @Autowired
   @Qualifier("agentRepository")
-  AgentRepository<Agent> agentRepository;
+  private AgentRepository<Agent> agentRepository;
 
-  @Autowired PersonRepository personRepository;
+  @Autowired private PersonRepository personRepository;
 
-  @Autowired ManifestationRepository manifestationRepository;
+  @Autowired private ManifestationRepository manifestationRepository;
 
   private DigitalObjectRepository digitalObjectRepository;
 
   @BeforeEach
   void setup(
       @Autowired Jdbi jdbi,
+      @Autowired CudamiConfig config,
+      @Autowired IdentifierRepository identifierRepository,
+      @Autowired UrlAliasRepository urlAliasRepository,
       @Autowired DigitalObjectRepositoryImpl digitalObjectRepository,
-      @Autowired @Qualifier("agentRepository") AgentRepositoryImpl<Agent> agentRepository,
-      @Autowired CudamiConfig config) {
+      @Autowired @Qualifier("agentRepository") AgentRepositoryImpl<Agent> agentRepository) {
     this.digitalObjectRepository = digitalObjectRepository;
-    repo = new ItemRepositoryImpl(jdbi, digitalObjectRepository, agentRepository, config);
+    repo =
+        new ItemRepositoryImpl(
+            jdbi,
+            config,
+            identifierRepository,
+            urlAliasRepository,
+            digitalObjectRepository,
+            agentRepository);
   }
 
   @Test
@@ -260,7 +272,7 @@ public class ItemRepositoryImplTest
         Item.builder()
             .label(Locale.GERMAN, "Ein Buch")
             .exemplifiesManifestation(false)
-            .identifier("mdz-sig", "Signatur")
+            .identifier(Identifier.builder().namespace("mdz-sig").id("Signatur").build())
             .title(Locale.GERMAN, "Ein Buchtitel")
             .holders(holders)
             .build();
@@ -302,13 +314,16 @@ public class ItemRepositoryImplTest
             .build();
     repo.save(expectedItem);
 
-    PageRequest pageRequest =
-        PageRequest.builder()
-            .pageNumber(0)
-            .pageSize(100)
-            .searchTerm("testSetHolderAndPartofItemUuidInSearchResult")
+    Filtering filtering =
+        Filtering.builder()
+            .add(
+                FilterCriterion.builder()
+                    .withExpression("label_de")
+                    .contains("testSetHolderAndPartofItemUuidInSearchResult")
+                    .build())
             .build();
-
+    PageRequest pageRequest =
+        PageRequest.builder().pageNumber(0).pageSize(100).filtering(filtering).build();
     PageResponse<Item> actualPageResponse = repo.find(pageRequest);
 
     assertThat(actualPageResponse.getTotalElements()).isEqualTo(1);
@@ -334,8 +349,8 @@ public class ItemRepositoryImplTest
             .filtering(
                 Filtering.builder()
                     .add(
-                        FilterCriterion.builder()
-                            .withExpression("part_of_item.uuid")
+                        FilterCriterion.nativeBuilder()
+                            .withExpression("part_of_item")
                             .isEquals(parentItem.getUuid())
                             .build())
                     .build())
@@ -349,14 +364,14 @@ public class ItemRepositoryImplTest
 
   @Test
   @DisplayName("can return an empty set of connected digital objects for an null item")
-  void digitalObjectsForNullItem() {
+  void digitalObjectsForNullItem() throws RepositoryException {
     PageRequest pageRequest = PageRequest.builder().pageSize(25).pageNumber(0).build();
-    assertThat(repo.findDigitalObjects(null, pageRequest)).isEmpty();
+    assertThat(repo.findDigitalObjects((UUID) null, pageRequest)).isEmpty();
   }
 
   @Test
   @DisplayName("can return an empty set of connected digital objects for an nonexisting item")
-  void digitalObjectsForNonexistingItem() {
+  void digitalObjectsForNonexistingItem() throws RepositoryException {
     PageRequest pageRequest = PageRequest.builder().pageSize(25).pageNumber(0).build();
     assertThat(repo.findDigitalObjects(UUID.randomUUID(), pageRequest)).isEmpty();
   }

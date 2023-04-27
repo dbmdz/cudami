@@ -1,7 +1,7 @@
 package de.digitalcollections.cudami.admin.controller.identifiable.entity;
 
+import de.digitalcollections.cudami.admin.business.i18n.LanguageService;
 import de.digitalcollections.cudami.admin.controller.ParameterHelper;
-import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
 import de.digitalcollections.cudami.client.identifiable.entity.CudamiWebsitesClient;
 import de.digitalcollections.model.exception.ResourceNotFoundException;
@@ -26,13 +26,13 @@ public class WebsitesController extends AbstractEntitiesController<Website, Cuda
 
   private static final Logger LOGGER = LoggerFactory.getLogger(WebsitesController.class);
 
-  public WebsitesController(LanguageSortingHelper languageSortingHelper, CudamiClient client) {
-    super(client.forWebsites(), languageSortingHelper, client.forLocales());
+  public WebsitesController(CudamiClient client, LanguageService languageService) {
+    super(client.forWebsites(), languageService);
   }
 
   @GetMapping("/websites/new")
   public String create(Model model) throws TechnicalException {
-    model.addAttribute("activeLanguage", localeService.getDefaultLanguage());
+    model.addAttribute("activeLanguage", languageService.getDefaultLanguage());
     return "websites/create";
   }
 
@@ -45,7 +45,7 @@ public class WebsitesController extends AbstractEntitiesController<Website, Cuda
     final Locale displayLocale = LocaleContextHolder.getLocale();
     Website website = service.getByUuid(uuid);
     List<Locale> existingLanguages =
-        languageSortingHelper.sortLanguages(displayLocale, website.getLabel().getLocales());
+        languageService.sortLanguages(displayLocale, website.getLabel().getLocales());
 
     if (activeLanguage != null && existingLanguages.contains(activeLanguage)) {
       model.addAttribute("activeLanguage", activeLanguage);
@@ -63,7 +63,7 @@ public class WebsitesController extends AbstractEntitiesController<Website, Cuda
   public String list(Model model) throws TechnicalException {
     model.addAttribute("existingLanguages", getExistingLanguagesFromService());
 
-    String dataLanguage = getDataLanguage(null, localeService);
+    String dataLanguage = getDataLanguage(null, languageService);
     model.addAttribute("dataLanguage", dataLanguage);
 
     return "websites/list";
@@ -86,7 +86,7 @@ public class WebsitesController extends AbstractEntitiesController<Website, Cuda
     }
 
     List<Locale> existingLanguages = getExistingLanguagesFromIdentifiable(website);
-    String dataLanguage = getDataLanguage(targetDataLanguage, localeService);
+    String dataLanguage = getDataLanguage(targetDataLanguage, languageService);
     model
         .addAttribute("existingLanguages", existingLanguages)
         .addAttribute("dataLanguage", dataLanguage);
@@ -95,7 +95,7 @@ public class WebsitesController extends AbstractEntitiesController<Website, Cuda
         getExistingLanguagesFromIdentifiables(website.getRootPages());
     model
         .addAttribute("existingWebpageLanguages", existingWebpageLanguages)
-        .addAttribute("dataLanguageWebpages", getDataLanguage(null, localeService));
+        .addAttribute("dataLanguageWebpages", getDataLanguage(null, languageService));
 
     model.addAttribute("website", website);
     return "websites/view";

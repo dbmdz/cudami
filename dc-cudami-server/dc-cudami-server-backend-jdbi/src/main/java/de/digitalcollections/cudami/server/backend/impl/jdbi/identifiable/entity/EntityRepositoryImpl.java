@@ -2,15 +2,20 @@ package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entit
 
 import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
+import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
+import de.digitalcollections.cudami.server.backend.api.repository.identifiable.alias.UrlAliasRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.EntityRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.IdentifiableRepositoryImpl;
-import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.resource.FileResourceMetadataRepositoryImpl;
 import de.digitalcollections.model.identifiable.entity.Entity;
 import de.digitalcollections.model.identifiable.entity.NamedEntity;
 import de.digitalcollections.model.identifiable.resource.FileResource;
 import de.digitalcollections.model.list.filtering.FilterCriterion;
 import de.digitalcollections.model.list.filtering.Filtering;
-import de.digitalcollections.model.text.LocalizedText;
+import de.digitalcollections.model.list.paging.PageRequest;
+import de.digitalcollections.model.list.paging.PageResponse;
+import de.digitalcollections.model.list.sorting.Direction;
+import de.digitalcollections.model.list.sorting.Order;
+import de.digitalcollections.model.list.sorting.Sorting;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -18,11 +23,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import org.jdbi.v3.core.Jdbi;
-import org.jdbi.v3.core.result.RowView;
 import org.jdbi.v3.core.statement.PreparedBatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,19 +42,193 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
   public static final String TABLE_ALIAS = "e";
   public static final String TABLE_NAME = "entities";
 
-  @Override
-  protected LinkedHashMap<String, Function<E, Optional<LocalizedText>>> getLocalizedTextFields() {
-    LinkedHashMap<String, Function<E, Optional<LocalizedText>>> localizedTextFields =
-        super.getLocalizedTextFields();
-    // An Entity might be a NamedEntity, too:
-    localizedTextFields.put(
-        "name",
-        i -> i instanceof NamedEntity ne ? Optional.ofNullable(ne.getName()) : Optional.empty());
-    return localizedTextFields;
+  @Autowired
+  public EntityRepositoryImpl(
+      Jdbi dbi,
+      CudamiConfig cudamiConfig,
+      IdentifierRepository identifierRepository,
+      UrlAliasRepository urlAliasRepository) {
+    this(
+        dbi,
+        TABLE_NAME,
+        TABLE_ALIAS,
+        MAPPING_PREFIX,
+        Entity.class,
+        cudamiConfig.getOffsetForAlternativePaging(),
+        identifierRepository,
+        urlAliasRepository);
+  }
+
+  public EntityRepositoryImpl(
+      Jdbi dbi,
+      String tableName,
+      String tableAlias,
+      String mappingPrefix,
+      Class<? extends Entity> entityImplClass,
+      int offsetForAlternativePaging,
+      IdentifierRepository identifierRepository,
+      UrlAliasRepository urlAliasRepository) {
+    super(
+        dbi,
+        tableName,
+        tableAlias,
+        mappingPrefix,
+        entityImplClass,
+        offsetForAlternativePaging,
+        identifierRepository,
+        urlAliasRepository);
   }
 
   @Override
-  public String getSqlInsertFields() {
+  public void addRelatedFileresource(UUID entityUuid, UUID fileResourceUuid)
+      throws RepositoryException {
+    Integer nextSortIndex =
+        retrieveNextSortIndexForParentChildren(
+            dbi, "rel_entity_fileresources", "entity_uuid", entityUuid);
+
+    dbi.withHandle(
+        h ->
+            h.createUpdate(
+                    "INSERT INTO rel_entity_fileresources(entity_uuid, fileresource_uuid, sortindex) VALUES (:entity_uuid, :fileresource_uuid, :sortindex)")
+                .bind("entity_uuid", entityUuid)
+                .bind("fileresource_uuid", fileResourceUuid)
+                .bind("sortindex", nextSortIndex)
+                .execute());
+  }
+
+  @Override
+  public PageResponse<Entity> findRelatedEntities(UUID entityUuid, PageRequest pageRequest)
+      throws RepositoryException {
+    StringBuilder commonSql =
+        new StringBuilder(
+            " FROM entities e"
+                + " INNER JOIN rel_entity_entities rel ON e.uuid=rel.object_uuid"
+                + " WHERE rel.subject_uuid = :entityUuid");
+    Map<String, Object> argumentMappings = new HashMap<>(0);
+    argumentMappings.put("entityUuid", entityUuid);
+    addFiltering(pageRequest, commonSql, argumentMappings);
+
+    StringBuilder query = new StringBuilder("SELECT rel.sortindex AS idx, *" + commonSql);
+    pageRequest.setSorting(new Sorting(new Order(Direction.ASC, "idx")));
+    addPagingAndSorting(pageRequest, query);
+    List<Entity> list =
+        dbi.withHandle(h -> h.createQuery(query.toString()).mapToBean(Entity.class).list());
+
+    StringBuilder countQuery = new StringBuilder("SELECT count(*)" + commonSql);
+    long total = retrieveCount(countQuery, argumentMappings);
+
+    PageResponse<Entity> pageResponse = new PageResponse<>(list, pageRequest, total);
+    return pageResponse;
+  }
+
+  @Override
+  public PageResponse<FileResource> findRelatedFileResources(
+      UUID entityUuid, PageRequest pageRequest) throws RepositoryException {
+    StringBuilder commonSql =
+        new StringBuilder(
+            " FROM FROM fileresources f"
+                + " INNER JOIN rel_entity_fileresources rel ON f.uuid=rel.fileresource_uuid"
+                + " WHERE rel.entitye_uuid = :entityUuid");
+    Map<String, Object> argumentMappings = new HashMap<>(0);
+    argumentMappings.put("entityUuid", entityUuid);
+    addFiltering(pageRequest, commonSql, argumentMappings);
+
+    StringBuilder query = new StringBuilder("SELECT rel.sortindex AS idx, *" + commonSql);
+    pageRequest.setSorting(new Sorting(new Order(Direction.ASC, "idx")));
+    addPagingAndSorting(pageRequest, query);
+    List<FileResource> list =
+        dbi.withHandle(h -> h.createQuery(query.toString()).mapToBean(FileResource.class).list());
+
+    StringBuilder countQuery = new StringBuilder("SELECT count(*)" + commonSql);
+    long total = retrieveCount(countQuery, argumentMappings);
+
+    PageResponse<FileResource> pageResponse = new PageResponse<>(list, pageRequest, total);
+    return pageResponse;
+  }
+
+  @Override
+  protected List<String> getAllowedOrderByFields() {
+    List<String> allowedOrderByFields = super.getAllowedOrderByFields();
+    allowedOrderByFields.addAll(Arrays.asList("refId"));
+    return allowedOrderByFields;
+  }
+
+  @Override
+  public E getByRefId(long refId) throws RepositoryException {
+    Filtering filtering =
+        Filtering.builder()
+            .add(FilterCriterion.builder().withExpression("refId").isEquals(refId).build())
+            .build();
+
+    return retrieveOne(getSqlSelectAllFields(), filtering, null);
+  }
+
+  @Override
+  public String getColumnName(String modelProperty) {
+    if (modelProperty == null) {
+      return null;
+    }
+    switch (modelProperty) {
+      case "navdate":
+        return tableAlias + ".navdate";
+      case "refId":
+        return tableAlias + ".refid";
+      case "name":
+        if (this instanceof NamedEntity) {
+          return "name";
+        } else {
+          return null;
+        }
+      case "nameLocalesOfOriginalScripts":
+        if (this instanceof NamedEntity) {
+          return "name_locales_original_scripts";
+        } else {
+          return null;
+        }
+      case "notes":
+        return tableAlias + ".notes";
+      default:
+        return super.getColumnName(modelProperty);
+    }
+  }
+
+  @Override
+  protected LinkedHashMap<String, Function<E, Optional<Object>>> getJsonbFields() {
+    LinkedHashMap<String, Function<E, Optional<Object>>> jsonbFields = super.getJsonbFields();
+    // An Entity might be a NamedEntity, too:
+    jsonbFields.put(
+        "name",
+        i ->
+            i instanceof NamedEntity
+                ? Optional.ofNullable(((NamedEntity) i).getName())
+                : Optional.empty());
+    return jsonbFields;
+  }
+
+  @Override
+  public List<E> getRandom(int count) throws RepositoryException {
+    // Warning: could be very slow if random is used on tables with many million
+    // records
+    // see https://www.gab.lc/articles/bigdata_postgresql_order_by_random/
+    StringBuilder innerQuery =
+        new StringBuilder("SELECT * FROM " + tableName + " ORDER BY RANDOM() LIMIT " + count);
+    return retrieveList(getSqlSelectReducedFields(), innerQuery, null, null);
+  }
+
+  @Override
+  protected List<String> getReturnedFieldsOnInsertUpdate() {
+    var fields = super.getReturnedFieldsOnInsertUpdate();
+    fields.add("refid");
+    return fields;
+  }
+
+  @Override
+  public String getSqlSelectAllFields(String tableAlias, String mappingPrefix) {
+    return getSqlSelectReducedFields(tableAlias, mappingPrefix);
+  }
+
+  @Override
+  protected String getSqlInsertFields() {
     return super.getSqlInsertFields()
         + ", custom_attrs"
         + ", navdate"
@@ -61,7 +238,7 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
 
   /* Do not change order! Must match order in getSqlInsertFields!!! */
   @Override
-  public String getSqlInsertValues() {
+  protected String getSqlInsertValues() {
     // refid is generated as serial, DO NOT SET!
     return super.getSqlInsertValues()
         + ", :customAttributes::JSONB"
@@ -70,11 +247,6 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
         + (isRepoForNamedEntity()
             ? ", :name::JSONB, :nameLocalesOfOriginalScripts::varchar[], :split_name::varchar[]"
             : "");
-  }
-
-  @Override
-  public String getSqlSelectAllFields(String tableAlias, String mappingPrefix) {
-    return getSqlSelectReducedFields(tableAlias, mappingPrefix);
   }
 
   @Override
@@ -105,7 +277,7 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
   }
 
   @Override
-  public String getSqlUpdateFieldValues() {
+  protected String getSqlUpdateFieldValues() {
     // do not update/left out from statement (not changed since insert):
     // uuid, created, identifiable_type, identifiable_objecttype, refid
     return super.getSqlUpdateFieldValues()
@@ -115,157 +287,12 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
             : "");
   }
 
-  private FileResourceMetadataRepositoryImpl fileResourceMetadataRepositoryImpl;
-
-  @Autowired
-  private EntityRepositoryImpl(
-      Jdbi dbi,
-      FileResourceMetadataRepositoryImpl fileResourceMetadataRepositoryImpl,
-      CudamiConfig cudamiConfig) {
-    this(
-        dbi,
-        TABLE_NAME,
-        TABLE_ALIAS,
-        MAPPING_PREFIX,
-        Entity.class,
-        cudamiConfig.getOffsetForAlternativePaging());
-    this.fileResourceMetadataRepositoryImpl = fileResourceMetadataRepositoryImpl;
-  }
-
-  protected EntityRepositoryImpl(
-      Jdbi dbi,
-      String tableName,
-      String tableAlias,
-      String mappingPrefix,
-      Class<? extends Entity> entityImplClass,
-      int offsetForAlternativePaging) {
-    this(
-        dbi,
-        tableName,
-        tableAlias,
-        mappingPrefix,
-        entityImplClass,
-        null,
-        offsetForAlternativePaging);
-  }
-
-  protected EntityRepositoryImpl(
-      Jdbi dbi,
-      String tableName,
-      String tableAlias,
-      String mappingPrefix,
-      Class<? extends Entity> entityImplClass,
-      BiConsumer<Map<UUID, E>, RowView> additionalReduceRowsBiConsumer,
-      int offsetForAlternativePaging) {
-    super(
-        dbi,
-        tableName,
-        tableAlias,
-        mappingPrefix,
-        entityImplClass,
-        additionalReduceRowsBiConsumer,
-        offsetForAlternativePaging);
-  }
-
   @Override
-  public void addRelatedFileresource(UUID entityUuid, UUID fileResourceUuid) {
-    Integer nextSortIndex =
-        retrieveNextSortIndexForParentChildren(
-            dbi, "rel_entity_fileresources", "entity_uuid", entityUuid);
-
-    dbi.withHandle(
-        h ->
-            h.createUpdate(
-                    "INSERT INTO rel_entity_fileresources(entity_uuid, fileresource_uuid, sortindex) VALUES (:entity_uuid, :fileresource_uuid, :sortindex)")
-                .bind("entity_uuid", entityUuid)
-                .bind("fileresource_uuid", fileResourceUuid)
-                .bind("sortindex", nextSortIndex)
-                .execute());
-  }
-
-  @Override
-  protected List<String> getAllowedOrderByFields() {
-    List<String> allowedOrderByFields = super.getAllowedOrderByFields();
-    allowedOrderByFields.addAll(Arrays.asList("entityType", "refId"));
-    return allowedOrderByFields;
-  }
-
-  @Override
-  public E getByRefId(long refId) {
-    Filtering filtering =
-        Filtering.builder()
-            .add(FilterCriterion.builder().withExpression("refId").isEquals(refId).build())
-            .build();
-
-    return retrieveOne(getSqlSelectAllFields(), filtering, null);
-  }
-
-  @Override
-  public String getColumnName(String modelProperty) {
-    if (modelProperty == null) {
-      return null;
+  protected boolean hasSplitColumn(String propertyName) {
+    if (isRepoForNamedEntity() && "name".equals(propertyName)) {
+      return true;
     }
-    switch (modelProperty) {
-      case "navdate":
-        return tableAlias + ".navdate";
-      case "refId":
-        return tableAlias + ".refid";
-      case "notes":
-        return tableAlias + ".notes";
-      default:
-        return super.getColumnName(modelProperty);
-    }
-  }
-
-  @Override
-  public List<E> getRandom(int count) {
-    // Warning: could be very slow if random is used on tables with many million records
-    // see https://www.gab.lc/articles/bigdata_postgresql_order_by_random/
-    StringBuilder innerQuery =
-        new StringBuilder("SELECT * FROM " + tableName + " ORDER BY RANDOM() LIMIT " + count);
-    return retrieveList(getSqlSelectReducedFields(), innerQuery, null, null);
-  }
-
-  @Override
-  public List<FileResource> getRelatedFileResources(UUID entityUuid) {
-    final String frTableAlias = fileResourceMetadataRepositoryImpl.getTableAlias();
-    final String frTableName = fileResourceMetadataRepositoryImpl.getTableName();
-
-    StringBuilder innerQuery =
-        new StringBuilder(
-            "SELECT ref.sortindex AS idx, * FROM "
-                + frTableName
-                + " AS "
-                + frTableAlias
-                + " INNER JOIN rel_entity_fileresources ref ON "
-                + frTableAlias
-                + ".uuid = ref.fileresource_uuid"
-                + " WHERE ref.entity_uuid = :entityUuid"
-                + " ORDER BY idx ASC");
-
-    Map<String, Object> argumentMappings = new HashMap<>();
-    argumentMappings.put("entityUuid", entityUuid);
-
-    return fileResourceMetadataRepositoryImpl.retrieveList(
-        fileResourceMetadataRepositoryImpl.getSqlSelectReducedFields(),
-        innerQuery,
-        argumentMappings,
-        "ORDER BY idx ASC");
-  }
-
-  /**
-   * Specify if this repository handles an {@code Entity} subclass that implements the interface
-   * {@code NamedEntity} so the additional fields are being added properly.
-   */
-  protected boolean isRepoForNamedEntity() {
-    return NamedEntity.class.isAssignableFrom(identifiableImplClass);
-  }
-
-  @Override
-  protected List<String> getReturnedFieldsOnInsertUpdate() {
-    var fields = super.getReturnedFieldsOnInsertUpdate();
-    fields.add("refid");
-    return fields;
+    return super.hasSplitColumn(propertyName);
   }
 
   @Override
@@ -274,11 +301,20 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
     identifiable.setRefId(Long.parseLong(returnedFields.getOrDefault("refid", 0).toString()));
   }
 
+  /**
+   * Specify if this repository handles an {@code Entity} subclass that implements the interface
+   * {@code NamedEntity} so the additional fields are being added properly.
+   */
+  protected boolean isRepoForNamedEntity() {
+    return NamedEntity.class.isAssignableFrom(uniqueObjectImplClass);
+  }
+
   @Override
   public void save(
       E entity,
       Map<String, Object> bindings,
-      BiFunction<String, Map<String, Object>, String> sqlModifier) {
+      BiFunction<String, Map<String, Object>, String> sqlModifier)
+      throws RepositoryException {
     if (bindings == null) {
       bindings = new HashMap<>(0);
     }
@@ -290,7 +326,7 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
 
   @Override
   public List<FileResource> setRelatedFileResources(
-      UUID entityUuid, List<FileResource> fileResources) {
+      UUID entityUuid, List<FileResource> fileResources) throws RepositoryException {
     if (fileResources == null) {
       return null;
     }
@@ -315,7 +351,8 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
           }
           preparedBatch.execute();
         });
-    return getRelatedFileResources(entityUuid);
+    return findRelatedFileResources(entityUuid, new PageRequest(0, fileResources.size()))
+        .getContent();
   }
 
   @Override
@@ -327,7 +364,8 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
   public void update(
       E entity,
       Map<String, Object> bindings,
-      BiFunction<String, Map<String, Object>, String> sqlModifier) {
+      BiFunction<String, Map<String, Object>, String> sqlModifier)
+      throws RepositoryException {
     if (bindings == null) {
       bindings = new HashMap<>(0);
     }

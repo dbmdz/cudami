@@ -22,10 +22,10 @@ import org.springframework.web.bind.annotation.RestController;
 @Tag(name = "Version controller")
 public class VersionController {
 
-  private final VersionService versionService;
+  private final VersionService service;
 
   public VersionController(VersionService versionService) {
-    this.versionService = versionService;
+    this.service = versionService;
   }
 
   @Operation(summary = "Get version by uuid")
@@ -38,7 +38,7 @@ public class VersionController {
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<Version> getByUuid(@PathVariable UUID uuid) {
-    Version version = versionService.getByUuid(uuid);
+    Version version = service.getByUuid(uuid);
     return new ResponseEntity<>(version, version != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
   }
 
@@ -53,7 +53,7 @@ public class VersionController {
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Version update(@PathVariable UUID uuid, @RequestBody Version version, BindingResult errors)
       throws ValidationException, ServiceException {
-    versionService.update(version);
+    service.update(version);
     return version;
   }
 }

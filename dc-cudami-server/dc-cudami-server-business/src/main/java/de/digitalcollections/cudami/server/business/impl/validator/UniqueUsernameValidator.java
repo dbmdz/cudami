@@ -1,5 +1,6 @@
 package de.digitalcollections.cudami.server.business.impl.validator;
 
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.security.UserService;
 import de.digitalcollections.model.security.User;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -24,9 +25,16 @@ public class UniqueUsernameValidator implements Validator {
   public void validate(Object target, Errors errors) {
     User user = (User) target;
     try {
-      User existingUser = userService.getByUsername(user.getEmail());
+      User existingUser;
+      try {
+        existingUser = userService.getByUsername(user.getEmail());
+      } catch (ServiceException e) {
+        errors.rejectValue("email", "error.service_unavailable");
+        return;
+      }
       if (existingUser != null) {
         errors.rejectValue("email", "error.username_already_exists");
+        return;
       }
     } catch (UsernameNotFoundException ex) {
       // ok, username not used, yet.

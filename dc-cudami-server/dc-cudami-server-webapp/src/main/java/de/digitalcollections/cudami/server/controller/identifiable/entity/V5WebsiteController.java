@@ -2,6 +2,7 @@ package de.digitalcollections.cudami.server.controller.identifiable.entity;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.WebsiteService;
 import de.digitalcollections.cudami.server.controller.CudamiControllerException;
 import de.digitalcollections.cudami.server.controller.legacy.V5MigrationHelper;
@@ -86,7 +87,7 @@ public class V5WebsiteController {
               schema = @Schema(type = "string"))
           @RequestParam(name = "searchTerm", required = false)
           String searchTerm)
-      throws CudamiControllerException {
+      throws CudamiControllerException, ServiceException {
     PageRequest pageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
     if (sortBy != null) {
       Sorting sorting = new Sorting(V5MigrationHelper.migrate(sortBy));
@@ -119,7 +120,7 @@ public class V5WebsiteController {
   public ResponseEntity<String> findRootPages(
       @Parameter(
               name = "uuid",
-              description = "the UUID of the parent webpage",
+              description = "the UUID of the website",
               example = "599a120c-2dd5-11e8-b467-0ed5f89f718b",
               schema = @Schema(implementation = UUID.class))
           @PathVariable("uuid")
@@ -145,9 +146,10 @@ public class V5WebsiteController {
               schema = @Schema(type = "string"))
           @RequestParam(name = "searchTerm", required = false)
           String searchTerm)
-      throws CudamiControllerException {
+      throws CudamiControllerException, ServiceException {
     PageRequest searchPageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
-    PageResponse<Webpage> pageResponse = websiteService.findRootWebpages(uuid, searchPageRequest);
+    PageResponse<Webpage> pageResponse =
+        websiteService.findRootWebpages(Website.builder().uuid(uuid).build(), searchPageRequest);
     try {
       String result = V5MigrationHelper.migrate(pageResponse, objectMapper);
       return new ResponseEntity<>(result, HttpStatus.OK);

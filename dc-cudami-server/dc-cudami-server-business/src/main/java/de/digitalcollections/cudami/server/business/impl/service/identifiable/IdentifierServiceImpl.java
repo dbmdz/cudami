@@ -6,90 +6,58 @@ import de.digitalcollections.cudami.server.business.api.service.exceptions.Servi
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifierService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifierTypeService;
+import de.digitalcollections.cudami.server.business.impl.service.UniqueObjectServiceImpl;
+import de.digitalcollections.model.identifiable.Identifiable;
 import de.digitalcollections.model.identifiable.Identifier;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
-import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service("identifierService")
-@Transactional(rollbackFor = {Exception.class})
-public class IdentifierServiceImpl implements IdentifierService {
-  private final IdentifierRepository identifierRepository;
+// @Transactional(rollbackFor = {Exception.class}) //is set on super class
+public class IdentifierServiceImpl extends UniqueObjectServiceImpl<Identifier, IdentifierRepository>
+    implements IdentifierService {
   private final IdentifierTypeService identifierTypeService;
 
   public IdentifierServiceImpl(
       IdentifierRepository identifierRepository, IdentifierTypeService identifierTypeService) {
-    this.identifierRepository = identifierRepository;
+    super(identifierRepository);
     this.identifierTypeService = identifierTypeService;
   }
 
   @Override
-  public void delete(Set<Identifier> identifiers) throws ServiceException {
+  public int deleteByIdentifiable(Identifiable identifiable) throws ServiceException {
     try {
-      List<UUID> uuids = identifiers.stream().map(i -> i.getUuid()).collect(Collectors.toList());
-      identifierRepository.delete(uuids);
+      return repository.deleteByIdentifiable(identifiable);
     } catch (RepositoryException e) {
-      throw new ServiceException(e);
+      throw new ServiceException("Backend failure", e);
     }
   }
 
   @Override
-  public int deleteByIdentifiable(UUID identifiableUuid) throws ServiceException {
+  public List<Identifier> findByIdentifiable(Identifiable identifiable) throws ServiceException {
     try {
-      return identifierRepository.deleteByIdentifiable(identifiableUuid);
+      return repository.findByIdentifiable(identifiable);
     } catch (RepositoryException e) {
-      throw new ServiceException(e);
+      throw new ServiceException("Backend failure", e);
     }
   }
 
   @Override
-  public List<Identifier> findByIdentifiable(UUID uuidIdentifiable) throws ServiceException {
-    try {
-      return identifierRepository.findByIdentifiable(uuidIdentifiable);
-    } catch (RepositoryException e) {
-      throw new ServiceException(e);
-    }
-  }
-
-  @Override
-  public void save(Identifier identifier) throws ServiceException {
-    try {
-      identifierRepository.save(identifier);
-    } catch (RepositoryException e) {
-      throw new ServiceException(e);
-    }
-  }
-
-  @Override
-  public Set<Identifier> saveForIdentifiable(UUID identifiableUuid, Set<Identifier> identifiers)
+  public Set<Identifier> saveForIdentifiable(Identifiable identifiable, Set<Identifier> identifiers)
       throws ServiceException {
-    if (identifiers == null) return new HashSet<>(0);
-    Set<Identifier> savedIdentifiers = new HashSet<>(identifiers.size());
-    for (Identifier identifier : identifiers) {
-      try {
-        identifier.setIdentifiable(identifiableUuid);
-        if (identifier.getUuid() == null) {
-          identifierRepository.save(identifier);
-          savedIdentifiers.add(identifier);
-        } else {
-          Identifier dbIdentifier = identifierRepository.getByUuid(identifier.getUuid());
-          savedIdentifiers.add(dbIdentifier);
-        }
-      } catch (RepositoryException e) {
-        throw new ServiceException("Cannot save identifier " + identifier + ": " + e, e);
-      }
+    try {
+      return repository.saveForIdentifiable(identifiable, identifiers);
+    } catch (RepositoryException e) {
+      throw new ServiceException("Backend failure", e);
     }
-    return savedIdentifiers;
   }
 
   @Override
   public void validate(Set<Identifier> identifiers) throws ValidationException, ServiceException {
+    // FIXME: do not get cache, get complete list of identifierTypes
     Map<String, String> identifierTypes = identifierTypeService.getIdentifierTypeCache();
     List<String> namespacesNotFound = new ArrayList<>(0);
     List<String> idsNotMatchingPattern = new ArrayList<>(0);
@@ -98,6 +66,9 @@ public class IdentifierServiceImpl implements IdentifierService {
       String namespace = identifier.getNamespace();
       String pattern = identifierTypes.get(namespace);
       if (pattern == null && !cacheUpdated) {
+        // FIXME: should not result in update! the repo has to update the cache every
+        // time
+        // inserts/updates/deletes happen!
         identifierTypes = identifierTypeService.updateIdentifierTypeCache();
         cacheUpdated = true;
         pattern = identifierTypes.get(namespace);

@@ -1,12 +1,14 @@
 package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.agent;
 
 import de.digitalcollections.cudami.model.config.CudamiConfig;
+import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
+import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
+import de.digitalcollections.cudami.server.backend.api.repository.identifiable.alias.UrlAliasRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.agent.CorporateBodyRepository;
 import de.digitalcollections.model.identifiable.entity.agent.CorporateBody;
 import org.jdbi.v3.core.Jdbi;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -18,6 +20,40 @@ public class CorporateBodyRepositoryImpl extends AgentRepositoryImpl<CorporateBo
   public static final String MAPPING_PREFIX = "cb";
   public static final String TABLE_ALIAS = "c";
   public static final String TABLE_NAME = "corporatebodies";
+
+  public CorporateBodyRepositoryImpl(
+      Jdbi dbi,
+      CudamiConfig cudamiConfig,
+      IdentifierRepository identifierRepository,
+      UrlAliasRepository urlAliasRepository) {
+    super(
+        dbi,
+        TABLE_NAME,
+        TABLE_ALIAS,
+        MAPPING_PREFIX,
+        CorporateBody.class,
+        cudamiConfig.getOffsetForAlternativePaging(),
+        identifierRepository,
+        urlAliasRepository);
+  }
+
+  @Override
+  public CorporateBody create() throws RepositoryException {
+    return new CorporateBody();
+  }
+
+  @Override
+  public String getColumnName(String modelProperty) {
+    if (modelProperty == null) {
+      return null;
+    }
+    switch (modelProperty) {
+      case "homepageUrl":
+        return tableAlias + ".homepage_url";
+      default:
+        return super.getColumnName(modelProperty);
+    }
+  }
 
   @Override
   public String getSqlInsertFields() {
@@ -32,7 +68,7 @@ public class CorporateBodyRepositoryImpl extends AgentRepositoryImpl<CorporateBo
 
   @Override
   public String getSqlSelectAllFields(String tableAlias, String mappingPrefix) {
-    return getSqlSelectReducedFields(tableAlias, mappingPrefix)
+    return super.getSqlSelectAllFields(tableAlias, mappingPrefix)
         + ", "
         + tableAlias
         + ".text "
@@ -53,33 +89,5 @@ public class CorporateBodyRepositoryImpl extends AgentRepositoryImpl<CorporateBo
   @Override
   public String getSqlUpdateFieldValues() {
     return super.getSqlUpdateFieldValues() + ", homepage_url=:homepageUrl, text=:text::JSONB";
-  }
-
-  @Autowired
-  public CorporateBodyRepositoryImpl(Jdbi dbi, CudamiConfig cudamiConfig) {
-    super(
-        dbi,
-        TABLE_NAME,
-        TABLE_ALIAS,
-        MAPPING_PREFIX,
-        CorporateBody.class,
-        null,
-        cudamiConfig.getOffsetForAlternativePaging());
-  }
-
-  @Override
-  public String getColumnName(String modelProperty) {
-    if (modelProperty == null) {
-      return null;
-    }
-    if (super.getColumnName(modelProperty) != null) {
-      return super.getColumnName(modelProperty);
-    }
-    switch (modelProperty) {
-      case "homepageUrl":
-        return tableAlias + ".homepage_url";
-      default:
-        return null;
-    }
   }
 }

@@ -11,6 +11,7 @@ import static org.mockito.Mockito.when;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ResourceNotFoundException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.DigitalObjectService;
 import de.digitalcollections.cudami.server.controller.BaseControllerTest;
+import de.digitalcollections.model.identifiable.Identifier;
 import de.digitalcollections.model.identifiable.entity.digitalobject.DigitalObject;
 import de.digitalcollections.model.list.filtering.FilterCriterion;
 import de.digitalcollections.model.list.filtering.FilterOperation;
@@ -52,7 +53,12 @@ class DigitalObjectControllerTest extends BaseControllerTest {
         DigitalObject.builder()
             .uuid("1c419226-8d61-4efa-923a-7fbaf961eb9d")
             .created("2020-08-21T07:49:37.004443")
-            .identifier("mdz-obj", "bsb10000001", "53e3e619-47a3-4110-84f7-acba12a52298")
+            .identifier(
+                Identifier.builder()
+                    .namespace("mdz-obj")
+                    .id("bsb10000001")
+                    .uuid("53e3e619-47a3-4110-84f7-acba12a52298")
+                    .build())
             .label(
                 "Actorum Bohemicorum, ... Theil, Das ist: Warhaffte vnd eigentliche Beschreibung aller fürnembsten vnd denckwürdigsten Historien vnd Geschichten, Welche sich im Königreich Böheim vnd dessen incorporirten Ländern ... begeben vnd zugetragen haben : Auß allerhand glaubwürdigen Publicis scriptis in eine feine richtige Ordnung zusammen verfasset, jetzo mit fleiß ubersehen, gemehret vnd auffs newe zugerichtet")
             .lastModified("2020-08-21T07:49:37.00445")
@@ -63,8 +69,7 @@ class DigitalObjectControllerTest extends BaseControllerTest {
             .refId(72)
             .build();
 
-    when(digitalObjectService.getByIdentifier(any(String.class), any(String.class)))
-        .thenReturn(expected);
+    when(digitalObjectService.getByIdentifier(any(Identifier.class))).thenReturn(expected);
 
     testJson(path);
   }
@@ -73,16 +78,17 @@ class DigitalObjectControllerTest extends BaseControllerTest {
   @ParameterizedTest
   @ValueSource(
       strings = {
-        "/v6/digitalobjects?pageNumber=0&pageSize=10000&parent.uuid=eq:1c419226-8d61-4efa-923a-7fbaf961eb9d"
+        "/v6/digitalobjects?pageNumber=0&pageSize=10000&filter=[parent_uuid]:eq:1c419226-8d61-4efa-923a-7fbaf961eb9d"
       })
   public void filterByParentUUID(String path) throws Exception {
-    UUID parentUuid = UUID.fromString("1c419226-8d61-4efa-923a-7fbaf961eb9d");
+    String parentUuidStr = "1c419226-8d61-4efa-923a-7fbaf961eb9d";
+    UUID parentUuid = UUID.fromString(parentUuidStr);
 
     PageRequest expectedPageRequest = new PageRequest();
     expectedPageRequest.setPageSize(10000);
     expectedPageRequest.setPageNumber(0);
     FilterCriterion filterCriterion =
-        new FilterCriterion("parent.uuid", FilterOperation.EQUALS, parentUuid);
+        new FilterCriterion("parent_uuid", true, FilterOperation.EQUALS, parentUuidStr);
     Filtering filtering = new Filtering(List.of(filterCriterion));
     expectedPageRequest.setFiltering(filtering);
 
@@ -92,7 +98,12 @@ class DigitalObjectControllerTest extends BaseControllerTest {
             DigitalObject.builder()
                 .uuid("7593c90e-6fb7-49b4-a70b-032761c9bbcd")
                 .created("2020-08-21T07:49:37.004443")
-                .identifier("mdz-obj", "bsb10000001", "53e3e619-47a3-4110-84f7-acba12a52298")
+                .identifier(
+                    Identifier.builder()
+                        .namespace("mdz-obj")
+                        .id("bsb10000001")
+                        .uuid("53e3e619-47a3-4110-84f7-acba12a52298")
+                        .build())
                 .label("Label")
                 .lastModified("2020-08-21T07:49:37.00445")
                 .previewImage(
@@ -131,11 +142,14 @@ class DigitalObjectControllerTest extends BaseControllerTest {
   void testGetByIdentifierWithPlaintextId(String path) throws Exception {
     DigitalObject expected = DigitalObject.builder().build();
 
-    when(digitalObjectService.getByIdentifier(eq("foo"), eq("bar"))).thenReturn(expected);
+    when(digitalObjectService.getByIdentifier(
+            eq(Identifier.builder().namespace("foo").id("bar").build())))
+        .thenReturn(expected);
 
     testHttpGet(path);
 
-    verify(digitalObjectService, times(1)).getByIdentifier(eq("foo"), eq("bar"));
+    verify(digitalObjectService, times(1))
+        .getByIdentifier(eq(Identifier.builder().namespace("foo").id("bar").build()));
   }
 
   @DisplayName("can retrieve by identifier with base 64 encoded data")
@@ -144,13 +158,16 @@ class DigitalObjectControllerTest extends BaseControllerTest {
   void testGetByIdentifierWithBase64EncodedData(String basePath) throws Exception {
     DigitalObject expected = DigitalObject.builder().build();
 
-    when(digitalObjectService.getByIdentifier(eq("foo"), eq("bar/bla"))).thenReturn(expected);
+    when(digitalObjectService.getByIdentifier(
+            eq(Identifier.builder().namespace("foo").id("bar/bla").build())))
+        .thenReturn(expected);
 
     testHttpGet(
         basePath
             + Base64.getEncoder().encodeToString("foo:bar/bla".getBytes(StandardCharsets.UTF_8)));
 
-    verify(digitalObjectService, times(1)).getByIdentifier(eq("foo"), eq("bar/bla"));
+    verify(digitalObjectService, times(1))
+        .getByIdentifier(eq(Identifier.builder().namespace("foo").id("bar/bla").build()));
   }
 
   @DisplayName("throws a 404 exception, when update of a not yet existing resource is attempted")

@@ -4,8 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import de.digitalcollections.cudami.client.CudamiRestClient;
 import de.digitalcollections.model.exception.TechnicalException;
 import de.digitalcollections.model.exception.http.client.ResourceNotFoundException;
-import de.digitalcollections.model.list.paging.PageRequest;
-import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.relation.Predicate;
 import java.net.URLEncoder;
 import java.net.http.HttpClient;
@@ -17,20 +15,6 @@ public class CudamiPredicatesClient extends CudamiRestClient<Predicate> {
 
   public CudamiPredicatesClient(HttpClient http, String serverUrl, ObjectMapper mapper) {
     super(http, serverUrl, Predicate.class, mapper, API_VERSION_PREFIX + "/predicates");
-  }
-
-  @Override
-  // FIXME: delete this method to use overridden method as soon as we proceed to breaking V7
-  // API-Version
-  public PageResponse<Predicate> find(PageRequest pageRequest) throws TechnicalException {
-    return doGetRequestForPagedObjectList(baseEndpoint + "/paged", pageRequest);
-  }
-
-  @Override
-  // FIXME: delete this method to use overridden method as soon as we proceed to breaking V7
-  // API-Version
-  public List<Predicate> getAll() throws TechnicalException {
-    return doGetRequestForObjectList(baseEndpoint);
   }
 
   public Predicate getByValue(String value) throws TechnicalException {

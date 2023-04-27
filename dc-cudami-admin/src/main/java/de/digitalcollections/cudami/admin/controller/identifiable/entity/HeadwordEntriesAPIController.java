@@ -1,13 +1,13 @@
 package de.digitalcollections.cudami.admin.controller.identifiable.entity;
 
+import de.digitalcollections.cudami.admin.business.i18n.LanguageService;
 import de.digitalcollections.cudami.admin.controller.ParameterHelper;
 import de.digitalcollections.cudami.admin.model.bootstraptable.BTResponse;
-import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
 import de.digitalcollections.cudami.client.identifiable.entity.CudamiHeadwordEntriesClient;
 import de.digitalcollections.model.exception.TechnicalException;
 import de.digitalcollections.model.identifiable.entity.HeadwordEntry;
-import de.digitalcollections.model.list.paging.PageResponse;
+import de.digitalcollections.model.relation.Predicate;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.UUID;
 import org.slf4j.Logger;
@@ -30,9 +30,8 @@ public class HeadwordEntriesAPIController
 
   private static final Logger LOGGER = LoggerFactory.getLogger(HeadwordEntriesAPIController.class);
 
-  public HeadwordEntriesAPIController(
-      CudamiClient client, LanguageSortingHelper languageSortingHelper) {
-    super(client.forHeadwordEntries(), languageSortingHelper, client.forLocales());
+  public HeadwordEntriesAPIController(CudamiClient client, LanguageService languageService) {
+    super(client.forHeadwordEntries(), languageService);
   }
 
   @GetMapping("/api/headwordentries/new")
@@ -46,16 +45,14 @@ public class HeadwordEntriesAPIController
   @ResponseBody
   public BTResponse<HeadwordEntry> find(
       @RequestParam(name = "offset", required = false, defaultValue = "0") int offset,
-      @RequestParam(name = "limit", required = false, defaultValue = "1") int limit,
+      @RequestParam(name = "limit", required = false, defaultValue = "10") int limit,
       @RequestParam(name = "search", required = false) String searchTerm,
-      @RequestParam(name = "sort", required = false, defaultValue = "label") String sort,
-      @RequestParam(name = "order", required = false, defaultValue = "asc") String order,
+      @RequestParam(name = "sort", required = false, defaultValue = "label") String sortProperty,
+      @RequestParam(name = "order", required = false, defaultValue = "asc") String sortOrder,
       @RequestParam(name = "dataLanguage", required = false) String dataLanguage)
       throws TechnicalException {
-
-    PageResponse<HeadwordEntry> pageResponse =
-        super.find(localeService, service, offset, limit, searchTerm, sort, order, dataLanguage);
-    return new BTResponse<>(pageResponse);
+    return find(
+        Predicate.class, offset, limit, sortProperty, sortOrder, "label", searchTerm, dataLanguage);
   }
 
   @GetMapping("/api/headwordentries/{uuid:" + ParameterHelper.UUID_PATTERN + "}")

@@ -14,11 +14,9 @@
         <div class="container-fluid">
           <div id="content-header">
             <div class="row">
-              <div class="col-sm-6">
+              <div class="col d-flex justify-content-between">
                 <h1 th:text="|#{website} &quot;*{url}&quot;|">Website "https://bavarikon.de/"</h1>
-              </div>
-              <div class="col-sm-6">
-                <div class="float-right">
+                <div>
                   <a class="btn btn-primary" id="edit-button" th:href="@{*{uuid} + '/edit'}" th:text="#{edit}">edit</a>
                 </div>
               </div>
@@ -61,7 +59,7 @@
                     <span aria-hidden="true">&times;</span>
                   </button>
                 </div>
-                
+
                 <div id="toolbar-webpages">
                   <!-- TODO it always contains "und" undefined language? -->
                   <th:block th:if="${not #lists.isEmpty(existingWebpageLanguages)}">
@@ -148,6 +146,16 @@
 
       <script type="text/javascript" th:inline="javascript">
         /*<![CDATA[*/
+        $('#table-website-webpages').bootstrapTable({
+          formatSearch: function () {
+            /*[+
+             let columnName = [[#{lbl.label}]];
+             let placeholder = `[(#{placeholder.search})]`;
+             +]*/
+            return placeholder;
+          }
+        });
+
         function buttonsWebpages() {
           /*[+
            const baseUrl = [[@{'/webpages'}]];
@@ -208,14 +216,14 @@
           const dataLanguage = $("#webpages-languages").val();
           return renderLabel(baseUrl, value, dataLanguage);
         }
-        
+
         function updateListOrder(tableId) {
           /*[+
            const errorMessage = [[#{error.technical_error}]];
            const apiUrl = [[@{/api/websites/__${website.uuid}__/webpages}]];
            const successMessage = `[(#{msg.save_reordered_list.success})]`;
            +]*/
-           
+
           let list = $(tableId).bootstrapTable('getData');
 
           // update root pages order

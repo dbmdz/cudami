@@ -1,6 +1,5 @@
 package de.digitalcollections.cudami.server.controller.identifiable.entity;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifiableService;
@@ -9,10 +8,10 @@ import de.digitalcollections.cudami.server.controller.ParameterHelper;
 import de.digitalcollections.cudami.server.controller.identifiable.AbstractIdentifiableController;
 import de.digitalcollections.model.identifiable.entity.Website;
 import de.digitalcollections.model.identifiable.web.Webpage;
+import de.digitalcollections.model.list.filtering.FilterCriterion;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.list.sorting.Order;
-import de.digitalcollections.model.list.sorting.Sorting;
 import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -41,15 +40,18 @@ import org.springframework.web.bind.annotation.RestController;
 @Tag(name = "Website controller")
 public class WebsiteController extends AbstractIdentifiableController<Website> {
 
-  private final WebsiteService websiteService;
+  // ----------------- Helper classes for Swagger Annotations only, since Swagger Annotations
+  // ----------------- cannot yet handle generics
+  @Hidden
+  private static class PageResponseWebpage extends PageResponse<Webpage> {}
+
+  @Hidden
+  private static class PageResponseWebsite extends PageResponse<Website> {}
+
+  private final WebsiteService service;
 
   public WebsiteController(WebsiteService websiteService) {
-    this.websiteService = websiteService;
-  }
-
-  @Override
-  protected IdentifiableService<Website> getService() {
-    return websiteService;
+    this.service = websiteService;
   }
 
   @Operation(
@@ -72,67 +74,30 @@ public class WebsiteController extends AbstractIdentifiableController<Website> {
         "/latest/websites/count"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public long count() {
-    return websiteService.count();
+  public long count() throws ServiceException {
+    return super.count();
   }
 
-  @Operation(
-      summary = "Get websites",
-      description = "Get a paged, filtered and sorted list of websites",
-      responses = {
-        @ApiResponse(
-            responseCode = "200",
-            description = "SearchPageResponse&lt;Website&gt;",
-            content =
-                @Content(
-                    mediaType = MediaType.APPLICATION_JSON_VALUE,
-                    schema = @Schema(implementation = PageResponseWebsite.class)))
-      })
+  @Operation(summary = "Get all websites as (paged, sorted, filtered) list")
   @GetMapping(
       value = {"/v6/websites"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public PageResponse<Website> find(
-      @Parameter(
-              name = "pageNumber",
-              description = "the page number (starting with 0); if unset, defaults to 0.",
-              example = "0",
-              schema = @Schema(type = "integer"))
-          @RequestParam(name = "pageNumber", required = false, defaultValue = "0")
-          int pageNumber,
-      @Parameter(
-              name = "pageSize",
-              description = "the page size; if unset, defaults to 25",
-              example = "25",
-              schema = @Schema(type = "integer"))
-          @RequestParam(name = "pageSize", required = false, defaultValue = "25")
-          int pageSize,
-      @Parameter(
-              name = "sortBy",
-              description =
-                  "the sorting specification; if unset, default to alphabetically ascending sorting of the field 'label')",
-              example = "label_de.desc.nullsfirst",
-              schema = @Schema(type = "string"))
-          @RequestParam(name = "sortBy", required = false)
-          List<Order> sortBy,
-      @Parameter(
-              name = "searchTerm",
-              description = "the search term, of which the result is filtered (substring match)",
-              example = "Test",
-              schema = @Schema(type = "string"))
-          @RequestParam(name = "searchTerm", required = false)
-          String searchTerm,
-      @RequestParam(name = "label", required = false) String labelTerm,
-      @RequestParam(name = "labelLanguage", required = false) Locale labelLanguage) {
-    return super.find(pageNumber, pageSize, sortBy, searchTerm, labelTerm, labelLanguage);
+      @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
+      @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
+      @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
+      @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria)
+      throws ServiceException {
+    return super.find(pageNumber, pageSize, sortBy, filterCriteria);
   }
 
   @Operation(
       summary = "Get root pages of a website",
-      description = "Get a paged, filtered and sorted list of root pages of a website",
+      description = "Get all root webpages of a website as (paged, sorted, filtered) list",
       responses = {
         @ApiResponse(
             responseCode = "200",
-            description = "SearchPageResponse&lt;Webpage&gt;",
+            description = "PageResponse&lt;Webpage&gt;",
             content =
                 @Content(
                     mediaType = MediaType.APPLICATION_JSON_VALUE,
@@ -171,18 +136,16 @@ public class WebsiteController extends AbstractIdentifiableController<Website> {
           @RequestParam(name = "sortBy", required = false)
           List<Order> sortBy,
       @Parameter(
-              name = "searchTerm",
-              description = "the search term, of which the result is filtered (substring match)",
-              example = "Test",
-              schema = @Schema(type = "string"))
-          @RequestParam(name = "searchTerm", required = false)
-          String searchTerm) {
-    PageRequest searchPageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
-    if (sortBy != null) {
-      Sorting sorting = new Sorting(sortBy);
-      searchPageRequest.setSorting(sorting);
-    }
-    return websiteService.findRootWebpages(uuid, searchPageRequest);
+              name = "filter",
+              description = "the filters the result is filtered with",
+              example = "label_de:like:Homepage",
+              schema = @Schema(type = "List<FilterCriterion>"))
+          @RequestParam(name = "filter", required = false)
+          List<FilterCriterion> filterCriteria)
+      throws ServiceException {
+    PageRequest pageRequest =
+        createPageRequest(Webpage.class, pageNumber, pageSize, sortBy, filterCriteria);
+    return service.findRootWebpages(Website.builder().uuid(uuid).build(), pageRequest);
   }
 
   @Operation(
@@ -211,9 +174,8 @@ public class WebsiteController extends AbstractIdentifiableController<Website> {
               schema = @Schema(implementation = UUID.class))
           @PathVariable
           UUID uuid)
-      throws JsonProcessingException, ServiceException {
-    Website website = websiteService.getByUuid(uuid);
-    return new ResponseEntity<>(website, website != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
+      throws ServiceException {
+    return super.getByUuid(uuid);
   }
 
   @Operation(
@@ -228,8 +190,13 @@ public class WebsiteController extends AbstractIdentifiableController<Website> {
         "/latest/websites/languages"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public List<Locale> getLanguages() {
-    return websiteService.getLanguages();
+  public List<Locale> getLanguages() throws ServiceException {
+    return super.getLanguages();
+  }
+
+  @Override
+  protected IdentifiableService<Website> getService() {
+    return service;
   }
 
   @Operation(
@@ -249,8 +216,7 @@ public class WebsiteController extends AbstractIdentifiableController<Website> {
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Website save(@RequestBody Website website, BindingResult errors)
       throws ServiceException, ValidationException {
-    websiteService.save(website);
-    return website;
+    return super.save(website, errors);
   }
 
   @Operation(
@@ -285,7 +251,7 @@ public class WebsiteController extends AbstractIdentifiableController<Website> {
       BindingResult errors)
       throws ServiceException, ValidationException {
     assert Objects.equals(uuid, website.getUuid());
-    websiteService.update(website);
+    service.update(website);
     return website;
   }
 
@@ -321,21 +287,11 @@ public class WebsiteController extends AbstractIdentifiableController<Website> {
           @PathVariable("uuid")
           UUID uuid,
       @Parameter(required = true, description = "rootpages as a list of webpages") @RequestBody
-          List<Webpage> rootPages) {
-    Website website = new Website();
-    website.setUuid(uuid);
-
-    boolean successful = websiteService.updateRootWebpagesOrder(website, rootPages);
+          List<Webpage> rootPages)
+      throws ServiceException {
+    boolean successful = service.updateRootWebpagesOrder(buildExampleWithUuid(uuid), rootPages);
     return successful
         ? new ResponseEntity<>(HttpStatus.NO_CONTENT)
         : new ResponseEntity<>(HttpStatus.NOT_FOUND);
   }
-
-  // ----------------- Helper classes for Swagger Annotations only, since Swagger Annotations
-  // ----------------- cannot yet handle generics
-  @Hidden
-  private static class PageResponseWebpage extends PageResponse<Webpage> {}
-
-  @Hidden
-  private static class PageResponseWebsite extends PageResponse<Website> {}
 }

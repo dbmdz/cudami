@@ -2,6 +2,7 @@ package de.digitalcollections.cudami.server.controller.identifiable.entity.geo.l
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.geo.location.GeoLocationService;
 import de.digitalcollections.cudami.server.controller.CudamiControllerException;
 import de.digitalcollections.cudami.server.controller.legacy.V5MigrationHelper;
@@ -49,7 +50,7 @@ public class V5GeoLocationController {
       @RequestParam(name = "language", required = false) String language,
       @RequestParam(name = "initial", required = false) String initial,
       @RequestParam(name = "searchTerm", required = false) String searchTerm)
-      throws CudamiControllerException {
+      throws CudamiControllerException, ServiceException {
     PageRequest searchPageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
     if (sortBy != null) {
       Sorting sorting = new Sorting(V5MigrationHelper.migrate(sortBy));

@@ -1,16 +1,17 @@
 package de.digitalcollections.cudami.server.controller.legal;
 
+import de.digitalcollections.cudami.server.business.api.service.UniqueObjectService;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ConflictException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.legal.LicenseService;
+import de.digitalcollections.cudami.server.controller.AbstractUniqueObjectController;
 import de.digitalcollections.cudami.server.controller.ParameterHelper;
 import de.digitalcollections.cudami.server.controller.editor.UrlEditor;
 import de.digitalcollections.model.legal.License;
 import de.digitalcollections.model.list.filtering.FilterCriterion;
-import de.digitalcollections.model.list.filtering.Filtering;
-import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.list.sorting.Order;
-import de.digitalcollections.model.list.sorting.Sorting;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -18,7 +19,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
 import java.util.Locale;
-import java.util.Objects;
+import java.util.Set;
 import java.util.UUID;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -37,7 +38,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @Tag(name = "License controller")
-public class LicenseController {
+public class LicenseController extends AbstractUniqueObjectController<License> {
 
   private final LicenseService service;
 
@@ -49,8 +50,8 @@ public class LicenseController {
   @GetMapping(
       value = {"/v6/licenses/count", "/v5/licenses/count"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public long count() {
-    return service.count();
+  public long count() throws ServiceException {
+    return super.count();
   }
 
   @Operation(summary = "Delete license by given url")
@@ -58,9 +59,11 @@ public class LicenseController {
       value = {"/v6/licenses", "/v5/licenses"},
       params = "url",
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<Void> deleteByUrl(@RequestParam(name = "url", required = true) URL url) {
+  public ResponseEntity<Void> deleteByUrl(@RequestParam(name = "url", required = true) URL url)
+      throws ServiceException {
     // WARNING: a DELETE request with param seems not to be spec allowed?
-    // an url as path variable is technically not possible (unescaping leads to not allowed
+    // an url as path variable is technically not possible (unescaping leads to not
+    // allowed
     // characters in url)
     service.deleteByUrl(url);
     return new ResponseEntity<>(HttpStatus.NO_CONTENT);
@@ -74,22 +77,22 @@ public class LicenseController {
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<Void> deleteByUuid(
-      @Parameter(example = "", description = "UUID of the license") @PathVariable("uuid")
-          UUID uuid) {
-    service.deleteByUuid(uuid);
-    return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+      @Parameter(example = "", description = "UUID of the license") @PathVariable("uuid") UUID uuid)
+      throws ConflictException, ServiceException {
+    return super.delete(uuid);
   }
 
   @Operation(summary = "Delete licenses by given uuid list")
   @DeleteMapping(
       value = {"/v6/licenses", "/v5/licenses"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<Void> deleteByUuids(@RequestBody List<UUID> uuids) {
+  public ResponseEntity<Void> deleteByUuids(@RequestBody List<UUID> uuids)
+      throws ConflictException, ServiceException {
     // WARNING: a DELETE request with body seems not to be spec allowed?
-    // FIXME: How to implement deleteByUrl (also with body? how to distinguish these both methods?
+    // FIXME: How to implement deleteByUrl (also with body? how to distinguish these
+    // both methods?
     // give param?)
-    service.deleteByUuids(uuids);
-    return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    return super.delete(uuids);
   }
 
   // No need for a v5 controller, since the v5 url were never actually used
@@ -101,39 +104,16 @@ public class LicenseController {
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
-      @RequestParam(name = "searchTerm", required = false) String searchTerm,
-      @RequestParam(name = "label", required = false) FilterCriterion<String> labelCriterion,
-      @RequestParam(name = "locale", required = false) FilterCriterion<String> localeCriterion) {
-    PageRequest pageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
-    if (sortBy != null) {
-      Sorting sorting = new Sorting(sortBy);
-      pageRequest.setSorting(sorting);
-    }
-    if (labelCriterion != null || localeCriterion != null) {
-      Filtering filtering = new Filtering();
-      if (labelCriterion != null) {
-        filtering.add(Filtering.builder().add("label", labelCriterion).build());
-      }
-      if (localeCriterion != null) {
-        filtering.add(
-            Filtering.builder()
-                .add(
-                    new FilterCriterion<Locale>(
-                        "locale",
-                        localeCriterion.getOperation(),
-                        Locale.forLanguageTag(localeCriterion.getValue().toString())))
-                .build());
-      }
-      pageRequest.setFiltering(filtering);
-    }
-    return service.find(pageRequest);
+      @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria)
+      throws ServiceException {
+    return super.find(pageNumber, pageSize, sortBy, filterCriteria);
   }
 
   @Operation(summary = "Get all licenses in reduced form")
   @GetMapping(
       value = {"/v6/licenses/all", "/v5/licenses/all"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public List<License> getAll() {
+  public Set<License> getAll() throws ServiceException {
     return service.getAll();
   }
 
@@ -143,7 +123,7 @@ public class LicenseController {
       params = "url",
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<License> getByUrl(@RequestParam(name = "url", required = true) URL url)
-      throws MalformedURLException {
+      throws MalformedURLException, ServiceException {
     License license = service.getByUrl(url);
     return new ResponseEntity<>(license, license != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
   }
@@ -155,17 +135,21 @@ public class LicenseController {
         "/v5/licenses/{uuid:" + ParameterHelper.UUID_PATTERN + "}"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<License> getByUuid(@PathVariable UUID uuid) {
-    License license = service.getByUuid(uuid);
-    return new ResponseEntity<>(license, license != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
+  public ResponseEntity<License> getByUuid(@PathVariable UUID uuid) throws ServiceException {
+    return super.getByUuid(uuid);
   }
 
   @Operation(summary = "Get languages of all licenses")
   @GetMapping(
       value = {"/v6/licenses/languages"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public List<Locale> getLanguages() {
+  public List<Locale> getLanguages() throws ServiceException {
     return service.getLanguages();
+  }
+
+  @Override
+  protected UniqueObjectService<License> getService() {
+    return service;
   }
 
   @InitBinder
@@ -177,8 +161,9 @@ public class LicenseController {
   @PostMapping(
       value = {"/v6/licenses", "/v5/licenses"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public License save(@RequestBody License license, BindingResult errors) throws ServiceException {
-    return service.save(license);
+  public License save(@RequestBody License license, BindingResult errors)
+      throws ServiceException, ValidationException {
+    return super.save(license, errors);
   }
 
   @Operation(summary = "Update a license")
@@ -192,8 +177,7 @@ public class LicenseController {
       @Parameter(example = "", description = "UUID of the license") @PathVariable("uuid") UUID uuid,
       @RequestBody License license,
       BindingResult errors)
-      throws ServiceException {
-    assert Objects.equals(uuid, license.getUuid());
-    return service.update(license);
+      throws ServiceException, ValidationException {
+    return super.update(uuid, license, errors);
   }
 }

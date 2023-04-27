@@ -1,8 +1,8 @@
 package de.digitalcollections.cudami.admin.controller.identifiable.resource;
 
+import de.digitalcollections.cudami.admin.business.i18n.LanguageService;
 import de.digitalcollections.cudami.admin.controller.ParameterHelper;
 import de.digitalcollections.cudami.admin.controller.identifiable.AbstractIdentifiablesController;
-import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
 import de.digitalcollections.cudami.client.identifiable.resource.CudamiFileResourcesMetadataClient;
 import de.digitalcollections.model.exception.ResourceNotFoundException;
@@ -29,14 +29,13 @@ public class FileResourcesMetadataController
   private static final Logger LOGGER =
       LoggerFactory.getLogger(FileResourcesMetadataController.class);
 
-  public FileResourcesMetadataController(
-      LanguageSortingHelper languageSortingHelper, CudamiClient client) {
-    super(client.forFileResourcesMetadata(), languageSortingHelper, client.forLocales());
+  public FileResourcesMetadataController(CudamiClient client, LanguageService languageService) {
+    super(client.forFileResourcesMetadata(), languageService);
   }
 
   @GetMapping(value = "/fileresources/new")
   public String create(Model model) throws TechnicalException {
-    model.addAttribute("activeLanguage", localeService.getDefaultLanguage());
+    model.addAttribute("activeLanguage", languageService.getDefaultLanguage());
     return "fileresources/create";
   }
 
@@ -49,7 +48,7 @@ public class FileResourcesMetadataController
     final Locale displayLocale = LocaleContextHolder.getLocale();
     FileResource fileResource = service.getByUuid(uuid);
     List<Locale> existingLanguages =
-        languageSortingHelper.sortLanguages(displayLocale, fileResource.getLabel().getLocales());
+        languageService.sortLanguages(displayLocale, fileResource.getLabel().getLocales());
 
     if (activeLanguage != null && existingLanguages.contains(activeLanguage)) {
       model.addAttribute("activeLanguage", activeLanguage);
@@ -67,7 +66,7 @@ public class FileResourcesMetadataController
   public String list(Model model) throws TechnicalException {
     model.addAttribute("existingLanguages", getExistingLanguagesFromService());
 
-    String dataLanguage = getDataLanguage(null, localeService);
+    String dataLanguage = getDataLanguage(null, languageService);
     model.addAttribute("dataLanguage", dataLanguage);
 
     return "fileresources/list";
@@ -91,7 +90,7 @@ public class FileResourcesMetadataController
     model.addAttribute("fileresource", resource);
 
     List<Locale> existingLanguages = getExistingLanguagesFromIdentifiable(resource);
-    String dataLanguage = getDataLanguage(targetDataLanguage, localeService);
+    String dataLanguage = getDataLanguage(targetDataLanguage, languageService);
     model
         .addAttribute("existingLanguages", existingLanguages)
         .addAttribute("dataLanguage", dataLanguage);

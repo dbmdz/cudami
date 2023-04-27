@@ -136,9 +136,9 @@ public class V1WebpageController {
   private Webpage loadWebpage(Locale pLocale, UUID uuid) throws ServiceException {
     Webpage webpage;
     if (pLocale == null) {
-      webpage = webpageService.getByUuid(uuid);
+      webpage = webpageService.getByExample(Webpage.builder().uuid(uuid).build());
     } else {
-      webpage = webpageService.getByUuidAndLocale(uuid, pLocale);
+      webpage = webpageService.getByExampleAndLocale(Webpage.builder().uuid(uuid).build(), pLocale);
     }
     return webpage;
   }

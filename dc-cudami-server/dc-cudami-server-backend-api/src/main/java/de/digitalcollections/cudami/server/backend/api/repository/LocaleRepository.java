@@ -6,11 +6,11 @@ import java.util.Locale;
 /** Repository for Locale persistence handling. */
 public interface LocaleRepository {
 
-  List<String> getSupportedLanguages();
-
-  List<Locale> getSupportedLocales();
-
   String getDefaultLanguage();
 
   Locale getDefaultLocale();
+
+  List<String> getSupportedLanguages();
+
+  List<Locale> getSupportedLocales();
 }

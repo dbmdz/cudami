@@ -5,6 +5,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.AbstractRepositoryImplTest;
 import de.digitalcollections.model.identifiable.IdentifierType;
+import de.digitalcollections.model.list.filtering.FilterCriterion;
+import de.digitalcollections.model.list.filtering.Filtering;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import java.util.List;
@@ -24,6 +26,15 @@ class IdentifierTypeRepositoryImplTest extends AbstractRepositoryImplTest {
   @BeforeEach
   public void beforeEach() {
     repo = new IdentifierTypeRepositoryImpl(jdbi, cudamiConfig);
+  }
+
+  @Test
+  @DisplayName("can create correct SQL snippets")
+  void providesCorrectSql() throws RepositoryException {
+    String sql = repo.getSqlSelectReducedFields();
+    assertThat(sql)
+        .isEqualTo(
+            " idt.uuid idt_uuid, idt.created idt_created, idt.last_modified idt_lastModified, idt.label idt_label, idt.namespace idt_namespace, idt.pattern idt_pattern");
   }
 
   @Test
@@ -140,7 +151,7 @@ class IdentifierTypeRepositoryImplTest extends AbstractRepositoryImplTest {
 
     repo.save(initial);
 
-    repo.delete(initial.getUuid());
+    repo.deleteByUuid(initial.getUuid());
 
     IdentifierType actual = repo.getByUuid(initial.getUuid());
     assertThat(actual).isNull();
@@ -169,8 +180,12 @@ class IdentifierTypeRepositoryImplTest extends AbstractRepositoryImplTest {
     type2.setPattern("type-pattern-2");
     repo.save(type2);
 
+    Filtering filtering =
+        Filtering.builder()
+            .add(FilterCriterion.builder().withExpression("namespace").contains(namespace1).build())
+            .build();
     PageRequest pageRequest =
-        PageRequest.builder().pageNumber(0).pageSize(99).searchTerm(namespace1).build();
+        PageRequest.builder().pageNumber(0).pageSize(99).filtering(filtering).build();
     PageResponse<IdentifierType> pageResponse = repo.find(pageRequest);
     List<IdentifierType> actualContent = pageResponse.getContent();
     assertThat(actualContent).hasSize(1);

@@ -1,8 +1,10 @@
 package de.digitalcollections.cudami.server.business.impl.service.semantic;
 
+import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
 import de.digitalcollections.cudami.server.backend.api.repository.semantic.HeadwordRepository;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.semantic.HeadwordService;
+import de.digitalcollections.cudami.server.business.impl.service.UniqueObjectServiceImpl;
 import de.digitalcollections.model.identifiable.entity.Entity;
 import de.digitalcollections.model.identifiable.resource.FileResource;
 import de.digitalcollections.model.list.buckets.BucketObjectsRequest;
@@ -16,127 +18,128 @@ import de.digitalcollections.model.list.sorting.Sorting;
 import de.digitalcollections.model.semantic.Headword;
 import java.util.List;
 import java.util.Locale;
-import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 @Service
-public class HeadwordServiceImpl implements HeadwordService {
+public class HeadwordServiceImpl extends UniqueObjectServiceImpl<Headword, HeadwordRepository>
+    implements HeadwordService {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(HeadwordServiceImpl.class);
 
-  private final HeadwordRepository repository;
-
   public HeadwordServiceImpl(HeadwordRepository repository) {
-    this.repository = repository;
+    super(repository);
   }
 
   @Override
-  public void addRelatedEntity(UUID headwordUuid, UUID entityUuid) {
-    repository.addRelatedEntity(headwordUuid, entityUuid);
+  public void addRelatedEntity(Headword headword, Entity entity) throws ServiceException {
+    try {
+      repository.addRelatedEntity(headword, entity);
+    } catch (RepositoryException e) {
+      throw new ServiceException("Backend failure", e);
+    }
   }
 
   @Override
-  public void addRelatedFileresource(UUID headwordUuid, UUID fileResourceUuid) {
-    repository.addRelatedFileresource(headwordUuid, fileResourceUuid);
+  public void addRelatedFileresource(Headword headword, FileResource fileResource)
+      throws ServiceException {
+    try {
+      repository.addRelatedFileresource(headword, fileResource);
+    } catch (RepositoryException e) {
+      throw new ServiceException("Backend failure", e);
+    }
   }
 
   @Override
-  public long count() {
-    return repository.count();
+  public BucketObjectsResponse<Headword> find(BucketObjectsRequest<Headword> bucketObjectsRequest)
+      throws ServiceException {
+    try {
+      return repository.find(bucketObjectsRequest);
+    } catch (RepositoryException e) {
+      throw new ServiceException("Backend failure", e);
+    }
   }
 
   @Override
-  public boolean delete(List<UUID> uuids) {
-    return repository.delete(uuids);
-  }
-
-  @Override
-  public PageResponse<Headword> find(PageRequest pageRequest) {
-    setDefaultSorting(pageRequest);
-    return repository.find(pageRequest);
-  }
-
-  @Override
-  public List<Headword> find(String searchTerm, int maxResults) {
-    return repository.find(searchTerm, maxResults);
-  }
-
-  @Override
-  public BucketsResponse<Headword> find(BucketsRequest<Headword> bucketsRequest) {
-    return repository.find(bucketsRequest);
-  }
-
-  @Override
-  public BucketObjectsResponse<Headword> find(BucketObjectsRequest<Headword> bucketObjectsRequest) {
-    return repository.find(bucketObjectsRequest);
-  }
-
-  @Override
-  public List<Headword> findByLabelAndLocale(String label, Locale locale) {
-    return repository.find(label, locale);
+  public BucketsResponse<Headword> find(BucketsRequest<Headword> bucketsRequest)
+      throws ServiceException {
+    try {
+      return repository.find(bucketsRequest);
+    } catch (RepositoryException e) {
+      throw new ServiceException("Backend failure", e);
+    }
   }
 
   @Override
   public PageResponse<Headword> findByLanguageAndInitial(
-      PageRequest pageRequest, String language, String initial) {
-    PageResponse<Headword> result =
-        repository.findByLanguageAndInitial(pageRequest, language, initial);
+      PageRequest pageRequest, String language, String initial) throws ServiceException {
+    PageResponse<Headword> result;
+    try {
+      result = repository.findByLanguageAndInitial(pageRequest, language, initial);
+    } catch (RepositoryException e) {
+      throw new ServiceException("Backend failure", e);
+    }
     return result;
   }
 
   @Override
-  public PageResponse<Entity> findRelatedEntities(UUID headwordUuid, PageRequest pageRequest) {
-    return repository.findRelatedEntities(headwordUuid, pageRequest);
+  public PageResponse<Entity> findRelatedEntities(Headword headword, PageRequest pageRequest)
+      throws ServiceException {
+    try {
+      return repository.findRelatedEntities(headword, pageRequest);
+    } catch (RepositoryException e) {
+      throw new ServiceException("Backend failure", e);
+    }
   }
 
   @Override
   public PageResponse<FileResource> findRelatedFileResources(
-      UUID headwordUuid, PageRequest pageRequest) {
-    return repository.findRelatedFileResources(headwordUuid, pageRequest);
-  }
-
-  @Override
-  public List<Headword> getAll() {
-    return repository.getAll();
-  }
-
-  @Override
-  public Headword getByUuid(UUID uuid) {
-    return repository.getByUuid(uuid);
-  }
-
-  @Override
-  public List<Locale> getLanguages() {
-    return repository.getLanguages();
-  }
-
-  @Override
-  public List<Headword> getRandom(int count) {
-    return repository.getRandom(count);
-  }
-
-  @Override
-  public List<Entity> getRelatedEntities(UUID headwordUuid) {
-    return repository.getRelatedEntities(headwordUuid);
-  }
-
-  @Override
-  public List<FileResource> getRelatedFileResources(UUID headwordUuid) {
-    return repository.getRelatedFileResources(headwordUuid);
-  }
-
-  @Override
-  public Headword save(Headword headword) throws ServiceException {
+      Headword headword, PageRequest pageRequest) throws ServiceException {
     try {
-      return repository.save(headword);
-    } catch (Exception e) {
-      LOGGER.error("Cannot save headword " + headword.getLabel() + ": ", e);
-      throw new ServiceException(e.getMessage());
+      return repository.findRelatedFileResources(headword, pageRequest);
+    } catch (RepositoryException e) {
+      throw new ServiceException("Backend failure", e);
     }
   }
 
+  @Override
+  public List<Headword> getByLabelAndLocale(String label, Locale locale) throws ServiceException {
+    try {
+      return repository.find(label, locale);
+    } catch (RepositoryException e) {
+      throw new ServiceException("Backend failure", e);
+    }
+  }
+
+  @Override
+  public List<Locale> getLanguages() throws ServiceException {
+    try {
+      return repository.getLanguages();
+    } catch (RepositoryException e) {
+      throw new ServiceException("Backend failure", e);
+    }
+  }
+
+  @Override
+  public List<Entity> getRelatedEntities(Headword headword) throws ServiceException {
+    try {
+      return repository.getRelatedEntities(headword);
+    } catch (RepositoryException e) {
+      throw new ServiceException("Backend failure", e);
+    }
+  }
+
+  @Override
+  public List<FileResource> getRelatedFileResources(Headword headword) throws ServiceException {
+    try {
+      return repository.getRelatedFileResources(headword);
+    } catch (RepositoryException e) {
+      throw new ServiceException("Backend failure", e);
+    }
+  }
+
+  @Override
   protected void setDefaultSorting(PageRequest pageRequest) {
     if (!pageRequest.hasSorting()) {
       Sorting sorting = new Sorting(Direction.ASC, "label", "uuid");
@@ -145,23 +148,22 @@ public class HeadwordServiceImpl implements HeadwordService {
   }
 
   @Override
-  public List<Entity> setRelatedEntities(UUID headwordUuid, List<Entity> entities) {
-    return repository.setRelatedEntities(headwordUuid, entities);
+  public List<Entity> setRelatedEntities(Headword headword, List<Entity> entities)
+      throws ServiceException {
+    try {
+      return repository.setRelatedEntities(headword, entities);
+    } catch (RepositoryException e) {
+      throw new ServiceException("Backend failure", e);
+    }
   }
 
   @Override
   public List<FileResource> setRelatedFileResources(
-      UUID headwordUuid, List<FileResource> fileResources) {
-    return repository.setRelatedFileResources(headwordUuid, fileResources);
-  }
-
-  @Override
-  public Headword update(Headword headword) throws ServiceException {
+      Headword headword, List<FileResource> fileResources) throws ServiceException {
     try {
-      return repository.update(headword);
-    } catch (Exception e) {
-      LOGGER.error("Cannot update headword " + headword + ": ", e);
-      throw new ServiceException(e.getMessage());
+      return repository.setRelatedFileResources(headword, fileResources);
+    } catch (RepositoryException e) {
+      throw new ServiceException("Backend failure", e);
     }
   }
 }

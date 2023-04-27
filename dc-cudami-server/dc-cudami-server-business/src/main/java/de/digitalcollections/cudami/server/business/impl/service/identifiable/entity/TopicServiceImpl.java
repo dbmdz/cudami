@@ -1,6 +1,7 @@
 package de.digitalcollections.cudami.server.business.impl.service.identifiable.entity;
 
 import de.digitalcollections.cudami.model.config.CudamiConfig;
+import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.NodeRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.TopicRepository;
 import de.digitalcollections.cudami.server.business.api.service.LocaleService;
@@ -17,7 +18,6 @@ import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.view.BreadcrumbNavigation;
 import java.util.List;
 import java.util.Locale;
-import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -46,108 +46,206 @@ public class TopicServiceImpl extends EntityServiceImpl<Topic> implements TopicS
   }
 
   @Override
-  public boolean addChildren(UUID parentUuid, List<UUID> childrenUuids) {
-    return ((NodeRepository<Topic>) repository).addChildren(parentUuid, childrenUuids);
+  public boolean addChild(Topic parent, Topic child) throws ServiceException {
+    try {
+      return ((NodeRepository<Topic>) repository).addChild(parent, child);
+    } catch (RepositoryException e) {
+      throw new ServiceException("Backend failure", e);
+    }
   }
 
   @Override
-  public PageResponse<Topic> findChildren(UUID nodeUuid, PageRequest pageRequest) {
-    return ((NodeRepository<Topic>) repository).findChildren(nodeUuid, pageRequest);
+  public boolean addChildren(Topic parent, List<Topic> children) throws ServiceException {
+    try {
+      return ((NodeRepository<Topic>) repository).addChildren(parent, children);
+    } catch (RepositoryException e) {
+      throw new ServiceException("Backend failure", e);
+    }
   }
 
   @Override
-  public PageResponse<Entity> findEntities(UUID topicUuid, PageRequest pageRequest) {
-    return ((TopicRepository) repository).findEntities(topicUuid, pageRequest);
+  public PageResponse<Topic> findChildren(Topic topic, PageRequest pageRequest)
+      throws ServiceException {
+    PageResponse<Topic> pageResponse;
+    try {
+      pageResponse = ((NodeRepository<Topic>) repository).findChildren(topic, pageRequest);
+    } catch (RepositoryException e) {
+      throw new ServiceException("Backend failure", e);
+    }
+    return pageResponse;
   }
 
   @Override
-  public PageResponse<FileResource> findFileResources(UUID topicUuid, PageRequest pageRequest) {
-    return ((TopicRepository) repository).findFileResources(topicUuid, pageRequest);
+  public PageResponse<Entity> findEntities(Topic topic, PageRequest pageRequest)
+      throws ServiceException {
+    try {
+      return ((TopicRepository) repository).findEntities(topic, pageRequest);
+    } catch (RepositoryException e) {
+      throw new ServiceException("Backend failure", e);
+    }
   }
 
   @Override
-  public PageResponse<Topic> findRootNodes(PageRequest pageRequest) {
+  public PageResponse<FileResource> findFileResources(Topic topic, PageRequest pageRequest)
+      throws ServiceException {
+    try {
+      return ((TopicRepository) repository).findFileResources(topic, pageRequest);
+    } catch (RepositoryException e) {
+      throw new ServiceException("Backend failure", e);
+    }
+  }
+
+  @Override
+  public PageResponse<Topic> findRootNodes(PageRequest pageRequest) throws ServiceException {
     setDefaultSorting(pageRequest);
-    return ((NodeRepository<Topic>) repository).findRootNodes(pageRequest);
+    PageResponse<Topic> pageResponse;
+    try {
+      pageResponse = ((NodeRepository<Topic>) repository).findRootNodes(pageRequest);
+    } catch (RepositoryException e) {
+      throw new ServiceException("Backend failure", e);
+    }
+    return pageResponse;
   }
 
   @Override
-  public BreadcrumbNavigation getBreadcrumbNavigation(UUID nodeUuid) {
-    return ((NodeRepository<Topic>) repository).getBreadcrumbNavigation(nodeUuid);
+  public BreadcrumbNavigation getBreadcrumbNavigation(Topic topic) throws ServiceException {
+    try {
+      return ((NodeRepository<Topic>) repository).getBreadcrumbNavigation(topic);
+    } catch (RepositoryException e) {
+      throw new ServiceException("Backend failure", e);
+    }
   }
 
   @Override
-  public List<Topic> getChildren(UUID nodeUuid) {
-    return ((NodeRepository<Topic>) repository).getChildren(nodeUuid);
+  public List<Topic> getChildren(Topic topic) throws ServiceException {
+    try {
+      return ((NodeRepository<Topic>) repository).getChildren(topic);
+    } catch (RepositoryException e) {
+      throw new ServiceException("Backend failure", e);
+    }
   }
 
   @Override
-  public List<Entity> getEntities(UUID topicUuid) {
-    return ((TopicRepository) repository).getEntities(topicUuid);
+  public List<FileResource> getFileResources(Topic topic) throws ServiceException {
+    try {
+      return ((TopicRepository) repository).getFileResources(topic);
+    } catch (RepositoryException e) {
+      throw new ServiceException("Backend failure", e);
+    }
   }
 
   @Override
-  public List<FileResource> getFileResources(UUID topicUuid) {
-    return ((TopicRepository) repository).getFileResources(topicUuid);
+  public List<Locale> getLanguagesOfEntities(Topic topic) throws ServiceException {
+    try {
+      return ((TopicRepository) repository).getLanguagesOfEntities(topic);
+    } catch (RepositoryException e) {
+      throw new ServiceException("Backend failure", e);
+    }
   }
 
   @Override
-  public List<Locale> getLanguagesOfEntities(UUID topicUuid) {
-    return ((TopicRepository) repository).getLanguagesOfEntities(topicUuid);
+  public List<Locale> getLanguagesOfFileResources(Topic topic) throws ServiceException {
+    try {
+      return ((TopicRepository) repository).getLanguagesOfFileResources(topic);
+    } catch (RepositoryException e) {
+      throw new ServiceException("Backend failure", e);
+    }
   }
 
   @Override
-  public List<Locale> getLanguagesOfFileResources(UUID topicUuid) {
-    return ((TopicRepository) repository).getLanguagesOfFileResources(topicUuid);
+  public Topic getParent(Topic topic) throws ServiceException {
+    Topic parent;
+    try {
+      parent = ((NodeRepository<Topic>) repository).getParent(topic);
+    } catch (RepositoryException e) {
+      throw new ServiceException("Backend failure", e);
+    }
+    return parent;
   }
 
   @Override
-  public Topic getParent(UUID nodeUuid) {
-    return ((NodeRepository<Topic>) repository).getParent(nodeUuid);
+  public List<Topic> getParents(Topic topic) throws ServiceException {
+    List<Topic> parents;
+    try {
+      parents = ((NodeRepository) repository).getParents(topic);
+    } catch (RepositoryException e) {
+      throw new ServiceException("Backend failure", e);
+    }
+    return parents;
   }
 
   @Override
-  public List<Topic> getParents(UUID nodeUuid) {
-    return ((NodeRepository<Topic>) repository).getParents(nodeUuid);
+  public List<Locale> getRootNodesLanguages() throws ServiceException {
+    try {
+      return ((NodeRepository<Topic>) repository).getRootNodesLanguages();
+    } catch (RepositoryException e) {
+      throw new ServiceException("Backend failure", e);
+    }
   }
 
   @Override
-  public List<Locale> getRootNodesLanguages() {
-    return ((NodeRepository<Topic>) repository).getRootNodesLanguages();
+  public List<Topic> getTopicsOfEntity(Entity entity) throws ServiceException {
+    try {
+      return ((TopicRepository) repository).getTopicsOfEntity(entity);
+    } catch (RepositoryException e) {
+      throw new ServiceException("Backend failure", e);
+    }
   }
 
   @Override
-  public List<Topic> getTopicsOfEntity(UUID entityUuid) {
-    return ((TopicRepository) repository).getTopicsOfEntity(entityUuid);
+  public List<Topic> getTopicsOfFileResource(FileResource fileResource) throws ServiceException {
+    try {
+      return ((TopicRepository) repository).getTopicsOfFileResource(fileResource);
+    } catch (RepositoryException e) {
+      throw new ServiceException("Backend failure", e);
+    }
   }
 
   @Override
-  public List<Topic> getTopicsOfFileResource(UUID fileResourceUuid) {
-    return ((TopicRepository) repository).getTopicsOfFileResource(fileResourceUuid);
+  public boolean removeChild(Topic parent, Topic child) throws ServiceException {
+    try {
+      return ((NodeRepository<Topic>) repository).removeChild(parent, child);
+    } catch (RepositoryException e) {
+      throw new ServiceException("Backend failure", e);
+    }
   }
 
   @Override
-  public boolean removeChild(UUID parentUuid, UUID childUuid) {
-    return ((NodeRepository<Topic>) repository).removeChild(parentUuid, childUuid);
+  public Topic saveWithParent(Topic child, Topic parent) throws ServiceException {
+    try {
+      Topic topic = ((TopicRepository) repository).saveWithParent(child, parent);
+      return topic;
+    } catch (Exception e) {
+      LOGGER.error("Cannot save topic " + child + ": ", e);
+      throw new ServiceException(e.getMessage());
+    }
   }
 
   @Override
-  public Topic saveWithParent(UUID childUuid, UUID parentUuid) throws ServiceException {
-    return ((NodeRepository<Topic>) repository).saveWithParent(childUuid, parentUuid);
+  public List<Entity> setEntities(Topic topic, List<Entity> entities) throws ServiceException {
+    try {
+      return ((TopicRepository) repository).setEntities(topic, entities);
+    } catch (RepositoryException e) {
+      throw new ServiceException("Backend failure", e);
+    }
   }
 
   @Override
-  public List<Entity> setEntities(UUID topicUuid, List<Entity> entities) {
-    return ((TopicRepository) repository).setEntities(topicUuid, entities);
+  public List<FileResource> setFileResources(Topic topic, List<FileResource> fileResources)
+      throws ServiceException {
+    try {
+      return ((TopicRepository) repository).setFileResources(topic, fileResources);
+    } catch (RepositoryException e) {
+      throw new ServiceException("Backend failure", e);
+    }
   }
 
   @Override
-  public List<FileResource> setFileResources(UUID topicUuid, List<FileResource> fileResources) {
-    return ((TopicRepository) repository).setFileResources(topicUuid, fileResources);
-  }
-
-  @Override
-  public boolean updateChildrenOrder(UUID parentUuid, List<Topic> children) {
-    return ((NodeRepository<Topic>) repository).updateChildrenOrder(parentUuid, children);
+  public boolean updateChildrenOrder(Topic parent, List<Topic> children) throws ServiceException {
+    try {
+      return ((NodeRepository<Topic>) repository).updateChildrenOrder(parent, children);
+    } catch (RepositoryException e) {
+      throw new ServiceException("Backend failure", e);
+    }
   }
 }

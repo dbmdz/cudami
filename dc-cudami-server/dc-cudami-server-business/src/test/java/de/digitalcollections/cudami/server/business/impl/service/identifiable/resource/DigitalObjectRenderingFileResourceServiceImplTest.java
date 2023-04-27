@@ -8,6 +8,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.resource.DigitalObjectRenderingFileResourceRepository;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ConflictException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
@@ -61,7 +62,8 @@ class DigitalObjectRenderingFileResourceServiceImplTest {
 
   @DisplayName("can delete resource and relation, when the resource is not referenced elsewhere")
   @Test
-  public void deleteResourceAndRelation() throws ServiceException, ConflictException {
+  public void deleteResourceAndRelation()
+      throws ServiceException, ConflictException, RepositoryException {
     UUID uuid = UUID.randomUUID();
     DigitalObject digitalObject = DigitalObject.builder().uuid(uuid).label("Label").build();
     TextFileResource renderingFileResource =
@@ -72,19 +74,20 @@ class DigitalObjectRenderingFileResourceServiceImplTest {
 
     digitalObject.setRenderingResources(List.of(renderingFileResource));
 
-    when(repo.getRenderingFileResources(eq(uuid))).thenReturn(List.of(renderingFileResource));
+    when(repo.getRenderingFileResources(eq(digitalObject)))
+        .thenReturn(List.of(renderingFileResource));
     when(repo.countDigitalObjectsForResource(eq(renderingFileResource.getUuid()))).thenReturn(0);
-    when(repo.delete(any(UUID.class))).thenReturn(1);
+    when(repo.delete(any(TextFileResource.class))).thenReturn(1);
 
-    service.deleteRenderingFileResources(uuid);
+    service.deleteRenderingFileResources(digitalObject);
 
-    verify(repo, times(1)).delete(renderingFileResource.getUuid());
-    verify(textFileResourceService, times(1)).delete(renderingFileResource.getUuid());
+    verify(repo, times(1)).delete(renderingFileResource);
+    verify(fileResourceMetadataService, times(1)).delete(renderingFileResource);
   }
 
   @DisplayName("can delete relation only, when the resource is referenced elsewhere")
   @Test
-  public void deleteOnlyRelation() throws ServiceException, ConflictException {
+  public void deleteOnlyRelation() throws ServiceException, ConflictException, RepositoryException {
     UUID uuid = UUID.randomUUID();
     DigitalObject digitalObject = DigitalObject.builder().uuid(uuid).label("Label").build();
     TextFileResource renderingFileResource =
@@ -95,13 +98,14 @@ class DigitalObjectRenderingFileResourceServiceImplTest {
 
     digitalObject.setRenderingResources(List.of(renderingFileResource));
 
-    when(repo.getRenderingFileResources(eq(uuid))).thenReturn(List.of(renderingFileResource));
+    when(repo.getRenderingFileResources(eq(digitalObject)))
+        .thenReturn(List.of(renderingFileResource));
     when(repo.countDigitalObjectsForResource(eq(renderingFileResource.getUuid()))).thenReturn(1);
-    when(repo.delete(any(UUID.class))).thenReturn(1);
+    when(repo.delete(any(TextFileResource.class))).thenReturn(1);
 
-    service.deleteRenderingFileResources(uuid);
+    service.deleteRenderingFileResources(digitalObject);
 
-    verify(repo, times(1)).delete(renderingFileResource.getUuid());
-    verify(textFileResourceService, never()).delete(renderingFileResource.getUuid());
+    verify(repo, times(1)).delete(renderingFileResource);
+    verify(fileResourceMetadataService, never()).delete(renderingFileResource);
   }
 }

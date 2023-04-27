@@ -6,9 +6,9 @@ import static org.mockito.Mockito.when;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.agent.PersonService;
 import de.digitalcollections.cudami.server.controller.BaseControllerTest;
 import de.digitalcollections.model.identifiable.entity.agent.Person;
+import de.digitalcollections.model.identifiable.entity.geo.location.GeoLocation;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
-import java.util.UUID;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -66,7 +66,7 @@ class V5PersonControllerTest extends BaseControllerTest {
                 .forAscendingOrderedField("uuid")
                 .build();
 
-    when(personService.findByGeoLocationOfBirth(any(PageRequest.class), any(UUID.class)))
+    when(personService.findByGeoLocationOfBirth(any(GeoLocation.class), any(PageRequest.class)))
         .thenReturn(expected);
 
     testJson(path, "/v5/persons/find_with_empty_result.json");
@@ -92,7 +92,7 @@ class V5PersonControllerTest extends BaseControllerTest {
                 .forAscendingOrderedField("uuid")
                 .build();
 
-    when(personService.findByGeoLocationOfDeath(any(PageRequest.class), any(UUID.class)))
+    when(personService.findByGeoLocationOfDeath(any(GeoLocation.class), any(PageRequest.class)))
         .thenReturn(expected);
 
     testJson(path, "/v5/persons/find_with_empty_result.json");

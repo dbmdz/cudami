@@ -1,8 +1,9 @@
 package de.digitalcollections.cudami.admin.controller.identifiable.entity;
 
+import de.digitalcollections.cudami.admin.business.i18n.LanguageService;
 import de.digitalcollections.cudami.admin.controller.ParameterHelper;
-import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
+import de.digitalcollections.cudami.client.identifiable.entity.CudamiEntitiesClient;
 import de.digitalcollections.cudami.client.identifiable.entity.CudamiTopicsClient;
 import de.digitalcollections.model.exception.ResourceNotFoundException;
 import de.digitalcollections.model.exception.TechnicalException;
@@ -28,8 +29,8 @@ public class TopicsController extends AbstractEntitiesController<Topic, CudamiTo
 
   private static final Logger LOGGER = LoggerFactory.getLogger(TopicsController.class);
 
-  public TopicsController(LanguageSortingHelper languageSortingHelper, CudamiClient client) {
-    super(client.forTopics(), languageSortingHelper, client.forLocales());
+  public TopicsController(CudamiClient client, LanguageService languageService) {
+    super(client.forTopics(), languageService);
   }
 
   @GetMapping("/topics/new")
@@ -38,7 +39,7 @@ public class TopicsController extends AbstractEntitiesController<Topic, CudamiTo
       @RequestParam(name = "parentType", required = false) String parentType,
       @RequestParam(name = "parentUuid", required = false) UUID parentUuid)
       throws TechnicalException {
-    model.addAttribute("activeLanguage", localeService.getDefaultLanguage());
+    model.addAttribute("activeLanguage", languageService.getDefaultLanguage());
     model.addAttribute("parentType", parentType);
     model.addAttribute("parentUuid", parentUuid);
     return "topics/create";
@@ -53,7 +54,7 @@ public class TopicsController extends AbstractEntitiesController<Topic, CudamiTo
     final Locale displayLocale = LocaleContextHolder.getLocale();
     Topic topic = service.getByUuid(uuid);
     List<Locale> existingLanguages =
-        languageSortingHelper.sortLanguages(displayLocale, topic.getLabel().getLocales());
+        languageService.sortLanguages(displayLocale, topic.getLabel().getLocales());
 
     if (activeLanguage != null && existingLanguages.contains(activeLanguage)) {
       model.addAttribute("activeLanguage", activeLanguage);
@@ -69,9 +70,11 @@ public class TopicsController extends AbstractEntitiesController<Topic, CudamiTo
   @GetMapping("/topics")
   public String list(Model model) throws TechnicalException {
     model.addAttribute(
-        "existingLanguages", getExistingLanguagesForLocales(service.getLanguagesOfTopTopics()));
+        "existingLanguages",
+        languageService.getExistingLanguagesForLocales(
+            ((CudamiTopicsClient) service).getLanguagesOfTopTopics()));
 
-    String dataLanguage = getDataLanguage(null, localeService);
+    String dataLanguage = getDataLanguage(null, languageService);
     model.addAttribute("dataLanguage", dataLanguage);
 
     return "topics/list";
@@ -95,7 +98,7 @@ public class TopicsController extends AbstractEntitiesController<Topic, CudamiTo
     model.addAttribute("topic", topic);
 
     List<Locale> existingLanguages = getExistingLanguagesFromIdentifiable(topic);
-    String dataLanguage = getDataLanguage(targetDataLanguage, localeService);
+    String dataLanguage = getDataLanguage(targetDataLanguage, languageService);
     model
         .addAttribute("existingLanguages", existingLanguages)
         .addAttribute("dataLanguage", dataLanguage);
@@ -104,24 +107,27 @@ public class TopicsController extends AbstractEntitiesController<Topic, CudamiTo
         getExistingLanguagesFromIdentifiables(topic.getChildren());
     model
         .addAttribute("existingSubtopicsLanguages", existingSubtopicsLanguages)
-        .addAttribute("dataLanguageSubtopics", getDataLanguage(null, localeService));
+        .addAttribute("dataLanguageSubtopics", getDataLanguage(null, languageService));
 
     final Locale displayLocale = LocaleContextHolder.getLocale();
-    List<Locale> existingEntitiesLanguages = service.getLanguagesOfEntities(uuid);
+    List<Locale> existingEntitiesLanguages =
+        ((CudamiTopicsClient) service).getLanguagesOfEntities(uuid);
     model
         .addAttribute(
             "existingEntitiesLanguages",
-            languageSortingHelper.sortLanguages(displayLocale, existingEntitiesLanguages))
-        .addAttribute("dataLanguageEntities", getDataLanguage(null, localeService));
+            languageService.sortLanguages(displayLocale, existingEntitiesLanguages))
+        .addAttribute("dataLanguageEntities", getDataLanguage(null, languageService));
 
-    List<Locale> existingFileResourcesLanguages = service.getLanguagesOfFileResources(uuid);
+    List<Locale> existingFileResourcesLanguages =
+        ((CudamiTopicsClient) service).getLanguagesOfFileResources(uuid);
     model
         .addAttribute(
             "existingFileResourcesLanguages",
-            languageSortingHelper.sortLanguages(displayLocale, existingFileResourcesLanguages))
-        .addAttribute("dataLanguageFileResources", getDataLanguage(null, localeService));
+            languageService.sortLanguages(displayLocale, existingFileResourcesLanguages))
+        .addAttribute("dataLanguageFileResources", getDataLanguage(null, languageService));
 
-    BreadcrumbNavigation breadcrumbNavigation = service.getBreadcrumbNavigation(uuid);
+    BreadcrumbNavigation breadcrumbNavigation =
+        ((CudamiTopicsClient) service).getBreadcrumbNavigation(uuid);
     List<BreadcrumbNode> breadcrumbs = breadcrumbNavigation.getNavigationItems();
     model.addAttribute("breadcrumbs", breadcrumbs);
 
@@ -134,7 +140,7 @@ public class TopicsController extends AbstractEntitiesController<Topic, CudamiTo
       @RequestParam(name = "dataLanguage", required = false) String targetDataLanguage,
       Model model)
       throws TechnicalException, ResourceNotFoundException {
-    Topic topic = service.getByRefId(refId);
+    Topic topic = ((CudamiEntitiesClient<Topic>) service).getByRefId(refId);
     if (topic == null) {
       throw new ResourceNotFoundException();
     }

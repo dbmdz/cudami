@@ -1,15 +1,14 @@
 package de.digitalcollections.cudami.admin.controller.identifiable.web;
 
+import de.digitalcollections.cudami.admin.business.i18n.LanguageService;
 import de.digitalcollections.cudami.admin.controller.ParameterHelper;
 import de.digitalcollections.cudami.admin.controller.identifiable.AbstractIdentifiablesController;
-import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
 import de.digitalcollections.cudami.client.identifiable.entity.CudamiWebsitesClient;
 import de.digitalcollections.cudami.client.identifiable.web.CudamiWebpagesClient;
 import de.digitalcollections.model.exception.ResourceNotFoundException;
 import de.digitalcollections.model.exception.TechnicalException;
 import de.digitalcollections.model.identifiable.entity.Website;
-import de.digitalcollections.model.identifiable.resource.FileResource;
 import de.digitalcollections.model.identifiable.web.Webpage;
 import de.digitalcollections.model.view.BreadcrumbNavigation;
 import de.digitalcollections.model.view.BreadcrumbNode;
@@ -34,8 +33,8 @@ public class WebpagesController
   private static final Logger LOGGER = LoggerFactory.getLogger(WebpagesController.class);
   private final CudamiWebsitesClient websiteService;
 
-  public WebpagesController(LanguageSortingHelper languageSortingHelper, CudamiClient client) {
-    super(client.forWebpages(), languageSortingHelper, client.forLocales());
+  public WebpagesController(CudamiClient client, LanguageService languageService) {
+    super(client.forWebpages(), languageService);
     this.websiteService = client.forWebsites();
   }
 
@@ -46,7 +45,7 @@ public class WebpagesController
       @RequestParam("parentUuid") UUID parentUuid)
       throws TechnicalException {
     model
-        .addAttribute("activeLanguage", localeService.getDefaultLanguage())
+        .addAttribute("activeLanguage", languageService.getDefaultLanguage())
         .addAttribute("parentType", parentType)
         .addAttribute("parentUuid", parentUuid);
 
@@ -67,7 +66,7 @@ public class WebpagesController
     final Locale displayLocale = LocaleContextHolder.getLocale();
     Webpage webpage = service.getByUuid(uuid);
     List<Locale> existingLanguages =
-        languageSortingHelper.sortLanguages(displayLocale, webpage.getLabel().getLocales());
+        languageService.sortLanguages(displayLocale, webpage.getLabel().getLocales());
 
     if (activeLanguage != null && existingLanguages.contains(activeLanguage)) {
       model.addAttribute("activeLanguage", activeLanguage);
@@ -88,7 +87,7 @@ public class WebpagesController
 
   private Website getWebsite(UUID uuid, String parentType) throws TechnicalException {
     if (parentType == null || "webpage".equals(parentType.toLowerCase())) {
-      return service.getWebsite(uuid);
+      return ((CudamiWebpagesClient) service).getWebsite(uuid);
     } else if ("website".equals(parentType.toLowerCase())) {
       return websiteService.getByUuid(uuid);
     }
@@ -113,28 +112,32 @@ public class WebpagesController
     model.addAttribute("webpage", webpage);
 
     List<Locale> existingLanguages = getExistingLanguagesFromIdentifiable(webpage);
-    String dataLanguage = getDataLanguage(targetDataLanguage, localeService);
+    String dataLanguage = getDataLanguage(targetDataLanguage, existingLanguages, languageService);
     model
         .addAttribute("existingLanguages", existingLanguages)
         .addAttribute("dataLanguage", dataLanguage);
 
     List<Locale> existingSubpageLanguages =
         getExistingLanguagesFromIdentifiables(webpage.getChildren());
+    String dataLanguageSubpages =
+        getDataLanguage(targetDataLanguage, existingSubpageLanguages, languageService);
     model
         .addAttribute("existingSubpageLanguages", existingSubpageLanguages)
-        .addAttribute("dataLanguageSubpages", getDataLanguage(null, localeService));
+        .addAttribute("dataLanguageSubpages", dataLanguageSubpages);
 
-    List<FileResource> relatedFileResources = service.getRelatedFileResources(uuid);
-    model.addAttribute("relatedFileResources", relatedFileResources);
+    //    List<FileResource> relatedFileResources =
+    //        ((CudamiWebpagesClient) service).findRelatedFileResources(uuid);
+    //    model.addAttribute("relatedFileResources", relatedFileResources);
 
-    BreadcrumbNavigation breadcrumbNavigation = service.getBreadcrumbNavigation(uuid);
+    BreadcrumbNavigation breadcrumbNavigation =
+        ((CudamiWebpagesClient) service).getBreadcrumbNavigation(uuid);
     List<BreadcrumbNode> breadcrumbs = breadcrumbNavigation.getNavigationItems();
     // Cut out first breadcrumb node (the one with empty uuid), which identifies the website, since
     // it is handled individually
     breadcrumbs.removeIf(n -> n.getTargetId() == null);
     model.addAttribute("breadcrumbs", breadcrumbs);
 
-    Website website = service.getWebsite(uuid);
+    Website website = ((CudamiWebpagesClient) service).getWebsite(uuid);
     model.addAttribute("website", website);
 
     return "webpages/view";

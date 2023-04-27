@@ -1,0 +1,35 @@
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="https://github.com/thymeleaf/thymeleaf-extras-springsecurity"
+      xmlns:data="https://github.com/mxab/thymeleaf-extras-data-attribute">
+  <head>
+  </head>
+  <body>
+  <th:block layout:fragment="html(fieldLanguage, active, beanName)" th:object="${__${beanName}__}">
+    <div th:id="lbl-__${fieldLanguage}__" class="tab-pane" th:classappend="${active} ? 'active'">
+      <div class="card">
+        <div class="card-body bg-light">
+          <div class="row">
+            <div class="col-sm-12">
+              <div class="form-group" th:classappend="${#fields.hasErrors('label[__${fieldLanguage}__]')}? has-error">
+                <label th:for="label-__${fieldLanguage}__" th:text="#{lbl.label}">Label</label>
+                <input th:id="label-__${fieldLanguage}__" class="form-control" type="text" value="" th:field="*{label['__${fieldLanguage}__']}" />
+                <p th:if="${#fields.hasErrors('label[__${fieldLanguage}__]')}" th:errors="*{label[__${fieldLanguage}__]}">...</p>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-12">
+              <div class="form-group" th:classappend="${#fields.hasErrors('description[__${fieldLanguage}__]')}? has-error">
+                <label th:for="description-__${fieldLanguage}__" th:text="#{lbl.description}">Abstract</label>
+                <input th:id="description-__${fieldLanguage}__" class="form-control" type="text" value="" th:field="*{description['__${fieldLanguage}__']}" />
+                <p th:if="${#fields.hasErrors('description[__${fieldLanguage}__]')}" th:errors="*{description[__${fieldLanguage}__]}">...</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </th:block>
+</body>
+</html>

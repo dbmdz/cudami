@@ -1,12 +1,14 @@
 package de.digitalcollections.cudami.server.controller.relation;
 
+import de.digitalcollections.cudami.server.business.api.service.UniqueObjectService;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ConflictException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.relation.PredicateService;
+import de.digitalcollections.cudami.server.controller.AbstractUniqueObjectController;
 import de.digitalcollections.cudami.server.controller.ParameterHelper;
-import de.digitalcollections.model.list.paging.PageRequest;
+import de.digitalcollections.model.list.filtering.FilterCriterion;
 import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.list.sorting.Order;
-import de.digitalcollections.model.list.sorting.Sorting;
 import de.digitalcollections.model.relation.Predicate;
 import de.digitalcollections.model.validation.ValidationError;
 import de.digitalcollections.model.validation.ValidationException;
@@ -23,23 +25,16 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @Tag(name = "Predicate controller")
-public class PredicateController {
+public class PredicateController extends AbstractUniqueObjectController<Predicate> {
 
-  private final PredicateService predicateService;
+  private final PredicateService service;
 
   public PredicateController(PredicateService predicateService) {
-    this.predicateService = predicateService;
+    this.service = predicateService;
   }
 
   @DeleteMapping(value = {"/v6/predicates/{uuid:" + ParameterHelper.UUID_PATTERN + "}"})
@@ -49,50 +44,36 @@ public class PredicateController {
               description =
                   "UUID of the predicate, e.g. <tt>599a120c-2dd5-11e8-b467-0ed5f89f718b</tt>")
           @PathVariable("uuid")
-          UUID uuid) {
-    boolean successful = predicateService.delete(uuid);
-    return successful
-        ? new ResponseEntity<>(HttpStatus.NO_CONTENT)
-        : new ResponseEntity<>(HttpStatus.NOT_FOUND);
+          UUID uuid)
+      throws ConflictException, ServiceException {
+    return super.delete(uuid);
   }
 
-  @Operation(summary = "Get all predicates as (sorted, paged) list")
+  @Operation(summary = "Get all predicates as (paged, sorted, filtered) list")
   @GetMapping(
-      value = {"/v6/predicates/paged"},
+      value = {"/v6/predicates"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  // FIXME: delete "/paged" from mapping as soon as we proceed to breaking V7 API-Version
   public PageResponse<Predicate> find(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
-      @RequestParam(name = "searchTerm", required = false) String searchTerm) {
-
-    PageRequest pageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
-    if (sortBy != null) {
-      Sorting sorting = new Sorting(sortBy);
-      pageRequest.setSorting(sorting);
-    }
-    return predicateService.find(pageRequest);
-  }
-
-  @GetMapping(value = {"/v6/predicates"})
-  // FIXME: append "/all" to mapping as soon as we proceed to breaking V7 API-Version
-  public List<Predicate> getAll() {
-    return predicateService.getAll();
+      @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria)
+      throws ServiceException {
+    return super.find(pageNumber, pageSize, sortBy, filterCriteria);
   }
 
   @Operation(summary = "Get a predicate by its value or UUID")
   @GetMapping(
       value = {"/v6/predicates/{valueOrUuid:.+}"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<Predicate> getByValueOrUUID(
-      @PathVariable("valueOrUuid") String valueOrUuid) {
+  public ResponseEntity<Predicate> getByValueOrUUID(@PathVariable("valueOrUuid") String valueOrUuid)
+      throws ServiceException {
     Predicate result;
     if (valueOrUuid.matches(ParameterHelper.UUID_PATTERN)) {
       UUID uuid = UUID.fromString(valueOrUuid);
-      result = predicateService.getByUuid(uuid);
+      result = service.getByExample(buildExampleWithUuid(uuid));
     } else {
-      result = predicateService.getByValue(valueOrUuid);
+      result = service.getByValue(valueOrUuid);
     }
     return new ResponseEntity<>(result, result != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
   }
@@ -101,16 +82,23 @@ public class PredicateController {
   @GetMapping(
       value = {"/v6/predicates/languages"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public List<Locale> getLanguages() {
-    return predicateService.getLanguages();
+  public List<Locale> getLanguages() throws ServiceException {
+    return service.getLanguages();
+  }
+
+  @Override
+  protected UniqueObjectService<Predicate> getService() {
+    return service;
   }
 
   @Operation(summary = "Save a newly created predicate")
   @PostMapping(
       value = {"/v6/predicates", "/v5/predicates", "/v3/predicates", "/latest/predicates"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public Predicate save(@Valid @RequestBody Predicate predicate, BindingResult bindingResult)
-      throws ServiceException, ValidationException {
+  public Predicate saveWithValidation(
+      @Valid @RequestBody Predicate predicate, BindingResult bindingResult)
+      throws ServiceException, ValidationException,
+          de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException {
     if (bindingResult.hasErrors()) {
       ValidationException validationException = new ValidationException("validation error");
       bindingResult
@@ -123,12 +111,12 @@ public class PredicateController {
               });
       throw validationException;
     }
-    return predicateService.save(predicate);
+    return super.save(predicate, bindingResult);
   }
 
   /*
-  Since we cannot use .* als "fallback" mapping (Spring reports "ambigious handler methods"), we
-  must evaluate the parameter manually
+   * Since we cannot use .* als "fallback" mapping (Spring reports
+   * "ambigious handler methods"), we must evaluate the parameter manually
    */
   @Operation(summary = "create or update a predicate, identified either by its value or by uuid")
   @PutMapping(
@@ -141,7 +129,8 @@ public class PredicateController {
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Predicate update(
       @PathVariable("valueOrUuid") String valueOrUuid, @NotNull @RequestBody Predicate predicate)
-      throws ServiceException {
+      throws ServiceException,
+          de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException {
 
     if (valueOrUuid.matches(ParameterHelper.UUID_PATTERN)) {
       UUID uuid = UUID.fromString(valueOrUuid);
@@ -152,7 +141,8 @@ public class PredicateController {
                 + " does not match uuid of predicate="
                 + predicate.getUuid());
       }
-      return predicateService.update(predicate);
+      service.update(predicate);
+      return predicate;
     }
 
     String value = valueOrUuid;
@@ -161,6 +151,7 @@ public class PredicateController {
           "value of path=" + value + " does not match value of predicate=" + predicate.getValue());
     }
 
-    return predicateService.saveOrUpdate(predicate);
+    service.saveOrUpdate(predicate);
+    return predicate;
   }
 }

@@ -37,7 +37,6 @@ public abstract class BaseCudamiRestClientTest<
    *   <li>order: Descending for property "sortable" and nulls first
    *   <li>pageNumber: 1
    *   <li>pageSize: 2
-   *   <li>searchTerm: "hello"
    * </ul>
    *
    * @return example PageRequest with defined pageSize, pageNumber, sorting and two filters
@@ -50,7 +49,7 @@ public abstract class BaseCudamiRestClientTest<
     FilterCriterion filterCriterion2 =
         new FilterCriterion("gnarf", FilterOperation.EQUALS, "krchch");
     Filtering filtering = new Filtering(List.of(filterCriterion1, filterCriterion2));
-    return new PageRequest(1, 2, sorting, filtering, "hello");
+    return new PageRequest(1, 2, sorting, filtering);
   }
 
   @Test
@@ -78,13 +77,6 @@ public abstract class BaseCudamiRestClientTest<
   }
 
   @Test
-  @DisplayName("can find all")
-  public void testFindAll() throws Exception {
-    client.getAll();
-    verifyHttpRequestByMethodAndRelativeURL("get", "/all");
-  }
-
-  @Test
   @DisplayName("can execute the find method with a basic PageRequest")
   public void testFindWithPageRequest1() throws Exception {
     PageRequest pageRequest = new PageRequest();
@@ -98,7 +90,7 @@ public abstract class BaseCudamiRestClientTest<
     client.find(buildExamplePageRequest());
     verifyHttpRequestByMethodAndRelativeURL(
         "get",
-        "?pageNumber=1&pageSize=2&sortBy=sortable.desc.nullsfirst.ignorecase&foo=eq:bar&gnarf=eq:krchch&searchTerm=hello");
+        "?pageNumber=1&pageSize=2&sortBy=sortable.desc.nullsfirst.ignorecase&filter=foo:eq:bar&filter=gnarf:eq:krchch");
   }
 
   @Test

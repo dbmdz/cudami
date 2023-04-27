@@ -1,8 +1,8 @@
 package de.digitalcollections.cudami.admin.controller.identifiable.entity.work;
 
+import de.digitalcollections.cudami.admin.business.i18n.LanguageService;
 import de.digitalcollections.cudami.admin.controller.ParameterHelper;
 import de.digitalcollections.cudami.admin.controller.identifiable.entity.AbstractEntitiesController;
-import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
 import de.digitalcollections.cudami.client.identifiable.entity.work.CudamiItemsClient;
 import de.digitalcollections.cudami.client.identifiable.entity.work.CudamiManifestationsClient;
@@ -25,8 +25,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 public class ItemsController extends AbstractEntitiesController<Item, CudamiItemsClient> {
   private final CudamiManifestationsClient manifestationsService;
 
-  public ItemsController(LanguageSortingHelper languageSortingHelper, CudamiClient client) {
-    super(client.forItems(), languageSortingHelper, client.forLocales());
+  public ItemsController(CudamiClient client, LanguageService languageService) {
+    super(client.forItems(), languageService);
     this.manifestationsService = client.forManifestations();
   }
 
@@ -34,7 +34,7 @@ public class ItemsController extends AbstractEntitiesController<Item, CudamiItem
   public String list(Model model) throws TechnicalException {
     model.addAttribute("existingLanguages", getExistingLanguagesFromService());
 
-    String dataLanguage = getDataLanguage(null, localeService);
+    String dataLanguage = getDataLanguage(null, languageService);
     model.addAttribute("dataLanguage", dataLanguage);
 
     return "items/list";
@@ -63,18 +63,18 @@ public class ItemsController extends AbstractEntitiesController<Item, CudamiItem
     model.addAttribute("item", item);
 
     List<Locale> existingLanguages = getExistingLanguagesFromIdentifiable(item);
-    String dataLanguage = getDataLanguage(targetDataLanguage, localeService);
+    String dataLanguage = getDataLanguage(targetDataLanguage, languageService);
     model
         .addAttribute("existingLanguages", existingLanguages)
         .addAttribute("dataLanguage", dataLanguage);
 
     Locale displayLocale = LocaleContextHolder.getLocale();
     List<Locale> existingDigitalObjectsLanguages =
-        languageSortingHelper.sortLanguages(
-            displayLocale, service.getLanguagesOfDigitalObjects(uuid));
+        languageService.sortLanguages(
+            displayLocale, ((CudamiItemsClient) service).getLanguagesOfDigitalObjects(uuid));
     model
         .addAttribute("existingDigitalObjectsLanguages", existingDigitalObjectsLanguages)
-        .addAttribute("dataLanguageDigitalObjects", getDataLanguage(null, localeService));
+        .addAttribute("dataLanguageDigitalObjects", getDataLanguage(null, languageService));
 
     return "items/view";
   }

@@ -3,100 +3,46 @@ package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable;
 import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierTypeRepository;
-import de.digitalcollections.cudami.server.backend.impl.jdbi.JdbiRepositoryImpl;
+import de.digitalcollections.cudami.server.backend.impl.jdbi.UniqueObjectRepositoryImpl;
 import de.digitalcollections.model.identifiable.IdentifierType;
-import de.digitalcollections.model.list.paging.PageRequest;
-import de.digitalcollections.model.list.paging.PageResponse;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.UUID;
 import org.jdbi.v3.core.Jdbi;
-import org.jdbi.v3.core.JdbiException;
-import org.jdbi.v3.core.statement.StatementException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class IdentifierTypeRepositoryImpl extends JdbiRepositoryImpl
+public class IdentifierTypeRepositoryImpl extends UniqueObjectRepositoryImpl<IdentifierType>
     implements IdentifierTypeRepository {
 
   public static final String MAPPING_PREFIX = "idt";
-
-  public static final String SQL_INSERT_FIELDS =
-      " uuid, created, label, namespace, pattern, last_modified";
-  public static final String SQL_INSERT_VALUES =
-      " :uuid, :created, :label, :namespace, :pattern, :lastModified";
   public static final String TABLE_ALIAS = "idt";
-  public static final String SQL_REDUCED_FIELDS_IDT =
-      String.format(
-          " %1$s.uuid, %1$s.created, %1$s.label, %1$s.namespace, %1$s.pattern, %1$s.last_modified",
-          TABLE_ALIAS);
-  public static final String SQL_FULL_FIELDS_IDT = SQL_REDUCED_FIELDS_IDT;
   public static final String TABLE_NAME = "identifiertypes";
 
-  @Autowired
   public IdentifierTypeRepositoryImpl(Jdbi dbi, CudamiConfig cudamiConfig) {
     super(
-        dbi, TABLE_NAME, TABLE_ALIAS, MAPPING_PREFIX, cudamiConfig.getOffsetForAlternativePaging());
+        dbi,
+        TABLE_NAME,
+        TABLE_ALIAS,
+        MAPPING_PREFIX,
+        IdentifierType.class,
+        cudamiConfig.getOffsetForAlternativePaging());
   }
 
   @Override
-  public void delete(List<UUID> uuids) {
-    dbi.withHandle(
-        h ->
-            h.createUpdate("DELETE FROM " + tableName + " WHERE uuid in (<uuids>)")
-                .bindList("uuids", uuids)
-                .execute());
-  }
-
-  @Override
-  public PageResponse<IdentifierType> find(PageRequest pageRequest) {
-    StringBuilder commonSql = new StringBuilder(" FROM " + tableName + " AS " + tableAlias);
-
-    Map<String, Object> argumentMappings = new HashMap<>(0);
-    String executedSearchTerm = addSearchTerm(pageRequest, commonSql, argumentMappings);
-
-    // Actually "*" should be used in select, but here we don't need it as there is no outer select
-    StringBuilder query = new StringBuilder("SELECT " + SQL_REDUCED_FIELDS_IDT + commonSql);
-    addPageRequestParams(pageRequest, query);
-    List<IdentifierType> result =
-        dbi.withHandle(
-            h ->
-                h.createQuery(query.toString())
-                    .bindMap(argumentMappings)
-                    .mapToBean(IdentifierType.class)
-                    .list());
-
-    long total = count(commonSql.toString(), argumentMappings);
-    return new PageResponse<>(result, pageRequest, total, executedSearchTerm);
-  }
-
-  @Override
-  public List<IdentifierType> findAll() throws RepositoryException {
-    String query = "SELECT " + SQL_REDUCED_FIELDS_IDT + " FROM " + tableName + " AS " + tableAlias;
-    try {
-      return dbi.withHandle(h -> h.createQuery(query).mapToBean(IdentifierType.class).list());
-    } catch (StatementException e) {
-      String detailMessage = e.getCause() != null ? e.getCause().getMessage() : e.getMessage();
-      throw new RepositoryException(
-          String.format("The SQL statement is defective: %s", detailMessage), e);
-    } catch (JdbiException e) {
-      throw new RepositoryException(e);
-    }
+  public IdentifierType create() throws RepositoryException {
+    return new IdentifierType();
   }
 
   @Override
   protected List<String> getAllowedOrderByFields() {
-    return new ArrayList<>(
-        Arrays.asList("created", "label", "lastModified", "namespace", "pattern"));
+    List<String> allowedOrderByFields = super.getAllowedOrderByFields();
+    allowedOrderByFields.addAll(Arrays.asList("label", "namespace", "pattern"));
+    return allowedOrderByFields;
   }
 
   @Override
-  public IdentifierType getByNamespace(String namespace) {
+  public IdentifierType getByNamespace(String namespace) throws RepositoryException {
     final String sql = "SELECT * FROM " + tableName + " WHERE namespace = :namespace";
 
     IdentifierType identifierType =
@@ -112,52 +58,29 @@ public class IdentifierTypeRepositoryImpl extends JdbiRepositoryImpl
   }
 
   @Override
-  public IdentifierType getByUuid(UUID uuid) {
-    final String sql =
-        "SELECT "
-            + SQL_FULL_FIELDS_IDT
-            + " FROM "
-            + tableName
-            + " AS "
-            + tableAlias
-            + " WHERE uuid = :uuid";
-
-    IdentifierType identifierType =
-        dbi.withHandle(
-            h ->
-                h.createQuery(sql)
-                    .bind("uuid", uuid)
-                    .mapToBean(IdentifierType.class)
-                    .findOne()
-                    .orElse(null));
-
-    return identifierType;
-  }
-
-  @Override
   public String getColumnName(String modelProperty) {
     if (modelProperty == null) {
       return null;
     }
     switch (modelProperty) {
-      case "created":
-        return tableAlias + ".created";
       case "label":
         return tableAlias + ".label";
-      case "lastModified":
-        return tableAlias + ".last_modified";
       case "namespace":
         return tableAlias + ".namespace";
       case "pattern":
         return tableAlias + ".pattern";
-      case "uuid":
-        return tableAlias + ".uuid";
       default:
-        return null;
+        return super.getColumnName(modelProperty);
     }
   }
 
   @Override
+  public List<IdentifierType> getRandom(int count) throws RepositoryException {
+    throw new UnsupportedOperationException(); // TODO: not yet implemented
+  }
+
+  @Override
+  // FIXME: still needed?
   protected List<String> getSearchTermTemplates(String tableAlias, String originalSearchTerm) {
     return new ArrayList<>(
         Arrays.asList(
@@ -166,36 +89,44 @@ public class IdentifierTypeRepositoryImpl extends JdbiRepositoryImpl
   }
 
   @Override
-  protected String getUniqueField() {
-    return "uuid";
+  protected String getSqlInsertFields() {
+    return super.getSqlInsertFields() + ", label, namespace, pattern";
   }
 
   @Override
-  public IdentifierType save(IdentifierType identifierType) throws RepositoryException {
-    identifierType.setUuid(UUID.randomUUID());
-    identifierType.setCreated(LocalDateTime.now());
-    identifierType.setLastModified(LocalDateTime.now());
+  protected String getSqlInsertValues() {
+    return super.getSqlInsertValues() + ", :label, :namespace, :pattern";
+  }
 
-    final String sql =
-        "INSERT INTO "
-            + tableName
-            + "("
-            + SQL_INSERT_FIELDS
-            + ")"
-            + " VALUES ("
-            + SQL_INSERT_VALUES
-            + ")"
-            + " RETURNING *";
+  @Override
+  public String getSqlSelectAllFields(String tableAlias, String mappingPrefix) {
+    return getSqlSelectReducedFields(tableAlias, mappingPrefix);
+  }
 
-    IdentifierType result =
-        dbi.withHandle(
-            h ->
-                h.createQuery(sql)
-                    .bindBean(identifierType)
-                    .mapToBean(IdentifierType.class)
-                    .findOne()
-                    .orElse(null));
-    return result;
+  @Override
+  public String getSqlSelectReducedFields(String tableAlias, String mappingPrefix) {
+    return super.getSqlSelectReducedFields(tableAlias, mappingPrefix)
+        + ", "
+        + tableAlias
+        + ".label "
+        + mappingPrefix
+        + "_label, "
+        + tableAlias
+        + ".namespace "
+        + mappingPrefix
+        + "_namespace, "
+        + tableAlias
+        + ".pattern "
+        + mappingPrefix
+        + "_pattern";
+  }
+
+  @Override
+  protected String getSqlUpdateFieldValues() {
+    // do not update/left out from statement (not changed since insert):
+    // uuid, created
+    return super.getSqlUpdateFieldValues()
+        + ", label=:label, namespace=:namespace, pattern=:pattern";
   }
 
   @Override
@@ -206,25 +137,5 @@ public class IdentifierTypeRepositoryImpl extends JdbiRepositoryImpl
       default:
         return false;
     }
-  }
-
-  @Override
-  public IdentifierType update(IdentifierType identifierType) throws RepositoryException {
-    identifierType.setLastModified(LocalDateTime.now());
-    // do not update/left out from statement (not changed since insert): uuid
-    final String sql =
-        "UPDATE "
-            + tableName
-            + " SET label=:label, last_modified=:lastModified, namespace=:namespace, pattern=:pattern WHERE uuid=:uuid RETURNING *";
-
-    IdentifierType result =
-        dbi.withHandle(
-            h ->
-                h.createQuery(sql)
-                    .bindBean(identifierType)
-                    .mapToBean(IdentifierType.class)
-                    .findOne()
-                    .orElse(null));
-    return result;
   }
 }

@@ -1,13 +1,15 @@
 package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.agent;
 
 import de.digitalcollections.cudami.model.config.CudamiConfig;
+import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
+import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.agent.FamilyNameRepository;
+import de.digitalcollections.cudami.server.backend.api.repository.identifiable.alias.UrlAliasRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.IdentifiableRepositoryImpl;
 import de.digitalcollections.model.identifiable.agent.FamilyName;
 import org.jdbi.v3.core.Jdbi;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -20,19 +22,24 @@ public class FamilyNameRepositoryImpl extends IdentifiableRepositoryImpl<FamilyN
   public static final String TABLE_ALIAS = "f";
   public static final String TABLE_NAME = "familynames";
 
-  @Override
-  public String getSqlSelectAllFields(String tableAlias, String mappingPrefix) {
-    return getSqlSelectReducedFields(tableAlias, mappingPrefix);
-  }
-
-  @Autowired
-  public FamilyNameRepositoryImpl(Jdbi dbi, CudamiConfig cudamiConfig) {
+  public FamilyNameRepositoryImpl(
+      Jdbi dbi,
+      CudamiConfig cudamiConfig,
+      IdentifierRepository identifierRepository,
+      UrlAliasRepository urlAliasRepository) {
     super(
         dbi,
         TABLE_NAME,
         TABLE_ALIAS,
         MAPPING_PREFIX,
         FamilyName.class,
-        cudamiConfig.getOffsetForAlternativePaging());
+        cudamiConfig.getOffsetForAlternativePaging(),
+        identifierRepository,
+        urlAliasRepository);
+  }
+
+  @Override
+  public FamilyName create() throws RepositoryException {
+    return new FamilyName();
   }
 }

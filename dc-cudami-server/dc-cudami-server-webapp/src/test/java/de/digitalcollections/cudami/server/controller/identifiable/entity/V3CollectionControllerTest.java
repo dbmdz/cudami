@@ -8,13 +8,13 @@ import de.digitalcollections.cudami.server.business.api.service.LocaleService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.CollectionService;
 import de.digitalcollections.cudami.server.controller.BaseControllerTest;
 import de.digitalcollections.model.file.MimeType;
+import de.digitalcollections.model.identifiable.Identifier;
 import de.digitalcollections.model.identifiable.entity.Collection;
 import de.digitalcollections.model.identifiable.entity.digitalobject.DigitalObject;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import java.util.List;
 import java.util.Locale;
-import java.util.UUID;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -45,7 +45,11 @@ public class V3CollectionControllerTest extends BaseControllerTest {
                         DigitalObject.builder()
                             .created("2020-09-29T10:58:30.458925")
                             .identifier(
-                                "mdz-obj", "bsb00000610", "5a4c1a74-40c9-4175-8f25-e5267eddaabc")
+                                Identifier.builder()
+                                    .namespace("mdz-obj")
+                                    .id("bsb00000610")
+                                    .uuid("5a4c1a74-40c9-4175-8f25-e5267eddaabc")
+                                    .build())
                             .label(
                                 "Die neuesten Schlager aus: Wenn Liebe erwacht : Hollandweibchen, Liebe im Schnee, Strohwitwe ... und viele andere ; Schlager u. Modelieder zum Mitsingen")
                             .lastModified("2020-09-29T10:58:30.458928")
@@ -105,7 +109,7 @@ public class V3CollectionControllerTest extends BaseControllerTest {
                     .build())
             .build();
 
-    when(collectionService.findActiveChildren(any(UUID.class), any(PageRequest.class)))
+    when(collectionService.findActiveChildren(any(Collection.class), any(PageRequest.class)))
         .thenReturn(expected);
 
     testJson(path);

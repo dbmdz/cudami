@@ -3,26 +3,23 @@ package de.digitalcollections.cudami.server.controller.identifiable.entity;
 import de.digitalcollections.cudami.server.business.api.service.LocaleService;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
-import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifiableService;
+import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.EntityService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.TopicService;
+import de.digitalcollections.cudami.server.controller.AbstractEntityController;
 import de.digitalcollections.cudami.server.controller.ParameterHelper;
-import de.digitalcollections.cudami.server.controller.identifiable.AbstractIdentifiableController;
 import de.digitalcollections.model.identifiable.entity.Entity;
 import de.digitalcollections.model.identifiable.entity.Topic;
 import de.digitalcollections.model.identifiable.resource.FileResource;
 import de.digitalcollections.model.list.filtering.FilterCriterion;
-import de.digitalcollections.model.list.filtering.Filtering;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.list.sorting.Order;
-import de.digitalcollections.model.list.sorting.Sorting;
 import de.digitalcollections.model.view.BreadcrumbNavigation;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import java.util.Locale;
-import java.util.Objects;
 import java.util.UUID;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -39,19 +36,14 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @Tag(name = "Topic controller")
-public class TopicController extends AbstractIdentifiableController<Topic> {
+public class TopicController extends AbstractEntityController<Topic> {
 
   private final LocaleService localeService;
-  private final TopicService topicService;
+  private final TopicService service;
 
   public TopicController(LocaleService localeService, TopicService topicService) {
     this.localeService = localeService;
-    this.topicService = topicService;
-  }
-
-  @Override
-  protected IdentifiableService<Topic> getService() {
-    return topicService;
+    this.service = topicService;
   }
 
   @Operation(summary = "Add an existing topic to an existing parent topic")
@@ -70,7 +62,8 @@ public class TopicController extends AbstractIdentifiableController<Topic> {
       @Parameter(name = "subtopicUuid", description = "The uuid of the subtopic") @PathVariable
           UUID subtopicUuid)
       throws ServiceException {
-    boolean successful = topicService.addChild(parentTopicUuid, subtopicUuid);
+    boolean successful =
+        service.addChild(buildExampleWithUuid(parentTopicUuid), buildExampleWithUuid(subtopicUuid));
     return successful
         ? new ResponseEntity<>(HttpStatus.NO_CONTENT)
         : new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -80,11 +73,11 @@ public class TopicController extends AbstractIdentifiableController<Topic> {
   @GetMapping(
       value = {"/v6/topics/count", "/v5/topics/count", "/v2/topics/count", "/latest/topics/count"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public long count() {
-    return topicService.count();
+  public long count() throws ServiceException {
+    return super.count();
   }
 
-  @Operation(summary = "Get all topics")
+  @Operation(summary = "Get all topics as (paged, sorted, filtered) list")
   @GetMapping(
       value = {"/v6/topics"},
       produces = MediaType.APPLICATION_JSON_VALUE)
@@ -92,13 +85,12 @@ public class TopicController extends AbstractIdentifiableController<Topic> {
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
-      @RequestParam(name = "searchTerm", required = false) String searchTerm,
-      @RequestParam(name = "label", required = false) String labelTerm,
-      @RequestParam(name = "labelLanguage", required = false) Locale labelLanguage) {
-    return super.find(pageNumber, pageSize, sortBy, searchTerm, labelTerm, labelLanguage);
+      @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria)
+      throws ServiceException {
+    return super.find(pageNumber, pageSize, sortBy, filterCriteria);
   }
 
-  @Operation(summary = "Get paged entities of a topic")
+  @Operation(summary = "Get all entities of a topic as (paged, sorted, filtered) list")
   @GetMapping(
       value = {"/v6/topics/{uuid:" + ParameterHelper.UUID_PATTERN + "}/entities"},
       produces = MediaType.APPLICATION_JSON_VALUE)
@@ -107,27 +99,32 @@ public class TopicController extends AbstractIdentifiableController<Topic> {
           UUID topicUuid,
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
-      @RequestParam(name = "entityType", required = false) FilterCriterion<String> entityType) {
-    PageRequest pageRequest = new PageRequest(pageNumber, pageSize, new Sorting());
-    if (entityType != null) {
-      Filtering filtering = Filtering.builder().add("entityType", entityType).build();
-      pageRequest.setFiltering(filtering);
-    }
-    return topicService.findEntities(topicUuid, pageRequest);
+      @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
+      @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria)
+      throws ServiceException {
+    PageRequest pageRequest =
+        createPageRequest(Entity.class, pageNumber, pageSize, sortBy, filterCriteria);
+    return service.findEntities(buildExampleWithUuid(topicUuid), pageRequest);
   }
 
-  @Operation(summary = "Get file resources of topic")
+  @Operation(summary = "Get all file resources of a topic as (paged, sorted, filtered) list")
   @GetMapping(
       value = {"/v6/topics/{uuid:" + ParameterHelper.UUID_PATTERN + "}/fileresources"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public PageResponse<FileResource> findFileResources(
-      @PathVariable UUID uuid,
+      @Parameter(example = "", description = "UUID of the topic") @PathVariable("uuid")
+          UUID topicUuid,
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
-      @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize) {
-    return topicService.findFileResources(uuid, new PageRequest(pageNumber, pageSize));
+      @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
+      @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
+      @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria)
+      throws ServiceException {
+    PageRequest pageRequest =
+        createPageRequest(FileResource.class, pageNumber, pageSize, sortBy, filterCriteria);
+    return service.findFileResources(buildExampleWithUuid(topicUuid), pageRequest);
   }
 
-  @Operation(summary = "Get paged subtopics of a topic")
+  @Operation(summary = "Get all subtopics of a topic as (paged, sorted, filtered) list")
   @GetMapping(
       value = {
         "/v6/topics/{uuid:" + ParameterHelper.UUID_PATTERN + "}/subtopics",
@@ -139,16 +136,14 @@ public class TopicController extends AbstractIdentifiableController<Topic> {
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
-      @RequestParam(name = "searchTerm", required = false) String searchTerm) {
-    PageRequest searchPageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
-    if (sortBy != null) {
-      Sorting sorting = new Sorting(sortBy);
-      searchPageRequest.setSorting(sorting);
-    }
-    return topicService.findChildren(topicUuid, searchPageRequest);
+      @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria)
+      throws ServiceException {
+    PageRequest pageRequest =
+        createPageRequest(Topic.class, pageNumber, pageSize, sortBy, filterCriteria);
+    return service.findChildren(buildExampleWithUuid(topicUuid), pageRequest);
   }
 
-  @Operation(summary = "Get all top topics")
+  @Operation(summary = "Get all top topics as (paged, sorted, filtered) list")
   @GetMapping(
       value = {"/v6/topics/top"},
       produces = MediaType.APPLICATION_JSON_VALUE)
@@ -156,13 +151,11 @@ public class TopicController extends AbstractIdentifiableController<Topic> {
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
-      @RequestParam(name = "searchTerm", required = false) String searchTerm) {
-    PageRequest searchPageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
-    if (sortBy != null) {
-      Sorting sorting = new Sorting(sortBy);
-      searchPageRequest.setSorting(sorting);
-    }
-    return topicService.findRootNodes(searchPageRequest);
+      @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria)
+      throws ServiceException {
+    PageRequest pageRequest =
+        createPageRequest(Topic.class, pageNumber, pageSize, sortBy, filterCriteria);
+    return service.findRootNodes(pageRequest);
   }
 
   @Operation(summary = "Get the breadcrumb for a topic")
@@ -185,15 +178,17 @@ public class TopicController extends AbstractIdentifiableController<Topic> {
               description =
                   "Desired locale, e.g. <tt>de_DE</tt>. If unset, contents in all languages will be returned")
           @RequestParam(name = "pLocale", required = false)
-          Locale pLocale) {
+          Locale pLocale)
+      throws ServiceException {
 
     BreadcrumbNavigation breadcrumbNavigation;
+    Topic example = buildExampleWithUuid(uuid);
 
     if (pLocale == null) {
-      breadcrumbNavigation = topicService.getBreadcrumbNavigation(uuid);
+      breadcrumbNavigation = service.getBreadcrumbNavigation(example);
     } else {
       breadcrumbNavigation =
-          topicService.getBreadcrumbNavigation(uuid, pLocale, localeService.getDefaultLocale());
+          service.getBreadcrumbNavigation(example, pLocale, localeService.getDefaultLocale());
     }
 
     if (breadcrumbNavigation == null || breadcrumbNavigation.getNavigationItems().isEmpty()) {
@@ -217,8 +212,7 @@ public class TopicController extends AbstractIdentifiableController<Topic> {
           @PathVariable
           long refId)
       throws ServiceException {
-    Topic topic = topicService.getByRefId(refId);
-    return getByUuid(topic.getUuid(), null);
+    return super.getByRefId(refId);
   }
 
   @Operation(summary = "Get topic by uuid (and optional locale)")
@@ -243,13 +237,11 @@ public class TopicController extends AbstractIdentifiableController<Topic> {
           @RequestParam(name = "pLocale", required = false)
           Locale pLocale)
       throws ServiceException {
-    Topic topic;
     if (pLocale == null) {
-      topic = topicService.getByUuid(uuid);
+      return super.getByUuid(uuid);
     } else {
-      topic = topicService.getByUuidAndLocale(uuid, pLocale);
+      return super.getByUuidAndLocale(uuid, pLocale);
     }
-    return new ResponseEntity<>(topic, topic != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
   }
 
   @Operation(summary = "Get subtopics of topic")
@@ -261,22 +253,8 @@ public class TopicController extends AbstractIdentifiableController<Topic> {
         "/latest/topics/{uuid:" + ParameterHelper.UUID_PATTERN + "}/children"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public List<Topic> getChildren(@PathVariable UUID uuid) {
-    return topicService.getChildren(uuid);
-  }
-
-  @Operation(summary = "Get all entities of topic")
-  @GetMapping(
-      value = {
-        "/v6/topics/{uuid:" + ParameterHelper.UUID_PATTERN + "}/entities/all",
-        "/v5/topics/{uuid:" + ParameterHelper.UUID_PATTERN + "}/entities/all",
-        "/v3/topics/{uuid:" + ParameterHelper.UUID_PATTERN + "}/entities/all",
-        "/latest/topics/{uuid:" + ParameterHelper.UUID_PATTERN + "}/entities/all"
-      },
-      produces = MediaType.APPLICATION_JSON_VALUE)
-  public List<Entity> getEntities(
-      @Parameter(name = "uuid", description = "The uuid of the topic") @PathVariable UUID uuid) {
-    return topicService.getEntities(uuid);
+  public List<Topic> getChildren(@PathVariable UUID uuid) throws ServiceException {
+    return service.getChildren(buildExampleWithUuid(uuid));
   }
 
   @Operation(summary = "Get all languages of entities of a topic")
@@ -286,8 +264,8 @@ public class TopicController extends AbstractIdentifiableController<Topic> {
         "/v5/topics/{uuid:" + ParameterHelper.UUID_PATTERN + "}/entities/languages"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public List<Locale> getLanguagesOfEntities(@PathVariable UUID uuid) {
-    return this.topicService.getLanguagesOfEntities(uuid);
+  public List<Locale> getLanguagesOfEntities(@PathVariable UUID uuid) throws ServiceException {
+    return this.service.getLanguagesOfEntities(buildExampleWithUuid(uuid));
   }
 
   @Operation(summary = "Get all languages of file resources of a topic")
@@ -297,8 +275,8 @@ public class TopicController extends AbstractIdentifiableController<Topic> {
         "/v5/topics/{uuid:" + ParameterHelper.UUID_PATTERN + "}/fileresources/languages"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public List<Locale> getLanguagesOfFileResources(@PathVariable UUID uuid) {
-    return this.topicService.getLanguagesOfFileResources(uuid);
+  public List<Locale> getLanguagesOfFileResources(@PathVariable UUID uuid) throws ServiceException {
+    return this.service.getLanguagesOfFileResources(buildExampleWithUuid(uuid));
   }
 
   @Operation(summary = "Get parent topic of topic")
@@ -310,8 +288,13 @@ public class TopicController extends AbstractIdentifiableController<Topic> {
         "/latest/topics/{uuid:" + ParameterHelper.UUID_PATTERN + "}/parent"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public Topic getParent(@PathVariable UUID uuid) {
-    return topicService.getParent(uuid);
+  public Topic getParent(@PathVariable UUID uuid) throws ServiceException {
+    return service.getParent(buildExampleWithUuid(uuid));
+  }
+
+  @Override
+  protected EntityService<Topic> getService() {
+    return service;
   }
 
   @Operation(summary = "Get subtopics of topic")
@@ -326,19 +309,6 @@ public class TopicController extends AbstractIdentifiableController<Topic> {
         HttpStatus.GONE);
   }
 
-  @Operation(summary = "Get languages of all top topics")
-  @GetMapping(
-      value = {
-        "/v6/topics/top/languages",
-        "/v5/topics/top/languages",
-        "/v3/topics/top/languages",
-        "/latest/topics/top/languages"
-      },
-      produces = MediaType.APPLICATION_JSON_VALUE)
-  public List<Locale> getTopTopicsLanguages() {
-    return topicService.getRootNodesLanguages();
-  }
-
   @Operation(summary = "Get topics an entity is linked to")
   @GetMapping(
       value = {
@@ -348,8 +318,8 @@ public class TopicController extends AbstractIdentifiableController<Topic> {
         "/latest/topics/entity/{uuid:" + ParameterHelper.UUID_PATTERN + "}"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public List<Topic> getTopicsOfEntity(@PathVariable UUID uuid) {
-    return topicService.getTopicsOfEntity(uuid);
+  public List<Topic> getTopicsOfEntity(@PathVariable UUID uuid) throws ServiceException {
+    return service.getTopicsOfEntity(buildExampleWithUuid(uuid));
   }
 
   @Operation(summary = "Get topics a fileresource is linked to")
@@ -361,8 +331,21 @@ public class TopicController extends AbstractIdentifiableController<Topic> {
         "/latest/topics/fileresource/{uuid:" + ParameterHelper.UUID_PATTERN + "}"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public List<Topic> getTopicsOfFileResource(@PathVariable UUID uuid) {
-    return topicService.getTopicsOfFileResource(uuid);
+  public List<Topic> getTopicsOfFileResource(@PathVariable UUID uuid) throws ServiceException {
+    return service.getTopicsOfFileResource(FileResource.builder().uuid(uuid).build());
+  }
+
+  @Operation(summary = "Get languages of all top topics")
+  @GetMapping(
+      value = {
+        "/v6/topics/top/languages",
+        "/v5/topics/top/languages",
+        "/v3/topics/top/languages",
+        "/latest/topics/top/languages"
+      },
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  public List<Locale> getTopTopicsLanguages() throws ServiceException {
+    return service.getRootNodesLanguages();
   }
 
   @Operation(summary = "Remove child-relation of the given subtopic to the given parent topic")
@@ -379,8 +362,11 @@ public class TopicController extends AbstractIdentifiableController<Topic> {
           @PathVariable
           UUID parentTopicUuid,
       @Parameter(name = "subtopicUuid", description = "The uuid of the subtopic") @PathVariable
-          UUID subtopicUuid) {
-    boolean successful = topicService.removeChild(parentTopicUuid, subtopicUuid);
+          UUID subtopicUuid)
+      throws ServiceException {
+    boolean successful =
+        service.removeChild(
+            buildExampleWithUuid(parentTopicUuid), buildExampleWithUuid(subtopicUuid));
     return successful
         ? new ResponseEntity<>(HttpStatus.NO_CONTENT)
         : new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -392,8 +378,7 @@ public class TopicController extends AbstractIdentifiableController<Topic> {
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Topic save(@RequestBody Topic topic, BindingResult errors)
       throws ServiceException, ValidationException {
-    topicService.save(topic);
-    return topic;
+    return super.save(topic, errors);
   }
 
   @Operation(summary = "Save a newly created topic and add it to parent")
@@ -412,7 +397,7 @@ public class TopicController extends AbstractIdentifiableController<Topic> {
       @RequestBody Topic topic,
       BindingResult errors)
       throws ServiceException, ValidationException {
-    return topicService.saveWithParent(topic, parentTopicUuid);
+    return service.saveWithParent(topic, buildExampleWithUuid(parentTopicUuid));
   }
 
   @Operation(summary = "Save entities of topic")
@@ -424,8 +409,9 @@ public class TopicController extends AbstractIdentifiableController<Topic> {
         "/latest/topics/{uuid:" + ParameterHelper.UUID_PATTERN + "}/entities"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public List<Entity> setEntities(@PathVariable UUID uuid, @RequestBody List<Entity> entities) {
-    return topicService.setEntities(uuid, entities);
+  public List<Entity> setEntities(@PathVariable UUID uuid, @RequestBody List<Entity> entities)
+      throws ServiceException {
+    return service.setEntities(buildExampleWithUuid(uuid), entities);
   }
 
   @Operation(summary = "Save fileresources of topic")
@@ -438,8 +424,9 @@ public class TopicController extends AbstractIdentifiableController<Topic> {
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public List<FileResource> setFileresources(
-      @PathVariable UUID uuid, @RequestBody List<FileResource> fileResources) {
-    return topicService.setFileResources(uuid, fileResources);
+      @PathVariable UUID uuid, @RequestBody List<FileResource> fileResources)
+      throws ServiceException {
+    return service.setFileResources(buildExampleWithUuid(uuid), fileResources);
   }
 
   @Operation(summary = "Update a topic")
@@ -453,8 +440,6 @@ public class TopicController extends AbstractIdentifiableController<Topic> {
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Topic update(@PathVariable UUID uuid, @RequestBody Topic topic, BindingResult errors)
       throws ServiceException, ValidationException {
-    assert Objects.equals(uuid, topic.getUuid());
-    topicService.update(topic);
-    return topic;
+    return super.update(uuid, topic, errors);
   }
 }

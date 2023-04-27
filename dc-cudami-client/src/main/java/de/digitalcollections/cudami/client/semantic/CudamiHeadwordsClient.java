@@ -17,7 +17,7 @@ import java.util.UUID;
 public class CudamiHeadwordsClient extends CudamiRestClient<Headword> {
 
   public CudamiHeadwordsClient(HttpClient http, String serverUrl, ObjectMapper mapper) {
-    super(http, serverUrl, Headword.class, mapper, API_VERSION_PREFIX + "/headwords", false);
+    super(http, serverUrl, Headword.class, mapper, API_VERSION_PREFIX + "/headwords");
   }
 
   public BucketObjectsResponse<Headword> findBucketObjects(

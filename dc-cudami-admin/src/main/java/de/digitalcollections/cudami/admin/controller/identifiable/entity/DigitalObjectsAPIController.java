@@ -1,10 +1,13 @@
 package de.digitalcollections.cudami.admin.controller.identifiable.entity;
 
+import de.digitalcollections.cudami.admin.business.i18n.LanguageService;
 import de.digitalcollections.cudami.admin.controller.ParameterHelper;
+import de.digitalcollections.cudami.admin.model.bootstraptable.BTRequest;
 import de.digitalcollections.cudami.admin.model.bootstraptable.BTResponse;
-import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
+import de.digitalcollections.cudami.client.identifiable.CudamiIdentifiablesClient;
 import de.digitalcollections.cudami.client.identifiable.entity.CudamiDigitalObjectsClient;
+import de.digitalcollections.cudami.client.identifiable.entity.CudamiEntitiesClient;
 import de.digitalcollections.model.exception.TechnicalException;
 import de.digitalcollections.model.identifiable.entity.Collection;
 import de.digitalcollections.model.identifiable.entity.Project;
@@ -12,7 +15,6 @@ import de.digitalcollections.model.identifiable.entity.digitalobject.DigitalObje
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.list.sorting.Order;
-import de.digitalcollections.model.list.sorting.Sorting;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.UUID;
@@ -33,30 +35,12 @@ public class DigitalObjectsAPIController
 
   private static final Logger LOGGER = LoggerFactory.getLogger(DigitalObjectsAPIController.class);
 
-  public DigitalObjectsAPIController(
-      CudamiClient client, LanguageSortingHelper languageSortingHelper) {
-    super(client.forDigitalObjects(), languageSortingHelper, client.forLocales());
-  }
-
-  @SuppressFBWarnings
-  @GetMapping("/api/digitalobjects")
-  @ResponseBody
-  public BTResponse<DigitalObject> find(
-      @RequestParam(name = "offset", required = false, defaultValue = "0") int offset,
-      @RequestParam(name = "limit", required = false, defaultValue = "1") int limit,
-      @RequestParam(name = "search", required = false) String searchTerm,
-      @RequestParam(name = "sort", required = false, defaultValue = "label") String sort,
-      @RequestParam(name = "order", required = false, defaultValue = "asc") String order,
-      @RequestParam(name = "dataLanguage", required = false) String dataLanguage)
-      throws TechnicalException {
-
-    PageResponse<DigitalObject> pageResponse =
-        super.find(localeService, service, offset, limit, searchTerm, sort, order, dataLanguage);
-    return new BTResponse<>(pageResponse);
+  public DigitalObjectsAPIController(CudamiClient client, LanguageService languageService) {
+    super(client.forDigitalObjects(), languageService);
   }
 
   /*
-   * Used in templates/collections/view.html and
+   * Used in templates/collections/view.html as param for
    * templates/fragments/modals/select-entities.html
    */
   @GetMapping("/api/digitalobjects/search")
@@ -68,13 +52,45 @@ public class DigitalObjectsAPIController
       @RequestParam(name = "searchTerm", required = false) String searchTerm,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy)
       throws TechnicalException {
+    // TODO ?: add datalanguage as request param to allow search / autocompletion in
+    // selected data language
+    String dataLanguage = null;
     PageRequest pageRequest =
-        createPageRequest(pageNumber, pageSize, searchField, searchTerm, sortBy);
+        createPageRequest(
+            DigitalObject.class,
+            pageNumber,
+            pageSize,
+            sortBy,
+            searchField,
+            searchTerm,
+            dataLanguage);
     PageResponse<DigitalObject> pageResponse = search(searchField, searchTerm, pageRequest);
     if (pageResponse == null) {
       throw new InvalidEndpointRequestException("invalid request param", searchField);
     }
     return pageResponse;
+  }
+
+  @SuppressFBWarnings
+  @GetMapping("/api/digitalobjects")
+  @ResponseBody
+  public BTResponse<DigitalObject> find(
+      @RequestParam(name = "offset", required = false, defaultValue = "0") int offset,
+      @RequestParam(name = "limit", required = false, defaultValue = "10") int limit,
+      @RequestParam(name = "search", required = false) String searchTerm,
+      @RequestParam(name = "sort", required = false, defaultValue = "label") String sortProperty,
+      @RequestParam(name = "order", required = false, defaultValue = "asc") String sortOrder,
+      @RequestParam(name = "dataLanguage", required = false) String dataLanguage)
+      throws TechnicalException {
+    return find(
+        DigitalObject.class,
+        offset,
+        limit,
+        sortProperty,
+        sortOrder,
+        "label",
+        searchTerm,
+        dataLanguage);
   }
 
   @GetMapping(
@@ -84,26 +100,24 @@ public class DigitalObjectsAPIController
   public BTResponse<Collection> findAssociatedCollections(
       @PathVariable UUID uuid,
       @RequestParam(name = "offset", required = false, defaultValue = "0") int offset,
-      @RequestParam(name = "limit", required = false, defaultValue = "1") int limit,
+      @RequestParam(name = "limit", required = false, defaultValue = "10") int limit,
       @RequestParam(name = "search", required = false) String searchTerm,
-      @RequestParam(name = "sort", required = false, defaultValue = "label") String sort,
-      @RequestParam(name = "order", required = false, defaultValue = "asc") String order,
+      @RequestParam(name = "sort", required = false, defaultValue = "label") String sortProperty,
+      @RequestParam(name = "order", required = false, defaultValue = "asc") String sortOrder,
       @RequestParam(name = "dataLanguage", required = false) String dataLanguage)
       throws TechnicalException {
-    PageRequest pageRequest =
-        createPageRequest(sort, order, dataLanguage, localeService, offset, limit, searchTerm);
-
-    if ("label".equals(sort)) {
-      if (dataLanguage == null) {
-        dataLanguage = localeService.getDefaultLanguage().getLanguage();
-      }
-      Sorting sorting =
-          Sorting.builder()
-              .order(Order.builder().property("label").subProperty(dataLanguage).build())
-              .build();
-      pageRequest.setSorting(sorting);
-    }
-    PageResponse<Collection> pageResponse = service.findCollections(uuid, pageRequest);
+    BTRequest btRequest =
+        createBTRequest(
+            Collection.class,
+            offset,
+            limit,
+            sortProperty,
+            sortOrder,
+            "label",
+            searchTerm,
+            dataLanguage);
+    PageResponse<Collection> pageResponse =
+        ((CudamiDigitalObjectsClient) service).findCollections(uuid, btRequest);
     return new BTResponse<>(pageResponse);
   }
 
@@ -114,26 +128,24 @@ public class DigitalObjectsAPIController
   public BTResponse<Project> findAssociatedProjects(
       @PathVariable UUID uuid,
       @RequestParam(name = "offset", required = false, defaultValue = "0") int offset,
-      @RequestParam(name = "limit", required = false, defaultValue = "1") int limit,
+      @RequestParam(name = "limit", required = false, defaultValue = "10") int limit,
       @RequestParam(name = "search", required = false) String searchTerm,
-      @RequestParam(name = "sort", required = false, defaultValue = "label") String sort,
-      @RequestParam(name = "order", required = false, defaultValue = "asc") String order,
+      @RequestParam(name = "sort", required = false, defaultValue = "label") String sortProperty,
+      @RequestParam(name = "order", required = false, defaultValue = "asc") String sortOrder,
       @RequestParam(name = "dataLanguage", required = false) String dataLanguage)
       throws TechnicalException {
-    PageRequest pageRequest =
-        createPageRequest(sort, order, dataLanguage, localeService, offset, limit, searchTerm);
-
-    if ("label".equals(sort)) {
-      if (dataLanguage == null) {
-        dataLanguage = localeService.getDefaultLanguage().getLanguage();
-      }
-      Sorting sorting =
-          Sorting.builder()
-              .order(Order.builder().property("label").subProperty(dataLanguage).build())
-              .build();
-      pageRequest.setSorting(sorting);
-    }
-    PageResponse<Project> pageResponse = service.findProjects(uuid, pageRequest);
+    BTRequest btRequest =
+        createBTRequest(
+            Project.class,
+            offset,
+            limit,
+            sortProperty,
+            sortOrder,
+            "label",
+            searchTerm,
+            dataLanguage);
+    PageResponse<Project> pageResponse =
+        ((CudamiDigitalObjectsClient) service).findProjects(uuid, btRequest);
     return new BTResponse<>(pageResponse);
   }
 
@@ -142,27 +154,25 @@ public class DigitalObjectsAPIController
   public BTResponse<DigitalObject> findContainedDigitalObjects(
       @PathVariable UUID uuid,
       @RequestParam(name = "offset", required = false, defaultValue = "0") int offset,
-      @RequestParam(name = "limit", required = false, defaultValue = "1") int limit,
+      @RequestParam(name = "limit", required = false, defaultValue = "10") int limit,
       @RequestParam(name = "search", required = false) String searchTerm,
-      @RequestParam(name = "sort", required = false, defaultValue = "label") String sort,
-      @RequestParam(name = "order", required = false, defaultValue = "asc") String order,
+      @RequestParam(name = "sort", required = false, defaultValue = "label") String sortProperty,
+      @RequestParam(name = "order", required = false, defaultValue = "asc") String sortOrder,
       @RequestParam(name = "dataLanguage", required = false) String dataLanguage)
       throws TechnicalException {
-    PageRequest pageRequest =
-        createPageRequest(sort, order, dataLanguage, localeService, offset, limit, searchTerm);
-
-    if ("label".equals(sort)) {
-      if (dataLanguage == null) {
-        dataLanguage = localeService.getDefaultLanguage().getLanguage();
-      }
-      Sorting sorting =
-          Sorting.builder()
-              .order(Order.builder().property("label").subProperty(dataLanguage).build())
-              .build();
-      pageRequest.setSorting(sorting);
-    }
+    BTRequest btRequest =
+        createBTRequest(
+            DigitalObject.class,
+            offset,
+            limit,
+            sortProperty,
+            sortOrder,
+            "label",
+            searchTerm,
+            dataLanguage);
     PageResponse<DigitalObject> pageResponse =
-        service.getAllForParent(DigitalObject.builder().uuid(uuid).build(), pageRequest);
+        ((CudamiDigitalObjectsClient) service)
+            .getAllForParent(DigitalObject.builder().uuid(uuid).build(), btRequest);
     return new BTResponse<>(pageResponse);
   }
 
@@ -170,13 +180,13 @@ public class DigitalObjectsAPIController
   @ResponseBody
   public DigitalObject getByIdentifier(@PathVariable String namespace, @PathVariable String id)
       throws TechnicalException {
-    return service.getByIdentifier(namespace, id);
+    return ((CudamiIdentifiablesClient<DigitalObject>) service).getByIdentifier(namespace, id);
   }
 
   @GetMapping("/api/digitalobjects/{refId:[0-9]+}")
   @ResponseBody
   public DigitalObject getByRefId(@PathVariable long refId) throws TechnicalException {
-    return service.getByRefId(refId);
+    return ((CudamiEntitiesClient<DigitalObject>) service).getByRefId(refId);
   }
 
   @GetMapping("/api/digitalobjects/{uuid:" + ParameterHelper.UUID_PATTERN + "}")

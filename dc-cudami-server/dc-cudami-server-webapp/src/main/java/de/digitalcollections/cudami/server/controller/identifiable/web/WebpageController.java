@@ -14,17 +14,13 @@ import de.digitalcollections.model.list.filtering.FilterCriterion;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.list.sorting.Order;
-import de.digitalcollections.model.list.sorting.Sorting;
 import de.digitalcollections.model.view.BreadcrumbNavigation;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Locale;
-import java.util.Objects;
 import java.util.UUID;
-import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -43,16 +39,11 @@ import org.springframework.web.bind.annotation.RestController;
 public class WebpageController extends AbstractIdentifiableController<Webpage> {
 
   private final LocaleService localeService;
-  private final WebpageService webpageService;
+  private final WebpageService service;
 
   public WebpageController(LocaleService localeService, WebpageService webpageService) {
     this.localeService = localeService;
-    this.webpageService = webpageService;
-  }
-
-  @Override
-  protected IdentifiableService<Webpage> getService() {
-    return webpageService;
+    this.service = webpageService;
   }
 
   @Operation(summary = "Add file resource related to webpage")
@@ -72,11 +63,13 @@ public class WebpageController extends AbstractIdentifiableController<Webpage> {
             + "}/related/fileresources/{fileResourceUuid}"
       })
   @ResponseStatus(value = HttpStatus.OK)
-  public void addRelatedFileResource(@PathVariable UUID uuid, @PathVariable UUID fileResourceUuid) {
-    webpageService.addRelatedFileresource(uuid, fileResourceUuid);
+  public void addRelatedFileResource(@PathVariable UUID uuid, @PathVariable UUID fileResourceUuid)
+      throws ServiceException {
+    service.addRelatedFileresource(
+        buildExampleWithUuid(uuid), FileResource.builder().uuid(fileResourceUuid).build());
   }
 
-  @Operation(summary = "Get all webpages")
+  @Operation(summary = "Get all webpages as (paged, sorted, filtered) list")
   @GetMapping(
       value = {"/v6/webpages"},
       produces = MediaType.APPLICATION_JSON_VALUE)
@@ -84,24 +77,12 @@ public class WebpageController extends AbstractIdentifiableController<Webpage> {
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
-      @RequestParam(name = "label", required = false) String labelTerm,
-      @RequestParam(name = "labelLanguage", required = false) Locale labelLanguage,
-      @RequestParam(name = "publicationStart", required = false)
-          FilterCriterion<LocalDate> publicationStart,
-      @RequestParam(name = "publicationEnd", required = false)
-          FilterCriterion<LocalDate> publicationEnd) {
-    return super.find(
-        pageNumber,
-        pageSize,
-        sortBy,
-        null,
-        labelTerm,
-        labelLanguage,
-        Pair.of("publicationStart", publicationStart),
-        Pair.of("publicationEnd", publicationEnd));
+      @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria)
+      throws ServiceException {
+    return super.find(pageNumber, pageSize, sortBy, filterCriteria);
   }
 
-  @Operation(summary = "Get (active or all) paged children of a webpage as JSON")
+  @Operation(summary = "Get all (active) children of a webpage as (paged, sorted, filtered) list")
   @GetMapping(
       value = {"/v6/webpages/{uuid:" + ParameterHelper.UUID_PATTERN + "}/children"},
       produces = MediaType.APPLICATION_JSON_VALUE)
@@ -115,18 +96,15 @@ public class WebpageController extends AbstractIdentifiableController<Webpage> {
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
-      @RequestParam(name = "active", required = false) String active,
-      @RequestParam(name = "searchTerm", required = false) String searchTerm)
+      @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria,
+      @RequestParam(name = "active", required = false) String active)
       throws ServiceException {
-    PageRequest searchPageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
-    if (sortBy != null) {
-      Sorting sorting = new Sorting(sortBy);
-      searchPageRequest.setSorting(sorting);
-    }
+    PageRequest pageRequest =
+        createPageRequest(Webpage.class, pageNumber, pageSize, sortBy, filterCriteria);
     if (active != null) {
-      return webpageService.findActiveChildren(uuid, searchPageRequest);
+      return service.findActiveChildren(buildExampleWithUuid(uuid), pageRequest);
     }
-    return webpageService.findChildren(uuid, searchPageRequest);
+    return service.findChildren(buildExampleWithUuid(uuid), pageRequest);
   }
 
   @Operation(summary = "Get the breadcrumb for a webpage")
@@ -150,15 +128,17 @@ public class WebpageController extends AbstractIdentifiableController<Webpage> {
               description =
                   "Desired locale, e.g. <tt>de_DE</tt>. If unset, contents in all languages will be returned")
           @RequestParam(name = "pLocale", required = false)
-          Locale pLocale) {
+          Locale pLocale)
+      throws ServiceException {
 
     BreadcrumbNavigation breadcrumbNavigation;
 
     if (pLocale == null) {
-      breadcrumbNavigation = webpageService.getBreadcrumbNavigation(uuid);
+      breadcrumbNavigation = service.getBreadcrumbNavigation(buildExampleWithUuid(uuid));
     } else {
       breadcrumbNavigation =
-          webpageService.getBreadcrumbNavigation(uuid, pLocale, localeService.getDefaultLocale());
+          service.getBreadcrumbNavigation(
+              buildExampleWithUuid(uuid), pLocale, localeService.getDefaultLocale());
     }
 
     if (breadcrumbNavigation == null || breadcrumbNavigation.getNavigationItems().isEmpty()) {
@@ -194,17 +174,19 @@ public class WebpageController extends AbstractIdentifiableController<Webpage> {
           String active)
       throws ServiceException {
     Webpage webpage;
+    Webpage example = buildExampleWithUuid(uuid);
+
     if (active != null) {
       if (pLocale == null) {
-        webpage = webpageService.getActive(uuid);
+        webpage = service.getByExampleAndActive(example);
       } else {
-        webpage = webpageService.getActive(uuid, pLocale);
+        webpage = service.getByExampleAndActiveAndLocale(example, pLocale);
       }
     } else {
       if (pLocale == null) {
-        webpage = webpageService.getByUuid(uuid);
+        webpage = service.getByExample(example);
       } else {
-        webpage = webpageService.getByUuidAndLocale(uuid, pLocale);
+        webpage = service.getByExampleAndLocale(example, pLocale);
       }
     }
     return new ResponseEntity<>(webpage, webpage != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
@@ -227,11 +209,12 @@ public class WebpageController extends AbstractIdentifiableController<Webpage> {
           UUID uuid,
       @Parameter(name = "active", description = "If set, only active children will be returned")
           @RequestParam(name = "active", required = false)
-          String active) {
+          String active)
+      throws ServiceException {
 
     return (active != null)
-        ? webpageService.getActiveChildrenTree(uuid)
-        : webpageService.getChildrenTree(uuid);
+        ? service.getActiveChildrenTree(buildExampleWithUuid(uuid))
+        : service.getChildrenTree(buildExampleWithUuid(uuid));
   }
 
   @Operation(summary = "Get parent of a webpage as JSON")
@@ -251,7 +234,7 @@ public class WebpageController extends AbstractIdentifiableController<Webpage> {
           @PathVariable("uuid")
           UUID uuid)
       throws ServiceException {
-    return webpageService.getParent(uuid);
+    return service.getParent(buildExampleWithUuid(uuid));
   }
 
   @Operation(summary = "Get file resources related to webpage")
@@ -263,8 +246,15 @@ public class WebpageController extends AbstractIdentifiableController<Webpage> {
         "/latest/webpages/{uuid:" + ParameterHelper.UUID_PATTERN + "}/related/fileresources"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public List<FileResource> getRelatedFileResources(@PathVariable UUID uuid) {
-    return webpageService.getRelatedFileResources(uuid);
+  public PageResponse<FileResource> findRelatedFileResources(@PathVariable UUID uuid)
+      throws ServiceException {
+    PageRequest pageRequest = PageRequest.builder().pageNumber(0).pageSize(25).build();
+    return service.findRelatedFileResources(buildExampleWithUuid(uuid), pageRequest);
+  }
+
+  @Override
+  protected IdentifiableService<Webpage> getService() {
+    return service;
   }
 
   @Operation(summary = "Get website of a webpage as JSON")
@@ -284,7 +274,7 @@ public class WebpageController extends AbstractIdentifiableController<Webpage> {
           @PathVariable("uuid")
           UUID uuid)
       throws ServiceException {
-    return webpageService.getWebsite(uuid);
+    return service.getWebsite(buildExampleWithUuid(uuid));
   }
 
   @Operation(summary = "Save a newly created webpage")
@@ -299,7 +289,7 @@ public class WebpageController extends AbstractIdentifiableController<Webpage> {
   public Webpage saveWithParentWebpage(
       @PathVariable UUID parentWebpageUuid, @RequestBody Webpage webpage, BindingResult errors)
       throws ServiceException, ValidationException {
-    return webpageService.saveWithParent(webpage, parentWebpageUuid);
+    return service.saveWithParent(webpage, buildExampleWithUuid(parentWebpageUuid));
   }
 
   @Operation(summary = "Save a newly created top-level webpage")
@@ -314,7 +304,8 @@ public class WebpageController extends AbstractIdentifiableController<Webpage> {
   public Webpage saveWithParentWebsite(
       @PathVariable UUID parentWebsiteUuid, @RequestBody Webpage webpage, BindingResult errors)
       throws ServiceException {
-    return webpageService.saveWithParentWebsite(webpage, parentWebsiteUuid);
+    return service.saveWithParentWebsite(
+        webpage, Website.builder().uuid(parentWebsiteUuid).build());
   }
 
   @Operation(summary = "Update a webpage")
@@ -328,9 +319,7 @@ public class WebpageController extends AbstractIdentifiableController<Webpage> {
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Webpage update(@PathVariable UUID uuid, @RequestBody Webpage webpage, BindingResult errors)
       throws ServiceException, ValidationException {
-    assert Objects.equals(uuid, webpage.getUuid());
-    webpageService.update(webpage);
-    return webpage;
+    return super.update(uuid, webpage, errors);
   }
 
   @Operation(summary = "Update the order of a webpage's children")
@@ -345,8 +334,9 @@ public class WebpageController extends AbstractIdentifiableController<Webpage> {
   public ResponseEntity updateChildrenOrder(
       @Parameter(example = "", description = "UUID of the webpage") @PathVariable("uuid") UUID uuid,
       @Parameter(example = "", description = "List of the children") @RequestBody
-          List<Webpage> rootPages) {
-    boolean successful = webpageService.updateChildrenOrder(uuid, rootPages);
+          List<Webpage> rootPages)
+      throws ServiceException {
+    boolean successful = service.updateChildrenOrder(buildExampleWithUuid(uuid), rootPages);
     return successful
         ? new ResponseEntity<>(HttpStatus.NO_CONTENT)
         : new ResponseEntity<>(HttpStatus.NOT_FOUND);

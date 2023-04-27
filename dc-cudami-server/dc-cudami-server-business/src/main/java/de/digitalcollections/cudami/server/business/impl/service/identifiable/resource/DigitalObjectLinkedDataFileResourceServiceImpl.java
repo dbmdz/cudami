@@ -5,9 +5,9 @@ import de.digitalcollections.cudami.server.backend.api.repository.identifiable.r
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.resource.DigitalObjectLinkedDataFileResourceService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.resource.LinkedDataFileResourceService;
+import de.digitalcollections.model.identifiable.entity.digitalobject.DigitalObject;
 import de.digitalcollections.model.identifiable.resource.LinkedDataFileResource;
 import java.util.List;
-import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -19,8 +19,8 @@ public class DigitalObjectLinkedDataFileResourceServiceImpl
   private static final Logger LOGGER =
       LoggerFactory.getLogger(DigitalObjectLinkedDataFileResourceServiceImpl.class);
 
-  private DigitalObjectLinkedDataFileResourceRepository repository;
   private LinkedDataFileResourceService linkedDataFileResourceService;
+  private DigitalObjectLinkedDataFileResourceRepository repository;
 
   public DigitalObjectLinkedDataFileResourceServiceImpl(
       DigitalObjectLinkedDataFileResourceRepository linkedDataFileResourceRepository,
@@ -30,26 +30,9 @@ public class DigitalObjectLinkedDataFileResourceServiceImpl
   }
 
   @Override
-  public List<LinkedDataFileResource> getLinkedDataFileResources(UUID digitalObjectUuid) {
-    return repository.getLinkedDataFileResources(digitalObjectUuid);
-  }
-
-  @Override
-  public List<LinkedDataFileResource> setLinkedDataFileResources(
-      UUID digitalObjectUuid, List<LinkedDataFileResource> linkedDataFileResources)
-      throws ServiceException {
-    try {
-      return repository.setLinkedDataFileResources(digitalObjectUuid, linkedDataFileResources);
-    } catch (RepositoryException e) {
-      throw new ServiceException(
-          "Cannot set linked data file resources for %s".formatted(digitalObjectUuid), e);
-    }
-  }
-
-  @Override
-  public void deleteLinkedDataFileResources(UUID digitalObjectUuid) throws ServiceException {
+  public void deleteLinkedDataFileResources(DigitalObject digitalObject) throws ServiceException {
     List<LinkedDataFileResource> linkedDataFileResources =
-        getLinkedDataFileResources(digitalObjectUuid);
+        getLinkedDataFileResources(digitalObject);
     if (linkedDataFileResources == null || linkedDataFileResources.isEmpty()) {
       return;
     }
@@ -62,24 +45,46 @@ public class DigitalObjectLinkedDataFileResourceServiceImpl
           throw new ServiceException(
               "Could not delete relation for LinkedDataFileResource="
                   + linkedDataFileResource
-                  + " for DigitalObject with uuid="
-                  + digitalObjectUuid);
+                  + " for DigitalObject="
+                  + digitalObject);
         }
 
         // Delete the resource, when no references exist to it
         if (repository.countDigitalObjectsForResource(linkedDataFileResource.getUuid()) == 0) {
-          linkedDataFileResourceService.delete(linkedDataFileResource.getUuid());
+          linkedDataFileResourceService.delete(linkedDataFileResource);
         }
       } catch (Exception e) {
         throw new ServiceException(
             "Cannot delete LinkedDataFileResource="
                 + linkedDataFileResource
-                + " for DigitalObject with uuid="
-                + digitalObjectUuid
+                + " for DigitalObject="
+                + digitalObject
                 + ": "
                 + e,
             e);
       }
+    }
+  }
+
+  @Override
+  public List<LinkedDataFileResource> getLinkedDataFileResources(DigitalObject digitalObject)
+      throws ServiceException {
+    try {
+      return repository.getLinkedDataFileResources(digitalObject);
+    } catch (RepositoryException e) {
+      throw new ServiceException("Backend failure", e);
+    }
+  }
+
+  @Override
+  public List<LinkedDataFileResource> setLinkedDataFileResources(
+      DigitalObject digitalObject, List<LinkedDataFileResource> linkedDataFileResources)
+      throws ServiceException {
+    try {
+      return repository.setLinkedDataFileResources(digitalObject, linkedDataFileResources);
+    } catch (RepositoryException e) {
+      throw new ServiceException(
+          "Cannot set linked data file resources for %s".formatted(digitalObject), e);
     }
   }
 }

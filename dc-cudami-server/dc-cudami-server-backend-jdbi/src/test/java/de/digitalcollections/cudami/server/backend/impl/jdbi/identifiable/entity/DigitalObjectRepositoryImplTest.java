@@ -3,6 +3,8 @@ package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entit
 import static de.digitalcollections.cudami.server.backend.impl.asserts.CudamiAssertions.assertThat;
 
 import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
+import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
+import de.digitalcollections.cudami.server.backend.api.repository.identifiable.alias.UrlAliasRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.work.ItemRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.AbstractIdentifiableRepositoryImplTest;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.IdentifierRepositoryImpl;
@@ -67,6 +69,9 @@ import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 class DigitalObjectRepositoryImplTest
     extends AbstractIdentifiableRepositoryImplTest<DigitalObjectRepositoryImpl> {
 
+  @Autowired private IdentifierRepository identifierRepository;
+  @Autowired private UrlAliasRepository urlAliasRepository;
+
   @Autowired private CollectionRepositoryImpl collectionRepositoryImpl;
 
   @Autowired private CorporateBodyRepositoryImpl corporateBodyRepositoryImpl;
@@ -102,7 +107,9 @@ class DigitalObjectRepositoryImplTest
 
   @BeforeEach
   public void beforeEach() {
-    repo = new DigitalObjectRepositoryImpl(jdbi, cudamiConfig);
+    repo =
+        new DigitalObjectRepositoryImpl(
+            jdbi, cudamiConfig, identifierRepository, urlAliasRepository);
     repo.setAgentEntityRepository(agentEntityRepositoryImpl);
     repo.setCollectionRepository(collectionRepositoryImpl);
     repo.setCorporateBodyRepository(corporateBodyRepositoryImpl);
@@ -127,14 +134,15 @@ class DigitalObjectRepositoryImplTest
             .label(Locale.ENGLISH, "Corporate Body")
             .build();
     CorporateBodyRepositoryImpl corporateBodyRepository =
-        new CorporateBodyRepositoryImpl(jdbi, cudamiConfig);
+        new CorporateBodyRepositoryImpl(
+            jdbi, cudamiConfig, identifierRepository, urlAliasRepository);
     corporateBodyRepository.save(creator);
 
     // Insert a geolocation with UUID
     GeoLocation creationPlace =
         GeoLocation.builder().uuid(UUID.randomUUID()).label(Locale.GERMAN, "Ort").build();
     GeoLocationRepositoryImpl geoLocationRepository =
-        new GeoLocationRepositoryImpl(jdbi, cudamiConfig);
+        new GeoLocationRepositoryImpl(jdbi, cudamiConfig, identifierRepository, urlAliasRepository);
     geoLocationRepository.save(creationPlace);
 
     // Build a CreationInfo object with the formerly persisted contents
@@ -148,7 +156,8 @@ class DigitalObjectRepositoryImplTest
     DigitalObject parent = DigitalObject.builder().label(Locale.GERMAN, "Parent").build();
     repo.save(parent);
 
-    Tag tag = tagRepository.save(Tag.builder().value("foo").build());
+    Tag tag = Tag.builder().value("foo").build();
+    tagRepository.save(tag);
 
     var noteText = new Text("a note to a digital object");
     var noteContent = new StructuredContent();
@@ -225,7 +234,7 @@ class DigitalObjectRepositoryImplTest
 
   @Test
   @DisplayName("should return properly sized pages on search")
-  void testSearchPageSize() {
+  void testSearchPageSize() throws RepositoryException {
     // Insert a bunch of DigitalObjects with labels
     IntStream.range(0, 20)
         .forEach(
@@ -289,7 +298,9 @@ class DigitalObjectRepositoryImplTest
     PageRequest pageRequest = new PageRequest();
     pageRequest.setFiltering(
         new Filtering(
-            List.of(new FilterCriterion("parent.uuid", FilterOperation.EQUALS, parent.getUuid()))));
+            List.of(
+                new FilterCriterion(
+                    "parent_uuid", true, FilterOperation.EQUALS, parent.getUuid()))));
     PageResponse response = repo.find(pageRequest);
 
     List<DigitalObject> actuals = response.getContent();
@@ -305,26 +316,24 @@ class DigitalObjectRepositoryImplTest
   @Test
   @DisplayName("returns all identifiers for a DigitalObject")
   void returnIdentifiers() throws RepositoryException {
-    // Step1: Create the DigitalObject
+    // Step1: Create and persist a DigitalObject with two identifiers
     DigitalObject digitalObject = DigitalObject.builder().label(Locale.GERMAN, "Label").build();
+    Identifier identifier1 = Identifier.builder().namespace("namespace1").id("1").build();
+    digitalObject.addIdentifier(identifier1);
+    Identifier identifier2 = Identifier.builder().namespace("namespace2").id("2").build();
+    digitalObject.addIdentifier(identifier2);
     repo.save(digitalObject);
 
-    // Step2: Create the identifiers and connect with with the DigitalObject
-    Identifier identifier1 = new Identifier(digitalObject.getUuid(), "namespace1", "1");
-    identifierRepositoryImpl.save(identifier1);
-    Identifier identifier2 = new Identifier(digitalObject.getUuid(), "namespace2", "2");
-    identifierRepositoryImpl.save(identifier2);
-
-    // Step3: Create and persist an identifier for another DigitalObject
+    // Step2: Create and persist an identifier for another DigitalObject
     DigitalObject otherDigitalObject =
         DigitalObject.builder().label(Locale.GERMAN, "Anderes Label").build();
+    otherDigitalObject.addIdentifier(
+        Identifier.builder().namespace("namespace1").id("other").build());
     repo.save(otherDigitalObject);
-    identifierRepositoryImpl.save(
-        new Identifier(otherDigitalObject.getUuid(), "namespace1", "other"));
 
     // Verify, that we get only the two identifiers of the DigitalObject and not the one for the
     // other DigitalObject
-    Identifier demandedIdentifier = new Identifier(null, "namespace1", "1");
+    Identifier demandedIdentifier = Identifier.builder().namespace("namespace1").id("1").build();
     DigitalObject actual = repo.getByIdentifier(demandedIdentifier);
 
     assertThat(actual.getIdentifiers()).containsExactly(identifier1, identifier2);
@@ -332,18 +341,22 @@ class DigitalObjectRepositoryImplTest
 
   @Test
   @DisplayName("can return null, when getByIdentifier finds no DigitalObject")
-  void returnNullByGetByIdentifier() {
-    assertThat(repo.getByIdentifier(new Identifier(null, "namespace", "nonexisting"))).isNull();
+  void returnNullByGetByIdentifier() throws RepositoryException {
+    assertThat(
+            repo.getByIdentifier(
+                Identifier.builder().namespace("namespace").id("nonexisting").build()))
+        .isNull();
   }
 
   @Test
   @DisplayName("returns the partially filled DigitalObject by getByIdentifer")
   void returnGetByIdentifier() throws RepositoryException {
     DigitalObject digitalObject = buildDigitalObject();
+    digitalObject.addIdentifier(Identifier.builder().namespace("namespace").id("key").build());
     repo.save(digitalObject);
-    identifierRepositoryImpl.save(new Identifier(digitalObject.getUuid(), "namespace", "key"));
 
-    DigitalObject actual = repo.getByIdentifier(new Identifier(null, "namespace", "key"));
+    DigitalObject actual =
+        repo.getByIdentifier(Identifier.builder().namespace("namespace").id("key").build());
 
     CreationInfo actualCreationInfo = actual.getCreationInfo();
     assertThat(actualCreationInfo).isNotNull();
@@ -360,7 +373,7 @@ class DigitalObjectRepositoryImplTest
         Item.builder()
             .label(Locale.GERMAN, "Ein Buch")
             .exemplifiesManifestation(false)
-            .identifier("mdz-sig", "Signatur")
+            .identifier(Identifier.builder().namespace("mdz-sig").id("Signatur").build())
             .title(Locale.GERMAN, "Ein Buchtitel")
             .build();
     itemRepository.save(item);
@@ -395,8 +408,11 @@ class DigitalObjectRepositoryImplTest
         .containsAll(List.of(Locale.GERMAN, Locale.ENGLISH, Locale.KOREAN));
   }
 
+  /**
+   * @throws RepositoryException
+   */
   @Test
-  @DisplayName("can update a DigitalObject iwht its directly embedded resources")
+  @DisplayName("can update a DigitalObject with its directly embedded resources")
   void update() throws RepositoryException {
     // Insert a license with uuid
     ensureLicense(EXISTING_LICENSE);
@@ -409,14 +425,15 @@ class DigitalObjectRepositoryImplTest
             .label(Locale.ENGLISH, "Corporate Body")
             .build();
     CorporateBodyRepositoryImpl corporateBodyRepository =
-        new CorporateBodyRepositoryImpl(jdbi, cudamiConfig);
+        new CorporateBodyRepositoryImpl(
+            jdbi, cudamiConfig, identifierRepository, urlAliasRepository);
     corporateBodyRepository.save(creator);
 
     // Insert a geolocation with UUID
     GeoLocation creationPlace =
         GeoLocation.builder().uuid(UUID.randomUUID()).label(Locale.GERMAN, "Ort").build();
     GeoLocationRepositoryImpl geoLocationRepository =
-        new GeoLocationRepositoryImpl(jdbi, cudamiConfig);
+        new GeoLocationRepositoryImpl(jdbi, cudamiConfig, identifierRepository, urlAliasRepository);
     geoLocationRepository.save(creationPlace);
 
     // Build a CreationInfo object with the formerly persisted contents
@@ -430,7 +447,8 @@ class DigitalObjectRepositoryImplTest
     DigitalObject parent = DigitalObject.builder().label(Locale.GERMAN, "Parent").build();
     repo.save(parent);
 
-    Tag tag = tagRepository.save(Tag.builder().value("foo").build());
+    Tag tag = Tag.builder().value("foo").build();
+    tagRepository.save(tag);
 
     DigitalObject digitalObject =
         DigitalObject.builder()
@@ -467,7 +485,7 @@ class DigitalObjectRepositoryImplTest
   }
 
   // -----------------------------------------------------------------
-  private void ensureLicense(License license) {
+  private void ensureLicense(License license) throws RepositoryException {
     if (licenseRepository.getByUuid(license.getUuid()) == null) {
       licenseRepository.save(license);
     }
@@ -485,14 +503,15 @@ class DigitalObjectRepositoryImplTest
             .label(Locale.ENGLISH, "Corporate Body")
             .build();
     CorporateBodyRepositoryImpl corporateBodyRepository =
-        new CorporateBodyRepositoryImpl(jdbi, cudamiConfig);
+        new CorporateBodyRepositoryImpl(
+            jdbi, cudamiConfig, identifierRepository, urlAliasRepository);
     corporateBodyRepository.save(creator);
 
     // Insert a geolocation with UUID
     GeoLocation creationPlace =
         GeoLocation.builder().uuid(UUID.randomUUID()).label(Locale.GERMAN, "Ort").build();
     GeoLocationRepositoryImpl geoLocationRepository =
-        new GeoLocationRepositoryImpl(jdbi, cudamiConfig);
+        new GeoLocationRepositoryImpl(jdbi, cudamiConfig, identifierRepository, urlAliasRepository);
     geoLocationRepository.save(creationPlace);
 
     // Insert a LinkedDataFileResource
@@ -516,7 +535,8 @@ class DigitalObjectRepositoryImplTest
     renderingResource.setFilename("foo.jpg");
     renderingResource.setLabel(new LocalizedText(Locale.GERMAN, "Zeichnung"));
     FileResourceMetadataRepositoryImpl<FileResource> fileResourceMetadataRepository =
-        new FileResourceMetadataRepositoryImpl<FileResource>(jdbi, cudamiConfig);
+        new FileResourceMetadataRepositoryImpl<FileResource>(
+            jdbi, cudamiConfig, identifierRepository, urlAliasRepository);
     fileResourceMetadataRepository.save(renderingResource);
 
     // Build a CreationInfo object with the formerly persisted contents

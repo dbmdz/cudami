@@ -6,6 +6,7 @@ import static org.mockito.Mockito.when;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.DigitalObjectService;
 import de.digitalcollections.cudami.server.controller.BaseControllerTest;
 import de.digitalcollections.model.file.MimeType;
+import de.digitalcollections.model.identifiable.Identifier;
 import de.digitalcollections.model.identifiable.entity.digitalobject.DigitalObject;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
@@ -35,7 +36,12 @@ public class V2DigitalObjectControllerTest extends BaseControllerTest {
                 DigitalObject.builder()
                     .uuid("3d01a4b5-deb9-4d04-a1ee-9f9ac16f510f")
                     .created("2020-09-29T12:06:32.360852")
-                    .identifier("mdz-obj", "bsb00041120", "ec6994d1-c248-4aa6-b5b1-b785cdcaf91d")
+                    .identifier(
+                        Identifier.builder()
+                            .namespace("mdz-obj")
+                            .id("bsb00041120")
+                            .uuid("ec6994d1-c248-4aa6-b5b1-b785cdcaf91d")
+                            .build())
                     .label("08/15 : ein Standard des 20. Jahrhunderts")
                     .lastModified("2020-10-20T14:44:20.995665")
                     .previewImage(

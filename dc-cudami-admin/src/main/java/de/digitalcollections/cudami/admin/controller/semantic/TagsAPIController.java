@@ -1,18 +1,11 @@
 package de.digitalcollections.cudami.admin.controller.semantic;
 
 import de.digitalcollections.cudami.admin.business.api.service.exceptions.ServiceException;
-import de.digitalcollections.cudami.admin.controller.AbstractPagingAndSortingController;
+import de.digitalcollections.cudami.admin.controller.AbstractUniqueObjectController;
 import de.digitalcollections.cudami.admin.controller.ParameterHelper;
 import de.digitalcollections.cudami.admin.model.bootstraptable.BTResponse;
-import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
-import de.digitalcollections.cudami.client.CudamiLocalesClient;
-import de.digitalcollections.cudami.client.semantic.CudamiTagsClient;
 import de.digitalcollections.model.exception.TechnicalException;
-import de.digitalcollections.model.list.filtering.FilterCriterion;
-import de.digitalcollections.model.list.filtering.Filtering;
-import de.digitalcollections.model.list.paging.PageRequest;
-import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.semantic.Tag;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.UUID;
@@ -26,16 +19,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 /** Controller for all public "Tags" endpoints (API). */
 @RestController
-public class TagsAPIController extends AbstractPagingAndSortingController<Tag> {
+public class TagsAPIController extends AbstractUniqueObjectController<Tag> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(TagsAPIController.class);
-  private final CudamiLocalesClient localeService;
-  private final CudamiTagsClient service;
 
-  public TagsAPIController(LanguageSortingHelper languageSortingHelper, CudamiClient client) {
-    super(languageSortingHelper);
-    this.localeService = client.forLocales();
-    this.service = client.forTags();
+  public TagsAPIController(CudamiClient client) {
+    // no "languageService" needed / no multilingual fields
+    super(client.forTags(), null);
   }
 
   @GetMapping("/api/tags/new")
@@ -49,21 +39,13 @@ public class TagsAPIController extends AbstractPagingAndSortingController<Tag> {
   @ResponseBody
   public BTResponse<Tag> find(
       @RequestParam(name = "offset", required = false, defaultValue = "0") int offset,
-      @RequestParam(name = "limit", required = false, defaultValue = "1") int limit,
+      @RequestParam(name = "limit", required = false, defaultValue = "10") int limit,
       @RequestParam(name = "search", required = false) String searchTerm,
-      @RequestParam(name = "sort", required = false, defaultValue = "value") String sort,
-      @RequestParam(name = "order", required = false, defaultValue = "asc") String order)
+      @RequestParam(name = "sort", required = false, defaultValue = "value") String sortProperty,
+      @RequestParam(name = "order", required = false, defaultValue = "asc") String sortOrder)
       throws TechnicalException, ServiceException {
-    PageRequest pageRequest = createPageRequest(offset, limit, sort, order);
-    if (searchTerm != null) {
-      Filtering filtering =
-          Filtering.builder()
-              .add(FilterCriterion.builder().withExpression("value").contains(searchTerm).build())
-              .build();
-      pageRequest.setFiltering(filtering);
-    }
-    PageResponse<Tag> pageResponse = service.find(pageRequest);
-    return new BTResponse<>(pageResponse);
+    // no "dataLanguage" / no multilingual fields
+    return find(Tag.class, offset, limit, sortProperty, sortOrder, "value", searchTerm, null);
   }
 
   @GetMapping("/api/tags/{uuid:" + ParameterHelper.UUID_PATTERN + "}")

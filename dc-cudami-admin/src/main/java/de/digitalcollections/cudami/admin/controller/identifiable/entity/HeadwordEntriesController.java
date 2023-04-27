@@ -1,7 +1,7 @@
 package de.digitalcollections.cudami.admin.controller.identifiable.entity;
 
+import de.digitalcollections.cudami.admin.business.i18n.LanguageService;
 import de.digitalcollections.cudami.admin.controller.ParameterHelper;
-import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
 import de.digitalcollections.cudami.client.identifiable.entity.CudamiHeadwordEntriesClient;
 import de.digitalcollections.model.exception.ResourceNotFoundException;
@@ -27,14 +27,13 @@ public class HeadwordEntriesController
 
   private static final Logger LOGGER = LoggerFactory.getLogger(HeadwordEntriesController.class);
 
-  public HeadwordEntriesController(
-      LanguageSortingHelper languageSortingHelper, CudamiClient client) {
-    super(client.forHeadwordEntries(), languageSortingHelper, client.forLocales());
+  public HeadwordEntriesController(CudamiClient client, LanguageService languageService) {
+    super(client.forHeadwordEntries(), languageService);
   }
 
   @GetMapping("/headwordentries/new")
   public String create(Model model) throws TechnicalException {
-    model.addAttribute("activeLanguage", localeService.getDefaultLanguage());
+    model.addAttribute("activeLanguage", languageService.getDefaultLanguage());
     return "headwordentries/create";
   }
 
@@ -47,7 +46,7 @@ public class HeadwordEntriesController
     final Locale displayLocale = LocaleContextHolder.getLocale();
     HeadwordEntry headwordEntry = service.getByUuid(uuid);
     List<Locale> existingLanguages =
-        languageSortingHelper.sortLanguages(displayLocale, headwordEntry.getLabel().getLocales());
+        languageService.sortLanguages(displayLocale, headwordEntry.getLabel().getLocales());
 
     if (activeLanguage != null && existingLanguages.contains(activeLanguage)) {
       model.addAttribute("activeLanguage", activeLanguage);
@@ -64,7 +63,7 @@ public class HeadwordEntriesController
   public String list(Model model) throws TechnicalException {
     model.addAttribute("existingLanguages", getExistingLanguagesFromService());
 
-    String dataLanguage = getDataLanguage(null, localeService);
+    String dataLanguage = getDataLanguage(null, languageService);
     model.addAttribute("dataLanguage", dataLanguage);
 
     return "headwordentries/list";
@@ -88,7 +87,7 @@ public class HeadwordEntriesController
     model.addAttribute("headwordEntry", headwordEntry);
 
     List<Locale> existingLanguages = getExistingLanguagesFromIdentifiable(headwordEntry);
-    String dataLanguage = getDataLanguage(targetDataLanguage, localeService);
+    String dataLanguage = getDataLanguage(targetDataLanguage, languageService);
     model
         .addAttribute("existingLanguages", existingLanguages)
         .addAttribute("dataLanguage", dataLanguage);

@@ -16,11 +16,9 @@
         <div class="container-fluid">
           <div id="content-header">
             <div class="row">
-              <div class="col-sm-6">
+              <div class="col d-flex justify-content-between">
                 <h1 th:text="#{collection}">Collection</h1>
-              </div>
-              <div class="col-sm-6">
-                <div class="float-right">
+                <div>
                   <a class="btn btn-primary" id="edit-button" th:href="@{*{uuid} + '/edit'}" th:text="#{edit}">edit</a>
                 </div>
               </div>
@@ -222,7 +220,7 @@
                           data-formatter="formatLabelDigitalObjects"
                           th:text="#{lbl.label}">Label</th>
                       <th data-field="identifiers" data-sortable="false"
-                          data-formatter="renderIdentifiers" th:text="#{identifiers}">Identifiers</th>
+                          data-formatter="renderIdentifiers" th:text="#{lbl.identifiers}">Identifiers</th>
                       <th data-field="lastModified" data-formatter="renderDateTime"
                           th:text="#{lbl.last_modified}">last modified</th>
                       <th data-field="created" data-formatter="renderDateTime"
@@ -278,6 +276,26 @@
 
       <script type="text/javascript" th:inline="javascript">
         /*<![CDATA[*/
+        $('#table-digitalobjects').bootstrapTable({
+          formatSearch: function () {
+            /*[+
+             let columnName = [[#{lbl.label}]];
+             let placeholder = `[(#{placeholder.search})]`;
+             +]*/
+            return placeholder;
+          }
+        });
+
+        $('#table-sub-collections').bootstrapTable({
+          formatSearch: function () {
+            /*[+
+             let columnName = [[#{lbl.label}]];
+             let placeholder = `[(#{placeholder.search})]`;
+             +]*/
+            return placeholder;
+          }
+        });
+
         function addDigitalObjects() {
           /*[+
            const errorMessage = [[#{error.technical_error}]];

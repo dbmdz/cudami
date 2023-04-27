@@ -1,12 +1,14 @@
 package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.geo.location;
 
 import de.digitalcollections.cudami.model.config.CudamiConfig;
+import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
+import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
+import de.digitalcollections.cudami.server.backend.api.repository.identifiable.alias.UrlAliasRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.geo.location.HumanSettlementRepository;
 import de.digitalcollections.model.identifiable.entity.geo.location.HumanSettlement;
 import org.jdbi.v3.core.Jdbi;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -19,20 +21,36 @@ public class HumanSettlementRepositoryImpl extends GeoLocationRepositoryImpl<Hum
   public static final String TABLE_ALIAS = "h";
   public static final String TABLE_NAME = "humansettlements";
 
+  public HumanSettlementRepositoryImpl(
+      Jdbi dbi,
+      CudamiConfig cudamiConfig,
+      IdentifierRepository identifierRepository,
+      UrlAliasRepository urlAliasRepository) {
+    super(
+        dbi,
+        TABLE_NAME,
+        TABLE_ALIAS,
+        MAPPING_PREFIX,
+        HumanSettlement.class,
+        cudamiConfig.getOffsetForAlternativePaging(),
+        identifierRepository,
+        urlAliasRepository);
+  }
+
   @Override
-  public String getSqlInsertFields() {
+  public HumanSettlement create() throws RepositoryException {
+    return new HumanSettlement();
+  }
+
+  @Override
+  protected String getSqlInsertFields() {
     return super.getSqlInsertFields() + ", settlement_type";
   }
 
   /* Do not change order! Must match order in getSqlInsertFields!!! */
   @Override
-  public String getSqlInsertValues() {
+  protected String getSqlInsertValues() {
     return super.getSqlInsertValues() + ", :humanSettlementType";
-  }
-
-  @Override
-  public String getSqlSelectAllFields(String tableAlias, String mappingPrefix) {
-    return getSqlSelectReducedFields();
   }
 
   @Override
@@ -46,18 +64,7 @@ public class HumanSettlementRepositoryImpl extends GeoLocationRepositoryImpl<Hum
   }
 
   @Override
-  public String getSqlUpdateFieldValues() {
+  protected String getSqlUpdateFieldValues() {
     return super.getSqlUpdateFieldValues() + ", settlement_type=:humanSettlementType";
-  }
-
-  @Autowired
-  public HumanSettlementRepositoryImpl(Jdbi dbi, CudamiConfig cudamiConfig) {
-    super(
-        dbi,
-        TABLE_NAME,
-        TABLE_ALIAS,
-        MAPPING_PREFIX,
-        HumanSettlement.class,
-        cudamiConfig.getOffsetForAlternativePaging());
   }
 }

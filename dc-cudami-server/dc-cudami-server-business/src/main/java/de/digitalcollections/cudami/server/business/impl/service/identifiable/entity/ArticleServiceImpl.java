@@ -1,6 +1,7 @@
 package de.digitalcollections.cudami.server.business.impl.service.identifiable.entity;
 
 import de.digitalcollections.cudami.model.config.CudamiConfig;
+import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.ArticleRepository;
 import de.digitalcollections.cudami.server.business.api.service.LocaleService;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
@@ -13,7 +14,6 @@ import de.digitalcollections.model.identifiable.entity.agent.Agent;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -42,8 +42,8 @@ public class ArticleServiceImpl extends EntityServiceImpl<Article> implements Ar
   }
 
   @Override
-  public Article getByUuidAndLocale(UUID uuid, Locale locale) throws ServiceException {
-    Article article = super.getByUuidAndLocale(uuid, locale);
+  public Article getByExampleAndLocale(Article example, Locale locale) throws ServiceException {
+    Article article = super.getByExampleAndLocale(example, locale);
     if (article == null) {
       return null;
     }
@@ -56,7 +56,11 @@ public class ArticleServiceImpl extends EntityServiceImpl<Article> implements Ar
   }
 
   @Override
-  public List<Agent> getCreators(UUID articleUuid) {
-    return ((ArticleRepository) repository).getCreators(articleUuid);
+  public List<Agent> getCreators(Article article) throws ServiceException {
+    try {
+      return ((ArticleRepository) repository).getCreators(article);
+    } catch (RepositoryException e) {
+      throw new ServiceException("Backend failure", e);
+    }
   }
 }

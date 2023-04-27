@@ -1,21 +1,24 @@
 package de.digitalcollections.cudami.server.controller.security;
 
+import de.digitalcollections.cudami.server.business.api.service.UniqueObjectService;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.security.UserService;
+import de.digitalcollections.cudami.server.controller.AbstractUniqueObjectController;
 import de.digitalcollections.cudami.server.controller.ParameterHelper;
-import de.digitalcollections.model.list.paging.PageRequest;
+import de.digitalcollections.model.list.filtering.FilterCriterion;
 import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.list.sorting.Order;
-import de.digitalcollections.model.list.sorting.Sorting;
 import de.digitalcollections.model.security.Role;
 import de.digitalcollections.model.security.User;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
-import java.util.Objects;
 import java.util.UUID;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -27,15 +30,15 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @Tag(name = "User controller")
-public class UserController {
+public class UserController extends AbstractUniqueObjectController<User> {
 
-  private final UserService userService;
+  private final UserService service;
 
   public UserController(UserService userService) {
-    this.userService = userService;
+    this.service = userService;
   }
 
-  @Operation(summary = "Get all users")
+  @Operation(summary = "Get all users as (paged, sorted, filtered) list")
   @GetMapping(
       value = {"/v6/users"},
       produces = MediaType.APPLICATION_JSON_VALUE)
@@ -43,13 +46,9 @@ public class UserController {
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
-      @RequestParam(name = "searchTerm", required = false) String searchTerm) {
-    PageRequest pageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
-    if (sortBy != null) {
-      Sorting sorting = new Sorting(sortBy);
-      pageRequest.setSorting(sorting);
-    }
-    return userService.find(pageRequest);
+      @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria)
+      throws ServiceException {
+    return super.find(pageNumber, pageSize, sortBy, filterCriteria);
   }
 
   @Operation(summary = "Get all users with given role and enabled status")
@@ -58,9 +57,10 @@ public class UserController {
       params = {"role", "enabled"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public List<User> getByRoleAndStatus(
-      @RequestParam(name = "role") Role role, @RequestParam(name = "enabled") boolean enabled) {
+      @RequestParam(name = "role") Role role, @RequestParam(name = "enabled") boolean enabled)
+      throws ServiceException {
     // FIXME: ignores role, just returns admins? what if we want other role users?
-    return userService.getActiveAdminUsers();
+    return service.getActiveAdminUsers();
   }
 
   @Operation(summary = "Get user by email address")
@@ -68,8 +68,9 @@ public class UserController {
       value = {"/v6/users", "/v5/users", "/v2/users", "/latest/users"},
       params = {"email"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<User> getByUsername(@RequestParam(name = "email") String email) {
-    User result = userService.getByUsername(email);
+  public ResponseEntity<User> getByUsername(@RequestParam(name = "email") String email)
+      throws UsernameNotFoundException, ServiceException {
+    User result = service.getByUsername(email);
     return new ResponseEntity<>(result, result != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
   }
 
@@ -82,17 +83,22 @@ public class UserController {
         "/latest/users/{uuid:" + ParameterHelper.UUID_PATTERN + "}"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<User> getByUuid(@PathVariable UUID uuid) {
-    User result = userService.getByUuid(uuid);
-    return new ResponseEntity<>(result, result != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
+  public ResponseEntity<User> getByUuid(@PathVariable UUID uuid) throws ServiceException {
+    return super.getByUuid(uuid);
+  }
+
+  @Override
+  protected UniqueObjectService<User> getService() {
+    return service;
   }
 
   @Operation(summary = "Save a newly created user")
   @PostMapping(
       value = {"/v6/users", "/v5/users", "/v2/users", "/latest/users"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public User save(@RequestBody User user, BindingResult errors) {
-    return userService.save(user, errors);
+  public User save(@RequestBody User user, BindingResult errors)
+      throws ServiceException, ValidationException {
+    return super.save(user, errors);
   }
 
   @Operation(summary = "Update a user")
@@ -104,8 +110,8 @@ public class UserController {
         "/latest/users/{uuid:" + ParameterHelper.UUID_PATTERN + "}"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public User update(@PathVariable UUID uuid, @RequestBody User user, BindingResult errors) {
-    assert Objects.equals(uuid, user.getUuid());
-    return userService.update(user, errors);
+  public User update(@PathVariable UUID uuid, @RequestBody User user, BindingResult errors)
+      throws ServiceException, ValidationException {
+    return super.update(uuid, user, errors);
   }
 }

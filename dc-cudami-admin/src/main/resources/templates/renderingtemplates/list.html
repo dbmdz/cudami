@@ -5,7 +5,7 @@
       xmlns:data="https://github.com/mxab/thymeleaf-extras-data-attribute"
       layout:decorate="~{base}">
   <head>
-    <title th:text="#{rendering_templates}">Rendering templates</title>
+    <title th:text="#{page.title.rendering_templates}">Design templates</title>
   </head>
   <body>
   <th:block layout:fragment="content">
@@ -14,7 +14,7 @@
 
         <div class="row">
           <div class="col">
-            <h1 th:text="#{page.title.rendering_templates}">Rendering templates</h1>
+            <h1 th:text="#{page.title.rendering_templates}">Design templates</h1>
             <hr>
           </div>
         </div>
@@ -96,6 +96,16 @@
 
     <script type="text/javascript" th:inline="javascript">
       /*<![CDATA[*/
+      $('#table-rendering_templates').bootstrapTable({
+          formatSearch: function () {
+            /*[+
+             let columnName = [[#{lbl.name}]];
+             let placeholder = `[(#{placeholder.search})]`;
+             +]*/
+            return placeholder;
+          }
+        });
+        
       function buttonsRenderingTemplates() {
         /*[+
          const baseUrl = [[@{'/renderingtemplates'}]];

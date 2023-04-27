@@ -1,8 +1,11 @@
 package de.digitalcollections.cudami.server.backend.api.repository.identifiable.alias;
 
+import de.digitalcollections.cudami.server.backend.api.repository.UniqueObjectRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
+import de.digitalcollections.model.identifiable.Identifiable;
 import de.digitalcollections.model.identifiable.alias.LocalizedUrlAliases;
 import de.digitalcollections.model.identifiable.alias.UrlAlias;
+import de.digitalcollections.model.identifiable.entity.Website;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import java.util.Collection;
@@ -12,26 +15,7 @@ import java.util.Locale;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-public interface UrlAliasRepository {
-
-  /**
-   * Filter the locales by their script and return only those with
-   *
-   * <ul>
-   *   <li>"" (no script)
-   *   <li>"Latn"
-   * </ul>
-   *
-   * @param locales
-   * @return
-   */
-  public static List<Locale> grabLocalesByScript(Collection<Locale> locales) {
-    if (locales == null) return Collections.emptyList();
-    List<String> scripts = List.of("", "Latn");
-    return locales.stream()
-        .filter(l -> l != null && scripts.contains(l.getScript()))
-        .collect(Collectors.toList());
-  }
+public interface UrlAliasRepository extends UniqueObjectRepository<UrlAlias> {
 
   /**
    * Returns the language of the passed locale w/o anything else e.g. country or script.
@@ -59,31 +43,33 @@ public interface UrlAliasRepository {
   }
 
   /**
-   * Remove the entries with the provided UUIDs (PK).
+   * Filter the locales by their script and return only those with
    *
-   * @param urlAliasUuids List of aliases' UUIDs to remove
-   * @return count of removed datasets
-   * @throws RepositoryException
+   * <ul>
+   *   <li>"" (no script)
+   *   <li>"Latn"
+   * </ul>
+   *
+   * @param locales
+   * @return
    */
-  int delete(List<UUID> urlAliasUuids) throws RepositoryException;
+  public static List<Locale> grabLocalesByScript(Collection<Locale> locales) {
+    if (locales == null) return Collections.emptyList();
+    List<String> scripts = List.of("", "Latn");
+    return locales.stream()
+        .filter(l -> l != null && scripts.contains(l.getScript()))
+        .collect(Collectors.toList());
+  }
 
-  /**
-   * Generic request method for getting a parametrized list.
-   *
-   * @param pageRequest request params for list
-   * @return pagable result list
-   * @throws RepositoryException
-   */
-  PageResponse<LocalizedUrlAliases> find(PageRequest pageRequest) throws RepositoryException;
+  default boolean deleteByIdentifiable(Identifiable identifiable, boolean force)
+      throws RepositoryException {
+    if (identifiable == null) {
+      throw new IllegalArgumentException("delete failed: given object must not be null");
+    }
+    return deleteByIdentifiable(identifiable.getUuid(), force);
+  }
 
-  /**
-   * Retrieve all slugs of a link target.
-   *
-   * @param uuid the target's (Webpage, Collection,...) UUID
-   * @return {@code LocalizedUrlAliases} containing all {@code UrlAlias} objects for that target
-   * @throws RepositoryException
-   */
-  LocalizedUrlAliases getAllForTarget(UUID uuid) throws RepositoryException;
+  boolean deleteByIdentifiable(UUID identifiableUuid, boolean force) throws RepositoryException;
 
   /**
    * Retrieve all primary links corresponding to a slug. The owning website is ignored.
@@ -93,6 +79,16 @@ public interface UrlAliasRepository {
    * @throws RepositoryException
    */
   LocalizedUrlAliases findAllPrimaryLinks(String slug) throws RepositoryException;
+
+  /**
+   * Generic request method for getting a parametrized list.
+   *
+   * @param pageRequest request params for list
+   * @return pagable result list
+   * @throws RepositoryException
+   */
+  PageResponse<LocalizedUrlAliases> findLocalizedUrlAliases(PageRequest pageRequest)
+      throws RepositoryException;
 
   /**
    * Retrieve the primary links corresponding to a slug and the target's language.
@@ -105,6 +101,14 @@ public interface UrlAliasRepository {
   default LocalizedUrlAliases findPrimaryLinksForWebsite(UUID websiteUuid, String slug)
       throws RepositoryException {
     return findPrimaryLinksForWebsite(websiteUuid, slug, true);
+  }
+
+  default LocalizedUrlAliases findPrimaryLinksForWebsite(Website website, String slug)
+      throws RepositoryException {
+    if (website == null) {
+      throw new IllegalArgumentException("find failed: given object must not be null");
+    }
+    return findPrimaryLinksForWebsite(website.getUuid(), slug, true);
   }
 
   /**
@@ -120,14 +124,31 @@ public interface UrlAliasRepository {
   LocalizedUrlAliases findPrimaryLinksForWebsite(
       UUID websiteUuid, String slug, boolean considerLanguage) throws RepositoryException;
 
+  default LocalizedUrlAliases findPrimaryLinksForWebsite(
+      Website website, String slug, boolean considerLanguage) throws RepositoryException {
+    UUID websiteUuid = null;
+    if (website != null) {
+      websiteUuid = website.getUuid();
+    }
+    return findPrimaryLinksForWebsite(websiteUuid, slug, considerLanguage);
+  }
+
+  default LocalizedUrlAliases getByIdentifiable(Identifiable identifiable)
+      throws RepositoryException {
+    if (identifiable == null) {
+      throw new IllegalArgumentException("get failed: given object must not be null");
+    }
+    return getByIdentifiable(identifiable.getUuid());
+  }
+
   /**
-   * Retrieve the {@code UrlAlias} with the supplied UUID (PK).
+   * Retrieve all slugs of a link target.
    *
-   * @param uuid UUID of url alias
-   * @return the found {@code UrlAlias} or {@code null}
+   * @param uuid the target's (Webpage, Collection,...) UUID
+   * @return {@code LocalizedUrlAliases} containing all {@code UrlAlias} objects for that target
    * @throws RepositoryException
    */
-  UrlAlias getByUuid(UUID uuid) throws RepositoryException;
+  LocalizedUrlAliases getByIdentifiable(UUID uuid) throws RepositoryException;
 
   /**
    * Check whether an entry exists for the passed website UUID, slug and language.
@@ -141,19 +162,11 @@ public interface UrlAliasRepository {
   boolean hasUrlAlias(String slug, UUID websiteUuid, Locale targetLanguage)
       throws RepositoryException;
 
-  /**
-   * Save an {@code UrlAlias} object.
-   *
-   * @param urlAlias the object to save
-   * @throws RepositoryException
-   */
-  void save(UrlAlias urlAlias) throws RepositoryException;
-
-  /**
-   * Update an existing object.
-   *
-   * @param urlAlias the existing object with changed properties
-   * @throws RepositoryException
-   */
-  void update(UrlAlias urlAlias) throws RepositoryException;
+  default boolean hasUrlAlias(String slug, Website website, Locale targetLanguage)
+      throws RepositoryException {
+    if (website == null) {
+      return hasUrlAlias(slug, (UUID) null, targetLanguage);
+    }
+    return hasUrlAlias(slug, website.getUuid(), targetLanguage);
+  }
 }

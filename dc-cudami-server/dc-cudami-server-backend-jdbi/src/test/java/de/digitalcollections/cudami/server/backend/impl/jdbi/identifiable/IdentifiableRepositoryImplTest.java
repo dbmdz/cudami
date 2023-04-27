@@ -1,21 +1,26 @@
 package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable;
 
 import static de.digitalcollections.cudami.server.backend.impl.asserts.CudamiAssertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
-import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.semantic.SubjectRepository;
+import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
+import de.digitalcollections.cudami.server.backend.api.repository.identifiable.alias.UrlAliasRepository;
+import de.digitalcollections.cudami.server.backend.api.repository.identifiable.semantic.SubjectRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.AbstractIdentifiableRepositoryImplTest;
 import de.digitalcollections.model.identifiable.Identifiable;
 import de.digitalcollections.model.identifiable.IdentifiableObjectType;
 import de.digitalcollections.model.identifiable.IdentifiableType;
 import de.digitalcollections.model.identifiable.Identifier;
+import de.digitalcollections.model.identifiable.alias.LocalizedUrlAliases;
+import de.digitalcollections.model.identifiable.alias.UrlAlias;
 import de.digitalcollections.model.identifiable.entity.digitalobject.DigitalObject;
+import de.digitalcollections.model.identifiable.semantic.Subject;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.list.sorting.Direction;
 import de.digitalcollections.model.list.sorting.Order;
 import de.digitalcollections.model.list.sorting.Sorting;
-import de.digitalcollections.model.semantic.Subject;
 import de.digitalcollections.model.text.LocalizedStructuredContent;
 import de.digitalcollections.model.text.LocalizedText;
 import de.digitalcollections.model.text.StructuredContent;
@@ -23,6 +28,7 @@ import de.digitalcollections.model.text.contentblock.Paragraph;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.IntStream;
 import org.junit.jupiter.api.BeforeEach;
@@ -37,11 +43,15 @@ import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 class IdentifiableRepositoryImplTest
     extends AbstractIdentifiableRepositoryImplTest<IdentifiableRepositoryImpl> {
 
-  @Autowired SubjectRepository subjectRepository;
+  @Autowired private SubjectRepository subjectRepository;
+  @Autowired private IdentifierRepository identifierRepository;
+  @Autowired private UrlAliasRepository urlAliasRepository;
 
   @BeforeEach
   public void beforeEach() {
-    repo = new IdentifiableRepositoryImpl(jdbi, cudamiConfig);
+    repo =
+        new IdentifiableRepositoryImpl(
+            jdbi, cudamiConfig, identifierRepository, urlAliasRepository);
   }
 
   private DigitalObject createDigitalObjectWithLabels(String label) {
@@ -60,8 +70,39 @@ class IdentifiableRepositoryImplTest
     return digitalObject;
   }
 
+  @DisplayName("deletes UrlAliases, too")
   @Test
-  @DisplayName("retrieve one digital object")
+  public void deleteIncludesUrlAliases() throws Exception {
+    Identifiable identifiable1 = createIdentifiable();
+    LocalizedUrlAliases localizedUrlAliases = new LocalizedUrlAliases();
+    UrlAlias urlAlias = new UrlAlias();
+    urlAlias.setPrimary(true);
+    urlAlias.setSlug("label1");
+    urlAlias.setTarget(identifiable1);
+    localizedUrlAliases.add(urlAlias);
+    identifiable1.setLocalizedUrlAliases(localizedUrlAliases);
+
+    Identifiable identifiable2 = createIdentifiable();
+    LocalizedUrlAliases localizedUrlAliases2 = new LocalizedUrlAliases();
+    UrlAlias urlAlias2 = new UrlAlias();
+    urlAlias.setPrimary(true);
+    urlAlias.setSlug("label2");
+    urlAlias.setTarget(identifiable2);
+    localizedUrlAliases2.add(urlAlias2);
+    identifiable2.setLocalizedUrlAliases(localizedUrlAliases2);
+
+    Set<Identifiable> identifiables = Set.of(identifiable1, identifiable2);
+    repo.save(identifiable1);
+    repo.save(identifiable2);
+
+    repo.delete(identifiables);
+
+    assertThat(urlAliasRepository.getByIdentifiable(identifiable1)).isNullOrEmpty();
+    assertThat(urlAliasRepository.getByIdentifiable(identifiable2)).isNullOrEmpty();
+  }
+
+  @Test
+  @DisplayName("retrieve one identifiable")
   void testGetByUuid() throws RepositoryException {
     Identifiable identifiable = new Identifiable();
     identifiable.setUuid(UUID.randomUUID());
@@ -70,10 +111,10 @@ class IdentifiableRepositoryImplTest
     identifiable.setLabel("test");
     identifiable.setLastModified(LocalDateTime.now());
 
-    this.repo.save(identifiable);
+    repo.save(identifiable);
 
-    Identifiable actual = (Identifiable) this.repo.getByUuid(identifiable.getUuid());
-    assertThat(actual).isEqualTo(identifiable);
+    Identifiable actual = (Identifiable) repo.getByUuid(identifiable.getUuid());
+    assertThat(actual.equals(identifiable));
   }
 
   @Test
@@ -129,7 +170,7 @@ class IdentifiableRepositoryImplTest
         Subject.builder()
             .label(new LocalizedText(Locale.ENGLISH, "My first subject"))
             .identifier(Identifier.builder().namespace("test").id("12345").build())
-            .type("SUBJECT_TYPE")
+            .subjectType("SUBJECT_TYPE")
             .build();
     subjectRepository.save(subject);
 
@@ -172,7 +213,8 @@ class IdentifiableRepositoryImplTest
     repo.update(identifiable);
     LocalDateTime timestampAfterUpdate = LocalDateTime.now();
 
-    // The last modified timestamp must be modified and must be between the time before and
+    // The last modified timestamp must be modified and must be between the time
+    // before and
     // after the uodate
     assertThat(identifiable.getLastModified()).isAfter(timestampBeforeUpdate);
     assertThat(identifiable.getLastModified()).isBefore(timestampAfterUpdate);
@@ -191,7 +233,7 @@ class IdentifiableRepositoryImplTest
 
   @Test
   @DisplayName("returns properly sized pages on search")
-  void testSearchPageSize() {
+  void testSearchPageSize() throws RepositoryException {
     // Insert a bunch of DigitalObjects with labels
     IntStream.range(0, 20)
         .forEach(

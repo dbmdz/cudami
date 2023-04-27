@@ -6,13 +6,13 @@ import static org.mockito.Mockito.when;
 import de.digitalcollections.cudami.server.business.api.service.LocaleService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.CollectionService;
 import de.digitalcollections.cudami.server.controller.BaseControllerTest;
+import de.digitalcollections.model.identifiable.Identifier;
 import de.digitalcollections.model.identifiable.entity.Collection;
 import de.digitalcollections.model.identifiable.entity.digitalobject.DigitalObject;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import java.util.List;
 import java.util.Locale;
-import java.util.UUID;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -78,7 +78,11 @@ class V5CollectionControllerTest extends BaseControllerTest {
                             .uuid("dde78cea-985b-4863-a782-1233978db71a")
                             .label(Locale.GERMAN, "Testdigitalisat")
                             .identifier(
-                                "mdz-obj", "bsb12345678", "73724e05-4972-436c-a8ba-79240f675b46")
+                                Identifier.builder()
+                                    .namespace("mdz-obj")
+                                    .id("bsb12345678")
+                                    .uuid("73724e05-4972-436c-a8ba-79240f675b46")
+                                    .build())
                             .refId(529)
                             .build()))
                 .build();
@@ -115,7 +119,7 @@ class V5CollectionControllerTest extends BaseControllerTest {
                             .build()))
                 .build();
 
-    when(collectionService.findChildren(any(UUID.class), any(PageRequest.class)))
+    when(collectionService.findChildren(any(Collection.class), any(PageRequest.class)))
         .thenReturn(expected);
 
     testJson(path, "/v5/collections/find_with_result.json");

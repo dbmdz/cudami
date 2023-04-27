@@ -1,7 +1,7 @@
 package de.digitalcollections.cudami.admin.controller.identifiable.entity;
 
+import de.digitalcollections.cudami.admin.business.i18n.LanguageService;
 import de.digitalcollections.cudami.admin.controller.ParameterHelper;
-import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
 import de.digitalcollections.cudami.client.identifiable.entity.CudamiProjectsClient;
 import de.digitalcollections.model.exception.ResourceNotFoundException;
@@ -26,13 +26,13 @@ public class ProjectsController extends AbstractEntitiesController<Project, Cuda
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ProjectsController.class);
 
-  public ProjectsController(LanguageSortingHelper languageSortingHelper, CudamiClient client) {
-    super(client.forProjects(), languageSortingHelper, client.forLocales());
+  public ProjectsController(CudamiClient client, LanguageService languageService) {
+    super(client.forProjects(), languageService);
   }
 
   @GetMapping("/projects/new")
   public String create(Model model) throws TechnicalException {
-    model.addAttribute("activeLanguage", localeService.getDefaultLanguage());
+    model.addAttribute("activeLanguage", languageService.getDefaultLanguage());
     return "projects/create";
   }
 
@@ -45,7 +45,7 @@ public class ProjectsController extends AbstractEntitiesController<Project, Cuda
     final Locale displayLocale = LocaleContextHolder.getLocale();
     Project project = service.getByUuid(uuid);
     List<Locale> existingLanguages =
-        languageSortingHelper.sortLanguages(displayLocale, project.getLabel().getLocales());
+        languageService.sortLanguages(displayLocale, project.getLabel().getLocales());
 
     if (activeLanguage != null && existingLanguages.contains(activeLanguage)) {
       model.addAttribute("activeLanguage", activeLanguage);
@@ -62,7 +62,7 @@ public class ProjectsController extends AbstractEntitiesController<Project, Cuda
   public String list(Model model) throws TechnicalException {
     model.addAttribute("existingLanguages", getExistingLanguagesFromService());
 
-    String dataLanguage = getDataLanguage(null, localeService);
+    String dataLanguage = getDataLanguage(null, languageService);
     model.addAttribute("dataLanguage", dataLanguage);
 
     return "projects/list";
@@ -86,7 +86,7 @@ public class ProjectsController extends AbstractEntitiesController<Project, Cuda
     model.addAttribute("project", project);
 
     List<Locale> existingLanguages = getExistingLanguagesFromIdentifiable(project);
-    String dataLanguage = getDataLanguage(targetDataLanguage, localeService);
+    String dataLanguage = getDataLanguage(targetDataLanguage, languageService);
     model
         .addAttribute("existingLanguages", existingLanguages)
         .addAttribute("dataLanguage", dataLanguage);

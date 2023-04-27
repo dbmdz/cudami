@@ -11,6 +11,7 @@ import de.digitalcollections.model.identifiable.alias.LocalizedUrlAliases;
 import de.digitalcollections.model.identifiable.alias.UrlAlias;
 import de.digitalcollections.model.identifiable.entity.Website;
 import de.digitalcollections.model.identifiable.web.Webpage;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -126,10 +127,12 @@ public class IdentifiableUrlAliasAlignHelper<I extends Identifiable> {
         actualIdentifiable.setLocalizedUrlAliases(new LocalizedUrlAliases());
       }
       for (UrlAlias primaryFromDb : primariesFromDb) {
+        // TODO: do not work with UUID in business layer
         final UUID websiteUuid =
             primaryFromDb.getWebsite() != null ? primaryFromDb.getWebsite().getUuid() : null;
         String newSlug =
-            slugGeneratorService.apply(langFromDbForAlias, labelInIdentifiable, websiteUuid);
+            slugGeneratorService.apply(
+                langFromDbForAlias, labelInIdentifiable, primaryFromDb.getWebsite());
         // if this slug already exists in the identifiable then we must silently go on, otherwise we
         // will add it
         if (actualIdentifiable.getLocalizedUrlAliases().flatten().stream()
@@ -145,10 +148,9 @@ public class IdentifiableUrlAliasAlignHelper<I extends Identifiable> {
         }
         UrlAlias newAlias = new UrlAlias();
         newAlias.setSlug(newSlug);
-        newAlias.setTargetIdentifiableType(actualIdentifiable.getType());
+        // FIXME: Remove target from UrlAlias
+        newAlias.setTarget(reduceToBasicIdentifiable(actualIdentifiable));
         newAlias.setTargetLanguage(langFromDbForAlias);
-        newAlias.setTargetUuid(actualIdentifiable.getUuid());
-        newAlias.setTargetIdentifiableObjectType(actualIdentifiable.getIdentifiableObjectType());
         if (websiteUuid != null) {
           Website ws = new Website();
           ws.setUuid(websiteUuid);
@@ -200,10 +202,9 @@ public class IdentifiableUrlAliasAlignHelper<I extends Identifiable> {
       // if there is not any label of the supported scripts then an alias is made of the UUID
       Locale urlAliasLang = new Locale("und");
       UrlAlias alias = new UrlAlias();
-      alias.setTargetIdentifiableType(actualIdentifiable.getType());
+      // FIXME: Remove target from UrlAlias
+      alias.setTarget(reduceToBasicIdentifiable(actualIdentifiable));
       alias.setTargetLanguage(urlAliasLang);
-      alias.setTargetUuid(actualIdentifiable.getUuid());
-      alias.setTargetIdentifiableObjectType(actualIdentifiable.getIdentifiableObjectType());
       alias.setPrimary(!urlAliases.containsKey(urlAliasLang));
       alias.setSlug(actualIdentifiable.getUuid().toString());
       urlAliases.add(alias);
@@ -219,11 +220,9 @@ public class IdentifiableUrlAliasAlignHelper<I extends Identifiable> {
                   .allMatch(alias -> alias.getWebsite() != null))) {
         // there is not any default alias (w/o website); create one.
         UrlAlias defaultAlias = new UrlAlias();
-        defaultAlias.setTargetIdentifiableType(actualIdentifiable.getType());
+        // FIXME: Remove target from UrlAlias
+        defaultAlias.setTarget(reduceToBasicIdentifiable(actualIdentifiable));
         defaultAlias.setTargetLanguage(urlAliasLang);
-        defaultAlias.setTargetUuid(actualIdentifiable.getUuid());
-        defaultAlias.setTargetIdentifiableObjectType(
-            actualIdentifiable.getIdentifiableObjectType());
         defaultAlias.setPrimary(!urlAliases.containsKey(urlAliasLang));
         try {
           String labelText = actualIdentifiable.getLabel().getText(labelLang);
@@ -244,6 +243,29 @@ public class IdentifiableUrlAliasAlignHelper<I extends Identifiable> {
                 urlAliasLang, labelLang, actualIdentifiable.getUuid()));
       }
     }
+  }
+
+  /**
+   * Reduce the identifiable to is basic relation data (UUID, object type)
+   *
+   * @param identifiable
+   * @return
+   */
+  private I reduceToBasicIdentifiable(I identifiable) {
+    I basicIdentifiable = null;
+    try {
+      basicIdentifiable = (I) identifiable.getClass().getDeclaredConstructor().newInstance();
+    } catch (InstantiationException
+        | IllegalAccessException
+        | InvocationTargetException
+        | NoSuchMethodException e) {
+      basicIdentifiable = (I) new Identifiable();
+    }
+    basicIdentifiable.setIdentifiableObjectType(identifiable.getIdentifiableObjectType());
+    basicIdentifiable.setIdentifiers(identifiable.getIdentifiers());
+    basicIdentifiable.setUuid(identifiable.getUuid());
+    basicIdentifiable.setLabel(identifiable.getLabel());
+    return basicIdentifiable;
   }
 
   private void fixMissingLocalizedUrlAliases() {
@@ -324,6 +346,6 @@ public class IdentifiableUrlAliasAlignHelper<I extends Identifiable> {
   // We do not want to have any services in this class but we need the slug generator.
   // It can easyly be passed into a parameter of this functional interface type.
   public interface SlugGeneratorService {
-    String apply(Locale locale, String label, UUID website) throws ServiceException;
+    String apply(Locale locale, String label, Website website) throws ServiceException;
   }
 }

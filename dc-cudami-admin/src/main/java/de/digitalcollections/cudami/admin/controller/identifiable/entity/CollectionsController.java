@@ -1,9 +1,10 @@
 package de.digitalcollections.cudami.admin.controller.identifiable.entity;
 
+import de.digitalcollections.cudami.admin.business.i18n.LanguageService;
 import de.digitalcollections.cudami.admin.controller.ParameterHelper;
-import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
 import de.digitalcollections.cudami.client.identifiable.entity.CudamiCollectionsClient;
+import de.digitalcollections.cudami.client.identifiable.entity.CudamiEntitiesClient;
 import de.digitalcollections.model.exception.ResourceNotFoundException;
 import de.digitalcollections.model.exception.TechnicalException;
 import de.digitalcollections.model.identifiable.entity.Collection;
@@ -29,8 +30,8 @@ public class CollectionsController
 
   private static final Logger LOGGER = LoggerFactory.getLogger(CollectionsController.class);
 
-  public CollectionsController(LanguageSortingHelper languageSortingHelper, CudamiClient client) {
-    super(client.forCollections(), languageSortingHelper, client.forLocales());
+  public CollectionsController(CudamiClient client, LanguageService languageService) {
+    super(client.forCollections(), languageService);
   }
 
   @GetMapping("/collections/new")
@@ -39,7 +40,7 @@ public class CollectionsController
       @RequestParam(name = "parentType", required = false) String parentType,
       @RequestParam(name = "parentUuid", required = false) UUID parentUuid)
       throws TechnicalException {
-    model.addAttribute("activeLanguage", localeService.getDefaultLanguage());
+    model.addAttribute("activeLanguage", languageService.getDefaultLanguage());
     model.addAttribute("parentType", parentType);
     model.addAttribute("parentUuid", parentUuid);
     return "collections/create";
@@ -54,7 +55,7 @@ public class CollectionsController
     final Locale displayLocale = LocaleContextHolder.getLocale();
     Collection collection = service.getByUuid(uuid);
     List<Locale> existingLanguages =
-        languageSortingHelper.sortLanguages(displayLocale, collection.getLabel().getLocales());
+        languageService.sortLanguages(displayLocale, collection.getLabel().getLocales());
 
     if (activeLanguage != null && existingLanguages.contains(activeLanguage)) {
       model.addAttribute("activeLanguage", activeLanguage);
@@ -70,10 +71,11 @@ public class CollectionsController
   @GetMapping("/collections")
   public String list(Model model) throws TechnicalException {
     List<Locale> existingLanguages =
-        getExistingLanguagesForLocales(service.getLanguagesOfTopCollections());
+        languageService.getExistingLanguagesForLocales(
+            ((CudamiCollectionsClient) service).getLanguagesOfTopCollections());
     model.addAttribute("existingLanguages", existingLanguages);
 
-    String dataLanguage = getDataLanguage(null, localeService);
+    String dataLanguage = getDataLanguage(null, languageService);
     model.addAttribute("dataLanguage", dataLanguage);
 
     return "collections/list";
@@ -97,7 +99,7 @@ public class CollectionsController
     model.addAttribute("collection", collection);
 
     List<Locale> existingLanguages = getExistingLanguagesFromIdentifiables(List.of(collection));
-    String dataLanguage = getDataLanguage(targetDataLanguage, localeService);
+    String dataLanguage = getDataLanguage(targetDataLanguage, languageService);
     model
         .addAttribute("existingLanguages", existingLanguages)
         .addAttribute("dataLanguage", dataLanguage);
@@ -106,12 +108,13 @@ public class CollectionsController
         getExistingLanguagesFromIdentifiables(collection.getChildren());
     model
         .addAttribute("existingSubcollectionsLanguages", existingSubcollectionsLanguages)
-        .addAttribute("dataLanguageSubcollections", getDataLanguage(null, localeService));
+        .addAttribute("dataLanguageSubcollections", getDataLanguage(null, languageService));
 
-    List<Collection> parents = service.getParents(uuid);
+    List<Collection> parents = ((CudamiCollectionsClient) service).getParents(uuid);
     model.addAttribute("parents", parents);
 
-    BreadcrumbNavigation breadcrumbNavigation = service.getBreadcrumbNavigation(uuid);
+    BreadcrumbNavigation breadcrumbNavigation =
+        ((CudamiCollectionsClient) service).getBreadcrumbNavigation(uuid);
     List<BreadcrumbNode> breadcrumbs = breadcrumbNavigation.getNavigationItems();
     model.addAttribute("breadcrumbs", breadcrumbs);
 
@@ -124,7 +127,7 @@ public class CollectionsController
       @RequestParam(name = "dataLanguage", required = false) String targetDataLanguage,
       Model model)
       throws TechnicalException, ResourceNotFoundException {
-    Collection collection = service.getByRefId(refId);
+    Collection collection = ((CudamiEntitiesClient<Collection>) service).getByRefId(refId);
     if (collection == null) {
       throw new ResourceNotFoundException();
     }

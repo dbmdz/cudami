@@ -1,8 +1,8 @@
 package de.digitalcollections.cudami.admin.controller.identifiable.entity.agent;
 
+import de.digitalcollections.cudami.admin.business.i18n.LanguageService;
 import de.digitalcollections.cudami.admin.controller.ParameterHelper;
 import de.digitalcollections.cudami.admin.controller.identifiable.entity.AbstractEntitiesController;
-import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
 import de.digitalcollections.cudami.client.identifiable.entity.agent.CudamiCorporateBodiesClient;
 import de.digitalcollections.model.exception.ResourceNotFoundException;
@@ -28,14 +28,13 @@ public class CorporateBodiesController
 
   private static final Logger LOGGER = LoggerFactory.getLogger(CorporateBodiesController.class);
 
-  public CorporateBodiesController(
-      LanguageSortingHelper languageSortingHelper, CudamiClient client) {
-    super(client.forCorporateBodies(), languageSortingHelper, client.forLocales());
+  public CorporateBodiesController(CudamiClient client, LanguageService languageService) {
+    super(client.forCorporateBodies(), languageService);
   }
 
   @GetMapping("/corporatebodies/new")
   public String create(Model model) throws TechnicalException {
-    model.addAttribute("activeLanguage", localeService.getDefaultLanguage());
+    model.addAttribute("activeLanguage", languageService.getDefaultLanguage());
     return "corporatebodies/create";
   }
 
@@ -48,7 +47,7 @@ public class CorporateBodiesController
     final Locale displayLocale = LocaleContextHolder.getLocale();
     CorporateBody corporateBody = service.getByUuid(uuid);
     List<Locale> existingLanguages =
-        languageSortingHelper.sortLanguages(displayLocale, corporateBody.getLabel().getLocales());
+        languageService.sortLanguages(displayLocale, corporateBody.getLabel().getLocales());
 
     if (activeLanguage != null && existingLanguages.contains(activeLanguage)) {
       model.addAttribute("activeLanguage", activeLanguage);
@@ -65,7 +64,7 @@ public class CorporateBodiesController
   public String list(Model model) throws TechnicalException {
     model.addAttribute("existingLanguages", getExistingLanguagesFromService());
 
-    String dataLanguage = getDataLanguage(null, localeService);
+    String dataLanguage = getDataLanguage(null, languageService);
     model.addAttribute("dataLanguage", dataLanguage);
 
     return "corporatebodies/list";
@@ -89,7 +88,7 @@ public class CorporateBodiesController
     model.addAttribute("corporateBody", corporateBody);
 
     List<Locale> existingLanguages = getExistingLanguagesFromIdentifiable(corporateBody);
-    String dataLanguage = getDataLanguage(targetDataLanguage, localeService);
+    String dataLanguage = getDataLanguage(targetDataLanguage, languageService);
     model
         .addAttribute("existingLanguages", existingLanguages)
         .addAttribute("dataLanguage", dataLanguage);

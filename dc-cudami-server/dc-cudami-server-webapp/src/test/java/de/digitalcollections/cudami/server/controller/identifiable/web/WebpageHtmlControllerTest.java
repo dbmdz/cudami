@@ -6,7 +6,6 @@ import static org.mockito.Mockito.when;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.web.WebpageService;
 import de.digitalcollections.model.identifiable.web.Webpage;
 import java.util.Locale;
-import java.util.UUID;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -30,8 +29,8 @@ public class WebpageHtmlControllerTest extends BaseWebpageControllerTest {
   public void returnWebpageV1Html(String path) throws Exception {
     Webpage expected = createPrefilledWebpage(path);
 
-    when(webpageService.getByUuid(any(UUID.class))).thenReturn(expected);
-    when(webpageService.getByUuidAndLocale(any(UUID.class), any(Locale.class)))
+    when(webpageService.getByExample(any(Webpage.class))).thenReturn(expected);
+    when(webpageService.getByExampleAndLocale(any(Webpage.class), any(Locale.class)))
         .thenReturn(expected);
 
     testHtml(path);
@@ -46,8 +45,8 @@ public class WebpageHtmlControllerTest extends BaseWebpageControllerTest {
       })
   public void returnWebpageV3Html(String path) throws Exception {
     Webpage expected = createPrefilledWebpage(path);
-    when(webpageService.getByUuid(any(UUID.class))).thenReturn(expected);
-    when(webpageService.getByUuidAndLocale(any(UUID.class), any(Locale.class)))
+    when(webpageService.getByExample(any(Webpage.class))).thenReturn(expected);
+    when(webpageService.getByExampleAndLocale(any(Webpage.class), any(Locale.class)))
         .thenReturn(expected);
 
     testHtml(path);

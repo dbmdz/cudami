@@ -83,8 +83,9 @@ public class JdbiRepositoryImplTest {
     Filtering filtering =
         Filtering.builder()
             .add(
-                FilterCriterion.builder()
+                FilterCriterion.nativeBuilder()
                     .withExpression(filteringProperty)
+                    .withNativeExpression(true)
                     .contains(List.of(uuid1, uuid2))
                     .build())
             .build();
@@ -127,6 +128,7 @@ public class JdbiRepositoryImplTest {
             .add(
                 FilterCriterion.builder()
                     .withExpression(filteringProperty)
+                    .withNativeExpression(true)
                     .isEquals(List.of(uuid1, uuid2))
                     .build())
             .build();
@@ -399,7 +401,7 @@ public class JdbiRepositoryImplTest {
             1000,
             new Sorting(
                 new Order(Direction.DESC, "last_modified"), new Order(Direction.ASC, "uuid")));
-    instance.addPageRequestParams(pageRequest, innerSql);
+    instance.addPagingAndSorting(pageRequest, innerSql);
     assertEquals(
         "SELECT d.* FROM digitalobjects AS d ORDER BY last_modified DESC, uuid ASC LIMIT 1000 OFFSET 0",
         innerSql.toString());
@@ -414,7 +416,7 @@ public class JdbiRepositoryImplTest {
             1000,
             new Sorting(
                 new Order(Direction.DESC, "last_modified"), new Order(Direction.ASC, "uuid")));
-    instance.addPageRequestParams(pageRequest, innerSql);
+    instance.addPagingAndSorting(pageRequest, innerSql);
     assertEquals(
         "SELECT * FROM digitalobjects AS d ORDER BY last_modified DESC, uuid ASC LIMIT 1000 OFFSET 1000",
         innerSql.toString());
@@ -429,7 +431,7 @@ public class JdbiRepositoryImplTest {
             1000,
             new Sorting(
                 new Order(Direction.DESC, "last_modified"), new Order(Direction.ASC, "uuid")));
-    instance.addPageRequestParams(pageRequest, innerSql);
+    instance.addPagingAndSorting(pageRequest, innerSql);
     assertEquals(
         "SELECT * FROM (SELECT row_number() OVER (ORDER BY last_modified DESC, uuid ASC) rn, d.uuid rnsetid FROM digitalobjects AS d) innerselect_rownumber "
             + "INNER JOIN digitalobjects ON digitalobjects.uuid = innerselect_rownumber.rnsetid "
@@ -446,7 +448,7 @@ public class JdbiRepositoryImplTest {
             1000,
             new Sorting(
                 new Order(Direction.DESC, "last_modified"), new Order(Direction.ASC, "uuid")));
-    instance.addPageRequestParams(pageRequest, innerSql);
+    instance.addPagingAndSorting(pageRequest, innerSql);
     assertEquals(
         "SELECT * FROM (SELECT row_number() OVER (ORDER BY last_modified DESC, uuid ASC) rn, d.uuid rnsetid FROM digitalobjects AS d) innerselect_rownumber "
             + "INNER JOIN digitalobjects ON digitalobjects.uuid = innerselect_rownumber.rnsetid "
@@ -462,7 +464,7 @@ public class JdbiRepositoryImplTest {
                 + "LEFT JOIN collection_digitalobjects AS cd ON d.uuid = cd.digitalobject_uuid WHERE cd.collection_uuid = :uuid");
     PageRequest pageRequest =
         new PageRequest(7, 1000, new Sorting(new Order(Direction.DESC, "last_modified")));
-    instance.addPageRequestParams(pageRequest, innerSql);
+    instance.addPagingAndSorting(pageRequest, innerSql);
     assertEquals(
         "SELECT * FROM ("
             + "SELECT row_number() OVER (ORDER BY last_modified DESC) rn, d.sortindex AS idx, d.uuid rnsetid FROM digitalobjects AS d "
@@ -482,7 +484,7 @@ public class JdbiRepositoryImplTest {
                 + "WHERE cd.collection_uuid = :uuid "
                 + "ORDER BY d.sortindex ASC");
     PageRequest pageRequest = new PageRequest(7, 1000);
-    instance.addPageRequestParams(pageRequest, innerSql);
+    instance.addPagingAndSorting(pageRequest, innerSql);
     assertEquals(
         "SELECT * FROM ("
             + "SELECT row_number() OVER (ORDER BY d.sortindex ASC) rn, d.sortindex AS idx, d.uuid rnsetid FROM digitalobjects AS d "
@@ -503,7 +505,7 @@ public class JdbiRepositoryImplTest {
                 + "ORDER BY d.sortindex ASC");
     PageRequest pageRequest =
         new PageRequest(7, 1000, new Sorting(Direction.DESC, "last_modified"));
-    instance.addPageRequestParams(pageRequest, innerSql);
+    instance.addPagingAndSorting(pageRequest, innerSql);
     assertEquals(
         "SELECT * FROM ("
             + "SELECT row_number() OVER (ORDER BY d.sortindex ASC, last_modified DESC) rn, d.sortindex AS idx, d.uuid rnsetid FROM digitalobjects AS d "
@@ -522,7 +524,7 @@ public class JdbiRepositoryImplTest {
             "SELECT d.sortindex AS idx, * FROM digitalobjects AS d "
                 + "LEFT JOIN collection_digitalobjects AS cd ON d.uuid = cd.digitalobject_uuid WHERE cd.collection_uuid = :uuid");
     PageRequest pageRequest = new PageRequest(7, 1000);
-    instance.addPageRequestParams(pageRequest, innerSql);
+    instance.addPagingAndSorting(pageRequest, innerSql);
     assertEquals(
         "SELECT * FROM ("
             + "SELECT row_number() OVER () rn, d.sortindex AS idx, d.uuid rnsetid FROM digitalobjects AS d "
@@ -543,7 +545,7 @@ public class JdbiRepositoryImplTest {
                 + "FROM url_aliases AS ua LEFT JOIN websites webs ON webs.uuid = ua.website_uuid "
                 + "WHERE (ua.slug ILIKE '%' || :filtervalue_1 || '%')");
     PageRequest pageRequest = new PageRequest(7, 1000, new Sorting(Direction.ASC, "slug"));
-    instance.addPageRequestParams(pageRequest, innerSql);
+    instance.addPagingAndSorting(pageRequest, innerSql);
     assertEquals(
         "SELECT * FROM ("
             + "SELECT row_number() OVER (ORDER BY slug ASC) rn, ua.created ua_created, ua.last_published ua_lastPublished, ua.primary ua_primary, ua.slug ua_slug, ua.target_identifiable_type "

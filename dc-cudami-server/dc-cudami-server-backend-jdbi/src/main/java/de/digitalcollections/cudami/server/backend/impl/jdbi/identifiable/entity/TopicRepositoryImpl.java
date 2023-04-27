@@ -1,6 +1,9 @@
 package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity;
 
 import de.digitalcollections.cudami.model.config.CudamiConfig;
+import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
+import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
+import de.digitalcollections.cudami.server.backend.api.repository.identifiable.alias.UrlAliasRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.TopicRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.resource.FileResourceMetadataRepositoryImpl;
 import de.digitalcollections.model.identifiable.Identifier;
@@ -21,12 +24,10 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Collectors;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.core.statement.PreparedBatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -41,25 +42,28 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
   private final EntityRepositoryImpl<Entity> entityRepositoryImpl;
   private final FileResourceMetadataRepositoryImpl fileResourceMetadataRepositoryImpl;
 
-  @Autowired
   public TopicRepositoryImpl(
       Jdbi dbi,
+      CudamiConfig cudamiConfig,
+      IdentifierRepository identifierRepository,
+      UrlAliasRepository urlAliasRepository,
       EntityRepositoryImpl entityRepositoryImpl,
-      FileResourceMetadataRepositoryImpl fileResourceMetadataRepositoryImpl,
-      CudamiConfig cudamiConfig) {
+      FileResourceMetadataRepositoryImpl fileResourceMetadataRepositoryImpl) {
     super(
         dbi,
         TABLE_NAME,
         TABLE_ALIAS,
         MAPPING_PREFIX,
         Topic.class,
-        cudamiConfig.getOffsetForAlternativePaging());
+        cudamiConfig.getOffsetForAlternativePaging(),
+        identifierRepository,
+        urlAliasRepository);
     this.entityRepositoryImpl = entityRepositoryImpl;
     this.fileResourceMetadataRepositoryImpl = fileResourceMetadataRepositoryImpl;
   }
 
   @Override
-  public boolean addChildren(UUID parentUuid, List<UUID> childrenUuids) {
+  public boolean addChildren(UUID parentUuid, List<UUID> childrenUuids) throws RepositoryException {
     if (parentUuid == null || childrenUuids == null) {
       return false;
     }
@@ -87,7 +91,13 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
   }
 
   @Override
-  public PageResponse<Topic> findChildren(UUID uuid, PageRequest pageRequest) {
+  public Topic create() throws RepositoryException {
+    return new Topic();
+  }
+
+  @Override
+  public PageResponse<Topic> findChildren(UUID uuid, PageRequest pageRequest)
+      throws RepositoryException {
     final String crossTableAlias = "xtable";
 
     StringBuilder commonSql =
@@ -108,12 +118,11 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
                 + ".parent_topic_uuid = :uuid");
     Map<String, Object> argumentMappings = new HashMap<>(0);
     argumentMappings.put("uuid", uuid);
-    String executedSearchTerm = addSearchTerm(pageRequest, commonSql, argumentMappings);
     addFiltering(pageRequest, commonSql, argumentMappings);
 
     StringBuilder innerQuery =
         new StringBuilder("SELECT " + crossTableAlias + ".sortindex AS idx, * " + commonSql);
-    String orderBy = addCrossTablePageRequestParams(pageRequest, innerQuery, crossTableAlias);
+    String orderBy = addCrossTablePagingAndSorting(pageRequest, innerQuery, crossTableAlias);
     List<Topic> result =
         retrieveList(getSqlSelectReducedFields(), innerQuery, argumentMappings, orderBy);
 
@@ -121,11 +130,12 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
         new StringBuilder("SELECT count(" + tableAlias + ".uuid)" + commonSql);
     long total = retrieveCount(countQuery, argumentMappings);
 
-    return new PageResponse<>(result, pageRequest, total, executedSearchTerm);
+    return new PageResponse<>(result, pageRequest, total);
   }
 
   @Override
-  public PageResponse<Entity> findEntities(UUID topicUuid, PageRequest pageRequest) {
+  public PageResponse<Entity> findEntities(UUID topicUuid, PageRequest pageRequest)
+      throws RepositoryException {
     final String crossTableAlias = "xtable";
 
     final String entityTableAlias = entityRepositoryImpl.getTableAlias();
@@ -148,7 +158,6 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
                 + ".topic_uuid = :uuid");
     Map<String, Object> argumentMappings = new HashMap<>(0);
     argumentMappings.put("uuid", topicUuid);
-    String executedSearchTerm = addSearchTerm(pageRequest, commonSql, argumentMappings);
     Filtering filtering = pageRequest.getFiltering();
     // as filtering has other target object type (entity) than this repository (topic)
     // we have to rename filter field names to target table alias and column names:
@@ -157,7 +166,9 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
 
     StringBuilder innerQuery =
         new StringBuilder("SELECT " + crossTableAlias + ".sortindex AS idx, * " + commonSql);
-    String orderBy = addCrossTablePageRequestParams(pageRequest, innerQuery, crossTableAlias);
+    String orderBy =
+        entityRepositoryImpl.addCrossTablePagingAndSorting(
+            pageRequest, innerQuery, crossTableAlias);
     List<Entity> result =
         entityRepositoryImpl.retrieveList(
             entityRepositoryImpl.getSqlSelectReducedFields(),
@@ -168,11 +179,12 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
     StringBuilder countQuery = new StringBuilder("SELECT count(*)" + commonSql);
     long total = retrieveCount(countQuery, argumentMappings);
 
-    return new PageResponse<>(result, pageRequest, total, executedSearchTerm);
+    return new PageResponse<>(result, pageRequest, total);
   }
 
   @Override
-  public PageResponse<FileResource> findFileResources(UUID topicUuid, PageRequest pageRequest) {
+  public PageResponse<FileResource> findFileResources(UUID topicUuid, PageRequest pageRequest)
+      throws RepositoryException {
     final String crossTableAlias = "xtable";
 
     final String frTableAlias = fileResourceMetadataRepositoryImpl.getTableAlias();
@@ -195,7 +207,6 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
                 + ".topic_uuid = :uuid");
     Map<String, Object> argumentMappings = new HashMap<>(0);
     argumentMappings.put("uuid", topicUuid);
-    String executedSearchTerm = addSearchTerm(pageRequest, commonSql, argumentMappings);
     Filtering filtering = pageRequest.getFiltering();
     // as filtering has other target object type (digitalobject) than this repository (collection)
     // we have to rename filter field names to target table alias and column names:
@@ -204,7 +215,9 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
 
     StringBuilder innerQuery =
         new StringBuilder("SELECT " + crossTableAlias + ".sortindex AS idx, * " + commonSql);
-    String orderBy = addCrossTablePageRequestParams(pageRequest, innerQuery, crossTableAlias);
+    String orderBy =
+        fileResourceMetadataRepositoryImpl.addCrossTablePagingAndSorting(
+            pageRequest, innerQuery, crossTableAlias);
     List<FileResource> result =
         fileResourceMetadataRepositoryImpl.retrieveList(
             fileResourceMetadataRepositoryImpl.getSqlSelectReducedFields(),
@@ -215,11 +228,11 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
     StringBuilder countQuery = new StringBuilder("SELECT count(*)" + commonSql);
     long total = retrieveCount(countQuery, argumentMappings);
 
-    return new PageResponse<>(result, pageRequest, total, executedSearchTerm);
+    return new PageResponse<>(result, pageRequest, total);
   }
 
   @Override
-  public PageResponse<Topic> findRootNodes(PageRequest pageRequest) {
+  public PageResponse<Topic> findRootNodes(PageRequest pageRequest) throws RepositoryException {
     String commonSql =
         " FROM "
             + tableName
@@ -229,6 +242,17 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
             + tableAlias
             + ".uuid)";
     return find(pageRequest, commonSql);
+  }
+
+  @Override
+  public PageResponse<Topic> findTopicsOfEntity(UUID entityUuid, PageRequest pageRequest) {
+    throw new UnsupportedOperationException(); // TODO: not yet implemented
+  }
+
+  @Override
+  public PageResponse<Topic> findTopicsOfFileResource(
+      UUID fileResourceUuid, PageRequest pageRequest) {
+    throw new UnsupportedOperationException(); // TODO: not yet implemented
   }
 
   @Override
@@ -272,7 +296,7 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
   }
 
   @Override
-  public Topic getByIdentifier(Identifier identifier) {
+  public Topic getByIdentifier(Identifier identifier) throws RepositoryException {
     Topic topic = super.getByIdentifier(identifier);
 
     if (topic != null) {
@@ -282,7 +306,7 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
   }
 
   @Override
-  public Topic getByUuidAndFiltering(UUID uuid, Filtering filtering) {
+  public Topic getByUuidAndFiltering(UUID uuid, Filtering filtering) throws RepositoryException {
     Topic topic = super.getByUuidAndFiltering(uuid, filtering);
 
     if (topic != null) {
@@ -292,7 +316,7 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
   }
 
   @Override
-  public List<Topic> getChildren(UUID uuid) {
+  public List<Topic> getChildren(UUID uuid) throws RepositoryException {
     StringBuilder innerQuery =
         new StringBuilder(
             "SELECT tt.sortindex AS idx, * FROM "
@@ -313,39 +337,7 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
   }
 
   @Override
-  public List<Entity> getEntities(UUID topicUuid) {
-    final String entityTableAlias = entityRepositoryImpl.getTableAlias();
-    final String entityTableName = entityRepositoryImpl.getTableName();
-
-    StringBuilder innerQuery =
-        new StringBuilder(
-            "SELECT te.sortindex AS idx, * FROM "
-                + entityTableName
-                + " AS "
-                + entityTableAlias
-                + " INNER JOIN topic_entities te ON "
-                + entityTableAlias
-                + ".uuid = te.entity_uuid"
-                + " WHERE te.topic_uuid = :uuid"
-                + " ORDER BY idx ASC");
-    Map<String, Object> argumentMappings = new HashMap<>();
-    argumentMappings.put("uuid", topicUuid);
-
-    List<Entity> result =
-        entityRepositoryImpl
-            .retrieveList(
-                entityRepositoryImpl.getSqlSelectReducedFields(),
-                innerQuery,
-                argumentMappings,
-                "ORDER BY idx ASC")
-            .stream()
-            .collect(Collectors.toList());
-
-    return result;
-  }
-
-  @Override
-  public List<FileResource> getFileResources(UUID topicUuid) {
+  public List<FileResource> getFileResources(UUID topicUuid) throws RepositoryException {
     PageResponse<FileResource> response;
     PageRequest request = new PageRequest(0, 100);
     Set<FileResource> fileResources = new HashSet<>();
@@ -400,7 +392,7 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
   }
 
   @Override
-  public Topic getParent(UUID nodeUuid) {
+  public Topic getParent(UUID nodeUuid) throws RepositoryException {
     String sqlAdditionalJoins =
         " INNER JOIN topic_topics tt ON " + tableAlias + ".uuid = tt.parent_topic_uuid";
 
@@ -419,7 +411,7 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
   }
 
   @Override
-  public List<Topic> getParents(UUID uuid) {
+  public List<Topic> getParents(UUID uuid) throws RepositoryException {
     StringBuilder innerQuery =
         new StringBuilder(
             "SELECT * FROM "
@@ -455,7 +447,7 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
   }
 
   @Override
-  public List<Topic> getTopicsOfEntity(UUID entityUuid) {
+  public List<Topic> getTopicsOfEntity(UUID entityUuid) throws RepositoryException {
     StringBuilder innerQuery =
         new StringBuilder(
             "SELECT * FROM "
@@ -475,7 +467,7 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
   }
 
   @Override
-  public List<Topic> getTopicsOfFileResource(UUID fileResourceUuid) {
+  public List<Topic> getTopicsOfFileResource(UUID fileResourceUuid) throws RepositoryException {
     StringBuilder innerQuery =
         new StringBuilder(
             "SELECT * FROM "
@@ -511,7 +503,7 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
   }
 
   @Override
-  public Topic saveWithParent(UUID childUuid, UUID parentUuid) {
+  public Topic saveWithParent(UUID childUuid, UUID parentUuid) throws RepositoryException {
     Integer nextSortIndex =
         retrieveNextSortIndexForParentChildren(
             dbi, "topic_topics", "parent_topic_uuid", parentUuid);
@@ -530,7 +522,8 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
   }
 
   @Override
-  public List<Entity> setEntities(UUID topicUuid, List<Entity> entities) {
+  public List<Entity> setEntities(UUID topicUuid, List<Entity> entities)
+      throws RepositoryException {
     // as we store the whole list new: delete old entries
     dbi.withHandle(
         h ->
@@ -538,7 +531,7 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
                 .bind("uuid", topicUuid)
                 .execute());
 
-    if (entities != null) {
+    if (entities != null && entities.size() > 0) {
       // we assume that the entities are already saved...
       dbi.useHandle(
           handle -> {
@@ -554,12 +547,17 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
             }
             preparedBatch.execute();
           });
+      int size = entities.size();
+      PageRequest pageRequest = PageRequest.builder().pageNumber(0).pageSize(size - 1).build();
+      PageResponse<Entity> pageResponse = findEntities(topicUuid, pageRequest);
+      return pageResponse.getContent();
     }
-    return getEntities(topicUuid);
+    return null;
   }
 
   @Override
-  public List<FileResource> setFileResources(UUID topicUuid, List<FileResource> fileResources) {
+  public List<FileResource> setFileResources(UUID topicUuid, List<FileResource> fileResources)
+      throws RepositoryException {
     // as we store the whole list new: delete old entries
     dbi.withHandle(
         h ->
@@ -588,9 +586,9 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
   }
 
   @Override
-  public boolean updateChildrenOrder(UUID parentUuid, List<Topic> children) {
+  public boolean updateChildrenOrder(UUID parentUuid, List<UUID> children) {
     if (parentUuid == null || children == null) {
-      return false;
+      throw new IllegalArgumentException("update failed: given objects must not be null");
     }
     String query =
         "UPDATE topic_topics"
@@ -600,10 +598,10 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
         h -> {
           PreparedBatch batch = h.prepareBatch(query);
           int idx = 0;
-          for (Topic child : children) {
+          for (UUID uuidChild : children) {
             batch
                 .bind("idx", idx++)
-                .bind("childUuid", child.getUuid())
+                .bind("childUuid", uuidChild)
                 .bind("parentUuid", parentUuid)
                 .add();
           }

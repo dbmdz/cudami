@@ -1,7 +1,7 @@
 package de.digitalcollections.cudami.admin.controller.identifiable.entity;
 
+import de.digitalcollections.cudami.admin.business.i18n.LanguageService;
 import de.digitalcollections.cudami.admin.controller.ParameterHelper;
-import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
 import de.digitalcollections.cudami.client.identifiable.entity.CudamiDigitalObjectsClient;
 import de.digitalcollections.model.exception.ResourceNotFoundException;
@@ -23,16 +23,15 @@ import org.springframework.web.bind.annotation.RequestParam;
 public class DigitalObjectsController
     extends AbstractEntitiesController<DigitalObject, CudamiDigitalObjectsClient> {
 
-  public DigitalObjectsController(
-      LanguageSortingHelper languageSortingHelper, CudamiClient client) {
-    super(client.forDigitalObjects(), languageSortingHelper, client.forLocales());
+  public DigitalObjectsController(CudamiClient client, LanguageService languageService) {
+    super(client.forDigitalObjects(), languageService);
   }
 
   @GetMapping("/digitalobjects")
   public String list(Model model) throws TechnicalException {
     model.addAttribute("existingLanguages", getExistingLanguagesFromService());
 
-    String dataLanguage = getDataLanguage(null, localeService);
+    String dataLanguage = getDataLanguage(null, languageService);
     model.addAttribute("dataLanguage", dataLanguage);
 
     return "digitalobjects/list";
@@ -56,35 +55,36 @@ public class DigitalObjectsController
     model.addAttribute("digitalObject", digitalObject);
 
     List<Locale> existingLanguages = getExistingLanguagesFromIdentifiable(digitalObject);
-    String dataLanguage = getDataLanguage(targetDataLanguage, localeService);
+    String dataLanguage = getDataLanguage(targetDataLanguage, languageService);
     model
         .addAttribute("existingLanguages", existingLanguages)
         .addAttribute("dataLanguage", dataLanguage);
 
     Locale displayLocale = LocaleContextHolder.getLocale();
 
-    List<Locale> existingCollectionsLanguages = service.getLanguagesOfCollections(uuid);
+    List<Locale> existingCollectionsLanguages =
+        ((CudamiDigitalObjectsClient) service).getLanguagesOfCollections(uuid);
     model
         .addAttribute(
             "existingCollectionsLanguages",
-            languageSortingHelper.sortLanguages(displayLocale, existingCollectionsLanguages))
-        .addAttribute("dataLanguageCollections", getDataLanguage(null, localeService));
+            languageService.sortLanguages(displayLocale, existingCollectionsLanguages))
+        .addAttribute("dataLanguageCollections", getDataLanguage(null, languageService));
 
-    List<Locale> existingProjectsLanguages = service.getLanguagesOfProjects(uuid);
+    List<Locale> existingProjectsLanguages =
+        ((CudamiDigitalObjectsClient) service).getLanguagesOfProjects(uuid);
     model
         .addAttribute(
             "existingProjectsLanguages",
-            languageSortingHelper.sortLanguages(displayLocale, existingProjectsLanguages))
-        .addAttribute("dataLanguageProjects", getDataLanguage(null, localeService));
+            languageService.sortLanguages(displayLocale, existingProjectsLanguages))
+        .addAttribute("dataLanguageProjects", getDataLanguage(null, languageService));
 
     List<Locale> existingContainedDigitalObjectsLanguages =
-        service.getLanguagesOfContainedDigitalObjects(uuid);
+        ((CudamiDigitalObjectsClient) service).getLanguagesOfContainedDigitalObjects(uuid);
     model
         .addAttribute(
             "existingDigitalObjectsLanguages",
-            languageSortingHelper.sortLanguages(
-                displayLocale, existingContainedDigitalObjectsLanguages))
-        .addAttribute("dataLanguageDigitalObjects", getDataLanguage(null, localeService));
+            languageService.sortLanguages(displayLocale, existingContainedDigitalObjectsLanguages))
+        .addAttribute("dataLanguageDigitalObjects", getDataLanguage(null, languageService));
 
     return "digitalobjects/view";
   }

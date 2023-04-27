@@ -5,7 +5,7 @@
       xmlns:data="https://github.com/mxab/thymeleaf-extras-data-attribute"
       layout:decorate="~{base}">
   <head>
-    <title th:text="#{licenses}">Licenses</title>
+    <title th:text="#{page.title.licenses}">Licenses</title>
   </head>
   <body>
   <th:block layout:fragment="content">
@@ -96,6 +96,16 @@
 
     <script type="text/javascript" th:inline="javascript">
       /*<![CDATA[*/
+      $('#table-licenses').bootstrapTable({
+          formatSearch: function () {
+            /*[+
+             let columnName = [[#{lbl.url}]];
+             let placeholder = `[(#{placeholder.search})]`;
+             +]*/
+            return placeholder;
+          }
+        });
+        
       function buttonsLicenses() {
         /*[+
          const baseUrl = [[@{'/licenses'}]];

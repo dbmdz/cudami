@@ -2,16 +2,17 @@ package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entit
 
 import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
+import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
+import de.digitalcollections.cudami.server.backend.api.repository.identifiable.alias.UrlAliasRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.ArticleRepository;
+import de.digitalcollections.model.identifiable.IdentifiableObjectType;
 import de.digitalcollections.model.identifiable.Identifier;
 import de.digitalcollections.model.identifiable.entity.Article;
 import de.digitalcollections.model.identifiable.entity.Entity;
-import de.digitalcollections.model.identifiable.entity.EntityType;
 import de.digitalcollections.model.identifiable.entity.agent.Agent;
 import de.digitalcollections.model.identifiable.entity.agent.CorporateBody;
 import de.digitalcollections.model.identifiable.entity.agent.Family;
 import de.digitalcollections.model.identifiable.entity.agent.Person;
-import de.digitalcollections.model.identifiable.resource.FileResource;
 import de.digitalcollections.model.list.filtering.Filtering;
 import java.util.HashMap;
 import java.util.List;
@@ -22,7 +23,6 @@ import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.core.statement.PreparedBatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Repository;
 
@@ -36,67 +36,33 @@ public class ArticleRepositoryImpl extends EntityRepositoryImpl<Article>
   public static final String TABLE_ALIAS = "a";
   public static final String TABLE_NAME = "articles";
 
-  @Override
-  public String getSqlInsertFields() {
-    return super.getSqlInsertFields() + ", date_published, text, timevalue_published";
-  }
-
-  /* Do not change order! Must match order in getSqlInsertFields!!! */
-  @Override
-  public String getSqlInsertValues() {
-    return super.getSqlInsertValues()
-        + ", :datePublished, :text::JSONB, :timeValuePublished::JSONB";
-  }
-
-  @Override
-  public String getSqlSelectAllFields(String tableAlias, String mappingPrefix) {
-    return getSqlSelectReducedFields(tableAlias, mappingPrefix)
-        + ", "
-        + tableAlias
-        + ".text "
-        + mappingPrefix
-        + "_text";
-  }
-
-  @Override
-  public String getSqlSelectReducedFields(String tableAlias, String mappingPrefix) {
-    return super.getSqlSelectReducedFields(tableAlias, mappingPrefix)
-        + ", "
-        + tableAlias
-        + ".date_published "
-        + mappingPrefix
-        + "_datePublished, "
-        + tableAlias
-        + ".timevalue_published "
-        + mappingPrefix
-        + "_timeValuePublished";
-  }
-
-  @Override
-  public String getSqlUpdateFieldValues() {
-    return super.getSqlUpdateFieldValues()
-        + ", date_published=:datePublished, text=:text::JSONB, timevalue_published=:timeValuePublished::JSONB";
-  }
-
   private final EntityRepositoryImpl<Entity> entityRepositoryImpl;
 
-  @Autowired
   public ArticleRepositoryImpl(
       Jdbi dbi,
+      CudamiConfig cudamiConfig,
       @Qualifier("entityRepositoryImpl") EntityRepositoryImpl<Entity> entityRepositoryImpl,
-      CudamiConfig cudamiConfig) {
+      IdentifierRepository identifierRepository,
+      UrlAliasRepository urlAliasRepository) {
     super(
         dbi,
         TABLE_NAME,
         TABLE_ALIAS,
         MAPPING_PREFIX,
         Article.class,
-        cudamiConfig.getOffsetForAlternativePaging());
+        cudamiConfig.getOffsetForAlternativePaging(),
+        identifierRepository,
+        urlAliasRepository);
     this.entityRepositoryImpl = entityRepositoryImpl;
   }
 
   @Override
-  public Article getByIdentifier(Identifier identifier) {
+  public Article create() throws RepositoryException {
+    return new Article();
+  }
+
+  @Override
+  public Article getByIdentifier(Identifier identifier) throws RepositoryException {
     Article article = super.getByIdentifier(identifier);
 
     if (article != null) {
@@ -106,7 +72,7 @@ public class ArticleRepositoryImpl extends EntityRepositoryImpl<Article>
   }
 
   @Override
-  public Article getByRefId(long refId) {
+  public Article getByRefId(long refId) throws RepositoryException {
     Article article = super.getByRefId(refId);
 
     if (article != null) {
@@ -116,7 +82,7 @@ public class ArticleRepositoryImpl extends EntityRepositoryImpl<Article>
   }
 
   @Override
-  public Article getByUuidAndFiltering(UUID uuid, Filtering filtering) {
+  public Article getByUuidAndFiltering(UUID uuid, Filtering filtering) throws RepositoryException {
     Article article = super.getByUuidAndFiltering(uuid, filtering);
 
     if (article != null) {
@@ -127,7 +93,7 @@ public class ArticleRepositoryImpl extends EntityRepositoryImpl<Article>
   }
 
   @Override
-  public List<Agent> getCreators(UUID articleUuid) {
+  public List<Agent> getCreators(UUID articleUuid) throws RepositoryException {
     StringBuilder innerQuery =
         new StringBuilder(
             "SELECT ac.sortindex AS idx, * FROM "
@@ -151,8 +117,8 @@ public class ArticleRepositoryImpl extends EntityRepositoryImpl<Article>
               .map(
                   (entity) -> {
                     // FIXME: use new agentrepositoryimpl (see workrepositoryimpl)
-                    EntityType entityType = entity.getEntityType();
-                    switch (entityType) {
+                    IdentifiableObjectType type = entity.getIdentifiableObjectType();
+                    switch (type) {
                       case CORPORATE_BODY:
                         CorporateBody corporateBody = new CorporateBody();
                         corporateBody.setLabel(entity.getLabel());
@@ -182,8 +148,45 @@ public class ArticleRepositoryImpl extends EntityRepositoryImpl<Article>
   }
 
   @Override
-  public List<FileResource> getRelatedFileResources(UUID entityUuid) {
-    return entityRepositoryImpl.getRelatedFileResources(entityUuid);
+  public String getSqlInsertFields() {
+    return super.getSqlInsertFields() + ", date_published, text, timevalue_published";
+  }
+
+  /* Do not change order! Must match order in getSqlInsertFields!!! */
+  @Override
+  public String getSqlInsertValues() {
+    return super.getSqlInsertValues()
+        + ", :datePublished, :text::JSONB, :timeValuePublished::JSONB";
+  }
+
+  @Override
+  public String getSqlSelectAllFields(String tableAlias, String mappingPrefix) {
+    return super.getSqlSelectAllFields(tableAlias, mappingPrefix)
+        + ", "
+        + tableAlias
+        + ".text "
+        + mappingPrefix
+        + "_text";
+  }
+
+  @Override
+  public String getSqlSelectReducedFields(String tableAlias, String mappingPrefix) {
+    return super.getSqlSelectReducedFields(tableAlias, mappingPrefix)
+        + ", "
+        + tableAlias
+        + ".date_published "
+        + mappingPrefix
+        + "_datePublished, "
+        + tableAlias
+        + ".timevalue_published "
+        + mappingPrefix
+        + "_timeValuePublished";
+  }
+
+  @Override
+  public String getSqlUpdateFieldValues() {
+    return super.getSqlUpdateFieldValues()
+        + ", date_published=:datePublished, text=:text::JSONB, timevalue_published=:timeValuePublished::JSONB";
   }
 
   @Override

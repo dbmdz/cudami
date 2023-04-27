@@ -2,6 +2,7 @@ package de.digitalcollections.cudami.server.controller.identifiable.agent;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.agent.FamilyNameService;
 import de.digitalcollections.cudami.server.controller.CudamiControllerException;
 import de.digitalcollections.cudami.server.controller.legacy.V5MigrationHelper;
@@ -44,7 +45,7 @@ public class V5FamilyNameController {
       @RequestParam(name = "language", required = false, defaultValue = "de") String language,
       @RequestParam(name = "searchTerm", required = false) String searchTerm,
       @RequestParam(name = "initial", required = false) String initial)
-      throws JsonProcessingException, CudamiControllerException {
+      throws JsonProcessingException, CudamiControllerException, ServiceException {
     PageRequest pageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
     if (sortBy != null) {
       Sorting sorting = new Sorting(sortBy);

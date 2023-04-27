@@ -2,21 +2,20 @@ package de.digitalcollections.cudami.server.controller.identifiable.entity;
 
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
+import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifiableService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.ArticleService;
 import de.digitalcollections.cudami.server.controller.ParameterHelper;
+import de.digitalcollections.cudami.server.controller.identifiable.AbstractIdentifiableController;
 import de.digitalcollections.model.identifiable.entity.Article;
-import de.digitalcollections.model.list.paging.PageRequest;
+import de.digitalcollections.model.list.filtering.FilterCriterion;
 import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.list.sorting.Order;
-import de.digitalcollections.model.list.sorting.Sorting;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import java.util.Locale;
-import java.util.Objects;
 import java.util.UUID;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -30,12 +29,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @Tag(name = "Article controller")
-public class ArticleController {
+public class ArticleController extends AbstractIdentifiableController<Article> {
 
-  private final ArticleService articleService;
+  private final ArticleService service;
 
   public ArticleController(ArticleService articleService) {
-    this.articleService = articleService;
+    this.service = articleService;
   }
 
   @Operation(summary = "Get count of articles")
@@ -47,11 +46,11 @@ public class ArticleController {
         "/latest/articles/count"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public long count() {
-    return articleService.count();
+  public long count() throws ServiceException {
+    return super.count();
   }
 
-  @Operation(summary = "Get all articles")
+  @Operation(summary = "Get all articles as (paged, sorted, filtered) list")
   @GetMapping(
       value = {"/v6/articles"},
       produces = MediaType.APPLICATION_JSON_VALUE)
@@ -59,13 +58,9 @@ public class ArticleController {
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
-      @RequestParam(name = "searchTerm", required = false) String searchTerm) {
-    PageRequest pageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
-    if (sortBy != null) {
-      Sorting sorting = new Sorting(sortBy);
-      pageRequest.setSorting(sorting);
-    }
-    return articleService.find(pageRequest);
+      @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria)
+      throws ServiceException {
+    return super.find(pageNumber, pageSize, sortBy, filterCriteria);
   }
 
   @Operation(summary = "Get an article")
@@ -91,14 +86,11 @@ public class ArticleController {
           @RequestParam(name = "pLocale", required = false)
           Locale pLocale)
       throws ServiceException {
-
-    Article article;
     if (pLocale == null) {
-      article = articleService.getByUuid(uuid);
+      return super.getByUuid(uuid);
     } else {
-      article = articleService.getByUuidAndLocale(uuid, pLocale);
+      return super.getByUuidAndLocale(uuid, pLocale);
     }
-    return new ResponseEntity<>(article, article != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
   }
 
   @Operation(summary = "Get languages of all articles")
@@ -110,8 +102,13 @@ public class ArticleController {
         "/latest/articles/languages"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public List<Locale> getLanguages() {
-    return this.articleService.getLanguages();
+  public List<Locale> getLanguages() throws ServiceException {
+    return super.getLanguages();
+  }
+
+  @Override
+  protected IdentifiableService<Article> getService() {
+    return service;
   }
 
   @Operation(summary = "Save a newly created article")
@@ -120,8 +117,7 @@ public class ArticleController {
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Article save(@RequestBody Article article, BindingResult errors)
       throws ServiceException, ValidationException {
-    articleService.save(article);
-    return article;
+    return super.save(article, errors);
   }
 
   @Operation(summary = "Update an article")
@@ -135,8 +131,6 @@ public class ArticleController {
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Article update(@PathVariable UUID uuid, @RequestBody Article article, BindingResult errors)
       throws ServiceException, ValidationException {
-    assert Objects.equals(uuid, article.getUuid());
-    articleService.update(article);
-    return article;
+    return super.update(uuid, article, errors);
   }
 }

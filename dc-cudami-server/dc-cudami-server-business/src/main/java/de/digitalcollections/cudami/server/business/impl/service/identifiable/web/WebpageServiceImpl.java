@@ -1,9 +1,11 @@
 package de.digitalcollections.cudami.server.business.impl.service.identifiable.web;
 
 import de.digitalcollections.cudami.model.config.CudamiConfig;
+import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.NodeRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.web.WebpageRepository;
 import de.digitalcollections.cudami.server.business.api.service.LocaleService;
+import de.digitalcollections.cudami.server.business.api.service.content.ManagedContentService;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifierService;
@@ -21,7 +23,6 @@ import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.view.BreadcrumbNavigation;
 import java.util.List;
 import java.util.Locale;
-import java.util.UUID;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,34 +48,41 @@ public class WebpageServiceImpl extends IdentifiableServiceImpl<Webpage, Webpage
   }
 
   @Override
-  public boolean addChildren(UUID parentUuid, List<UUID> childrenUuids) {
-    return ((NodeRepository<Webpage>) repository).addChildren(parentUuid, childrenUuids);
+  public boolean addChild(Webpage parent, Webpage child) throws ServiceException {
+    try {
+      return ((NodeRepository<Webpage>) repository).addChild(parent, child);
+    } catch (RepositoryException e) {
+      throw new ServiceException("Backend failure", e);
+    }
   }
 
   @Override
-  public PageResponse<Webpage> find(PageRequest pageRequest) {
+  public boolean addChildren(Webpage parent, List<Webpage> children) throws ServiceException {
+    try {
+      return ((NodeRepository<Webpage>) repository).addChildren(parent, children);
+    } catch (RepositoryException e) {
+      throw new ServiceException("Backend failure", e);
+    }
+  }
+
+  @Override
+  public PageResponse<Webpage> find(PageRequest pageRequest) throws ServiceException {
     PageResponse<Webpage> pageResponse = super.find(pageRequest);
     setPublicationStatus(pageResponse.getContent());
     return pageResponse;
   }
 
   @Override
-  public List<Webpage> find(String searchTerm, int maxResults) {
-    List<Webpage> webpages = super.find(searchTerm, maxResults);
-    setPublicationStatus(webpages);
-    return webpages;
-  }
-
-  @Override
-  public PageResponse<Webpage> findActiveChildren(UUID uuid, PageRequest pageRequest) {
-    Filtering filtering = filteringForActive();
+  public PageResponse<Webpage> findActiveChildren(Webpage webpage, PageRequest pageRequest)
+      throws ServiceException {
+    Filtering filtering = ManagedContentService.filteringForActive();
     pageRequest.add(filtering);
-    return findChildren(uuid, pageRequest);
+    return findChildren(webpage, pageRequest);
   }
 
   @Override
   public PageResponse<Webpage> findByLanguageAndInitial(
-      PageRequest pageRequest, String language, String initial) {
+      PageRequest pageRequest, String language, String initial) throws ServiceException {
     PageResponse<Webpage> pageResponse =
         super.findByLanguageAndInitial(pageRequest, language, initial);
     setPublicationStatus(pageResponse.getContent());
@@ -82,169 +90,227 @@ public class WebpageServiceImpl extends IdentifiableServiceImpl<Webpage, Webpage
   }
 
   @Override
-  public PageResponse<Webpage> findChildren(UUID uuid, PageRequest pageRequest) {
-    PageResponse<Webpage> pageResponse =
-        ((NodeRepository<Webpage>) repository).findChildren(uuid, pageRequest);
-    setPublicationStatus(pageResponse.getContent());
-    return pageResponse;
-  }
-
-  @Override
-  public PageResponse<Webpage> findRootNodes(PageRequest pageRequest) {
-    PageResponse<Webpage> pageResponse =
-        ((NodeRepository<Webpage>) repository).findRootNodes(pageRequest);
-    setPublicationStatus(pageResponse.getContent());
-    return pageResponse;
-  }
-
-  @Override
-  public PageResponse<Webpage> findRootWebpagesForWebsite(
-      UUID websiteUuid, PageRequest pageRequest) {
-    PageResponse<Webpage> pageResponse =
-        ((WebpageRepository) repository).findRootWebpagesForWebsite(websiteUuid, pageRequest);
-    setPublicationStatus(pageResponse.getContent());
-    return pageResponse;
-  }
-
-  @Override
-  public Webpage getActive(UUID uuid) {
-    Filtering filtering = filteringForActive();
-    Webpage webpage = ((WebpageRepository) repository).getByUuidAndFiltering(uuid, filtering);
-    if (webpage != null) {
-      webpage.setChildren(getActiveChildren(uuid));
+  public PageResponse<Webpage> findChildren(Webpage webpage, PageRequest pageRequest)
+      throws ServiceException {
+    PageResponse<Webpage> pageResponse;
+    try {
+      pageResponse = ((NodeRepository<Webpage>) repository).findChildren(webpage, pageRequest);
+    } catch (RepositoryException e) {
+      throw new ServiceException("Backend failure", e);
     }
-    setPublicationStatus(webpage);
-    return webpage;
+    setPublicationStatus(pageResponse.getContent());
+    return pageResponse;
   }
 
   @Override
-  public Webpage getActive(UUID uuid, Locale pLocale) {
-    Webpage webpage = getActive(uuid);
-    webpage = reduceMultilanguageFieldsToGivenLocale(webpage, pLocale);
-    setPublicationStatus(webpage);
-    return webpage;
+  public PageResponse<Webpage> findRootNodes(PageRequest pageRequest) throws ServiceException {
+    PageResponse<Webpage> pageResponse;
+    try {
+      pageResponse = ((NodeRepository<Webpage>) repository).findRootNodes(pageRequest);
+    } catch (RepositoryException e) {
+      throw new ServiceException("Backend failure", e);
+    }
+    setPublicationStatus(pageResponse.getContent());
+    return pageResponse;
   }
 
   @Override
-  public List<Webpage> getActiveChildren(UUID uuid) {
-    Filtering filtering = filteringForActive();
+  public PageResponse<Webpage> findRootWebpagesForWebsite(Website website, PageRequest pageRequest)
+      throws ServiceException {
+    PageResponse<Webpage> pageResponse;
+    try {
+      pageResponse =
+          ((WebpageRepository) repository).findRootWebpagesForWebsite(website, pageRequest);
+    } catch (RepositoryException e) {
+      throw new ServiceException("Backend failure", e);
+    }
+    setPublicationStatus(pageResponse.getContent());
+    return pageResponse;
+  }
+
+  @Override
+  public List<Webpage> getActiveChildren(Webpage webpage) throws ServiceException {
+    Filtering filtering = ManagedContentService.filteringForActive();
     PageRequest pageRequest = new PageRequest();
     pageRequest.add(filtering);
-    return findChildren(uuid, pageRequest).getContent();
+    List<Webpage> children = findChildren(webpage, pageRequest).getContent();
+    setPublicationStatus(children);
+    return children;
   }
 
   @Override
-  public List<Webpage> getActiveChildrenTree(UUID uuid) {
-    List<Webpage> webpages = getActiveChildren(uuid);
+  public List<Webpage> getActiveChildrenTree(Webpage webpage) throws ServiceException {
+    List<Webpage> webpages = getActiveChildren(webpage);
     List<Webpage> list =
         webpages.stream()
-            .peek(w -> w.setChildren(getActiveChildrenTree(w.getUuid())))
+            .peek(
+                w -> {
+                  try {
+                    w.setChildren(getActiveChildrenTree(w));
+                  } catch (ServiceException e) {
+                    LOGGER.error("Can not get active children tree for webpage", e);
+                  }
+                })
             .collect(Collectors.toList());
     setPublicationStatus(list);
     return list;
   }
 
   @Override
-  public List<Webpage> getAllFull() {
-    List<Webpage> webpages = super.getAllFull();
-    setPublicationStatus(webpages);
-    return webpages;
+  public BreadcrumbNavigation getBreadcrumbNavigation(Webpage webpage) throws ServiceException {
+    try {
+      return ((NodeRepository<Webpage>) repository).getBreadcrumbNavigation(webpage);
+    } catch (RepositoryException e) {
+      throw new ServiceException("Backend failure", e);
+    }
   }
 
   @Override
-  public List<Webpage> getAllReduced() {
-    List<Webpage> webpages = super.getAllReduced();
-    setPublicationStatus(webpages);
-    return webpages;
+  public Webpage getByExample(Webpage uniqueObject) throws ServiceException {
+    Webpage webpage = super.getByExample(uniqueObject);
+    if (webpage != null) {
+      setPublicationStatus(webpage);
+    }
+    return webpage;
   }
 
   @Override
-  public BreadcrumbNavigation getBreadcrumbNavigation(UUID uuid) {
-    return ((NodeRepository<Webpage>) repository).getBreadcrumbNavigation(uuid);
+  public Webpage getByExampleAndActive(Webpage example) throws ServiceException {
+    Filtering filtering = ManagedContentService.filteringForActive();
+    Webpage webpage;
+    try {
+      webpage = ((WebpageRepository) repository).getByExampleAndFiltering(example, filtering);
+    } catch (RepositoryException e) {
+      throw new ServiceException("Backend failure", e);
+    }
+    if (webpage != null) {
+      setPublicationStatus(webpage);
+      webpage.setChildren(getActiveChildren(webpage));
+    }
+    return webpage;
   }
 
   @Override
-  public Webpage getByIdentifier(Identifier identifier) {
+  public Webpage getByExampleAndActiveAndLocale(Webpage example, Locale pLocale)
+      throws ServiceException {
+    Webpage webpage = getByExampleAndActive(example);
+    webpage = reduceMultilanguageFieldsToGivenLocale(webpage, pLocale);
+    if (webpage != null) {
+      setPublicationStatus(webpage);
+      webpage.setChildren(getActiveChildren(webpage));
+    }
+    return webpage;
+  }
+
+  @Override
+  public Webpage getByIdentifier(Identifier identifier) throws ServiceException {
     Webpage webpage = super.getByIdentifier(identifier);
+    if (webpage != null) {
+      setPublicationStatus(webpage);
+    }
+    return webpage;
+  }
+
+  @Override
+  public Webpage getByExampleAndLocale(Webpage example, Locale locale) throws ServiceException {
+    Webpage webpage = super.getByExampleAndLocale(example, locale);
     setPublicationStatus(webpage);
     return webpage;
   }
 
   @Override
-  public Webpage getByUuid(UUID uuid) throws ServiceException {
-    Webpage webpage = super.getByUuid(uuid);
-    setPublicationStatus(webpage);
-    return webpage;
-  }
-
-  @Override
-  public Webpage getByUuidAndLocale(UUID uuid, Locale locale) throws ServiceException {
-    Webpage webpage = super.getByUuidAndLocale(uuid, locale);
-    setPublicationStatus(webpage);
-    return webpage;
-  }
-
-  @Override
-  public List<Webpage> getChildren(Webpage webpage) {
-    List<Webpage> children = ((NodeRepository<Webpage>) repository).getChildren(webpage);
+  public List<Webpage> getChildren(Webpage webpage) throws ServiceException {
+    List<Webpage> children;
+    try {
+      children = ((NodeRepository<Webpage>) repository).getChildren(webpage);
+    } catch (RepositoryException e) {
+      throw new ServiceException("Backend failure", e);
+    }
     setPublicationStatus(children);
     return children;
   }
 
   @Override
-  public List<Webpage> getChildren(UUID uuid) {
-    List<Webpage> children = ((NodeRepository<Webpage>) repository).getChildren(uuid);
-    setPublicationStatus(children);
-    return children;
-  }
-
-  @Override
-  public List<Webpage> getChildrenTree(UUID uuid) {
-    List<Webpage> webpages = getChildren(uuid);
+  public List<Webpage> getChildrenTree(Webpage webpage) throws ServiceException {
+    List<Webpage> webpages = getChildren(webpage);
     List<Webpage> list =
         webpages.stream()
-            .peek(w -> w.setChildren(getChildrenTree(w.getUuid())))
+            .peek(
+                w -> {
+                  try {
+                    w.setChildren(getChildrenTree(w));
+                  } catch (ServiceException e) {
+                    LOGGER.error("Can not get children tree for webpage", e);
+                  }
+                })
             .collect(Collectors.toList());
     setPublicationStatus(list);
     return list;
   }
 
   @Override
-  public Webpage getParent(UUID webpageUuid) {
-    Webpage parent = ((NodeRepository<Webpage>) repository).getParent(webpageUuid);
+  public Webpage getParent(Webpage webpage) throws ServiceException {
+    Webpage parent;
+    try {
+      parent = ((NodeRepository<Webpage>) repository).getParent(webpage);
+    } catch (RepositoryException e) {
+      throw new ServiceException("Backend failure", e);
+    }
     setPublicationStatus(parent);
     return parent;
   }
 
   @Override
-  public List<Webpage> getParents(UUID uuid) {
-    List<Webpage> parents = ((NodeRepository<Webpage>) repository).getParents(uuid);
+  public List<Webpage> getParents(Webpage webpage) throws ServiceException {
+    List<Webpage> parents;
+    try {
+      parents = ((NodeRepository) repository).getParents(webpage);
+    } catch (RepositoryException e) {
+      throw new ServiceException("Backend failure", e);
+    }
     setPublicationStatus(parents);
     return parents;
   }
 
   @Override
-  public List<Locale> getRootNodesLanguages() {
-    List<Locale> rootNodesLanguages =
-        ((NodeRepository<Webpage>) repository).getRootNodesLanguages();
-    return rootNodesLanguages;
+  public List<Webpage> getRandom(int count) throws ServiceException {
+    List<Webpage> webpages = super.getRandom(count);
+    setPublicationStatus(webpages);
+    return webpages;
   }
 
   @Override
-  public Website getWebsite(UUID webpageUuid) {
-    UUID rootWebpageUuid = webpageUuid;
-    Webpage parent = getParent(webpageUuid);
+  public List<Locale> getRootNodesLanguages() throws ServiceException {
+    try {
+      return ((NodeRepository<Webpage>) repository).getRootNodesLanguages();
+    } catch (RepositoryException e) {
+      throw new ServiceException("Backend failure", e);
+    }
+  }
+
+  @Override
+  public Website getWebsite(Webpage webpage) throws ServiceException {
+    Webpage rootWebpage = webpage;
+    Webpage parent = getParent(webpage);
     while (parent != null) {
-      rootWebpageUuid = parent.getUuid();
+      rootWebpage = parent;
       parent = getParent(parent);
     }
     // root webpage under a website
-    return ((WebpageRepository) repository).getWebsite(rootWebpageUuid);
+    try {
+      return ((WebpageRepository) repository).getWebsite(rootWebpage);
+    } catch (RepositoryException e) {
+      throw new ServiceException("Backend failure", e);
+    }
   }
 
   @Override
-  public boolean removeChild(UUID parentUuid, UUID childUuid) {
-    return ((NodeRepository<Webpage>) repository).removeChild(parentUuid, childUuid);
+  public boolean removeChild(Webpage parent, Webpage child) throws ServiceException {
+    try {
+      return ((NodeRepository<Webpage>) repository).removeChild(parent, child);
+    } catch (RepositoryException e) {
+      throw new ServiceException("Backend failure", e);
+    }
   }
 
   @Override
@@ -258,28 +324,29 @@ public class WebpageServiceImpl extends IdentifiableServiceImpl<Webpage, Webpage
   }
 
   @Override
-  public Webpage saveWithParent(UUID childUuid, UUID parentUuid) throws ServiceException {
+  public Webpage saveWithParent(Webpage child, Webpage parent) throws ServiceException {
     try {
-      Webpage webpage =
-          ((NodeRepository<Webpage>) repository).saveWithParent(childUuid, parentUuid);
+      Webpage webpage = ((NodeRepository<Webpage>) repository).saveWithParent(child, parent);
       setPublicationStatus(webpage);
       return webpage;
     } catch (Exception e) {
-      LOGGER.error("Cannot save webpage " + childUuid + ": ", e);
+      LOGGER.error("Cannot save webpage " + child + ": ", e);
       throw new ServiceException(e.getMessage());
     }
   }
 
   @Override
-  public Webpage saveWithParentWebsite(Webpage webpage, UUID parentWebsiteUuid)
+  public Webpage saveWithParentWebsite(Webpage webpage, Website parentWebsite)
       throws ServiceException {
     try {
       if (webpage.getUuid() == null) {
         save(webpage);
       }
-      webpage =
-          ((WebpageRepository) repository)
-              .saveWithParentWebsite(webpage.getUuid(), parentWebsiteUuid);
+      try {
+        webpage = ((WebpageRepository) repository).saveWithParentWebsite(webpage, parentWebsite);
+      } catch (RepositoryException e) {
+        throw new ServiceException("Backend failure", e);
+      }
       setPublicationStatus(webpage);
       return webpage;
     } catch (ServiceException | ValidationException e) {
@@ -299,8 +366,13 @@ public class WebpageServiceImpl extends IdentifiableServiceImpl<Webpage, Webpage
   }
 
   @Override
-  public boolean updateChildrenOrder(UUID parentUuid, List<Webpage> children) {
-    return ((NodeRepository<Webpage>) repository).updateChildrenOrder(parentUuid, children);
+  public boolean updateChildrenOrder(Webpage parent, List<Webpage> children)
+      throws ServiceException {
+    try {
+      return ((NodeRepository<Webpage>) repository).updateChildrenOrder(parent, children);
+    } catch (RepositoryException e) {
+      throw new ServiceException("Backend failure", e);
+    }
   }
 
   private void validate(LocalizedUrlAliases localizedUrlAliases) throws ValidationException {

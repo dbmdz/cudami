@@ -1,7 +1,7 @@
 package de.digitalcollections.cudami.server.controller.identifiable.entity.relation;
 
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
-import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.relation.EntityRelationService;
+import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.relation.EntityToEntityRelationService;
 import de.digitalcollections.model.identifiable.entity.relation.EntityRelation;
 import de.digitalcollections.model.list.filtering.FilterCriterion;
 import de.digitalcollections.model.list.filtering.Filtering;
@@ -24,10 +24,10 @@ import org.springframework.web.bind.annotation.RestController;
 @Tag(name = "Entity relation controller")
 public class EntityRelationController {
 
-  private final EntityRelationService entityRelationService;
+  private final EntityToEntityRelationService service;
 
-  public EntityRelationController(EntityRelationService entityRelationservice) {
-    this.entityRelationService = entityRelationservice;
+  public EntityRelationController(EntityToEntityRelationService entityRelationservice) {
+    this.service = entityRelationservice;
   }
 
   @Operation(summary = "Get paged, sorted, filtered relations")
@@ -37,7 +37,8 @@ public class EntityRelationController {
   public PageResponse<EntityRelation> findByPredicate(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
-      @RequestParam(name = "predicate", required = false) String predicate) {
+      @RequestParam(name = "predicate", required = false) String predicate)
+      throws ServiceException {
     PageRequest pageRequest = new PageRequest(pageNumber, pageSize);
 
     if (StringUtils.hasText(predicate)) {
@@ -49,7 +50,22 @@ public class EntityRelationController {
 
       pageRequest.add(filtering);
     }
-    return entityRelationService.find(pageRequest);
+    return service.find(pageRequest);
+  }
+
+  @Operation(summary = "Connect a list of entity pairs with a predicate each")
+  @PutMapping(
+      value = {
+        "/v5/entities/relations",
+        "/v6/entities/relations",
+        "/v3/entities/relations",
+        "/latest/entities/relations"
+      },
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  List<EntityRelation> save(@RequestBody List<EntityRelation> entityRelations)
+      throws ServiceException {
+    service.save(entityRelations);
+    return entityRelations;
   }
 
   @Operation(
@@ -75,22 +91,7 @@ public class EntityRelationController {
       throw new IllegalArgumentException(
           "Mismatching arguments. SubjectUuid must match the Uuid of the subject of the first item");
     }
-    entityRelationService.save(entityRelations);
-    return entityRelations;
-  }
-
-  @Operation(summary = "Connect a list of entity pairs with a predicate each")
-  @PutMapping(
-      value = {
-        "/v5/entities/relations",
-        "/v6/entities/relations",
-        "/v3/entities/relations",
-        "/latest/entities/relations"
-      },
-      produces = MediaType.APPLICATION_JSON_VALUE)
-  List<EntityRelation> save(@RequestBody List<EntityRelation> entityRelations)
-      throws ServiceException {
-    entityRelationService.save(entityRelations);
+    service.save(entityRelations);
     return entityRelations;
   }
 }

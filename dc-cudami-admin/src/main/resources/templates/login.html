@@ -19,24 +19,23 @@
       <div class="login-logo">
         <img th:src="@{/images/logo-cudami.png}" alt="cudami Logo" class="brand-image" style="opacity: .8">
       </div>
-      <!-- /.login-logo -->
       <div class="card">
         <div class="card-body login-card-body">
           <p class="login-box-msg" th:text="#{title_login}">Please log in</p>
 
-          <div class="alert alert-danger" th:if="${param.error}" th:text="#{login_failed}">Wrong username or password</div>
+          <div class="alert alert-danger" th:if="${param.error}" th:text="#{alert.danger.login_failed}">Wrong username or password</div>
 
           <form role="form" name="input" th:action="@{/login}" method="post">
             <div class="input-group mb-3">
-              <input type="email" class="form-control" th:placeholder="#{lbl_username}" name="username" autofocus="autofocus">
+              <input type="email" class="form-control" th:placeholder="#{lbl.username}" name="username" autofocus="autofocus">
               <div class="input-group-append">
                 <div class="input-group-text">
-                  <span class="fas fa-question-circle" th:attr="title=#{tooltip_username}"></span>
+                  <span class="fas fa-question-circle" th:attr="title=#{tooltip.username}"></span>
                 </div>
               </div>
             </div>
             <div class="input-group mb-3">
-              <input type="password" class="form-control" th:placeholder="#{lbl_password}" name="password">
+              <input type="password" class="form-control" th:placeholder="#{lbl.password}" name="password">
               <div class="input-group-append">
                 <div class="input-group-text">
                   <span class="fas fa-lock"></span>
@@ -47,14 +46,12 @@
               <div class="col-8">
                 <div class="icheck-primary">
                   <input type="checkbox" id="remember-me" name="remember-me" value="true">
-                  <label for="remember-me" th:text="#{lbl_stay_logged_in}">Remember me</label>
+                  <label for="remember-me" th:text="#{lbl.stay_logged_in}">Remember me</label>
                 </div>
               </div>
-              <!-- /.col -->
               <div class="col-4">
-                <button type="submit" class="btn btn-primary btn-block" th:text="#{btn_login}">Login</button>
+                <button type="submit" class="btn btn-primary btn-block" th:text="#{btn.login}">Login</button>
               </div>
-              <!-- /.col -->
             </div>
           </form>
 
@@ -62,13 +59,11 @@
                   <a href="forgot-password.html">I forgot my password</a>
                 </p>-->
         </div>
-        <!-- /.login-card-body -->
       </div>
       <div class="float-right text-muted">
         v<small th:text="${version}">1.0.0</small>
       </div>
     </div>
-    <!-- /.login-box -->
 
     <!-- jQuery -->
     <script th:src="@{/webjars/AdminLTE/plugins/jquery/jquery.min.js}"></script>

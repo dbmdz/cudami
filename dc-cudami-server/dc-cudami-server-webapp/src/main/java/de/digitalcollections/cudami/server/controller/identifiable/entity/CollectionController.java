@@ -4,10 +4,10 @@ import de.digitalcollections.cudami.server.business.api.service.LocaleService;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ConflictException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
-import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifiableService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.CollectionService;
+import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.EntityService;
+import de.digitalcollections.cudami.server.controller.AbstractEntityController;
 import de.digitalcollections.cudami.server.controller.ParameterHelper;
-import de.digitalcollections.cudami.server.controller.identifiable.AbstractIdentifiableController;
 import de.digitalcollections.model.identifiable.entity.Collection;
 import de.digitalcollections.model.identifiable.entity.agent.CorporateBody;
 import de.digitalcollections.model.identifiable.entity.digitalobject.DigitalObject;
@@ -16,48 +16,30 @@ import de.digitalcollections.model.list.filtering.Filtering;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.list.sorting.Order;
-import de.digitalcollections.model.list.sorting.Sorting;
 import de.digitalcollections.model.view.BreadcrumbNavigation;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import java.util.Locale;
-import java.util.Objects;
 import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @Tag(name = "Collection controller")
-public class CollectionController extends AbstractIdentifiableController<Collection> {
+public class CollectionController extends AbstractEntityController<Collection> {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(CollectionController.class);
-
-  private final CollectionService collectionService;
   private final LocaleService localeService;
+  private final CollectionService service;
 
   public CollectionController(CollectionService collectionService, LocaleService localeService) {
-    this.collectionService = collectionService;
+    this.service = collectionService;
     this.localeService = localeService;
-  }
-
-  @Override
-  protected IdentifiableService<Collection> getService() {
-    return collectionService;
   }
 
   @Operation(summary = "Add an existing digital object to an existing collection")
@@ -82,14 +64,15 @@ public class CollectionController extends AbstractIdentifiableController<Collect
           UUID collectionUuid,
       @Parameter(example = "", description = "UUID of the digital object")
           @PathVariable("digitalObjectUuid")
-          UUID digitalObjectUuid) {
+          UUID digitalObjectUuid)
+      throws ServiceException {
     Collection collection = new Collection();
     collection.setUuid(collectionUuid);
 
     DigitalObject digitalObject = new DigitalObject();
     digitalObject.setUuid(digitalObjectUuid);
 
-    boolean successful = collectionService.addDigitalObject(collection, digitalObject);
+    boolean successful = service.addDigitalObject(collection, digitalObject);
     return successful
         ? new ResponseEntity<>(HttpStatus.NO_CONTENT)
         : new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -108,11 +91,12 @@ public class CollectionController extends AbstractIdentifiableController<Collect
       @Parameter(example = "", description = "UUID of the collection") @PathVariable("uuid")
           UUID collectionUuid,
       @Parameter(example = "", description = "List of the digital objects") @RequestBody
-          List<DigitalObject> digitalObjects) {
+          List<DigitalObject> digitalObjects)
+      throws ServiceException {
     Collection collection = new Collection();
     collection.setUuid(collectionUuid);
 
-    boolean successful = collectionService.addDigitalObjects(collection, digitalObjects);
+    boolean successful = service.addDigitalObjects(collection, digitalObjects);
     return successful
         ? new ResponseEntity<>(HttpStatus.NO_CONTENT)
         : new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -140,14 +124,15 @@ public class CollectionController extends AbstractIdentifiableController<Collect
           UUID uuid,
       @Parameter(example = "", description = "UUID of the subcollection")
           @PathVariable("subcollectionUuid")
-          UUID subcollectionUuid) {
+          UUID subcollectionUuid)
+      throws ServiceException {
     Collection collection = new Collection();
     collection.setUuid(uuid);
 
     Collection subcollection = new Collection();
     subcollection.setUuid(subcollectionUuid);
 
-    boolean successful = collectionService.addChild(collection, subcollection);
+    boolean successful = service.addChild(collection, subcollection);
     return successful
         ? new ResponseEntity<>(HttpStatus.NO_CONTENT)
         : new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -166,11 +151,12 @@ public class CollectionController extends AbstractIdentifiableController<Collect
       @Parameter(example = "", description = "UUID of the collection") @PathVariable("uuid")
           UUID uuid,
       @Parameter(example = "", description = "List of the subcollections") @RequestBody
-          List<Collection> subcollections) {
+          List<Collection> subcollections)
+      throws ServiceException {
     Collection collection = new Collection();
     collection.setUuid(uuid);
 
-    boolean successful = collectionService.addChildren(collection, subcollections);
+    boolean successful = service.addChildren(collection, subcollections);
     return successful
         ? new ResponseEntity<>(HttpStatus.NO_CONTENT)
         : new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -185,8 +171,8 @@ public class CollectionController extends AbstractIdentifiableController<Collect
         "/latest/collections/count"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public long count() {
-    return collectionService.count();
+  public long count() throws ServiceException {
+    return super.count();
   }
 
   @Operation(summary = "Delete an existing collection")
@@ -198,48 +184,30 @@ public class CollectionController extends AbstractIdentifiableController<Collect
   public ResponseEntity delete(
       @Parameter(example = "", description = "UUID of the collection") @PathVariable("uuid")
           UUID uuid)
-      throws ConflictException {
-
-    boolean successful;
-    try {
-      successful = collectionService.delete(uuid);
-    } catch (ServiceException e) {
-      return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-    return successful
-        ? new ResponseEntity<>(HttpStatus.NO_CONTENT)
-        : new ResponseEntity<>(HttpStatus.NOT_FOUND);
+      throws ConflictException, ServiceException {
+    return super.delete(uuid);
   }
 
-  @Operation(
-      summary =
-          "Find limited amount of (active or all) collections containing searchTerm in label or description")
+  @Operation(summary = "Get (active or all) collections as (paged, sorted, filtered) list")
   @GetMapping(
       value = {"/v6/collections"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  // should work with v5-clients, too, as only searchTerm field is added (will be ignored by jackson
-  // if unknown)
   public PageResponse<Collection> find(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
-      @RequestParam(name = "searchTerm", required = false) String searchTerm,
-      @RequestParam(name = "label", required = false) String labelTerm,
-      @RequestParam(name = "labelLanguage", required = false) Locale labelLanguage,
-      @RequestParam(name = "active", required = false) String active) {
-    PageRequest pageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
-    if (sortBy != null) {
-      Sorting sorting = new Sorting(sortBy);
-      pageRequest.setSorting(sorting);
-    }
-    addLabelFilter(pageRequest, labelTerm, labelLanguage);
+      @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria,
+      @RequestParam(name = "active", required = false) String active)
+      throws ServiceException {
+    PageRequest pageRequest =
+        createPageRequest(Collection.class, pageNumber, pageSize, sortBy, filterCriteria);
     if (active != null) {
-      return collectionService.findActive(pageRequest);
+      return service.findActive(pageRequest);
     }
-    return collectionService.find(pageRequest);
+    return super.find(pageNumber, pageSize, sortBy, filterCriteria);
   }
 
-  @Operation(summary = "Get paged digital objects of a collection")
+  @Operation(summary = "Get all digital objects of a collection as (paged, sorted, filtered) list")
   @GetMapping(
       value = {"/v6/collections/{uuid:" + ParameterHelper.UUID_PATTERN + "}/digitalobjects"},
       produces = MediaType.APPLICATION_JSON_VALUE)
@@ -248,12 +216,17 @@ public class CollectionController extends AbstractIdentifiableController<Collect
           UUID collectionUuid,
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
-      @RequestParam(name = "searchTerm", required = false) String searchTerm) {
-    PageRequest searchPageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
-
+      //      @RequestParam(name = "sortBy", required = false) List<Order> sortBy, // FIXME: no
+      // sorting as we use sortIndex from cross table!
+      @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria)
+      throws ServiceException {
+    // FIXME: if we pass sortBy: down in backend we get an error because c.label is used instead
+    // do.label...
+    PageRequest pageRequest =
+        createPageRequest(DigitalObject.class, pageNumber, pageSize, null, filterCriteria);
     Collection collection = new Collection();
     collection.setUuid(collectionUuid);
-    return collectionService.findDigitalObjects(collection, searchPageRequest);
+    return service.findDigitalObjects(collection, pageRequest);
   }
 
   @Operation(
@@ -269,12 +242,14 @@ public class CollectionController extends AbstractIdentifiableController<Collect
   public List<CorporateBody> findRelatedCorporateBodies(
       @Parameter(example = "", description = "UUID of the collection") @PathVariable("uuid")
           UUID uuid,
-      @RequestParam(name = "predicate", required = true) FilterCriterion<String> predicate) {
-    Filtering filtering = Filtering.builder().add("predicate", predicate).build();
-    return collectionService.findRelatedCorporateBodies(uuid, filtering);
+      @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria)
+      throws ServiceException {
+    return service.findRelatedCorporateBodies(
+        buildExampleWithUuid(uuid), new Filtering(filterCriteria));
   }
 
-  @Operation(summary = "Get (active or all) paged subcollections of a collection")
+  @Operation(
+      summary = "Get all (active) subcollections of a collection as (paged, sorted, filtered) list")
   @GetMapping(
       value = {"/v6/collections/{uuid:" + ParameterHelper.UUID_PATTERN + "}/subcollections"},
       produces = MediaType.APPLICATION_JSON_VALUE)
@@ -283,35 +258,32 @@ public class CollectionController extends AbstractIdentifiableController<Collect
           UUID collectionUuid,
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
-      @RequestParam(name = "active", required = false) String active,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
-      @RequestParam(name = "searchTerm", required = false) String searchTerm) {
-    PageRequest searchPageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
-    if (sortBy != null) {
-      Sorting sorting = new Sorting(sortBy);
-      searchPageRequest.setSorting(sorting);
-    }
+      @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria,
+      @RequestParam(name = "active", required = false) String active)
+      throws ServiceException {
+    PageRequest pageRequest =
+        createPageRequest(Collection.class, pageNumber, pageSize, sortBy, filterCriteria);
     if (active != null) {
-      return collectionService.findActiveChildren(collectionUuid, searchPageRequest);
+      return service.findActiveChildren(buildExampleWithUuid(collectionUuid), pageRequest);
     }
-    return collectionService.findChildren(collectionUuid, searchPageRequest);
+    return service.findChildren(buildExampleWithUuid(collectionUuid), pageRequest);
   }
 
-  @Operation(summary = "Get all top collections")
+  @Operation(summary = "Get all (active) top collections as (paged, sorted, filtered) list")
   @GetMapping(
       value = {"/v6/collections/top"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public PageResponse<Collection> findTopCollections(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
-      @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
+      @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
-      @RequestParam(name = "searchTerm", required = false) String searchTerm) {
-    PageRequest pageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
-    if (sortBy != null) {
-      Sorting sorting = new Sorting(sortBy);
-      pageRequest.setSorting(sorting);
-    }
-    return collectionService.findRootNodes(pageRequest);
+      @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria,
+      @RequestParam(name = "active", required = false) String active)
+      throws ServiceException {
+    PageRequest pageRequest =
+        createPageRequest(Collection.class, pageNumber, pageSize, sortBy, filterCriteria);
+    return service.findRootNodes(pageRequest);
   }
 
   @Operation(summary = "Get the breadcrumb for a collection")
@@ -335,16 +307,17 @@ public class CollectionController extends AbstractIdentifiableController<Collect
               description =
                   "Desired locale, e.g. <tt>de_DE</tt>. If unset, contents in all languages will be returned")
           @RequestParam(name = "pLocale", required = false)
-          Locale pLocale) {
+          Locale pLocale)
+      throws ServiceException {
 
     BreadcrumbNavigation breadcrumbNavigation;
 
     if (pLocale == null) {
-      breadcrumbNavigation = collectionService.getBreadcrumbNavigation(uuid);
+      breadcrumbNavigation = service.getBreadcrumbNavigation(buildExampleWithUuid(uuid));
     } else {
       breadcrumbNavigation =
-          collectionService.getBreadcrumbNavigation(
-              uuid, pLocale, localeService.getDefaultLocale());
+          service.getBreadcrumbNavigation(
+              buildExampleWithUuid(uuid), pLocale, localeService.getDefaultLocale());
     }
 
     if (breadcrumbNavigation == null || breadcrumbNavigation.getNavigationItems().isEmpty()) {
@@ -385,11 +358,7 @@ public class CollectionController extends AbstractIdentifiableController<Collect
           @PathVariable
           long refId)
       throws ServiceException {
-    Collection collection = collectionService.getByRefId(refId);
-    if (collection == null) {
-      return ResponseEntity.notFound().build();
-    }
-    return getByUuid(collection.getUuid(), null, null);
+    return super.getByRefId(refId);
   }
 
   @Operation(summary = "Get a collection by uuid")
@@ -418,18 +387,19 @@ public class CollectionController extends AbstractIdentifiableController<Collect
           @RequestParam(name = "active", required = false)
           String active)
       throws ServiceException {
+    Collection example = buildExampleWithUuid(uuid);
     Collection collection;
     if (active != null) {
       if (pLocale == null) {
-        collection = collectionService.getActive(uuid);
+        collection = service.getByExampleAndActive(example);
       } else {
-        collection = collectionService.getActive(uuid, pLocale);
+        collection = service.getByExampleAndActiveAndLocale(example, pLocale);
       }
     } else {
       if (pLocale == null) {
-        collection = collectionService.getByUuid(uuid);
+        collection = service.getByExample(example);
       } else {
-        collection = collectionService.getByUuidAndLocale(uuid, pLocale);
+        collection = service.getByExampleAndLocale(example, pLocale);
       }
     }
     return new ResponseEntity<>(
@@ -445,8 +415,8 @@ public class CollectionController extends AbstractIdentifiableController<Collect
         "/latest/collections/{uuid:" + ParameterHelper.UUID_PATTERN + "}/parent"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public Collection getParent(@PathVariable UUID uuid) {
-    return collectionService.getParent(uuid);
+  public Collection getParent(@PathVariable UUID uuid) throws ServiceException {
+    return service.getParent(buildExampleWithUuid(uuid));
   }
 
   @Operation(summary = "Get parent collections")
@@ -460,8 +430,14 @@ public class CollectionController extends AbstractIdentifiableController<Collect
       produces = MediaType.APPLICATION_JSON_VALUE)
   public List<Collection> getParents(
       @Parameter(example = "", description = "UUID of the collection") @PathVariable("uuid")
-          UUID collectionUuid) {
-    return collectionService.getParents(collectionUuid);
+          UUID collectionUuid)
+      throws ServiceException {
+    return service.getParents(buildExampleWithUuid(collectionUuid));
+  }
+
+  @Override
+  protected EntityService<Collection> getService() {
+    return service;
   }
 
   @Operation(summary = "Get languages of all top collections")
@@ -473,8 +449,8 @@ public class CollectionController extends AbstractIdentifiableController<Collect
         "/latest/collections/top/languages"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public List<Locale> getTopCollectionsLanguages() {
-    return collectionService.getRootNodesLanguages();
+  public List<Locale> getTopCollectionsLanguages() throws ServiceException {
+    return service.getRootNodesLanguages();
   }
 
   @Operation(summary = "Remove an existing digital object from an existing collection")
@@ -499,14 +475,15 @@ public class CollectionController extends AbstractIdentifiableController<Collect
           UUID collectionUuid,
       @Parameter(example = "", description = "UUID of the digital object")
           @PathVariable("digitalObjectUuid")
-          UUID digitalObjectUuid) {
+          UUID digitalObjectUuid)
+      throws ServiceException {
     Collection collection = new Collection();
     collection.setUuid(collectionUuid);
 
     DigitalObject digitalObject = new DigitalObject();
     digitalObject.setUuid(digitalObjectUuid);
 
-    boolean successful = collectionService.removeDigitalObject(collection, digitalObject);
+    boolean successful = service.removeDigitalObject(collection, digitalObject);
     return successful
         ? new ResponseEntity<>(HttpStatus.NO_CONTENT)
         : new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -534,14 +511,15 @@ public class CollectionController extends AbstractIdentifiableController<Collect
           UUID uuid,
       @Parameter(example = "", description = "UUID of the subcollection")
           @PathVariable("subcollectionUuid")
-          UUID subcollectionUuid) {
+          UUID subcollectionUuid)
+      throws ServiceException {
     Collection collection = new Collection();
     collection.setUuid(uuid);
 
     Collection subcollection = new Collection();
     subcollection.setUuid(subcollectionUuid);
 
-    boolean successful = collectionService.removeChild(collection, subcollection);
+    boolean successful = service.removeChild(collection, subcollection);
     return successful
         ? new ResponseEntity<>(HttpStatus.NO_CONTENT)
         : new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -553,8 +531,7 @@ public class CollectionController extends AbstractIdentifiableController<Collect
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Collection save(@RequestBody Collection collection, BindingResult errors)
       throws ServiceException, ValidationException {
-    collectionService.save(collection);
-    return collection;
+    return super.save(collection, errors);
   }
 
   @Operation(summary = "Save existing digital objects into an existing collection")
@@ -570,11 +547,10 @@ public class CollectionController extends AbstractIdentifiableController<Collect
       @Parameter(example = "", description = "UUID of the collection") @PathVariable("uuid")
           UUID collectionUuid,
       @Parameter(example = "", description = "List of the digital objects") @RequestBody
-          List<DigitalObject> digitalObjects) {
-    Collection collection = new Collection();
-    collection.setUuid(collectionUuid);
-
-    boolean successful = collectionService.saveDigitalObjects(collection, digitalObjects);
+          List<DigitalObject> digitalObjects)
+      throws ServiceException {
+    boolean successful =
+        service.setDigitalObjects(buildExampleWithUuid(collectionUuid), digitalObjects);
     return successful
         ? new ResponseEntity<>(HttpStatus.NO_CONTENT)
         : new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -595,7 +571,7 @@ public class CollectionController extends AbstractIdentifiableController<Collect
           UUID parentUuid,
       @RequestBody Collection collection)
       throws ServiceException, ValidationException {
-    return collectionService.saveWithParent(collection, parentUuid);
+    return service.saveWithParent(collection, buildExampleWithUuid(parentUuid));
   }
 
   @Operation(summary = "Update a collection")
@@ -610,8 +586,6 @@ public class CollectionController extends AbstractIdentifiableController<Collect
   public Collection update(
       @PathVariable UUID uuid, @RequestBody Collection collection, BindingResult errors)
       throws ServiceException, ValidationException {
-    assert Objects.equals(uuid, collection.getUuid());
-    collectionService.update(collection);
-    return collection;
+    return super.update(uuid, collection, errors);
   }
 }

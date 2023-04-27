@@ -9,6 +9,7 @@ import static org.mockito.Mockito.when;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.agent.CorporateBodyService;
 import de.digitalcollections.cudami.server.controller.BaseControllerTest;
+import de.digitalcollections.model.identifiable.Identifier;
 import de.digitalcollections.model.identifiable.entity.agent.CorporateBody;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
@@ -70,11 +71,14 @@ class CorporateBodyControllerTest extends BaseControllerTest {
   void testGetByIdentifierWithPlaintextId(String path) throws Exception {
     CorporateBody expected = CorporateBody.builder().build();
 
-    when(corporateBodyService.getByIdentifier(eq("foo"), eq("bar"))).thenReturn(expected);
+    when(corporateBodyService.getByIdentifier(
+            eq(Identifier.builder().namespace("foo").id("bar").build())))
+        .thenReturn(expected);
 
     testHttpGet(path);
 
-    verify(corporateBodyService, times(1)).getByIdentifier(eq("foo"), eq("bar"));
+    verify(corporateBodyService, times(1))
+        .getByIdentifier(eq(Identifier.builder().namespace("foo").id("bar").build()));
   }
 
   @DisplayName("can retrieve by identifier with base 64 encoded data")
@@ -89,12 +93,15 @@ class CorporateBodyControllerTest extends BaseControllerTest {
   void testGetByIdentifierWithBase64EncodedData(String basePath) throws Exception {
     CorporateBody expected = CorporateBody.builder().build();
 
-    when(corporateBodyService.getByIdentifier(eq("foo"), eq("bar/bla"))).thenReturn(expected);
+    when(corporateBodyService.getByIdentifier(
+            eq(Identifier.builder().namespace("foo").id("bar/bla").build())))
+        .thenReturn(expected);
 
     testHttpGet(
         basePath
             + Base64.getEncoder().encodeToString("foo:bar/bla".getBytes(StandardCharsets.UTF_8)));
 
-    verify(corporateBodyService, times(1)).getByIdentifier(eq("foo"), eq("bar/bla"));
+    verify(corporateBodyService, times(1))
+        .getByIdentifier(eq(Identifier.builder().namespace("foo").id("bar/bla").build()));
   }
 }

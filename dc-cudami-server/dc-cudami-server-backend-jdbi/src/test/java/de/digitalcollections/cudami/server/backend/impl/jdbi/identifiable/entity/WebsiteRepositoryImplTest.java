@@ -3,6 +3,8 @@ package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entit
 import static org.assertj.core.api.Assertions.assertThat;
 
 import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
+import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
+import de.digitalcollections.cudami.server.backend.api.repository.identifiable.alias.UrlAliasRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.AbstractIdentifiableRepositoryImplTest;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.web.WebpageRepositoryImpl;
 import de.digitalcollections.model.identifiable.entity.Website;
@@ -27,11 +29,15 @@ import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 @DisplayName("The Website Repository")
 class WebsiteRepositoryImplTest
     extends AbstractIdentifiableRepositoryImplTest<WebsiteRepositoryImpl> {
-  @Autowired WebpageRepositoryImpl webpageRepository;
+  @Autowired private IdentifierRepository identifierRepository;
+  @Autowired private UrlAliasRepository urlAliasRepository;
+  @Autowired private WebpageRepositoryImpl webpageRepository;
 
   @BeforeEach
   public void beforeEach() {
-    repo = new WebsiteRepositoryImpl(jdbi, webpageRepository, cudamiConfig);
+    repo =
+        new WebsiteRepositoryImpl(
+            jdbi, cudamiConfig, identifierRepository, urlAliasRepository, webpageRepository);
   }
 
   @Test

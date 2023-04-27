@@ -1,6 +1,9 @@
 package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity;
 
 import de.digitalcollections.cudami.model.config.CudamiConfig;
+import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
+import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
+import de.digitalcollections.cudami.server.backend.api.repository.identifiable.alias.UrlAliasRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.WebsiteRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.SearchTermTemplates;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.web.WebpageRepositoryImpl;
@@ -8,6 +11,8 @@ import de.digitalcollections.model.identifiable.Identifier;
 import de.digitalcollections.model.identifiable.entity.Website;
 import de.digitalcollections.model.identifiable.web.Webpage;
 import de.digitalcollections.model.list.filtering.Filtering;
+import de.digitalcollections.model.list.paging.PageRequest;
+import de.digitalcollections.model.list.paging.PageResponse;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -18,7 +23,6 @@ import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.core.statement.PreparedBatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -27,53 +31,38 @@ public class WebsiteRepositoryImpl extends EntityRepositoryImpl<Website>
 
   private static final Logger LOGGER = LoggerFactory.getLogger(WebsiteRepositoryImpl.class);
 
-  public static final String MAPPING_PREFIX = "ws";
-  public static final String TABLE_ALIAS = "w";
+  public static final String MAPPING_PREFIX = "webs";
+  public static final String TABLE_ALIAS = "webs";
   public static final String TABLE_NAME = "websites";
-
-  @Override
-  public String getSqlInsertFields() {
-    return super.getSqlInsertFields() + ", registration_date, url";
-  }
-
-  /* Do not change order! Must match order in getSqlInsertFields!!! */
-  @Override
-  public String getSqlInsertValues() {
-    return super.getSqlInsertValues() + ", :registrationDate, :url";
-  }
-
-  @Override
-  public String getSqlSelectReducedFields(String tableAlias, String mappingPrefix) {
-    return super.getSqlSelectReducedFields(tableAlias, mappingPrefix)
-        + ", "
-        + tableAlias
-        + ".url "
-        + mappingPrefix
-        + "_url, "
-        + tableAlias
-        + ".registration_date "
-        + mappingPrefix
-        + "_registrationDate";
-  }
-
-  @Override
-  public String getSqlUpdateFieldValues() {
-    return super.getSqlUpdateFieldValues() + ", registration_date=:registrationDate, url=:url";
-  }
 
   private final WebpageRepositoryImpl webpageRepositoryImpl;
 
-  @Autowired
   public WebsiteRepositoryImpl(
-      Jdbi dbi, WebpageRepositoryImpl webpageRepositoryImpl, CudamiConfig cudamiConfig) {
+      Jdbi dbi,
+      CudamiConfig cudamiConfig,
+      IdentifierRepository identifierRepository,
+      UrlAliasRepository urlAliasRepository,
+      WebpageRepositoryImpl webpageRepositoryImpl) {
     super(
         dbi,
         TABLE_NAME,
         TABLE_ALIAS,
         MAPPING_PREFIX,
         Website.class,
-        cudamiConfig.getOffsetForAlternativePaging());
+        cudamiConfig.getOffsetForAlternativePaging(),
+        identifierRepository,
+        urlAliasRepository);
     this.webpageRepositoryImpl = webpageRepositoryImpl;
+  }
+
+  @Override
+  public Website create() throws RepositoryException {
+    return new Website();
+  }
+
+  @Override
+  public PageResponse<Webpage> findRootWebpages(UUID uuid, PageRequest pageRequest) {
+    throw new UnsupportedOperationException(); // TODO: paging not yet implemented
   }
 
   @Override
@@ -84,21 +73,21 @@ public class WebsiteRepositoryImpl extends EntityRepositoryImpl<Website>
   }
 
   @Override
-  public Website getByIdentifier(Identifier identifier) {
+  public Website getByIdentifier(Identifier identifier) throws RepositoryException {
     Website website = super.getByIdentifier(identifier);
 
     if (website != null) {
-      website.setRootPages(getRootPages(website));
+      website.setRootPages(getRootWebpages(website.getUuid()));
     }
     return website;
   }
 
   @Override
-  public Website getByUuidAndFiltering(UUID uuid, Filtering filtering) {
+  public Website getByUuidAndFiltering(UUID uuid, Filtering filtering) throws RepositoryException {
     Website website = super.getByUuidAndFiltering(uuid, filtering);
 
     if (website != null) {
-      website.setRootPages(getRootPages(website));
+      website.setRootPages(getRootWebpages(website.getUuid()));
     }
     return website;
   }
@@ -108,21 +97,18 @@ public class WebsiteRepositoryImpl extends EntityRepositoryImpl<Website>
     if (modelProperty == null) {
       return null;
     }
-    if (super.getColumnName(modelProperty) != null) {
-      return super.getColumnName(modelProperty);
-    }
     switch (modelProperty) {
       case "url":
         return tableAlias + ".url";
       case "registrationDate":
         return tableAlias + ".registration_date";
       default:
-        return null;
+        return super.getColumnName(modelProperty);
     }
   }
 
   @Override
-  public List<Webpage> getRootWebpages(UUID uuid) {
+  public List<Webpage> getRootWebpages(UUID uuid) throws RepositoryException {
     final String wpTableAlias = webpageRepositoryImpl.getTableAlias();
     final String wpTableName = webpageRepositoryImpl.getTableName();
 
@@ -153,6 +139,36 @@ public class WebsiteRepositoryImpl extends EntityRepositoryImpl<Website>
     List<String> searchTermTemplates = super.getSearchTermTemplates(tblAlias, originalSearchTerm);
     searchTermTemplates.add(SearchTermTemplates.ILIKE_SEARCH.renderTemplate(tblAlias, "url"));
     return searchTermTemplates;
+  }
+
+  @Override
+  protected String getSqlInsertFields() {
+    return super.getSqlInsertFields() + ", registration_date, url";
+  }
+
+  /* Do not change order! Must match order in getSqlInsertFields!!! */
+  @Override
+  protected String getSqlInsertValues() {
+    return super.getSqlInsertValues() + ", :registrationDate, :url";
+  }
+
+  @Override
+  public String getSqlSelectReducedFields(String tableAlias, String mappingPrefix) {
+    return super.getSqlSelectReducedFields(tableAlias, mappingPrefix)
+        + ", "
+        + tableAlias
+        + ".url "
+        + mappingPrefix
+        + "_url, "
+        + tableAlias
+        + ".registration_date "
+        + mappingPrefix
+        + "_registrationDate";
+  }
+
+  @Override
+  public String getSqlUpdateFieldValues() {
+    return super.getSqlUpdateFieldValues() + ", registration_date=:registrationDate, url=:url";
   }
 
   @Override

@@ -1,6 +1,7 @@
 package de.digitalcollections.cudami.server.business.impl.service.identifiable.entity;
 
 import de.digitalcollections.cudami.model.config.CudamiConfig;
+import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.EntityRepository;
 import de.digitalcollections.cudami.server.business.api.service.LocaleService;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
@@ -10,11 +11,9 @@ import de.digitalcollections.cudami.server.business.api.service.identifiable.ali
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.EntityService;
 import de.digitalcollections.cudami.server.business.impl.service.identifiable.IdentifiableServiceImpl;
 import de.digitalcollections.cudami.server.config.HookProperties;
+import de.digitalcollections.model.identifiable.IdentifiableObjectType;
 import de.digitalcollections.model.identifiable.entity.Entity;
-import de.digitalcollections.model.identifiable.entity.EntityType;
 import de.digitalcollections.model.identifiable.resource.FileResource;
-import de.digitalcollections.model.list.filtering.FilterCriterion;
-import de.digitalcollections.model.list.filtering.Filtering;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -23,8 +22,6 @@ import java.net.URL;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.time.LocalDate;
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import org.slf4j.Logger;
@@ -55,21 +52,22 @@ public class EntityServiceImpl<E extends Entity>
   }
 
   @Override
-  public void addRelatedFileresource(E entity, FileResource fileResource) {
-    ((EntityRepository<E>) repository).addRelatedFileresource(entity, fileResource);
-  }
-
-  @Override
-  public void addRelatedFileresource(UUID entityUuid, UUID fileResourceUuid) {
-    ((EntityRepository<E>) repository).addRelatedFileresource(entityUuid, fileResourceUuid);
+  public void addRelatedFileresource(E entity, FileResource fileResource) throws ServiceException {
+    try {
+      ((EntityRepository<E>) repository).addRelatedFileresource(entity, fileResource);
+    } catch (RepositoryException e) {
+      throw new ServiceException("Backend failure", e);
+    }
   }
 
   /**
    * Build a notification url by replacing placeholders in the template with the entity's uuid and
    * type
    */
-  protected URI buildNotificationUrl(String urlTemplate, UUID entityUuid, EntityType entityType) {
-    String url = String.format(urlTemplate, entityUuid, entityType);
+  // TODO: externalize to Hook-/NotificationService and use Entity instead uuid as param
+  protected URI buildNotificationUrl(
+      String urlTemplate, UUID entityUuid, IdentifiableObjectType identifiableObjectType) {
+    String url = String.format(urlTemplate, entityUuid, identifiableObjectType);
     try {
       return new URL(url).toURI();
     } catch (MalformedURLException | URISyntaxException e) {
@@ -78,76 +76,35 @@ public class EntityServiceImpl<E extends Entity>
     }
   }
 
-  protected Filtering filteringForActive() {
-    // business logic that defines, what "active" means
-    LocalDate now = LocalDate.now();
-    Filtering filtering =
-        Filtering.builder()
-            .add(
-                FilterCriterion.builder()
-                    .withExpression("publicationStart")
-                    .lessOrEqualAndSet(now)
-                    .build())
-            .add(
-                FilterCriterion.builder()
-                    .withExpression("publicationEnd")
-                    .greaterOrNotSet(now)
-                    .build())
-            .build();
-    return filtering;
-  }
-
   @Override
-  public E getByRefId(long refId) {
-    return ((EntityRepository<E>) repository).getByRefId(refId);
-  }
-
-  @Override
-  public List<E> getRandom(int count) {
-    return ((EntityRepository<E>) repository).getRandom(count);
-  }
-
-  @Override
-  public List<FileResource> getRelatedFileResources(E entity) {
-    return ((EntityRepository<E>) repository).getRelatedFileResources(entity);
-  }
-
-  @Override
-  public List<FileResource> getRelatedFileResources(UUID entityUuid) {
-    return ((EntityRepository<E>) repository).getRelatedFileResources(entityUuid);
+  public E getByRefId(long refId) throws ServiceException {
+    try {
+      return ((EntityRepository<E>) repository).getByRefId(refId);
+    } catch (RepositoryException e) {
+      throw new ServiceException("Backend failure", e);
+    }
   }
 
   @Override
   public void save(E entity) throws ServiceException, ValidationException {
     try {
       super.save(entity);
-      sendNotification("save", "POST", entity.getUuid(), entity.getEntityType());
+      sendNotification("save", "POST", entity.getUuid(), entity.getIdentifiableObjectType());
     } catch (ServiceException e) {
       LOGGER.error("Cannot save entity " + entity + ": ", e);
       throw e;
     }
   }
 
-  @Override
-  public List<FileResource> setRelatedFileResources(E entity, List<FileResource> fileResources) {
-    return ((EntityRepository<E>) repository).setRelatedFileResources(entity, fileResources);
-  }
-
-  @Override
-  public List<FileResource> setRelatedFileResources(
-      UUID entityUuid, List<FileResource> fileResources) {
-    return ((EntityRepository<E>) repository).setRelatedFileResources(entityUuid, fileResources);
-  }
-
   /** Send a notification to an external url when an entity has changed */
   protected void sendNotification(
-      String action, String httpVerb, UUID uuid, EntityType entityType) {
-    Optional<String> hook = hookProperties.getHookForActionAndType(action, entityType);
+      String action, String httpVerb, UUID uuid, IdentifiableObjectType identifiableObjectType) {
+    Optional<String> hook = hookProperties.getHookForActionAndType(action, identifiableObjectType);
     if (hook.isEmpty()) {
       // if no suitable hook is found, do nothing
       return;
     }
-    URI url = buildNotificationUrl(hook.get(), uuid, entityType);
+    URI url = buildNotificationUrl(hook.get(), uuid, identifiableObjectType);
     if (url == null) {
       LOGGER.warn("No url given, ignoring.");
       return;
@@ -177,7 +134,7 @@ public class EntityServiceImpl<E extends Entity>
   public void update(E entity) throws ServiceException, ValidationException {
     try {
       super.update(entity);
-      sendNotification("update", "PUT", entity.getUuid(), entity.getEntityType());
+      sendNotification("update", "PUT", entity.getUuid(), entity.getIdentifiableObjectType());
     } catch (ServiceException e) {
       LOGGER.error("Cannot update identifiable " + entity + ": ", e);
       throw e;

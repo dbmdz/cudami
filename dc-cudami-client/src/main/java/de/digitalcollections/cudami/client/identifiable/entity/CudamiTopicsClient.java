@@ -48,11 +48,6 @@ public class CudamiTopicsClient extends CudamiEntitiesClient<Topic> {
     return doGetRequestForPagedObjectList(String.format("%s/top", baseEndpoint), pageRequest);
   }
 
-  public List<Entity> getAllEntities(UUID uuid) throws TechnicalException {
-    return doGetRequestForObjectList(
-        String.format("%s/%s/entities/all", baseEndpoint, uuid), Entity.class);
-  }
-
   public BreadcrumbNavigation getBreadcrumbNavigation(UUID uuid) throws TechnicalException {
     try {
       return (BreadcrumbNavigation)

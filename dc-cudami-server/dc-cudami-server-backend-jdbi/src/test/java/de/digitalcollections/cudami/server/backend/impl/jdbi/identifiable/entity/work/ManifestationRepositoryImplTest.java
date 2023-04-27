@@ -3,8 +3,10 @@ package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entit
 import static org.assertj.core.api.Assertions.assertThat;
 
 import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
-import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.relation.EntityRelationRepository;
-import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.semantic.SubjectRepository;
+import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
+import de.digitalcollections.cudami.server.backend.api.repository.identifiable.alias.UrlAliasRepository;
+import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.relation.EntityToEntityRelationRepository;
+import de.digitalcollections.cudami.server.backend.api.repository.identifiable.semantic.SubjectRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.relation.PredicateRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.AbstractIdentifiableRepositoryImplTest;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.EntityRepositoryImpl;
@@ -29,10 +31,10 @@ import de.digitalcollections.model.identifiable.entity.manifestation.Publication
 import de.digitalcollections.model.identifiable.entity.manifestation.Publisher;
 import de.digitalcollections.model.identifiable.entity.relation.EntityRelation;
 import de.digitalcollections.model.identifiable.entity.work.Work;
+import de.digitalcollections.model.identifiable.semantic.Subject;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.relation.Predicate;
-import de.digitalcollections.model.semantic.Subject;
 import de.digitalcollections.model.text.LocalizedStructuredContent;
 import de.digitalcollections.model.text.LocalizedText;
 import de.digitalcollections.model.text.StructuredContent;
@@ -61,10 +63,12 @@ import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 class ManifestationRepositoryImplTest
     extends AbstractIdentifiableRepositoryImplTest<ManifestationRepositoryImpl> {
 
+  @Autowired private IdentifierRepository identifierRepository;
+  @Autowired private UrlAliasRepository urlAliasRepository;
   @Autowired CorporateBodyRepositoryImpl corporateBodyRepository;
   @Autowired HumanSettlementRepositoryImpl humanSettlementRepository;
   @Autowired PredicateRepository predicateRepository;
-  @Autowired EntityRelationRepository entityRelationRepository;
+  @Autowired EntityToEntityRelationRepository entityRelationRepository;
   @Autowired SubjectRepository subjectRepository;
   @Autowired ExpressionTypeMapper expressionTypeMapper;
   @Autowired LocalDateRangeMapper localDateRangeMapper;
@@ -80,6 +84,8 @@ class ManifestationRepositoryImplTest
         new ManifestationRepositoryImpl(
             jdbi,
             cudamiConfig,
+            identifierRepository,
+            urlAliasRepository,
             expressionTypeMapper,
             localDateRangeMapper,
             titleMapper,
@@ -99,10 +105,10 @@ class ManifestationRepositoryImplTest
     corporateBodyRepository.save(someoneElse);
 
     // predicates
-    Predicate isEditorOf =
-        predicateRepository.save(Predicate.builder().value("is_editor_of").build());
-    Predicate isSomethingElseOf =
-        predicateRepository.save(Predicate.builder().value("is_somethingelse_of").build());
+    Predicate isEditorOf = Predicate.builder().value("is_editor_of").build();
+    predicateRepository.save(isEditorOf);
+    Predicate isSomethingElseOf = Predicate.builder().value("is_somethingelse_of").build();
+    predicateRepository.save(isSomethingElseOf);
 
     // subjects
     Subject subject = ensurePersistedSubject();
@@ -273,7 +279,7 @@ class ManifestationRepositoryImplTest
     repo.save(child2);
 
     PageResponse<Manifestation> actual =
-        repo.findChildren(parent.getUuid(), new PageRequest(0, 10));
+        repo.findSubParts(parent.getUuid(), new PageRequest(0, 10));
     assertThat(actual.getContent()).containsExactlyInAnyOrder(child1, child2);
   }
 
@@ -437,7 +443,7 @@ class ManifestationRepositoryImplTest
         Subject.builder()
             .label(new LocalizedText(Locale.ENGLISH, "My subject"))
             .identifier(Identifier.builder().namespace("test").id("12345").build())
-            .type("SUBJECT_TYPE")
+            .subjectType("SUBJECT_TYPE")
             .build();
     subjectRepository.save(subject);
     return subject;

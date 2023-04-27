@@ -6,14 +6,15 @@ import de.digitalcollections.cudami.server.business.api.service.exceptions.Valid
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.semantic.SubjectService;
 import de.digitalcollections.cudami.server.controller.AbstractUniqueObjectController;
 import de.digitalcollections.cudami.server.controller.ParameterHelper;
+import de.digitalcollections.model.identifiable.Identifier;
+import de.digitalcollections.model.identifiable.semantic.Subject;
+import de.digitalcollections.model.list.filtering.FilterCriterion;
 import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.list.sorting.Order;
-import de.digitalcollections.model.semantic.Subject;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import java.util.Locale;
-import java.util.Objects;
 import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.tuple.Triple;
@@ -39,7 +40,7 @@ public class SubjectController extends AbstractUniqueObjectController<Subject> {
     this.service = service;
   }
 
-  @Operation(summary = "Get all subjects")
+  @Operation(summary = "Get all subjects as (paged, sorted, filtered) list")
   @GetMapping(
       value = {"/v6/subjects"},
       produces = MediaType.APPLICATION_JSON_VALUE)
@@ -47,10 +48,9 @@ public class SubjectController extends AbstractUniqueObjectController<Subject> {
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
-      @RequestParam(name = "searchTerm", required = false) String searchTerm,
-      @RequestParam(name = "label", required = false) String labelTerm,
-      @RequestParam(name = "labelLanguage", required = false) Locale labelLanguage) {
-    return super.find(pageNumber, pageSize, sortBy, searchTerm, labelTerm, labelLanguage);
+      @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria)
+      throws ServiceException {
+    return super.find(pageNumber, pageSize, sortBy, filterCriteria);
   }
 
   @Operation(
@@ -72,7 +72,11 @@ public class SubjectController extends AbstractUniqueObjectController<Subject> {
     }
     Subject subject =
         service.getByTypeAndIdentifier(
-            typeNamespaceId.getLeft(), typeNamespaceId.getMiddle(), typeNamespaceId.getRight());
+            typeNamespaceId.getLeft(),
+            Identifier.builder()
+                .namespace(typeNamespaceId.getMiddle())
+                .id(typeNamespaceId.getRight())
+                .build());
     return new ResponseEntity<>(subject, subject != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
   }
 
@@ -80,18 +84,30 @@ public class SubjectController extends AbstractUniqueObjectController<Subject> {
   @GetMapping(
       value = {"/v6/subjects/{uuid:" + ParameterHelper.UUID_PATTERN + "}"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<Subject> getByUuid(@PathVariable UUID uuid) {
-    Subject subject = service.getByUuid(uuid);
-    return new ResponseEntity<>(subject, subject != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
+  public ResponseEntity<Subject> getByUuid(@PathVariable UUID uuid) throws ServiceException {
+    return super.getByUuid(uuid);
+  }
+
+  @Operation(summary = "Get languages of all subjects")
+  @GetMapping(
+      value = {"/v6/subjects/languages"},
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  public List<Locale> getLanguages() throws ServiceException {
+    return service.getLanguages();
+  }
+
+  @Override
+  protected UniqueObjectService<Subject> getService() {
+    return service;
   }
 
   @Operation(summary = "Save a newly created subject")
   @PostMapping(
       value = {"/v6/subjects"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public Subject save(@RequestBody Subject subject, BindingResult errors) throws ServiceException {
-    service.save(subject);
-    return subject;
+  public Subject save(@RequestBody Subject subject, BindingResult errors)
+      throws ServiceException, ValidationException {
+    return super.save(subject, errors);
   }
 
   @Operation(summary = "Update a subject")
@@ -99,14 +115,7 @@ public class SubjectController extends AbstractUniqueObjectController<Subject> {
       value = {"/v6/subjects/{uuid:" + ParameterHelper.UUID_PATTERN + "}"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Subject update(@PathVariable UUID uuid, @RequestBody Subject subject, BindingResult errors)
-      throws ServiceException {
-    assert Objects.equals(uuid, subject.getUuid());
-    service.update(subject);
-    return subject;
-  }
-
-  @Override
-  protected UniqueObjectService<Subject> getService() {
-    return service;
+      throws ServiceException, ValidationException {
+    return super.update(uuid, subject, errors);
   }
 }

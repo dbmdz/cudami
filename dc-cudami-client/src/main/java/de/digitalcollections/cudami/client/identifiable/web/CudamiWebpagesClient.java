@@ -79,9 +79,12 @@ public class CudamiWebpagesClient extends CudamiIdentifiablesClient<Webpage> {
     return doGetRequestForObject(String.format("%s/%s/parent", baseEndpoint, uuid));
   }
 
-  public List<FileResource> getRelatedFileResources(UUID uuid) throws TechnicalException {
-    return doGetRequestForObjectList(
-        String.format("%s/%s/related/fileresources", baseEndpoint, uuid), FileResource.class);
+  public PageResponse<FileResource> findRelatedFileResources(UUID uuid, PageRequest pageRequest)
+      throws TechnicalException {
+    return doGetRequestForPagedObjectList(
+        String.format("%s/%s/related/fileresources", baseEndpoint, uuid),
+        pageRequest,
+        FileResource.class);
   }
 
   public Website getWebsite(UUID rootWebpageUuid) throws TechnicalException {

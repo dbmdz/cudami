@@ -15,7 +15,7 @@ import de.digitalcollections.cudami.server.business.api.service.exceptions.Servi
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifierService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.alias.UrlAliasService;
-import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.relation.EntityRelationService;
+import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.relation.EntityToEntityRelationService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.work.WorkService;
 import de.digitalcollections.cudami.server.business.impl.service.AbstractServiceImplTest;
 import de.digitalcollections.cudami.server.config.HookProperties;
@@ -36,7 +36,7 @@ class WorkServiceImplTest extends AbstractServiceImplTest {
   private WorkRepository workRepository;
 
   private HookProperties hookProperties;
-  private EntityRelationService entityRelationService;
+  private EntityToEntityRelationService entityRelationService;
   private IdentifierService identifierService;
   private LocaleService localeService;
   private UrlAliasService urlAliasService;
@@ -46,7 +46,7 @@ class WorkServiceImplTest extends AbstractServiceImplTest {
   public void beforeEach() throws Exception {
     super.beforeEach();
     hookProperties = mock(HookProperties.class);
-    entityRelationService = mock(EntityRelationService.class);
+    entityRelationService = mock(EntityToEntityRelationService.class);
     identifierService = mock(IdentifierService.class);
     localeService = mock(LocaleService.class);
     urlAliasService = mock(UrlAliasService.class);
@@ -120,7 +120,7 @@ class WorkServiceImplTest extends AbstractServiceImplTest {
     workService.save(workToSave);
 
     verify(entityRelationService, times(1))
-        .persistEntityRelations(eq(savedWork), eq(workToSave.getRelations()), eq(true));
+        .setEntityRelations(eq(savedWork), eq(workToSave.getRelations()), eq(true));
   }
 
   @DisplayName("can update a work without relations")
@@ -136,14 +136,14 @@ class WorkServiceImplTest extends AbstractServiceImplTest {
             })
         .when(workRepository)
         .update(eq(workToUpdate));
-    when(workRepository.getByUuid(eq(uuid))).thenReturn(workToUpdate);
+    when(workRepository.getByExample(eq(workToUpdate))).thenReturn(workToUpdate);
 
     workService.update(workToUpdate);
 
     assertThat(workToUpdate).isEqualTo(workToUpdate);
 
     verify(entityRelationService, times(1))
-        .persistEntityRelations(eq(workToUpdate), eq(List.of()), eq(false));
+        .setEntityRelations(eq(workToUpdate), eq(List.of()), eq(false));
   }
 
   @DisplayName("can update a work with relations")
@@ -172,13 +172,13 @@ class WorkServiceImplTest extends AbstractServiceImplTest {
             })
         .when(workRepository)
         .update(eq(workToUpdate));
-    when(workRepository.getByUuid(eq(uuid))).thenReturn(workToUpdate);
+    when(workRepository.getByExample(eq(workToUpdate))).thenReturn(workToUpdate);
 
     workService.update(workToUpdate);
 
     assertThat(workToUpdate).isEqualTo(workToUpdate);
 
     verify(entityRelationService, times(1))
-        .persistEntityRelations(eq(workToUpdate), eq(workToUpdate.getRelations()), eq(false));
+        .setEntityRelations(eq(workToUpdate), eq(workToUpdate.getRelations()), eq(false));
   }
 }

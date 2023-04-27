@@ -1,18 +1,19 @@
 package de.digitalcollections.cudami.server.controller.identifiable.entity.work;
 
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ConflictException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
-import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifiableService;
+import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.EntityService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.agent.AgentService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.work.ItemService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.work.ManifestationService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.work.WorkService;
+import de.digitalcollections.cudami.server.controller.AbstractEntityController;
 import de.digitalcollections.cudami.server.controller.ParameterHelper;
-import de.digitalcollections.cudami.server.controller.identifiable.AbstractIdentifiableController;
 import de.digitalcollections.model.identifiable.entity.agent.Agent;
-import de.digitalcollections.model.identifiable.entity.item.Item;
 import de.digitalcollections.model.identifiable.entity.manifestation.Manifestation;
 import de.digitalcollections.model.identifiable.entity.work.Work;
+import de.digitalcollections.model.list.filtering.FilterCriterion;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.list.sorting.Order;
@@ -26,56 +27,51 @@ import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @Tag(name = "Work controller")
-public class WorkController extends AbstractIdentifiableController<Work> {
+public class WorkController extends AbstractEntityController<Work> {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(WorkController.class);
-
-  private final WorkService workService;
-  private final ItemService itemService;
   private final AgentService agentService;
+  private final ItemService itemService;
   private final ManifestationService manifestationService;
+  private final WorkService service;
 
   public WorkController(
       WorkService workService,
       ItemService itemService,
       AgentService agentService,
       ManifestationService manifestationService) {
-    this.workService = workService;
+    this.service = workService;
     this.itemService = itemService;
     this.agentService = agentService;
     this.manifestationService = manifestationService;
-  }
-
-  @Override
-  protected IdentifiableService<Work> getService() {
-    return workService;
   }
 
   @Operation(summary = "count all works")
   @GetMapping(
       value = {"/v6/works/count", "/v5/works/count", "/v2/works/count", "/latest/works/count"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public long count() {
-    return workService.count();
+  public long count() throws ServiceException {
+    return super.count();
   }
 
-  @Operation(summary = "get all works")
+  @Operation(summary = "Delete a work")
+  @DeleteMapping(
+      value = {"/v6/works/{uuid:" + ParameterHelper.UUID_PATTERN + "}"},
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity delete(
+      @Parameter(example = "", description = "UUID of the work") @PathVariable("uuid") UUID uuid)
+      throws ConflictException, ServiceException {
+    return super.delete(uuid);
+  }
+
+  @Operation(summary = "Get all works as (paged, sorted, filtered) list")
   @GetMapping(
       value = {"/v6/works"},
       produces = MediaType.APPLICATION_JSON_VALUE)
@@ -83,10 +79,9 @@ public class WorkController extends AbstractIdentifiableController<Work> {
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
-      @RequestParam(name = "searchTerm", required = false) String searchTerm,
-      @RequestParam(name = "label", required = false) String labelTerm,
-      @RequestParam(name = "labelLanguage", required = false) Locale labelLanguage) {
-    return super.find(pageNumber, pageSize, sortBy, searchTerm, labelTerm, labelLanguage);
+      @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria)
+      throws ServiceException {
+    return super.find(pageNumber, pageSize, sortBy, filterCriteria);
   }
 
   @Operation(summary = "Find all children of a work")
@@ -97,13 +92,14 @@ public class WorkController extends AbstractIdentifiableController<Work> {
       @Parameter(example = "", description = "UUID of the work") @PathVariable("uuid") UUID uuid,
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
-      @RequestParam(name = "sortBy", required = false) List<Order> sortBy) {
+      @RequestParam(name = "sortBy", required = false) List<Order> sortBy)
+      throws ServiceException {
     PageRequest pageRequest = new PageRequest(null, pageNumber, pageSize);
     if (sortBy != null) {
       Sorting sorting = new Sorting(sortBy);
       pageRequest.setSorting(sorting);
     }
-    return workService.findEmbedded(uuid, pageRequest);
+    return service.findEmbeddedWorks(buildExampleWithUuid(uuid), pageRequest);
   }
 
   @Operation(summary = "Find all manifestations of a work")
@@ -121,7 +117,7 @@ public class WorkController extends AbstractIdentifiableController<Work> {
       Sorting sorting = new Sorting(sortBy);
       pageRequest.setSorting(sorting);
     }
-    return manifestationService.findManifestationsByWork(uuid, pageRequest);
+    return manifestationService.findManifestationsByWork(buildExampleWithUuid(uuid), pageRequest);
   }
 
   @Override
@@ -183,14 +179,11 @@ public class WorkController extends AbstractIdentifiableController<Work> {
           @RequestParam(name = "pLocale", required = false)
           Locale pLocale)
       throws ServiceException {
-
-    Work result;
     if (pLocale == null) {
-      result = workService.getByUuid(uuid);
+      return super.getByUuid(uuid);
     } else {
-      result = workService.getByUuidAndLocale(uuid, pLocale);
+      return super.getByUuidAndLocale(uuid, pLocale);
     }
-    return new ResponseEntity<>(result, result != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
   }
 
   @Operation(summary = "Get creators of a work")
@@ -202,21 +195,8 @@ public class WorkController extends AbstractIdentifiableController<Work> {
         "/latest/works/{uuid:" + ParameterHelper.UUID_PATTERN + "}/creators"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public List<Agent> getCreators(@PathVariable UUID uuid) {
-    return agentService.getCreatorsForWork(uuid);
-  }
-
-  @Operation(summary = "Get items of a work")
-  @GetMapping(
-      value = {
-        "/v6/works/{uuid:" + ParameterHelper.UUID_PATTERN + "}/items",
-        "/v5/works/{uuid:" + ParameterHelper.UUID_PATTERN + "}/items",
-        "/v2/works/{uuid:" + ParameterHelper.UUID_PATTERN + "}/items",
-        "/latest/works/{uuid:" + ParameterHelper.UUID_PATTERN + "}/items"
-      },
-      produces = MediaType.APPLICATION_JSON_VALUE)
-  public List<Item> getItems(@PathVariable UUID uuid) {
-    return itemService.getItemsForWork(uuid);
+  public List<Agent> getCreators(@PathVariable UUID uuid) throws ServiceException {
+    return agentService.getCreatorsForWork(buildExampleWithUuid(uuid));
   }
 
   @Operation(
@@ -226,8 +206,8 @@ public class WorkController extends AbstractIdentifiableController<Work> {
   @GetMapping(
       value = {"/v6/works/languages"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public List<Locale> getLanguages() {
-    return workService.getLanguages();
+  public List<Locale> getLanguages() throws ServiceException {
+    return super.getLanguages();
   }
 
   @Operation(
@@ -238,8 +218,14 @@ public class WorkController extends AbstractIdentifiableController<Work> {
       value = {"/v6/works/{uuid:" + ParameterHelper.UUID_PATTERN + "}/manifestations/languages"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public List<Locale> getLanguagesOfManifestations(
-      @Parameter(name = "uuid", description = "UUID of the work") @PathVariable UUID uuid) {
-    return manifestationService.getLanguagesOfManifestationsForWork(uuid);
+      @Parameter(name = "uuid", description = "UUID of the work") @PathVariable UUID uuid)
+      throws ServiceException {
+    return manifestationService.getLanguagesOfManifestationsForWork(buildExampleWithUuid(uuid));
+  }
+
+  @Override
+  protected EntityService<Work> getService() {
+    return service;
   }
 
   @Operation(summary = "save a newly created work")
@@ -248,8 +234,7 @@ public class WorkController extends AbstractIdentifiableController<Work> {
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Work save(@RequestBody Work work, BindingResult errors)
       throws ServiceException, ValidationException {
-    workService.save(work);
-    return work;
+    return super.save(work, errors);
   }
 
   @Operation(summary = "update a work")
@@ -263,11 +248,6 @@ public class WorkController extends AbstractIdentifiableController<Work> {
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Work update(@PathVariable("uuid") UUID uuid, @RequestBody Work work, BindingResult errors)
       throws ServiceException, ValidationException {
-    if (uuid == null || work == null || !uuid.equals(work.getUuid())) {
-      throw new IllegalArgumentException("UUID mismatch of new and existing work");
-    }
-
-    workService.update(work);
-    return work;
+    return super.update(uuid, work, errors);
   }
 }

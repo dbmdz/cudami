@@ -18,6 +18,7 @@ import com.github.openjson.JSONObject;
 import de.digitalcollections.commons.web.SlugGenerator;
 import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.config.SpringUtility;
+import de.digitalcollections.model.identifiable.Identifiable;
 import de.digitalcollections.model.identifiable.IdentifiableObjectType;
 import de.digitalcollections.model.identifiable.IdentifiableType;
 import de.digitalcollections.model.identifiable.alias.UrlAlias;
@@ -305,8 +306,10 @@ public class V9_02_02__DML_Fill_urlaliases extends BaseJavaMigration {
     urlAlias.setUuid(UUID.randomUUID());
     urlAlias.setTargetLanguage(locale);
     urlAlias.setPrimary(true);
-    urlAlias.setTargetUuid(uuid);
-    urlAlias.setTargetIdentifiableType(identifiableType);
+
+    Identifiable target = Identifiable.builder().uuid(uuid).type(identifiableType).build();
+
+    urlAlias.setTarget(target);
     urlAlias.setSlug(slug);
     if (websiteUuid != null) {
       Website website = new Website();
@@ -326,9 +329,9 @@ public class V9_02_02__DML_Fill_urlaliases extends BaseJavaMigration {
           urlAlias.getUuid().toString(),
           urlAlias.isPrimary(),
           urlAlias.getSlug(),
-          urlAlias.getTargetIdentifiableType().toString(),
+          urlAlias.getTarget().getType().toString(),
           urlAlias.getTargetLanguage().toString(),
-          urlAlias.getTargetUuid().toString(),
+          urlAlias.getTarget().getUuid().toString(),
           urlAlias.getWebsite() != null ? urlAlias.getWebsite().getUuid().toString() : null);
     } catch (SQLException e) {
       throw new SQLException("Cannot insert " + urlAlias + ":" + e, e);

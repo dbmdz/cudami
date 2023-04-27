@@ -3,6 +3,7 @@ package de.digitalcollections.cudami.server.backend.impl.jdbi.legal;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import de.digitalcollections.cudami.model.config.CudamiConfig;
+import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
 import de.digitalcollections.cudami.server.backend.impl.database.config.SpringConfigBackendTestDatabase;
 import de.digitalcollections.cudami.server.backend.impl.model.TestModelFixture;
 import de.digitalcollections.model.legal.License;
@@ -69,14 +70,14 @@ public class LicenseRepositoryImplTest {
 
   @Test
   @DisplayName("should return count of records in table")
-  public void testCount() {
+  public void testCount() throws RepositoryException {
     License license1 = createLicense("1");
-    License actual = repo.save(license1);
-    UUID uuid1 = actual.getUuid();
+    repo.save(license1);
+    UUID uuid1 = license1.getUuid();
 
     License license2 = createLicense("2");
-    actual = repo.save(license2);
-    UUID uuid2 = actual.getUuid();
+    repo.save(license2);
+    UUID uuid2 = license2.getUuid();
 
     long count = repo.count();
     assertThat(count).isEqualTo(2);
@@ -86,12 +87,12 @@ public class LicenseRepositoryImplTest {
 
   @Test
   @DisplayName("should delete a license by given url")
-  public void testDeleteByUrl() {
+  public void testDeleteByUrl() throws RepositoryException {
     License license = createLicense();
-    License actual = repo.save(license);
-    UUID uuid = actual.getUuid();
+    repo.save(license);
+    UUID uuid = license.getUuid();
 
-    repo.deleteByUrl(actual.getUrl());
+    repo.deleteByUrl(license.getUrl());
 
     License result = repo.getByUuid(uuid);
 
@@ -100,10 +101,10 @@ public class LicenseRepositoryImplTest {
 
   @Test
   @DisplayName("should delete a license by given uuid")
-  public void testDeleteByUuid() {
+  public void testDeleteByUuid() throws RepositoryException {
     License license = createLicense();
-    License actual = repo.save(license);
-    UUID uuid = actual.getUuid();
+    repo.save(license);
+    UUID uuid = license.getUuid();
 
     repo.deleteByUuid(uuid);
 
@@ -114,14 +115,14 @@ public class LicenseRepositoryImplTest {
 
   @Test
   @DisplayName("should delete a list of licenses by given uuids")
-  public void testDeleteByUuids() {
+  public void testDeleteByUuids() throws RepositoryException {
     License license1 = createLicense("1");
-    License actual = repo.save(license1);
-    UUID uuid1 = actual.getUuid();
+    repo.save(license1);
+    UUID uuid1 = license1.getUuid();
 
     License license2 = createLicense("2");
-    actual = repo.save(license2);
-    UUID uuid2 = actual.getUuid();
+    repo.save(license2);
+    UUID uuid2 = license2.getUuid();
 
     repo.deleteByUuids(List.of(uuid1, uuid2));
 
@@ -134,19 +135,19 @@ public class LicenseRepositoryImplTest {
 
   @Test
   @DisplayName("should get a paged list of licenses")
-  public void testFind() {
+  public void testFind() throws RepositoryException {
     // create 4 licenses
     License license1 = createLicense("1");
-    license1 = repo.save(license1);
+    repo.save(license1);
 
     License license2 = createLicense("2");
-    license2 = repo.save(license2);
+    repo.save(license2);
 
     License license3 = createLicense("3");
-    license3 = repo.save(license3);
+    repo.save(license3);
 
     License license4 = createLicense("4");
-    license4 = repo.save(license4);
+    repo.save(license4);
 
     // do find
     PageRequest pageRequest = PageRequest.builder().pageSize(2).pageNumber(0).build();
@@ -162,40 +163,13 @@ public class LicenseRepositoryImplTest {
   }
 
   @Test
-  @DisplayName("should get the complete list of licenses")
-  public void testFindAll() {
-    // create 4 licenses
-    License license1 = createLicense("1");
-    license1 = repo.save(license1);
-
-    License license2 = createLicense("2");
-    license2 = repo.save(license2);
-
-    License license3 = createLicense("3");
-    license3 = repo.save(license3);
-
-    License license4 = createLicense("4");
-    license4 = repo.save(license4);
-
-    // do find
-    List<License> list = repo.getAll();
-    assertThat(list.size()).isEqualTo(4);
-
-    // do cleanup
-    repo.deleteByUuid(license1.getUuid());
-    repo.deleteByUuid(license2.getUuid());
-    repo.deleteByUuid(license3.getUuid());
-    repo.deleteByUuid(license4.getUuid());
-  }
-
-  @Test
   @DisplayName("should get a license by given url")
-  public void testGetByUrl() {
+  public void testGetByUrl() throws RepositoryException {
     License license = createLicense();
-    License actual = repo.save(license);
-    UUID uuid = actual.getUuid();
+    repo.save(license);
+    UUID uuid = license.getUuid();
 
-    final URL url = actual.getUrl();
+    final URL url = license.getUrl();
     License result = repo.getByUrl(url);
     assertThat(result).isNotNull();
 
@@ -204,10 +178,10 @@ public class LicenseRepositoryImplTest {
 
   @Test
   @DisplayName("should get a license by given uuid")
-  public void testGetByUuid() {
+  public void testGetByUuid() throws RepositoryException {
     License license = createLicense();
-    License actual = repo.save(license);
-    UUID uuid = actual.getUuid();
+    repo.save(license);
+    UUID uuid = license.getUuid();
 
     License result = repo.getByUuid(uuid);
     assertThat(result).isNotNull();
@@ -217,31 +191,31 @@ public class LicenseRepositoryImplTest {
 
   @Test
   @DisplayName("should save a license")
-  public void testSave() {
+  public void testSave() throws RepositoryException {
     License license = createLicense();
+    repo.save(license);
 
-    License actual = repo.save(license);
-
-    assertThat(actual.getAcronym()).isEqualTo("NoC-NC 1.0");
-    assertThat(actual.getLabel().getText(Locale.GERMAN))
+    assertThat(license.getAcronym()).isEqualTo("NoC-NC 1.0");
+    assertThat(license.getLabel().getText(Locale.GERMAN))
         .isEqualTo("Kein Urheberrechtsschutz – nur nicht-kommerzielle Nutzung erlaubt");
-    assertThat(actual.getLabel().getText(Locale.ENGLISH))
+    assertThat(license.getLabel().getText(Locale.ENGLISH))
         .isEqualTo("No Copyright – Non-Commercial Use Only");
-    assertThat(actual.getUrl().toString())
+    assertThat(license.getUrl().toString())
         .isEqualTo("http://rightsstatements.org/vocab/NoC-NC/1.0/");
 
-    repo.deleteByUuid(actual.getUuid());
+    repo.deleteByUuid(license.getUuid());
   }
 
   @Test
   @DisplayName("should update a license")
-  public void testUpdate() {
+  public void testUpdate() throws RepositoryException {
     License license = createLicense();
+    repo.save(license);
 
-    License actual = repo.save(license);
+    license.setAcronym("UPDATED");
+    repo.update(license);
 
-    actual.setAcronym("UPDATED");
-    License updatedLicense = repo.update(actual);
+    License updatedLicense = repo.getByUuid(license.getUuid());
 
     assertThat(updatedLicense.getAcronym()).isEqualTo("UPDATED");
     assertThat(updatedLicense.getLabel().getText(Locale.GERMAN))

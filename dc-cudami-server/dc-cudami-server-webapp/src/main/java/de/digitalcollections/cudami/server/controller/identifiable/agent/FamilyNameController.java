@@ -7,17 +7,15 @@ import de.digitalcollections.cudami.server.business.api.service.identifiable.age
 import de.digitalcollections.cudami.server.controller.ParameterHelper;
 import de.digitalcollections.cudami.server.controller.identifiable.AbstractIdentifiableController;
 import de.digitalcollections.model.identifiable.agent.FamilyName;
-import de.digitalcollections.model.list.paging.PageRequest;
+import de.digitalcollections.model.list.filtering.FilterCriterion;
 import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.list.sorting.Order;
-import de.digitalcollections.model.list.sorting.Sorting;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.net.URI;
 import java.util.List;
 import java.util.Locale;
-import java.util.Objects;
 import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
@@ -36,32 +34,23 @@ import org.springframework.web.bind.annotation.RestController;
 @Tag(name = "Family name controller")
 public class FamilyNameController extends AbstractIdentifiableController<FamilyName> {
 
-  private final FamilyNameService familyNameService;
+  private final FamilyNameService service;
 
   public FamilyNameController(FamilyNameService familyNameservice) {
-    this.familyNameService = familyNameservice;
+    this.service = familyNameservice;
   }
 
-  @Override
-  protected IdentifiableService<FamilyName> getService() {
-    return familyNameService;
-  }
-
-  @Operation(summary = "get all family names")
+  @Operation(summary = "Get all family names as (paged, sorted, filtered) list")
   @GetMapping(
       value = {"/v6/familynames"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public PageResponse<FamilyName> find(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
-      @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
+      @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
-      @RequestParam(name = "searchTerm", required = false) String searchTerm) {
-    PageRequest pageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
-    if (sortBy != null) {
-      Sorting sorting = new Sorting(sortBy);
-      pageRequest.setSorting(sorting);
-    }
-    return familyNameService.find(pageRequest);
+      @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria)
+      throws ServiceException {
+    return super.find(pageNumber, pageSize, sortBy, filterCriteria);
   }
 
   @Operation(
@@ -113,13 +102,24 @@ public class FamilyNameController extends AbstractIdentifiableController<FamilyN
           @RequestParam(name = "pLocale", required = false)
           Locale pLocale)
       throws ServiceException {
-    FamilyName result;
     if (pLocale == null) {
-      result = familyNameService.getByUuid(uuid);
+      return super.getByUuid(uuid);
     } else {
-      result = familyNameService.getByUuidAndLocale(uuid, pLocale);
+      return super.getByUuidAndLocale(uuid, pLocale);
     }
-    return new ResponseEntity<>(result, result != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
+  }
+
+  @Operation(summary = "Get languages of all family names")
+  @GetMapping(
+      value = {"/v6/familynames/languages"},
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  public List<Locale> getLanguages() throws ServiceException {
+    return super.getLanguages();
+  }
+
+  @Override
+  protected IdentifiableService<FamilyName> getService() {
+    return service;
   }
 
   @Operation(summary = "save a newly created family")
@@ -128,8 +128,7 @@ public class FamilyNameController extends AbstractIdentifiableController<FamilyN
       produces = MediaType.APPLICATION_JSON_VALUE)
   public FamilyName save(@RequestBody FamilyName familyName, BindingResult errors)
       throws ServiceException, ValidationException {
-    familyNameService.save(familyName);
-    return familyName;
+    return super.save(familyName, errors);
   }
 
   @Operation(summary = "update a familyname")
@@ -142,8 +141,6 @@ public class FamilyNameController extends AbstractIdentifiableController<FamilyN
   public FamilyName update(
       @PathVariable("uuid") UUID uuid, @RequestBody FamilyName familyName, BindingResult errors)
       throws ServiceException, ValidationException {
-    assert Objects.equals(uuid, familyName.getUuid());
-    familyNameService.update(familyName);
-    return familyName;
+    return super.update(uuid, familyName, errors);
   }
 }

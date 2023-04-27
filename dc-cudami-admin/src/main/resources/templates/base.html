@@ -111,45 +111,45 @@
                       <a class="nav-link"
                          th:classappend="${menu == 'users'} ? active"
                          th:href="@{/users}"
-                         th:title="#{users}">
+                         th:title="#{menu.users}">
                         <i class="fas fa-users nav-icon"></i>
-                        <p th:text="#{users}">Users</p>
+                        <p th:text="#{menu.users}">Users</p>
                       </a>
                     </li>
                     <li class="nav-item">
                       <a class="nav-link"
                          th:classappend="${menu == 'predicates'} ? active"
                          th:href="@{/predicates}"
-                         th:title="#{predicates}">
+                         th:title="#{menu.predicates}">
                         <i class="fas fa-project-diagram nav-icon"></i>
-                        <p th:text="#{predicates}">Relation types</p>
+                        <p th:text="#{menu.predicates}">Relation types</p>
                       </a>
                     </li>
                     <li class="nav-item">
                       <a class="nav-link"
                          th:classappend="${menu == 'identifiertypes'} ? active"
                          th:href="@{/identifiertypes}"
-                         th:title="#{identifier_types}">
+                         th:title="#{menu.identifier_types}">
                         <i class="fas fa-barcode nav-icon"></i>
-                        <p th:text="#{identifier_types}">Identifier types</p>
+                        <p th:text="#{menu.identifier_types}">Identifier types</p>
                       </a>
                     </li>
                     <li class="nav-item">
                       <a class="nav-link"
                          th:classappend="${menu == 'licenses'} ? active"
                          th:href="@{/licenses}"
-                         th:title="#{licenses}">
+                         th:title="#{menu.licenses}">
                         <i class="fas fa-copyright nav-icon"></i>
-                        <p th:text="#{licenses}">Licenses</p>
+                        <p th:text="#{menu.licenses}">Licenses</p>
                       </a>
                     </li>
                     <li class="nav-item">
                       <a class="nav-link"
                          th:classappend="${menu == 'renderingtemplates'} ? active"
                          th:href="@{/renderingtemplates}"
-                         th:title="#{rendering_templates}">
+                         th:title="#{menu.rendering_templates}">
                         <i class="fas fa-palette nav-icon"></i>
-                        <p th:text="#{rendering_templates}">Rendering templates</p>
+                        <p th:text="#{menu.rendering_templates}">Rendering templates</p>
                       </a>
                     </li>
                   </ul>
@@ -275,6 +275,26 @@
                         <i class="fas fa-users nav-icon"></i>
                         <p th:text="#{persons}">Persons</p>
                       </a>
+                      <ul class="list-unstyled pl-3">
+                        <li class="nav-item">
+                          <a class="nav-link"
+                             th:classappend="${menu == 'familynames'} ? active"
+                             th:href="@{/familynames}"
+                             th:title="#{tooltip.familynames}">
+                            <i class="far fa-address-card nav-icon"></i>
+                            <p th:text="#{menu.familynames}">Family names</p>
+                          </a>
+                        </li>
+                        <li class="nav-item">
+                          <a class="nav-link"
+                             th:classappend="${menu == 'givennames'} ? active"
+                             th:href="@{/givennames}"
+                             th:title="#{tooltip.givennames}">
+                            <i class="far fa-address-card nav-icon"></i>
+                            <p th:text="#{menu.givennames}">Given names</p>
+                          </a>
+                        </li>
+                      </ul>
                     </li>
                     <li class="nav-item">
                       <a class="nav-link"
@@ -314,6 +334,15 @@
                     </p>
                   </a>
                   <ul class="nav nav-treeview">
+                    <li class="nav-item">
+                      <a class="nav-link"
+                         th:classappend="${menu == 'subjects'} ? active"
+                         th:href="@{/subjects}"
+                         th:title="#{tooltip.subjects}">
+                        <i class="fas fa-inbox nav-icon"></i>
+                        <p th:text="#{menu.subjects}">Subjects</p>
+                      </a>
+                    </li>
                     <li class="nav-item">
                       <a class="nav-link"
                          th:classappend="${menu == 'headwords'} ? active"

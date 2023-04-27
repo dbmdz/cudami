@@ -6,6 +6,9 @@ import de.digitalcollections.cudami.server.business.api.service.identifiable.Ide
 import de.digitalcollections.cudami.server.controller.AbstractUniqueObjectController;
 import de.digitalcollections.cudami.server.controller.ParameterHelper;
 import de.digitalcollections.model.identifiable.Identifiable;
+import de.digitalcollections.model.identifiable.Identifier;
+import java.util.List;
+import java.util.Locale;
 import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.http.HttpStatus;
@@ -13,16 +16,6 @@ import org.springframework.http.ResponseEntity;
 
 public abstract class AbstractIdentifiableController<T extends Identifiable>
     extends AbstractUniqueObjectController<T> {
-
-  public ResponseEntity<T> getByIdentifier(HttpServletRequest request)
-      throws ServiceException, ValidationException {
-    Pair<String, String> namespaceAndId = extractNamespaceAndId(request);
-
-    T identifiable =
-        getService().getByIdentifier(namespaceAndId.getLeft(), namespaceAndId.getRight());
-    return new ResponseEntity<>(
-        identifiable, identifiable != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
-  }
 
   /**
    * Extract the namespace and identifier from the HttpServletRequest
@@ -43,6 +36,25 @@ public abstract class AbstractIdentifiableController<T extends Identifiable>
     return namespaceAndId;
   }
 
+  public ResponseEntity<T> getByIdentifier(HttpServletRequest request)
+      throws ServiceException, ValidationException {
+    Pair<String, String> namespaceAndId = extractNamespaceAndId(request);
+
+    T identifiable =
+        getService()
+            .getByIdentifier(
+                Identifier.builder()
+                    .namespace(namespaceAndId.getLeft())
+                    .id(namespaceAndId.getRight())
+                    .build());
+    return new ResponseEntity<>(
+        identifiable, identifiable != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
+  }
+
   @Override
   protected abstract IdentifiableService<T> getService();
+
+  protected List<Locale> getLanguages() throws ServiceException {
+    return getService().getLanguages();
+  }
 }

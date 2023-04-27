@@ -1,0 +1,73 @@
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="https://github.com/thymeleaf/thymeleaf-extras-springsecurity"
+      xmlns:data="https://github.com/mxab/thymeleaf-extras-data-attribute"
+      layout:decorate="~{base-form}">
+
+  <head>
+    <title th:text="|#{page.title.identifier_types}: | + (${mode} == 'create' ? #{page.title.identifier_type.create} : #{page.title.identifier_type.edit(${identifierType.label})})">Identifier types: Create a new identifier type / Edit identifier type</title>
+  </head>
+
+  <body>
+    <th:block layout:fragment="content">
+      <div class="content">
+        <div class="container-fluid">
+
+          <form action="#" th:action="@{#}" th:object="${identifierType}" method="post" role="form">
+            <div id="content-header">
+              <div class="row">
+                <div class="col d-flex justify-content-between">
+                  <h1 th:text="${mode} == 'create' ? #{page.title.identifier_type.create} : #{page.title.identifier_type.edit(${identifierType.label})}">Create a new identifier type / Edit identifier type "my type"</h1>
+                  <div>
+                    <button type="submit" class="btn btn-primary" th:text="#{save}">Save</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div id="content-body" class="rows-striped">
+              <div th:replace="fragments/feedback-messages :: form"></div>
+
+              <th:block th:if="${mode} == 'edit'">
+                <th:block th:insert="fragments/uniqueobject::renderFields(${identifierType})"></th:block>
+                <hr>
+              </th:block>
+
+              <div class="row">
+                <div class="col-sm-12">
+                  <div class="form-group" th:classappend="${#fields.hasErrors('label')}? has-error">
+                    <label for="label" class="required" th:text="#{lbl.label}">Value</label>
+                    <input id="label" type="text" class="form-control" autofocus="autofocus" required="" value=""
+                           th:field="*{label}"
+                           th:classappend="${#fields.hasErrors('label')}? 'is-invalid'">
+                    <p th:if="${#fields.hasErrors('label')}" th:errors="*{label}">...</p>
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="col">
+                  <div class="form-group">
+                    <label for="namespace" class="required" th:text="#{lbl.namespace}">Namespace</label>
+                    <input id="namespace" type="text" class="form-control" required="" value=""
+                           th:classappend="${#fields.hasErrors('namespace')}? 'is-invalid'" th:field="*{namespace}">
+                    <p th:if="${#fields.hasErrors('namespace')}" th:errors="*{namespace}">...</p>
+                  </div>
+                </div>
+                <div class="col">
+                  <div class="form-group">
+                    <label for="pattern" class="required" th:text="#{lbl.pattern}">Pattern</label>
+                    <input id="pattern" type="text" class="form-control" required="" value=""
+                           th:classappend="${#fields.hasErrors('pattern')}? 'is-invalid'" th:field="*{pattern}">
+                    <p th:if="${#fields.hasErrors('pattern')}" th:errors="*{pattern}">...</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </th:block>
+  </body>
+
+</html>

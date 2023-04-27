@@ -3,6 +3,7 @@ package de.digitalcollections.cudami.server.controller.identifiable.entity;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.digitalcollections.cudami.server.business.api.service.LocaleService;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.TopicService;
 import de.digitalcollections.cudami.server.controller.CudamiControllerException;
 import de.digitalcollections.cudami.server.controller.legacy.V5MigrationHelper;
@@ -53,7 +54,7 @@ public class V5TopicController {
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
       @RequestParam(name = "searchTerm", required = false) String searchTerm)
-      throws CudamiControllerException {
+      throws CudamiControllerException, ServiceException {
     PageRequest pageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
     if (sortBy != null) {
       Sorting sorting = new Sorting(V5MigrationHelper.migrate(sortBy));
@@ -83,13 +84,14 @@ public class V5TopicController {
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
       @RequestParam(name = "entityType", required = false) FilterCriterion<String> entityType)
-      throws CudamiControllerException {
+      throws CudamiControllerException, ServiceException {
     PageRequest pageRequest = new PageRequest(pageNumber, pageSize, new Sorting());
     if (entityType != null) {
       Filtering filtering = Filtering.builder().add("entityType", entityType).build();
       pageRequest.setFiltering(filtering);
     }
-    PageResponse<Entity> pageResponse = topicService.findEntities(topicUuid, pageRequest);
+    PageResponse<Entity> pageResponse =
+        topicService.findEntities(Topic.builder().uuid(topicUuid).build(), pageRequest);
 
     try {
       String result = V5MigrationHelper.migrate(pageResponse, objectMapper);
@@ -112,13 +114,14 @@ public class V5TopicController {
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
       @RequestParam(name = "searchTerm", required = false) String searchTerm)
-      throws CudamiControllerException {
+      throws CudamiControllerException, ServiceException {
     PageRequest searchPageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
     if (sortBy != null) {
       Sorting sorting = new Sorting(V5MigrationHelper.migrate(sortBy));
       searchPageRequest.setSorting(sorting);
     }
-    PageResponse<Topic> pageResponse = topicService.findChildren(topicUuid, searchPageRequest);
+    PageResponse<Topic> pageResponse =
+        topicService.findChildren(Topic.builder().uuid(topicUuid).build(), searchPageRequest);
 
     try {
       String result = V5MigrationHelper.migrate(pageResponse, objectMapper);
@@ -140,9 +143,10 @@ public class V5TopicController {
       @PathVariable UUID uuid,
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize)
-      throws CudamiControllerException {
+      throws CudamiControllerException, ServiceException {
     PageResponse<FileResource> pageResponse =
-        topicService.findFileResources(uuid, new PageRequest(pageNumber, pageSize));
+        topicService.findFileResources(
+            Topic.builder().uuid(uuid).build(), new PageRequest(pageNumber, pageSize));
 
     try {
       String result = V5MigrationHelper.migrate(pageResponse, objectMapper);
@@ -161,7 +165,7 @@ public class V5TopicController {
       @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
       @RequestParam(name = "searchTerm", required = false) String searchTerm)
-      throws CudamiControllerException {
+      throws CudamiControllerException, ServiceException {
     PageRequest searchPageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
     if (sortBy != null) {
       Sorting sorting = new Sorting(V5MigrationHelper.migrate(sortBy));

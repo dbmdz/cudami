@@ -1,11 +1,7 @@
 package de.digitalcollections.cudami.client.identifiable.entity;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.when;
-
 import de.digitalcollections.model.identifiable.entity.digitalobject.DigitalObject;
 import de.digitalcollections.model.identifiable.resource.FileResource;
-import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
@@ -15,20 +11,6 @@ import org.junit.jupiter.api.Test;
 @DisplayName("The client for DigitalObjects")
 class CudamiDigitalObjectsClientTest
     extends BaseCudamiEntitiesClientTest<DigitalObject, CudamiDigitalObjectsClient> {
-
-  @Test
-  @DisplayName("can retrieve the list of reduced DigitalObjects")
-  public void testFindAllReduced() throws Exception {
-    String bodyJson =
-        "[{\"entityType\":\"DIGITAL_OBJECT\",\"identifiableObjectType\":\"DIGITAL_OBJECT\"}]";
-    when(httpResponse.body()).thenReturn(bodyJson.getBytes(StandardCharsets.UTF_8));
-
-    List<DigitalObject> actual = client.getAllReduced();
-    assertThat(actual).isNotNull();
-    assertThat(actual.get(0)).isExactlyInstanceOf(DigitalObject.class);
-
-    verifyHttpRequestByMethodAndRelativeURL("get", "/reduced");
-  }
 
   @Test
   @DisplayName("can find a number of random DigitalObjects")
@@ -46,7 +28,7 @@ class CudamiDigitalObjectsClientTest
         "get",
         "/"
             + uuid
-            + "/collections?active=true&pageNumber=1&pageSize=2&sortBy=sortable.desc.nullsfirst.ignorecase&foo=eq:bar&gnarf=eq:krchch&searchTerm=hello");
+            + "/collections?active=true&pageNumber=1&pageSize=2&sortBy=sortable.desc.nullsfirst.ignorecase&filter=foo:eq:bar&filter=gnarf:eq:krchch");
   }
 
   @Test
@@ -58,7 +40,7 @@ class CudamiDigitalObjectsClientTest
         "get",
         "/"
             + uuid
-            + "/collections?pageNumber=1&pageSize=2&sortBy=sortable.desc.nullsfirst.ignorecase&foo=eq:bar&gnarf=eq:krchch&searchTerm=hello");
+            + "/collections?pageNumber=1&pageSize=2&sortBy=sortable.desc.nullsfirst.ignorecase&filter=foo:eq:bar&filter=gnarf:eq:krchch");
   }
 
   @Test
@@ -119,7 +101,7 @@ class CudamiDigitalObjectsClientTest
         "get",
         "/"
             + uuid
-            + "/projects?pageNumber=1&pageSize=2&sortBy=sortable.desc.nullsfirst.ignorecase&foo=eq:bar&gnarf=eq:krchch&searchTerm=hello");
+            + "/projects?pageNumber=1&pageSize=2&sortBy=sortable.desc.nullsfirst.ignorecase&filter=foo:eq:bar&filter=gnarf:eq:krchch");
   }
 
   @Test
@@ -144,6 +126,6 @@ class CudamiDigitalObjectsClientTest
     client.getAllForParent(parent);
 
     verifyHttpRequestByMethodAndRelativeURL(
-        "get", "?pageNumber=0&pageSize=10000&parent.uuid=eq:" + parent.getUuid());
+        "get", "?pageNumber=0&pageSize=10000&filter=parent.uuid:eq:" + parent.getUuid());
   }
 }

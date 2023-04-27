@@ -9,6 +9,7 @@ import de.digitalcollections.cudami.server.business.api.service.identifiable.ent
 import de.digitalcollections.cudami.server.controller.ParameterHelper;
 import de.digitalcollections.cudami.server.controller.identifiable.AbstractIdentifiableController;
 import de.digitalcollections.model.identifiable.entity.Event;
+import de.digitalcollections.model.list.filtering.FilterCriterion;
 import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.list.sorting.Order;
 import io.swagger.v3.oas.annotations.Operation;
@@ -17,37 +18,23 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import java.util.Locale;
-import java.util.Objects;
 import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @Tag(name = "Event controller")
 public class EventController extends AbstractIdentifiableController<Event> {
 
   private final LocaleService localeService;
-  private final EventService eventService;
+  private final EventService service;
 
   public EventController(LocaleService localeService, EventService eventService) {
     this.localeService = localeService;
-    this.eventService = eventService;
-  }
-
-  @Override
-  protected IdentifiableService<Event> getService() {
-    return eventService;
+    this.service = eventService;
   }
 
   @Operation(summary = "Get count of events")
@@ -56,11 +43,21 @@ public class EventController extends AbstractIdentifiableController<Event> {
         "/v6/events/count",
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public long count() {
-    return eventService.count();
+  public long count() throws ServiceException {
+    return super.count();
   }
 
-  @Operation(summary = "get all events")
+  @Operation(summary = "Delete an event")
+  @DeleteMapping(
+      value = {"/v6/events/{uuid}"},
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity delete(
+      @Parameter(example = "", description = "UUID of the event") @PathVariable("uuid") UUID uuid)
+      throws ConflictException, ServiceException {
+    return super.delete(uuid);
+  }
+
+  @Operation(summary = "get all events as (paged, sorted, filtered) list")
   @GetMapping(
       value = {"/v6/events"},
       produces = MediaType.APPLICATION_JSON_VALUE)
@@ -68,25 +65,9 @@ public class EventController extends AbstractIdentifiableController<Event> {
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
-      @RequestParam(name = "searchTerm", required = false) String searchTerm,
-      @RequestParam(name = "label", required = false) String labelTerm,
-      @RequestParam(name = "labelLanguage", required = false) Locale labelLanguage) {
-    return super.find(pageNumber, pageSize, sortBy, searchTerm, labelTerm, labelLanguage);
-  }
-
-  @Operation(summary = "Get an event by uuid")
-  @GetMapping(
-      value = {"/v6/events/{uuid:" + ParameterHelper.UUID_PATTERN + "}"},
-      produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<Event> getByUuid(
-      @Parameter(
-              example = "",
-              description = "UUID of the event, e.g. <tt>599a120c-2dd5-11e8-b467-0ed5f89f718b</tt>")
-          @PathVariable("uuid")
-          UUID uuid)
+      @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria)
       throws ServiceException {
-    Event event = eventService.getByUuid(uuid);
-    return new ResponseEntity<>(event, event != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
+    return super.find(pageNumber, pageSize, sortBy, filterCriteria);
   }
 
   @Operation(
@@ -102,6 +83,20 @@ public class EventController extends AbstractIdentifiableController<Event> {
     return super.getByIdentifier(request);
   }
 
+  @Operation(summary = "Get an event by uuid")
+  @GetMapping(
+      value = {"/v6/events/{uuid:" + ParameterHelper.UUID_PATTERN + "}"},
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity<Event> getByUuid(
+      @Parameter(
+              example = "",
+              description = "UUID of the event, e.g. <tt>599a120c-2dd5-11e8-b467-0ed5f89f718b</tt>")
+          @PathVariable("uuid")
+          UUID uuid)
+      throws ServiceException {
+    return super.getByUuid(uuid);
+  }
+
   @Operation(
       summary = "Get languages of all events",
       description = "Get languages of all events",
@@ -109,26 +104,13 @@ public class EventController extends AbstractIdentifiableController<Event> {
   @GetMapping(
       value = {"/v6/events/languages"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public List<Locale> getLanguages() {
-    return eventService.getLanguages();
+  public List<Locale> getLanguages() throws ServiceException {
+    return super.getLanguages();
   }
 
-  @Operation(summary = "Delete an event")
-  @DeleteMapping(
-      value = {"/v6/events/{uuid}"},
-      produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity delete(
-      @Parameter(example = "", description = "UUID of the event") @PathVariable("uuid") UUID uuid)
-      throws ConflictException {
-    boolean successful;
-    try {
-      successful = eventService.delete(uuid);
-    } catch (ServiceException e) {
-      return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-    return successful
-        ? new ResponseEntity<>(HttpStatus.NO_CONTENT)
-        : new ResponseEntity<>(HttpStatus.NOT_FOUND);
+  @Override
+  protected IdentifiableService<Event> getService() {
+    return service;
   }
 
   @Operation(summary = "Save an event")
@@ -137,8 +119,7 @@ public class EventController extends AbstractIdentifiableController<Event> {
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Event save(@RequestBody Event event, BindingResult errors)
       throws ServiceException, ValidationException {
-    eventService.save(event);
-    return event;
+    return super.save(event, errors);
   }
 
   @Operation(summary = "Update an event")
@@ -147,8 +128,6 @@ public class EventController extends AbstractIdentifiableController<Event> {
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Event update(@PathVariable UUID uuid, @RequestBody Event event, BindingResult errors)
       throws ServiceException, ValidationException {
-    assert Objects.equals(uuid, event.getUuid());
-    eventService.update(event);
-    return event;
+    return super.update(uuid, event, errors);
   }
 }

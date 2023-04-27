@@ -7,11 +7,15 @@ import de.digitalcollections.commons.web.SlugGenerator;
 import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.alias.UrlAliasRepository;
 import de.digitalcollections.cudami.server.business.api.service.LocaleService;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ConflictException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.alias.UrlAliasService;
+import de.digitalcollections.cudami.server.business.impl.service.UniqueObjectServiceImpl;
+import de.digitalcollections.model.identifiable.Identifiable;
 import de.digitalcollections.model.identifiable.alias.LocalizedUrlAliases;
 import de.digitalcollections.model.identifiable.alias.UrlAlias;
+import de.digitalcollections.model.identifiable.entity.Website;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import java.time.LocalDateTime;
@@ -22,7 +26,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,18 +35,18 @@ import org.springframework.transaction.annotation.Transactional;
 
 /** Service implementation for UrlAlias handling. */
 @Service
-@Transactional(rollbackFor = {Exception.class})
-public class UrlAliasServiceImpl implements UrlAliasService {
+// @Transactional(rollbackFor = {Exception.class}) //is set on super class
+public class UrlAliasServiceImpl extends UniqueObjectServiceImpl<UrlAlias, UrlAliasRepository>
+    implements UrlAliasService {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(UrlAliasServiceImpl.class);
   private final LocaleService localeService;
-  private final UrlAliasRepository repository;
   private final SlugGenerator slugGenerator;
 
   @Autowired
   public UrlAliasServiceImpl(
       UrlAliasRepository repository, SlugGenerator slugGenerator, LocaleService localeService) {
-    this.repository = repository;
+    super(repository);
     this.slugGenerator = slugGenerator;
     this.localeService = localeService;
   }
@@ -51,7 +54,7 @@ public class UrlAliasServiceImpl implements UrlAliasService {
   protected void checkPublication(UrlAlias urlAlias) throws ServiceException {
     if (urlAlias.getLastPublished() != null) {
       if (urlAlias.getUuid() != null) {
-        UrlAlias publishedAlias = getByUuid(urlAlias.getUuid());
+        UrlAlias publishedAlias = getByExample(urlAlias);
         if (!publishedAlias.isPrimary() && urlAlias.isPrimary()) {
           // set lastPublished to current date
           urlAlias.setLastPublished(LocalDateTime.now());
@@ -75,26 +78,14 @@ public class UrlAliasServiceImpl implements UrlAliasService {
   }
 
   @Override
-  public boolean delete(List<UUID> uuids) throws ServiceException {
-    try {
-      return repository.delete(uuids) > 0;
-    } catch (RepositoryException e) {
-      throw new ServiceException("Cannot delete UrlAliases by uuids: " + e, e);
-    }
-  }
-
-  @Override
   @Transactional(rollbackFor = {RuntimeException.class, ServiceException.class})
-  public boolean deleteAllForTarget(UUID uuid, boolean force) throws ServiceException {
-    if (uuid == null) {
-      return false;
+  public boolean deleteByIdentifiable(Identifiable identifiable, boolean force)
+      throws ServiceException, ConflictException {
+    try {
+      return repository.deleteByIdentifiable(identifiable, force);
+    } catch (RepositoryException e) {
+      throw new ServiceException("Backend failure");
     }
-    LocalizedUrlAliases urlAliases = getLocalizedUrlAliases(uuid);
-    return delete(
-        urlAliases.flatten().stream()
-            .filter(ua -> force || ua.getLastPublished() == null)
-            .map(ua -> ua.getUuid())
-            .collect(Collectors.toList()));
   }
 
   protected LocalizedUrlAliases filterForLocale(
@@ -127,9 +118,10 @@ public class UrlAliasServiceImpl implements UrlAliasService {
   }
 
   @Override
-  public PageResponse<LocalizedUrlAliases> find(PageRequest pageRequest) throws ServiceException {
+  public PageResponse<LocalizedUrlAliases> findLocalizedUrlAliases(PageRequest pageRequest)
+      throws ServiceException {
     try {
-      return repository.find(pageRequest);
+      return repository.findLocalizedUrlAliases(pageRequest);
     } catch (Exception e) {
       throw new ServiceException(
           "Cannot find LocalizedUrlAliases with pageRequest=" + pageRequest + ": " + e, e);
@@ -137,19 +129,19 @@ public class UrlAliasServiceImpl implements UrlAliasService {
   }
 
   @Override
-  public String generateSlug(Locale pLocale, String label, UUID websiteUuid)
+  public String generateSlug(Locale pLocale, String label, Website website)
       throws ServiceException {
 
     String slug = slugGenerator.generateSlug(label);
 
     try {
-      if (!repository.hasUrlAlias(slug, websiteUuid, pLocale)) {
+      if (!repository.hasUrlAlias(slug, website, pLocale)) {
         return slug;
       }
     } catch (Exception e) {
       throw new ServiceException(
-          "Cannot check, if UrlAliases for websiteUuid="
-              + websiteUuid
+          "Cannot check, if UrlAliases for website="
+              + website
               + ", slug="
               + slug
               + ", locale="
@@ -163,13 +155,13 @@ public class UrlAliasServiceImpl implements UrlAliasService {
     while (true) {
       String numericalSuffixedSlug = slug + "-" + suffixId;
       try {
-        if (!repository.hasUrlAlias(numericalSuffixedSlug, websiteUuid, pLocale)) {
+        if (!repository.hasUrlAlias(numericalSuffixedSlug, website, pLocale)) {
           return numericalSuffixedSlug;
         }
       } catch (Exception e) {
         throw new ServiceException(
-            "Cannot check, if UrlAliases for websiteUuid="
-                + websiteUuid
+            "Cannot check, if UrlAliases for website="
+                + website
                 + ", slug="
                 + numericalSuffixedSlug
                 + ", locale="
@@ -183,40 +175,27 @@ public class UrlAliasServiceImpl implements UrlAliasService {
   }
 
   @Override
-  public UrlAlias getByUuid(UUID uuid) throws ServiceException {
-    if (uuid == null) {
-      return null;
-    }
-
+  public LocalizedUrlAliases getByIdentifiable(Identifiable identifiable) throws ServiceException {
     try {
-      return repository.getByUuid(uuid);
-    } catch (Exception e) {
-      throw new ServiceException("Cannot find an UrlAlias with uuid=" + uuid + ": " + e, e);
-    }
-  }
-
-  @Override
-  public LocalizedUrlAliases getLocalizedUrlAliases(UUID targetUuid) throws ServiceException {
-    try {
-      return repository.getAllForTarget(targetUuid);
+      return repository.getByIdentifiable(identifiable);
     } catch (Exception e) {
       throw new ServiceException(
-          "Cannot find LocalizedUrlAliases for identifiable with uuid=" + targetUuid + ": " + e, e);
+          "Cannot find LocalizedUrlAliases for identifiable =" + identifiable + ": " + e, e);
     }
   }
 
   @Override
-  public LocalizedUrlAliases getPrimaryUrlAliases(UUID websiteUuid, String slug, Locale pLocale)
+  public LocalizedUrlAliases getPrimaryUrlAliases(Website website, String slug, Locale pLocale)
       throws ServiceException {
     if (slug == null || slug.isBlank()) {
       throw new ServiceException("Missing or empty slug");
     }
 
     try {
-      if (websiteUuid == null) {
+      if (website == null) {
         // We only want the unspecified primary links
         LocalizedUrlAliases unspecificLocalizedUrlAliases =
-            repository.findPrimaryLinksForWebsite(null, slug, pLocale != null);
+            repository.findPrimaryLinksForWebsite((Website) null, slug, pLocale != null);
         unspecificLocalizedUrlAliases =
             filterForLocaleWithFallback(pLocale, unspecificLocalizedUrlAliases);
         return unspecificLocalizedUrlAliases;
@@ -224,10 +203,11 @@ public class UrlAliasServiceImpl implements UrlAliasService {
 
       // Try to retrieve the specific localizedUrlAliases for a website
       LocalizedUrlAliases localizedUrlAliases =
-          repository.findPrimaryLinksForWebsite(websiteUuid, slug, pLocale != null);
+          repository.findPrimaryLinksForWebsite(website, slug, pLocale != null);
       if (localizedUrlAliases.isEmpty()) {
         // Fallback to generic localizedUrlAliases
-        localizedUrlAliases = repository.findPrimaryLinksForWebsite(null, slug, pLocale != null);
+        localizedUrlAliases =
+            repository.findPrimaryLinksForWebsite((Website) null, slug, pLocale != null);
       }
 
       localizedUrlAliases = filterForLocaleWithFallback(pLocale, localizedUrlAliases);
@@ -235,15 +215,15 @@ public class UrlAliasServiceImpl implements UrlAliasService {
       return localizedUrlAliases;
     } catch (Exception e) {
       throw new ServiceException(
-          "Could not find mainLink for websiteUuid=" + websiteUuid + ", slug=" + slug + ": " + e,
-          e);
+          "Could not find mainLink for website=" + website + ", slug=" + slug + ": " + e, e);
     }
   }
 
   @Override
-  public List<UrlAlias> getPrimaryUrlAliasesForTarget(UUID targetUuid) throws ServiceException {
+  public List<UrlAlias> getPrimaryUrlAliasesByIdentifiable(Identifiable identifiable)
+      throws ServiceException {
     try {
-      LocalizedUrlAliases localizedUrlAliases = repository.getAllForTarget(targetUuid);
+      LocalizedUrlAliases localizedUrlAliases = repository.getByIdentifiable(identifiable);
       if (localizedUrlAliases == null) {
         return new ArrayList<>(0);
       }
@@ -252,9 +232,7 @@ public class UrlAliasServiceImpl implements UrlAliasService {
           .collect(Collectors.toList());
     } catch (RepositoryException e) {
       throw new ServiceException(
-          String.format(
-              "Cannot find all UrlAliases of a specific target. targetUuid='%s'.", targetUuid),
-          e);
+          String.format("Cannot find primary UrlAliases by identifiable='%s'.", identifiable), e);
     }
   }
 
@@ -276,6 +254,7 @@ public class UrlAliasServiceImpl implements UrlAliasService {
     if (urlAlias == null) {
       throw new ServiceException("Cannot create an empty UrlAlias");
     }
+    // TODO: do not work with uuid in service layer
     if (!force && urlAlias.getUuid() != null) {
       throw new ServiceException("Cannot create an UrlAlias, when its UUID is already set!");
     }
@@ -293,6 +272,7 @@ public class UrlAliasServiceImpl implements UrlAliasService {
     if (urlAlias == null) {
       throw new ServiceException("Cannot update an empty UrlAlias");
     }
+    // TODO: do not work with uuid in service layer
     if (urlAlias.getUuid() == null) {
       throw new ServiceException("Cannot update an UrlAlias with empty UUID");
     }
@@ -312,13 +292,14 @@ public class UrlAliasServiceImpl implements UrlAliasService {
     }
 
     Map<String, Integer> primaries = new HashMap<>(0);
+    // TODO: do not work with uuid in service layer
     localizedUrlAliases.flatten().stream()
         .forEach(
             u -> {
               String key =
                   (u.getWebsite() != null ? u.getWebsite().getUuid() : "default")
                       + "-"
-                      + u.getTargetUuid()
+                      + u.getTarget().getUuid()
                       + "-"
                       + grabLanguage(u.getTargetLanguage());
               Integer primariesPerTuple = primaries.getOrDefault(key, 0);
@@ -328,7 +309,8 @@ public class UrlAliasServiceImpl implements UrlAliasService {
               primaries.put(key, primariesPerTuple);
             });
 
-    // Validation is failed, if we do not have only single primaries per tuple, or if we have no
+    // Validation is failed, if we do not have only single primaries per tuple, or
+    // if we have no
     // single primary per tuple at all
     if (primaries.values().stream().collect(Collectors.toSet()).size() != 1
         || !primaries.values().contains(1)) {
@@ -345,6 +327,7 @@ public class UrlAliasServiceImpl implements UrlAliasService {
               + "-"
               + u.getSlug();
       if (tuples.contains(key)) {
+        // TODO: do not work with uuid in service layer
         throw new ValidationException(
             "multiple entries for slug="
                 + u.getSlug()
@@ -353,7 +336,7 @@ public class UrlAliasServiceImpl implements UrlAliasService {
                 + ", website="
                 + u.getWebsite()
                 + ", target="
-                + u.getTargetUuid()
+                + u.getTarget().getUuid()
                 + " in "
                 + tuples
                 + " of "

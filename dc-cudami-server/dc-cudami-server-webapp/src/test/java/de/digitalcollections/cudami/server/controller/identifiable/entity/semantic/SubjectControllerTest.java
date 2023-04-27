@@ -8,10 +8,10 @@ import static org.mockito.Mockito.when;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.semantic.SubjectService;
 import de.digitalcollections.cudami.server.controller.BaseControllerTest;
 import de.digitalcollections.model.identifiable.Identifier;
+import de.digitalcollections.model.identifiable.semantic.Subject;
 import de.digitalcollections.model.list.filtering.FilterCriterion;
 import de.digitalcollections.model.list.filtering.Filtering;
 import de.digitalcollections.model.list.paging.PageRequest;
-import de.digitalcollections.model.semantic.Subject;
 import java.nio.charset.StandardCharsets;
 import org.apache.commons.codec.binary.Base64;
 import org.junit.jupiter.api.DisplayName;
@@ -36,9 +36,10 @@ class SubjectControllerTest extends BaseControllerTest {
     Subject expected =
         Subject.builder()
             .identifier(Identifier.builder().namespace("namespace").id("id").build())
-            .type("type")
+            .subjectType("type")
             .build();
-    when(subjectService.getByTypeAndIdentifier(eq("type"), eq("namespace"), eq("id")))
+    when(subjectService.getByTypeAndIdentifier(
+            eq("type"), eq(Identifier.builder().namespace("namespace").id("id").build())))
         .thenReturn(expected);
 
     testJson(path, "/v5/subjects/type_namespace_id.json");
@@ -51,14 +52,15 @@ class SubjectControllerTest extends BaseControllerTest {
     String path =
         "/v6/subjects/identifier/"
             + Base64.encodeBase64String("type:namespace:id".getBytes(StandardCharsets.UTF_8));
-    when(subjectService.getByTypeAndIdentifier(eq("type"), eq("namespace"), eq("id")))
+    when(subjectService.getByTypeAndIdentifier(
+            eq("type"), eq(Identifier.builder().namespace("namespace").id("id").build())))
         .thenReturn(null);
     testNotFound(path);
   }
 
   @DisplayName("can retrieve by localized exact label")
   @ParameterizedTest
-  @ValueSource(strings = {"/v6/subjects?label=\"Antike und Altertum\"&labelLanguage=und-Latn"})
+  @ValueSource(strings = {"/v6/subjects?filter=label_und-Latn:eq:\"Antike und Altertum\""})
   public void findByLocalizedExactLabel(String path) throws Exception {
     testHttpGet(path);
     PageRequest expectedPageRequest =
@@ -69,7 +71,7 @@ class SubjectControllerTest extends BaseControllerTest {
                 Filtering.builder()
                     .add(
                         FilterCriterion.builder()
-                            .withExpression("label.und-latn")
+                            .withExpression("label_und-Latn")
                             .isEquals("\"Antike und Altertum\"")
                             .build())
                     .build())
@@ -79,7 +81,7 @@ class SubjectControllerTest extends BaseControllerTest {
 
   @DisplayName("can retrieve by localized 'like' label")
   @ParameterizedTest
-  @ValueSource(strings = {"/v6/subjects?label=Antike&labelLanguage=und-Latn"})
+  @ValueSource(strings = {"/v6/subjects?filter=label_und-Latn:like:Antike"})
   public void findByLocalizedLikeLabel(String path) throws Exception {
     testHttpGet(path);
     PageRequest expectedPageRequest =
@@ -90,7 +92,7 @@ class SubjectControllerTest extends BaseControllerTest {
                 Filtering.builder()
                     .add(
                         FilterCriterion.builder()
-                            .withExpression("label.und-latn")
+                            .withExpression("label_und-Latn")
                             .contains("Antike")
                             .build())
                     .build())

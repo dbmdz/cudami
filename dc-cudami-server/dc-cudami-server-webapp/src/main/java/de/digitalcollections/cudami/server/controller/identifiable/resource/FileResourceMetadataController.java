@@ -12,21 +12,16 @@ import de.digitalcollections.model.list.filtering.Filtering;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.list.sorting.Order;
-import de.digitalcollections.model.list.sorting.Sorting;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Locale;
-import java.util.Objects;
 import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -45,20 +40,15 @@ public class FileResourceMetadataController extends AbstractIdentifiableControll
   private static final Logger LOGGER =
       LoggerFactory.getLogger(FileResourceMetadataController.class);
 
-  private final FileResourceMetadataService<FileResource> metadataService;
+  private final FileResourceMetadataService<FileResource> service;
 
   public FileResourceMetadataController(
       @Qualifier("fileResourceMetadataService")
           FileResourceMetadataService<FileResource> metadataService) {
-    this.metadataService = metadataService;
+    this.service = metadataService;
   }
 
-  @Override
-  protected IdentifiableService<FileResource> getService() {
-    return metadataService;
-  }
-
-  @Operation(summary = "Get all fileresources")
+  @Operation(summary = "Get all fileresources as (paged, sorted, filtered) list")
   @GetMapping(
       value = {"/v6/fileresources"},
       produces = MediaType.APPLICATION_JSON_VALUE)
@@ -66,33 +56,12 @@ public class FileResourceMetadataController extends AbstractIdentifiableControll
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
-      @RequestParam(name = "searchTerm", required = false) String searchTerm,
-      @RequestParam(name = "label", required = false) String labelTerm,
-      @RequestParam(name = "labelLanguage", required = false) Locale labelLanguage,
-      @RequestParam(name = "uri", required = false)
-          FilterCriterion<String> encodedUriFilterCriterion) {
-    PageRequest searchPageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
-    if (sortBy != null) {
-      Sorting sorting = new Sorting(sortBy);
-      searchPageRequest.setSorting(sorting);
-    }
-    if (encodedUriFilterCriterion != null) {
-      FilterCriterion<String> uri =
-          new FilterCriterion<>(
-              "uri",
-              encodedUriFilterCriterion.getOperation(),
-              URLDecoder.decode(
-                  (String) encodedUriFilterCriterion.getValue(), StandardCharsets.UTF_8));
-      Filtering filtering = Filtering.builder().add("uri", uri).build();
-      searchPageRequest.setFiltering(filtering);
-    }
-    addLabelFilter(searchPageRequest, labelTerm, labelLanguage);
-    return metadataService.find(searchPageRequest);
+      @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria)
+      throws ServiceException {
+    return super.find(pageNumber, pageSize, sortBy, filterCriteria);
   }
 
-  @Operation(
-      summary =
-          "Find limited amount of fileresources of given type containing searchTerm in label or description")
+  @Operation(summary = "Get all fileresources of given type as (paged, sorted, filtered) list")
   @GetMapping(
       value = {"/v6/fileresources/type/{type}"},
       produces = MediaType.APPLICATION_JSON_VALUE)
@@ -103,12 +72,10 @@ public class FileResourceMetadataController extends AbstractIdentifiableControll
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
-      @RequestParam(name = "searchTerm", required = false) String searchTerm) {
-    PageRequest pageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
-    if (sortBy != null) {
-      Sorting sorting = new Sorting(sortBy);
-      pageRequest.setSorting(sorting);
-    }
+      @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria)
+      throws ServiceException {
+    PageRequest pageRequest =
+        createPageRequest(FileResource.class, pageNumber, pageSize, sortBy, filterCriteria);
 
     String prefix;
     switch (type) {
@@ -141,7 +108,7 @@ public class FileResourceMetadataController extends AbstractIdentifiableControll
               .build();
       pageRequest.add(filtering);
     }
-    return metadataService.find(pageRequest);
+    return service.find(pageRequest);
   }
 
   @Operation(
@@ -185,13 +152,11 @@ public class FileResourceMetadataController extends AbstractIdentifiableControll
           @RequestParam(name = "pLocale", required = false)
           Locale pLocale)
       throws ServiceException {
-    FileResource result;
     if (pLocale == null) {
-      result = metadataService.getByUuid(uuid);
+      return super.getByUuid(uuid);
     } else {
-      result = metadataService.getByUuidAndLocale(uuid, pLocale);
+      return super.getByUuidAndLocale(uuid, pLocale);
     }
-    return new ResponseEntity<>(result, result != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
   }
 
   @Operation(summary = "Get languages of all websites")
@@ -203,8 +168,13 @@ public class FileResourceMetadataController extends AbstractIdentifiableControll
         "/latest/fileresources/languages"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public List<Locale> getLanguages() {
-    return metadataService.getLanguages();
+  public List<Locale> getLanguages() throws ServiceException {
+    return super.getLanguages();
+  }
+
+  @Override
+  protected IdentifiableService<FileResource> getService() {
+    return service;
   }
 
   @Operation(summary = "Save a newly created fileresource")
@@ -216,10 +186,9 @@ public class FileResourceMetadataController extends AbstractIdentifiableControll
         "/latest/fileresources"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public FileResource save(@RequestBody FileResource fileResource)
+  public FileResource save(@RequestBody FileResource fileResource, BindingResult bindingResult)
       throws ServiceException, ValidationException {
-    metadataService.save(fileResource);
-    return fileResource;
+    return super.save(fileResource, bindingResult);
   }
 
   @Operation(summary = "Update a fileresource")
@@ -234,8 +203,6 @@ public class FileResourceMetadataController extends AbstractIdentifiableControll
   public FileResource update(
       @PathVariable UUID uuid, @RequestBody FileResource fileResource, BindingResult errors)
       throws ServiceException, ValidationException {
-    assert Objects.equals(uuid, fileResource.getUuid());
-    metadataService.update(fileResource);
-    return fileResource;
+    return super.update(uuid, fileResource, errors);
   }
 }

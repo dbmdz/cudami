@@ -4,7 +4,6 @@ import de.digitalcollections.cudami.admin.business.api.service.exceptions.Servic
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.security.User;
-import java.util.List;
 import java.util.UUID;
 import org.springframework.validation.Errors;
 
@@ -28,7 +27,6 @@ public interface UserService<U extends User> {
   PageResponse<U> find(PageRequest pageRequest) throws ServiceException;
 
   //  List<U> findActiveAdminUsers();
-  List<U> findAll() throws ServiceException;
 
   U getByEmail(String email) throws ServiceException;
 

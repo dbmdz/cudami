@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectReader;
 import de.digitalcollections.model.exception.TechnicalException;
 import de.digitalcollections.model.exception.http.HttpErrorDecoder;
 import de.digitalcollections.model.list.filtering.FilterCriterion;
+import de.digitalcollections.model.list.filtering.FilterOperation;
 import de.digitalcollections.model.list.filtering.Filtering;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
@@ -75,7 +76,7 @@ public abstract class BaseRestClient<T extends Object> {
             .uri(url)
             .header("Accept", "application/json")
             // TODO add creation of a request id if needed
-            //            .header("X-Request-Id", request.getRequestId())
+            // .header("X-Request-Id", request.getRequestId())
             .build();
     return req;
   }
@@ -93,7 +94,7 @@ public abstract class BaseRestClient<T extends Object> {
             .uri(url)
             .header("Accept", "application/json")
             // TODO add creation of a request id if needed
-            //            .header("X-Request-Id", request.getRequestId())
+            // .header("X-Request-Id", request.getRequestId())
             .build();
     return req;
   }
@@ -107,7 +108,7 @@ public abstract class BaseRestClient<T extends Object> {
             .uri(url)
             .header("Accept", "application/json")
             // TODO add creation of a request id if needed
-            //            .header("X-Request-Id", request.getRequestId())
+            // .header("X-Request-Id", request.getRequestId())
             .build();
     return req;
   }
@@ -124,7 +125,7 @@ public abstract class BaseRestClient<T extends Object> {
             .header("Content-Type", "application/json")
             .header("Accept", "application/json")
             // TODO add creation of a request id if needed
-            //            .header("X-Request-Id", request.getRequestId())
+            // .header("X-Request-Id", request.getRequestId())
             .build();
     return req;
   }
@@ -139,7 +140,7 @@ public abstract class BaseRestClient<T extends Object> {
             .header("Content-Type", "application/json")
             .header("Accept", "application/json")
             // TODO add creation of a request id if needed
-            //            .header("X-Request-Id", request.getRequestId())
+            // .header("X-Request-Id", request.getRequestId())
             .build();
     return req;
   }
@@ -155,7 +156,7 @@ public abstract class BaseRestClient<T extends Object> {
             .header("Content-Type", "application/json")
             .header("Accept", "application/json")
             // TODO add creation of a request id if needed
-            //            .header("X-Request-Id", request.getRequestId())
+            // .header("X-Request-Id", request.getRequestId())
             .build();
     return req;
   }
@@ -171,7 +172,7 @@ public abstract class BaseRestClient<T extends Object> {
             .header("Content-Type", "application/json")
             .header("Accept", "application/json")
             // TODO add creation of a request id if needed
-            //            .header("X-Request-Id", request.getRequestId())
+            // .header("X-Request-Id", request.getRequestId())
             .build();
     return req;
   }
@@ -238,7 +239,7 @@ public abstract class BaseRestClient<T extends Object> {
     }
     HttpRequest req = createGetRequest(requestUrl);
     // TODO add creation of a request id if needed
-    //            .header("X-Request-Id", request.getRequestId())
+    // .header("X-Request-Id", request.getRequestId())
     try {
       HttpResponse<byte[]> response = http.send(req, HttpResponse.BodyHandlers.ofByteArray());
       Integer statusCode = response.statusCode();
@@ -271,12 +272,6 @@ public abstract class BaseRestClient<T extends Object> {
     Filtering filtering = pageRequest.getFiltering();
     if (filtering != null) {
       requestUrl += "&" + getFilterParamsAsString(filtering.getFilterCriteria());
-    }
-
-    String searchTerm = pageRequest.getSearchTerm();
-    if (searchTerm != null) {
-      requestUrl =
-          requestUrl + "&searchTerm=" + URLEncoder.encode(searchTerm, StandardCharsets.UTF_8);
     }
 
     HttpRequest req = createGetRequest(requestUrl);
@@ -589,33 +584,44 @@ public abstract class BaseRestClient<T extends Object> {
     }
   }
 
-  protected String filterCriterionToUrlParam(FilterCriterion filterCriterion) {
-    if (filterCriterion.getOperation() == null) {
+  public String filterCriterionToUrlParam(FilterCriterion filterCriterion) {
+    String expression = filterCriterion.getExpression();
+    boolean isNativeExpression = filterCriterion.isNativeExpression();
+    FilterOperation operation = filterCriterion.getOperation();
+    if (expression == null || operation == null) {
       return "";
     }
-    String criterion = filterCriterion.getExpression() + "=" + filterCriterion.getOperation() + ":";
-    switch (filterCriterion.getOperation().getOperandCount()) {
+    String operand;
+    switch (operation.getOperandCount()) {
       case SINGLEVALUE:
-        criterion +=
-            URLEncoder.encode(filterCriterion.getValue().toString(), StandardCharsets.UTF_8);
+        operand = URLEncoder.encode(filterCriterion.getValue().toString(), StandardCharsets.UTF_8);
         break;
       case MIN_MAX_VALUES:
-        criterion +=
+        operand =
             URLEncoder.encode(filterCriterion.getMinValue().toString(), StandardCharsets.UTF_8)
                 + ","
                 + URLEncoder.encode(
                     filterCriterion.getMaxValue().toString(), StandardCharsets.UTF_8);
         break;
       case MULTIVALUE:
-        criterion +=
+        operand =
             filterCriterion.getValues().stream()
                 .map(value -> URLEncoder.encode(value.toString(), StandardCharsets.UTF_8))
-                .collect(Collectors.joining(","));
+                .collect(Collectors.joining(","))
+                .toString();
         break;
       default:
+        // no value operations ("set"/"notset")
+        operand = "";
         break;
     }
-    return criterion;
+
+    if (isNativeExpression) {
+      expression = URLEncoder.encode("[" + expression + "]", StandardCharsets.UTF_8);
+    }
+    // filter=expression:operation:operand (non native)
+    // filter=[expression]:operation:operand (native)
+    return "filter=" + expression + ":" + operation + ":" + operand;
   }
 
   /**
