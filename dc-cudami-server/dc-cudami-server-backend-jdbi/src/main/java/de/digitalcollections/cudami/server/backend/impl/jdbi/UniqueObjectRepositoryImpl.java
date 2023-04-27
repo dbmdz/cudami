@@ -486,7 +486,7 @@ public abstract class UniqueObjectRepositoryImpl<U extends UniqueObject>
             "SELECT"
                 + fieldsSql
                 + " FROM "
-                + (StringUtils.hasText(innerSelect) ? innerSelect : tableName)
+                + (StringUtils.hasText(innerSelect) ? "(%s)".formatted(innerSelect) : tableName)
                 + " AS "
                 + tableAlias
                 + (StringUtils.hasText(sqlAdditionalJoins)
@@ -498,8 +498,6 @@ public abstract class UniqueObjectRepositoryImpl<U extends UniqueObject>
                 + (StringUtils.hasText(getSqlSelectReducedFieldsJoins())
                     ? " %s".formatted(getSqlSelectReducedFieldsJoins())
                     : ""));
-    // TODO: getSqlSelectReducedFieldsJoins necessary if already
-    // getSqlSelectAllFieldsJoins is inserted? UseCase?
 
     if (argumentMappings == null) {
       argumentMappings = new HashMap<>(0);
@@ -598,7 +596,6 @@ public abstract class UniqueObjectRepositoryImpl<U extends UniqueObject>
     // uuid, created
 
     boolean hasReturningStmt = !getReturnedFieldsOnInsertUpdate().isEmpty();
-    // TODO: test. shouldn't it be RETURNING *  by default?
     String sql =
         "UPDATE "
             + tableName
