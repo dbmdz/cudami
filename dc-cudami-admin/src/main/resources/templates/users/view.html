@@ -5,7 +5,7 @@
       layout:decorate="~{base}">
 
   <head>
-    <title th:text="|#{users}: #{user} &quot;${user.email}&quot;|">Users: User "admin@unknown.org"</title>
+    <title th:text="|#{page.title.users}: #{lbl.user} &quot;${user.email}&quot;|">Users: User "admin@unknown.org"</title>
   </head>
 
   <body>
@@ -15,24 +15,24 @@
           <div id="content-header">
             <div class="row">
               <div class="col d-flex justify-content-between">
-                <h1 th:text="|#{user} &quot;*{email}&quot;|">User "email@email.de"</h1>
+                <h1 th:text="|#{lbl.user} &quot;*{email}&quot;|">User "email@email.de"</h1>
                 <div>
                   <input
                          class="btn btn-danger user-status-toggle"
                          th:if="*{enabled}"
-                         th:title="#{tooltip_deactivate_user}"
-                         th:value="#{btn_deactivate_user}"
+                         th:title="#{tooltip.deactivate_user}"
+                         th:value="#{btn.deactivate_user}"
                          type="button"
                          data:enable="false"
                          data:message="#{msg.confirm_user_deactivation(*{email})}"
-                         data:title="#{title_warning}"
+                         data:title="#{modal.title.warning}"
                          data-target="#confirmYesNoDialog"
                          data-toggle="modal" />
                   <input
                          class="btn btn-success user-status-toggle"
                          th:unless="*{enabled}"
-                         th:title="#{tooltip_activate_user}"
-                         th:value="#{btn_activate_user}"
+                         th:title="#{tooltip.activate_user}"
+                         th:value="#{btn.activate_user}"
                          type="button"
                          data:enable="true" />
                   <a
@@ -53,21 +53,21 @@
             <hr>
 
             <div class="row">
-              <div class="col-md-3"><label th:text="#{username}">Username / Email</label></div>
+              <div class="col-md-3"><label th:text="#{lbl.username}">Username / Email</label></div>
               <div class="col-md-9"><span th:text="*{email}">email@email.de</span></div>
             </div>
             <div class="row">
-              <div class="col-md-3"><label th:text="|#{lastname}, #{firstname}">Lastname, Firstname</label></div>
+              <div class="col-md-3"><label th:text="|#{lbl.lastname}, #{lbl.firstname}">Lastname, Firstname</label></div>
               <div class="col-md-9"><span th:text="*{lastname}">Lastname</span>, <span th:text="*{firstname}">Firstname</span></div>
             </div>
             <div class="row">
-              <div class="col-md-3"><label th:text="#{roles}">Role(s)</label></div>
+              <div class="col-md-3"><label th:text="#{lbl.roles}">Role(s)</label></div>
               <div class="col-md-9">
-                <th:block th:each="role,rowStat : *{roles}"><span th:text="${role.name()}">ROLE_CONTENT_MANAGER</span><span th:unless="${rowStat.last}">, </span></th:block>
+                <th:block th:each="role,rowStat : *{roles}"><span th:text="#{enum.userRoles.__${role}__}">Content-Manager</span><span th:unless="${rowStat.last}">, </span></th:block>
               </div>
             </div>
             <div class="row">
-              <div class="col-md-3"><label th:text="#{status}">Status</label></div>
+              <div class="col-md-3"><label th:text="#{lbl.status}">Status</label></div>
               <div class="col-md-9"><span th:text="#{${'tooltip.enabled.' + user.enabled}}">active</span></div>
             </div>
           </div>

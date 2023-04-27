@@ -52,7 +52,7 @@ public class IdentifierTypeServiceImpl
   public void save(IdentifierType identifierType) throws ServiceException, ValidationException {
     super.save(identifierType);
     if (identifierType != null) {
-      identifierTypeCache.put(identifierType.getNamespace(), identifierType.getPattern());
+      getIdentifierTypeCache().put(identifierType.getNamespace(), identifierType.getPattern());
     }
   }
 
@@ -68,7 +68,7 @@ public class IdentifierTypeServiceImpl
   public void update(IdentifierType identifierType) throws ServiceException, ValidationException {
     super.update(identifierType);
     if (identifierType != null) {
-      identifierTypeCache.put(identifierType.getNamespace(), identifierType.getPattern());
+      getIdentifierTypeCache().put(identifierType.getNamespace(), identifierType.getPattern());
     }
   }
 

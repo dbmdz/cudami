@@ -1,1 +1,0 @@
-select i.uuid from identifiables i, webpages w  where i.uuid=w.uuid; 

@@ -5,7 +5,7 @@
       layout:decorate="~{base-form}">
 
   <head>
-    <title th:text="|#{page.title.predicates}: | + (${mode} == 'create' ? #{page.title.predicate.create} : #{page.title.predicate.edit})">Relation types: Create a new relation type / Edit relation type</title>
+    <title th:text="|#{page.title.rendering_templates}: | + (${mode} == 'create' ? #{page.title.rendering_template.create} : #{page.title.rendering_template.edit(${renderingTemplate.name})})">Design templates: Create a new design template / Edit design template "name"</title>
   </head>
 
   <body>
@@ -13,11 +13,11 @@
       <div class="content">
         <div class="container-fluid">
 
-          <form action="#" th:action="@{#}" th:object="${predicate}" method="post" role="form">
+          <form action="#" th:action="@{#}" th:object="${renderingTemplate}" method="post" role="form">
             <div id="content-header">
               <div class="row">
                 <div class="col d-flex justify-content-between">
-                  <h1 th:text="${mode} == 'create' ? #{page.title.predicate.create} : #{page.title.predicate.edit}">Create a new relation type / Edit relation type</h1>
+                  <h1 th:text="${mode} == 'create' ? #{page.title.rendering_template.create} : #{page.title.rendering_template.edit(${renderingTemplate.name})}">Create a new license / Edit license "https://licenses.org/lic-1"</h1>
                   <div>
                     <button type="submit" class="btn btn-primary" th:text="#{save}">Save</button>
                   </div>
@@ -29,13 +29,25 @@
               <div th:replace="fragments/feedback-messages :: form"></div>
 
               <th:block th:if="${mode} == 'edit'">
-                <th:block th:insert="fragments/uniqueobject::renderFields(${predicate})"></th:block>
+                <th:block th:insert="fragments/uniqueobject::renderFields(${renderingTemplate})"></th:block>
                 <hr>
               </th:block>
 
-              <div class="row">
-                <div class="col-sm-12">
-                  <div class="localized-form" data-tabid-prefix="lbl-desc-">
+              <div class="form-row">
+                <div class="col">
+                  <div class="form-group" th:classappend="${#fields.hasErrors('name')}? has-error">
+                    <label for="name" class="required" th:text="#{lbl.name}">Name</label>
+                    <input id="name" type="text" class="form-control" autofocus="autofocus" required="" value=""
+                           th:field="*{name}"
+                           th:classappend="${#fields.hasErrors('name')}? 'is-invalid'">
+                    <p th:if="${#fields.hasErrors('name')}" th:errors="*{name}">...</p>
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="col">
+                  <div class="localized-form" data-tabid-prefix="lbl-">
                     <ul class="nav nav-tabs" role="tablist">
                       <li class="nav-tab language-tab" th:each="language,iter : ${existingLanguages}" th:classappend="${iter.index} == 0 ? active">
                         <a
@@ -43,43 +55,26 @@
                            th:classappend="${iter.index} == 0 ? active"
                            data-toggle="tab"
                            role="tab"
-                           th:href="${'#lbl-desc-' + language}"
+                           th:href="${'#lbl-' + language}"
                            th:with="languageToDisplay=${language.getDisplayName(#locale)}"
                            th:text="${#strings.isEmpty(languageToDisplay)} ? #{language_not_specified} : ${languageToDisplay}">
                           language
                         </a>
                       </li>
                       <li class="nav-tab">
-                        <a th:title="#{tooltip.add_new_language}" class="nav-link" data-toggle="modal" data-target="#addLanguageDialog" data-fragment="label-description">
+                        <a th:title="#{tooltip.add_new_language}" class="nav-link" data-toggle="modal" data-target="#addLanguageDialog" data-fragment="label-loctextdescription">
                           <i class="fa fa-plus"></i>
                         </a>
                       </li>
                     </ul>
                     <div class="tab-content">
-                      <th:block th:each="language, iter : ${existingLanguages}">
-                        <div th:replace="fragments/forms/multilanguage-label-description-form :: html(fieldLanguage=${language},active=${iter.index == 0},beanName='predicate')"></div>
+                      <th:block th:each="language, iter : ${existingLanguages}" th:with="active=${iter.index == 0}">
+                        <div th:replace="fragments/forms/multilanguage-label-loctextdescription-form :: html(fieldLanguage=${language},active=${iter.index == 0},beanName='renderingTemplate')"></div>
                       </th:block>
                     </div>
                   </div>
-
-                  <th:block th:if="${mode} == 'create'">
-                    <div class="form-group" th:classappend="${#fields.hasErrors('value')}? has-error">
-                      <label for="value" th:text="#{lbl.value}" class="required">Value</label>
-                      <input id="value" type="text" class="form-control" required="" value=""
-                             th:classappend="${#fields.hasErrors('value')}? 'is-invalid'"
-                             th:field="*{value}">
-                      <p th:if="${#fields.hasErrors('value')}" th:errors="*{value}">...</p>
-                    </div>
-                  </th:block>
                 </div>
               </div>
-
-              <th:block th:if="${mode} == 'edit'">
-                <div class="row">
-                  <div class="col-md-3"><label class="mb-0" th:text="#{lbl.value}">Value</label></div>
-                  <div class="col-md-9"><span th:text="*{value}">is_author_of</span></div>
-                </div>
-              </th:block>
             </div>
           </form>
         </div>

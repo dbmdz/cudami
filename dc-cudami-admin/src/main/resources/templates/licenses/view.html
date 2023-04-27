@@ -5,7 +5,7 @@
       layout:decorate="~{base}">
 
   <head>
-    <title th:text="|#{page.title.licenses}: #{license} &quot;${url}&quot;|">...</title>
+    <title th:text="|#{page.title.licenses}: #{lbl.license} &quot;${url}&quot;|">...</title>
   </head>
 
   <body>
@@ -15,7 +15,7 @@
           <div id="content-header">
             <div class="row">
               <div class="col d-flex justify-content-between">
-                <h1 th:text="|#{license} &quot;*{url}&quot;|">...</h1>
+                <h1 th:text="|#{lbl.license} &quot;*{url}&quot;|">...</h1>
                 <div>
                   <a class="btn btn-primary" id="edit-button" th:href="@{*{uuid} + '/edit'}" th:text="#{edit}">edit</a>
                 </div>
@@ -43,12 +43,12 @@
               </div>
             </div>
             <div class="row" th:if="*{url}">
-              <div class="col-md-3"><label th:text="#{url}">URL</label></div>
+              <div class="col-md-3"><label th:text="#{lbl.url}">URL</label></div>
               <div class="col-md-9"><a th:href="*{url}" th:text="*{url}" target="_blank">http://www.example.de/</a></div>
             </div>
             <div class="row" th:if="*{acronym}">
-              <div class="col-md-3"><label th:text="#{acronym}">...</label></div>
-              <div class="col-md-9"><span th:text="*{acronym}">...</span></div>
+              <div class="col-md-3"><label th:text="#{lbl.acronym}">Acronym</label></div>
+              <div class="col-md-9"><span th:text="*{acronym}">CC-BY 4.0</span></div>
             </div>
           </div>
         </div>

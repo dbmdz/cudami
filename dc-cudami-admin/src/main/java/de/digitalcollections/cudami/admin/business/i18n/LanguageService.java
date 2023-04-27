@@ -68,6 +68,13 @@ public class LanguageService {
     return existingLanguages;
   }
 
+  public List<Locale> getExistingLanguages(LocalizedText localizedText) {
+    if (!CollectionUtils.isEmpty(localizedText)) {
+      return getExistingLanguagesForLocales(localizedText.getLocales());
+    }
+    return null;
+  }
+
   public List<Locale> getExistingLanguagesForLocales(List<Locale> locales) {
     List<Locale> existingLanguages = Collections.emptyList();
     if (!CollectionUtils.isEmpty(locales)) {
