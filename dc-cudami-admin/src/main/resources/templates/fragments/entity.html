@@ -42,7 +42,7 @@
           role="tab"
           th:classappend="${iter.index} == 0 ? active"
           th:href="${'#note-' + idx + '-' + note.key}"
-          th:text="${#strings.isEmpty(languageToDisplay)} ? #{language_not_specified} : ${languageToDisplay}"
+          th:text="${#strings.isEmpty(languageToDisplay)} ? #{lbl.language_not_specified} : ${languageToDisplay}"
           th:with="languageToDisplay=${note.key.getDisplayName(#locale)}"
           >
           language

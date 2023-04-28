@@ -101,7 +101,7 @@
              role="tab"
              th:classappend="${iter.index} == 0 ? active"
              th:href="${'#' + language}"
-             th:text="${#strings.isEmpty(languageToDisplay)} ? #{language_not_specified} : ${languageToDisplay}"
+             th:text="${#strings.isEmpty(languageToDisplay)} ? #{lbl.language_not_specified} : ${languageToDisplay}"
              th:with="languageToDisplay=${language.getDisplayName(#locale)}">
             language
           </a>
