@@ -11,9 +11,11 @@ cudami:
       - CONTAINED
       - IMAGES
       - ISSUE
+      - MIKROSKOPAUFNAHMEN
       - NEWSPAPER
       - PART
       - SERIAL
+      - SPEKTRALOPTIMIERTE BILDER
       - UNINDEPENDENT
       - WASSERZEICHEN
 
@@ -68,6 +70,8 @@ cudami:
       - mainType: FORMER
         subType: SUB
       - mainType: HOST
+        subType:
+      - mainType: SUP
         subType:
       - mainType: MAIN
         subType: MAIN
