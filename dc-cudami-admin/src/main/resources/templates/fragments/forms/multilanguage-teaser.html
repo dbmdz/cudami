@@ -42,8 +42,8 @@
 
                         // show preview image
                         let imageFileResource = JSON.parse(imageFileResourceJson)
-                        let url = getImageUrl(imageFileResource);
-                        $("#preview-image").append("<img src='" + url + "' />");
+                        let url = getImageUrl(imageFileResource, "200,");
+                        $("#preview-image .card-body").html("<img class='img-fluid mw-100' src='" + url + "' />");
                       }
 
                       function getImageUrl(image, width = 'full') {
