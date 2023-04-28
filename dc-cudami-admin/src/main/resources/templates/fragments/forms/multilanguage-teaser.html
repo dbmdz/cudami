@@ -1,0 +1,96 @@
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="https://github.com/thymeleaf/thymeleaf-extras-springsecurity"
+      xmlns:data="https://github.com/mxab/thymeleaf-extras-data-attribute">
+
+  <head>
+  </head>
+
+  <body>
+    <th:block layout:fragment="html(fieldLanguage, active, beanName)" th:object="${__${beanName}__}">
+      <div th:id="lbl-desc-__${fieldLanguage}__" class="tab-pane" th:classappend="${active} ? 'active'">
+        <div class="card">
+          <div class="card-body bg-light">
+            <div class="row">
+              <div class="col-sm-2">
+                <label for="preview-image" th:text="#{lbl.preview_image}">Preview Image</label>
+                <div id="preview-image" style="z-index: 0;" class="rounded text-center card">
+                  <div class="card-body">
+                    <a th:title="#{tooltip.add_preview_image}" class="stretched-link btn btn-link"
+                       onClick="previewImageDialog();">
+                      <i class="fa fa-plus"></i>
+                    </a>
+                    <script>
+                      function previewImageDialog() {
+                        /*[+
+                         const modalTitle = [[#{modal.title.add_digitalobjects}]];
+                         +]*/
+
+                        const modalDialog = $('#selectImageDialog');
+                        // $(modalDialog).find('.modal-title').text(modalTitle);
+                        // $(modalDialog).find('.modal-message').html(modalMessage);
+                        var btnOk = $(modalDialog).find('.modal-footer .btn-primary');
+                        $(btnOk).attr('onclick', "setPreviewImage();");
+                        $(modalDialog).modal('show');
+                      }
+
+                      function setPreviewImage() {
+                        $('#selectImageDialog').modal('hide');
+                        let imageFileResourceJson = $("input#selectedImageFileResource-json").val();
+                        // already stringified, just copy value
+                        $("input#previewImage-json").val(imageFileResourceJson);
+
+                        // show preview image
+                        let imageFileResource = JSON.parse(imageFileResourceJson)
+                        let url = getImageUrl(imageFileResource);
+                        $("#preview-image").append("<img src='" + url + "' />");
+                      }
+
+                      function getImageUrl(image, width = 'full') {
+                        if (!image.httpBaseUrl || !image.mimeType) {
+                          return image.uri
+                        }
+                        const mimeExtensionMapping = {
+                          gif: 'gif',
+                          png: 'png',
+                        }
+                        const subMimeType = image.mimeType.split('/')[1]
+                        return `${image.httpBaseUrl}/full/${width}/0/default.${mimeExtensionMapping[subMimeType] ?? 'jpg'
+                          }`
+                      }
+                    </script>
+
+                  </div>
+                </div>
+                <input th:id="previewImage-json" type="hidden" th:field="*{previewImage}" />
+              </div>
+              <div class="col-sm-10">
+                <div class="form-group" th:classappend="${#fields.hasErrors('label[__${fieldLanguage}__]')}? has-error">
+                  <label th:for="label-__${fieldLanguage}__" th:text="#{lbl.label}" class="required">Label</label>
+                  <input th:id="label-__${fieldLanguage}__" class="form-control" type="text" value="" th:field="*{label['__${fieldLanguage}__']}" />
+                  <p th:if="${#fields.hasErrors('label[__${fieldLanguage}__]')}" th:errors="*{label[__${fieldLanguage}__]}">...</p>
+                </div>
+                <div class="form-group">
+                  <label th:text="#{lbl.abstract}">Abstract</label>
+                  <div th:id="description-menu-__${fieldLanguage}__" th:insert="fragments/tiptap :: editor-menu-short(editorId='description-editor-' + ${fieldLanguage})" class="editorMenu border-1 p-1"></div>
+                  <div th:id="description-editor-__${fieldLanguage}__" th:data-menu-id="description-menu-__${fieldLanguage}__"></div>
+                  <input th:id="description-json-__${fieldLanguage}__" type="hidden" th:field="*{description['__${fieldLanguage}__']}" />
+                  <script th:inline="javascript" type="module">
+                    import {MiniEditor} from '@cudami/tiptap';
+                    /*[+
+                     let idEditorElement = [[description-editor-__${fieldLanguage}__]];
+                     let idEditorMenu    = [[description-menu-__${fieldLanguage}__]];
+                     let idJsonField     = [[description-json-__${fieldLanguage}__]];
+                     +]*/
+                    editors.set(idEditorElement, new MiniEditor(idEditorElement, idEditorMenu, idJsonField));
+                  </script>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </th:block>
+  </body>
+
+</html>

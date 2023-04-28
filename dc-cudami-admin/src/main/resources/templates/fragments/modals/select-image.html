@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+
+  <body>
+    <th:block th:fragment="select-image-dialog">
+      <div class="modal fade" id="selectImageDialog">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <!-- TODO: title depending on add/edit link -->
+              <h4 class="modal-title" th:text="#{modal.title.select_image}">Select image</h4>
+              <button type="button" class="close" data-dismiss="modal" th:aria-label="#{modal.close}">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              <form action="#">
+                <!-- this is were the previews should be shown. -->
+                <div class="dropzone" id="imageFileResourceDropzone"></div>
+                <input th:id="selectedImageFileResource-json" type="hidden" />
+              </form>
+            </div>
+            <div class="modal-footer justify-content-between">
+              <button type="button" class="btn btn-default" data-dismiss="modal" th:text="#{btn.cancel}">Cancel</button>
+              <a class="btn btn-primary" id="confirm" th:text="#{btn.add}">Add</a>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <script type="text/javascript" th:inline="javascript">
+        /*<![CDATA[*/
+        /*[+
+         const uploadUrl = [[@{'/api/files'}]];
+         +]*/
+        /*]]>*/
+      </script>
+
+      <script type="text/javascript">
+        $("div#imageFileResourceDropzone").dropzone({
+          url: uploadUrl,
+          success: function (file, response) {
+            $("input#selectedImageFileResource-json").val(JSON.stringify(response));
+          },
+        });
+
+        $("#selectImageDialog").on('show.bs.modal', function (event) {
+
+        });
+        $("#selectImageDialog").on('click', '.btn-primary', function (event) {
+
+          $('#selectImageDialog').modal('hide');
+        });
+      </script>
+
+    </th:block>
+  </body>
+
+</html>

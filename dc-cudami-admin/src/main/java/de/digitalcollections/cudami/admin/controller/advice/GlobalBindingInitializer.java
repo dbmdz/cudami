@@ -3,6 +3,7 @@ package de.digitalcollections.cudami.admin.controller.advice;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.digitalcollections.cudami.admin.propertyeditor.JsonObjectEditor;
 import de.digitalcollections.cudami.admin.propertyeditor.RoleEditor;
+import de.digitalcollections.model.identifiable.resource.ImageFileResource;
 import de.digitalcollections.model.security.Role;
 import de.digitalcollections.model.text.LocalizedStructuredContent;
 import de.digitalcollections.model.text.LocalizedText;
@@ -22,6 +23,8 @@ public class GlobalBindingInitializer {
 
   @InitBinder
   public void registerCustomEditors(WebDataBinder binder, WebRequest request) {
+    binder.registerCustomEditor(
+        ImageFileResource.class, new JsonObjectEditor(objectMapper, ImageFileResource.class));
     binder.registerCustomEditor(
         LocalizedStructuredContent.class,
         new JsonObjectEditor(objectMapper, LocalizedStructuredContent.class));

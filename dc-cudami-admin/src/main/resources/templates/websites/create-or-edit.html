@@ -1,0 +1,91 @@
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="https://github.com/thymeleaf/thymeleaf-extras-springsecurity"
+      xmlns:data="https://github.com/mxab/thymeleaf-extras-data-attribute"
+      layout:decorate="~{base-form}">
+
+  <head>
+    <title th:text="|#{page.title.websites}: | + (${mode} == 'create' ? #{page.title.website.create} : #{page.title.website.edit(${website.url})})">Websites: Create a new website / Edit website "http://demo.de/"</title>
+    <script th:src="@{/webjars/dropzone/dist/dropzone-min.js}"></script>
+    <link th:href="@{/webjars/dropzone/dist/dropzone.css}" rel="stylesheet" type="text/css" />
+  </head>
+
+  <body>
+    <th:block layout:fragment="content">
+      <div class="content">
+        <div class="container-fluid">
+
+          <form action="#" th:action="@{#}" th:object="${website}" method="post" role="form">
+            <div id="content-header">
+              <div class="row">
+                <div class="col d-flex justify-content-between">
+                  <h1 th:text="${mode} == 'create' ? #{page.title.website.create} : #{page.title.website.edit(*{url})}">Create a new website / Edit website "http://demo.de/"</h1>
+                  <div>
+                    <button type="submit" class="btn btn-primary" th:text="#{save}">Save</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div id="content-body" class="rows-striped">
+              <div th:replace="fragments/feedback-messages :: form"></div>
+
+              <th:block th:if="${mode} == 'edit'">
+                <th:block th:insert="fragments/uniqueobject::renderFields(${website})"></th:block>
+                <hr>
+              </th:block>
+
+              <div class="row">
+                <div class="col-sm-12">
+                  <div class="localized-form" data-tabid-prefix="lbl-desc-">
+                    <ul class="nav nav-tabs" role="tablist">
+                      <li class="nav-tab language-tab" th:each="language,iter : ${existingLanguages}" th:classappend="${iter.index} == 0 ? active">
+                        <a
+                           class="language-switcher nav-link"
+                           th:classappend="${iter.index} == 0 ? active"
+                           data-toggle="tab"
+                           role="tab"
+                           th:href="${'#lbl-desc-' + language}"
+                           th:with="languageToDisplay=${language.getDisplayName(#locale)}"
+                           th:text="${#strings.isEmpty(languageToDisplay)} ? #{lbl.language_not_specified} : ${languageToDisplay}">
+                          language
+                        </a>
+                      </li>
+                      <li class="nav-tab">
+                        <a th:title="#{tooltip.add_new_language}" class="nav-link" data-toggle="modal" data-target="#addLanguageDialog" data-fragment="teaser">
+                          <i class="fa fa-plus"></i>
+                        </a>
+                      </li>
+                    </ul>
+                    <div class="tab-content">
+                      <th:block th:each="language, iter : ${existingLanguages}">
+                        <div th:replace="fragments/forms/multilanguage-teaser :: html(fieldLanguage=${language},active=${iter.index == 0},beanName='website')"></div>
+                      </th:block>
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="col">
+                  <div class="form-group" th:classappend="${#fields.hasErrors('url')}? has-error">
+                    <label for="url" class="required" th:text="#{lbl.url}">URL</label>
+                    <input id="url" type="text" class="form-control" autofocus="autofocus" required="" value=""
+                           th:field="*{url}"
+                           th:classappend="${#fields.hasErrors('url')}? 'is-invalid'">
+                    <p th:if="${#fields.hasErrors('url')}" th:errors="*{url}">...</p>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </form>
+        </div>
+      </div>
+      
+      <th:block th:replace="fragments/modals/select-image :: select-image-dialog"></th:block>
+    </th:block>
+  </body>
+
+</html>

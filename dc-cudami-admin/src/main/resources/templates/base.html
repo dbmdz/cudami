@@ -168,9 +168,9 @@
                       <a class="nav-link"
                          th:classappend="${menu?.matches('(webpages|websites)')} ? active"
                          th:href="@{/websites}"
-                         th:title="#{websites}">
+                         th:title="#{menu.websites}">
                         <i class="fas fa-globe nav-icon"></i>
-                        <p th:text="#{websites}">Websites</p>
+                        <p th:text="#{menu.websites}">Websites</p>
                       </a>
                     </li>
                     <li class="nav-item">
