@@ -431,7 +431,7 @@ class ManifestationRepositoryImplTest
                 ProductionInfo.builder()
                     .publisher(Publisher.builder().agent(productionAgent).build())
                     .navDateRange(
-                        new LocalDateRange(LocalDate.of(2019, 10, 1), LocalDate.of(2020, 6, 30)))
+                        new LocalDateRange(LocalDate.of(-1000, 10, 1), LocalDate.of(5, 6, 30)))
                     .build())
             .navDate("2020-01-01")
             .build();

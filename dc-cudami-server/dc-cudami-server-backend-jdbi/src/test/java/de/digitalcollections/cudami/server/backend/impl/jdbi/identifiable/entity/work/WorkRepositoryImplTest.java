@@ -123,7 +123,7 @@ class WorkRepositoryImplTest extends AbstractIdentifiableRepositoryImplTest<Work
                         .text(new LocalizedText(Locale.GERMAN, "Aller Anfang ist schwer"))
                         .build()))
             .creationDateRange(
-                new LocalDateRange(LocalDate.parse("2023-01-01"), LocalDate.parse("2023-02-01")))
+                new LocalDateRange(LocalDate.parse("-1000-01-01"), LocalDate.parse("2023-02-01")))
             .creationTimeValue(new TimeValue(2023, (byte) 1, (byte) 1))
             .firstAppearedDate(LocalDate.parse("2023-02-02"))
             .firstAppearedDatePresentation("02.02.2023")
