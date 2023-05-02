@@ -1,3 +1,4 @@
+:
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
@@ -5,22 +6,153 @@
   <body>
     <th:block th:fragment="select-image-dialog">
       <div class="modal fade" id="selectImageDialog">
-        <div class="modal-dialog">
+        <div class="modal-dialog modal-lg">
           <div class="modal-content">
             <div class="modal-header">
-              <!-- TODO: title depending on add/edit link -->
               <h4 class="modal-title" th:text="#{modal.title.select_image}">Select image</h4>
               <button type="button" class="close" data-dismiss="modal" th:aria-label="#{modal.close}">
                 <span aria-hidden="true">&times;</span>
               </button>
             </div>
             <div class="modal-body">
-              <form action="#">
-                <!-- this is were the previews should be shown. -->
-                <div class="dropzone" id="imageFileResourceDropzone"></div>
-                <input th:id="selectedImageFileResource-json" type="hidden" />
+              <form action="#" id="image-dialog-form">
+                <input th:id="imageFileResource-json" type="hidden" />
+                
+                <div class="card">
+                  <div class="card-body p-2">
+                    <ul class="nav nav-tabs" role="tablist">
+                      <li class="nav-item">
+                        <a class="nav-link active" href="#" data-toggle="tab" data-target="#pane-upload-file" role="tab">
+                          <th:block th:text="#{tab.image_upload}">Upload image</th:block>
+                          <i class="fas fa-question-circle text-primary ml-1" data-toggle="popover" th:data-content="#{tooltip.file_upload}"></i>
+                        </a>
+                      </li>
+                      <li class="nav-item">
+                        <a class="nav-link" href="#" data-toggle="tab" data-target="#pane-url-file" role="tab">
+                          <th:block th:text="#{tab.image_url}">Integrate image via weblink</th:block>
+                          <i class="fas fa-question-circle text-primary ml-1" data-toggle="popover" th:data-content="#{tooltip.file_url}"></i>
+                        </a>
+                      </li>
+                      <li class="nav-item">
+                        <a class="nav-link" href="#" data-toggle="tab" data-target="#pane-search-file" role="tab">
+                          <th:block th:text="#{tab.image_search}">Use existing image</th:block>
+                          <i class="fas fa-question-circle text-primary ml-1" data-toggle="popover" th:data-content="#{tooltip.file_search}"></i>
+                        </a>
+                      </li>
+                    </ul>
+                    <div class="tab-content p-2">
+                      <div class="tab-pane fade show active" id="pane-upload-file" role="tabpanel">
+
+                        <!-- this is were the previews should be shown. -->
+                        <div class="dropzone mt-2" id="imageFileResourceDropzone"></div>
+
+                        <div class="mb-0 mt-3 form-group">
+                          <div class="input-group form-label-group in-border">
+                            <input id="image-filename-input" placeholder="" name="fr-filename" type="text" class="text-dark form-control" value="">
+                            <label for="image-filename-input" th:text="#{lbl.filename}">Filename</label>
+                            <div class="input-group-append">
+                              <i class="fas fa-question-circle text-dark align-items-center border d-flex btn btn-light" data-toggle="popover" th:data-content="#{tooltip.file_filename}"></i>
+                            </div>
+                          </div>
+                        </div>
+
+                      </div>
+                      <div class="tab-pane fade" id="pane-url-file" role="tabpanel">
+                        <div class="mb-0 mt-3 form-group">
+                          <div class="form-label-group in-border">
+                            <input type="url" class="form-control" id="image-url" placeholder="" name="fr-uri">
+                            <label for="image-url">URL</label>
+                          </div>
+
+                          <div class="input-group form-label-group in-border">
+                            <input id="image-filename-input" placeholder="" name="fr-filename" type="text" class="text-dark form-control" value="">
+                            <label for="image-filename-input">Filename</label>
+                            <div class="input-group-append">
+                              <i class="fas fa-question-circle text-dark align-items-center border d-flex btn btn-light" data-toggle="popover" th:data-content="#{tooltip.file_filename}"></i>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="tab-pane fade" id="pane-search-file" role="tabpanel">
+                        <div class="mb-0 mt-3 form-group">
+                          <div class="form-label-group in-border">
+                            <input type="text" class="form-control" id="image-search" placeholder="">
+                            <label for="image-search">Search term (in image label, filename, abstract)</label>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                </div>
+
+                <div class="card">
+                  <div class="card-header p-1" id="header-metadata">
+                    <a href="#" class="btn btn-link" data-toggle="collapse" data-target="#body-metadata" aria-expanded="true" aria-controls="body-metadata">Enter metadata</a>
+                  </div>
+
+                  <div id="body-metadata" class="collapse show" aria-labelledby="header-metadata">
+                    <div class="card-body">
+
+                      <div class="form-group">
+                        <div class="input-group form-label-group in-border">
+                          <input id="image-caption-input" placeholder="" name="hints-caption" type="text" class="text-dark form-control" value="">
+                          <label for="image-caption-input">Caption</label>
+                          <div class="input-group-append">
+                            <i class="fas fa-question-circle text-dark align-items-center border d-flex btn btn-light" data-toggle="popover" th:data-content="#{tooltip.file_search}"></i>
+                          </div>
+                        </div>
+
+                        <div class="input-group form-label-group in-border">
+                          <input id="image-title-input" placeholder="" name="hints-title" type="text" class="text-dark form-control" value="">
+                          <label for="image-title-input">Tooltip</label>
+                          <div class="input-group-append">
+                            <i class="fas fa-question-circle text-dark align-items-center border d-flex btn btn-light" data-toggle="popover" th:data-content="#{tooltip.file_search}"></i>
+                          </div>
+                        </div>
+
+                        <div class="input-group form-label-group in-border">
+                          <input id="image-alttext-input" placeholder="" name="hints-alttext" type="text" class="text-dark form-control" value="">
+                          <label for="image-alttext-input">Alt text</label>
+                          <div class="input-group-append">
+                            <i class="fas fa-question-circle text-dark align-items-center border d-flex btn btn-light" data-toggle="popover" th:data-content="#{tooltip.file_search}"></i>
+                          </div>
+                        </div>
+                      </div>
+
+                    </div>
+                  </div>
+                </div>
+
+                <div class="card">
+                  <div class="card-header p-1" id="header-rendering-hints">
+                    <a href="#" class="btn btn-link" data-toggle="collapse" data-target="#body-rendering-hints" aria-expanded="false" aria-controls="collapseOne">Define rendering hints</a>
+                  </div>
+
+                  <div id="body-rendering-hints" class="collapse hide" aria-labelledby="header-rendering-hints">
+                    <div class="card-body">
+                      <label class="mb-2">Image link</label>
+                      <div class="form-group">
+                        <div class="form-label-group in-border mb-1">
+                          <input type="url" class="form-control" id="image-link" name="hints-targetLink" placeholder="">
+                          <label for="image-link">URL</label>
+                        </div>
+                        <div class="custom-control custom-radio">
+                          <input type="radio" id="image-link-blank" name="hints-openLinkInNewWindow" class="custom-control-input" checked="" value="true">
+                          <label class="custom-control-label" for="image-link-blank">open in a new tab</label>
+                        </div>
+                        <div class="custom-control custom-radio">
+                          <input type="radio" id="image-link-no-blank" name="hints-openLinkInNewWindow" class="custom-control-input" value="false">
+                          <label class="custom-control-label" for="image-link-no-blank">open in the same tab</label>
+                        </div>
+
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </form>
             </div>
+
             <div class="modal-footer justify-content-between">
               <button type="button" class="btn btn-default" data-dismiss="modal" th:text="#{btn.cancel}">Cancel</button>
               <a class="btn btn-primary" id="confirm" th:text="#{btn.add}">Add</a>
@@ -44,14 +176,6 @@
           success: function (file, response) {
             $("input#selectedImageFileResource-json").val(JSON.stringify(response));
           },
-        });
-
-        $("#selectImageDialog").on('show.bs.modal', function (event) {
-
-        });
-        $("#selectImageDialog").on('click', '.btn-primary', function (event) {
-
-          $('#selectImageDialog').modal('hide');
         });
       </script>
 

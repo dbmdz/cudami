@@ -8,6 +8,7 @@ import de.digitalcollections.model.security.Role;
 import de.digitalcollections.model.text.LocalizedStructuredContent;
 import de.digitalcollections.model.text.LocalizedText;
 import de.digitalcollections.model.text.StructuredContent;
+import de.digitalcollections.model.view.RenderingHintsPreviewImage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.StringTrimmerEditor;
 import org.springframework.web.bind.WebDataBinder;
@@ -30,6 +31,9 @@ public class GlobalBindingInitializer {
         new JsonObjectEditor(objectMapper, LocalizedStructuredContent.class));
     binder.registerCustomEditor(
         LocalizedText.class, new JsonObjectEditor(objectMapper, LocalizedText.class));
+    binder.registerCustomEditor(
+        RenderingHintsPreviewImage.class,
+        new JsonObjectEditor(objectMapper, RenderingHintsPreviewImage.class));
     binder.registerCustomEditor(Role.class, roleEditor);
     binder.registerCustomEditor(String.class, new StringTrimmerEditor(true));
     binder.registerCustomEditor(

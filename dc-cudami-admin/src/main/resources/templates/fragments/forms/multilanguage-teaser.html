@@ -16,53 +16,85 @@
                 <label for="preview-image" th:text="#{lbl.preview_image}">Preview Image</label>
                 <div id="preview-image" style="z-index: 0;" class="rounded text-center card">
                   <div class="card-body">
-                    <a th:title="#{tooltip.add_preview_image}" class="stretched-link btn btn-link"
-                       onClick="previewImageDialog();">
-                      <i class="fa fa-plus"></i>
-                    </a>
-                    <script>
-                      function previewImageDialog() {
-                        /*[+
-                         const modalTitle = [[#{modal.title.add_digitalobjects}]];
-                         +]*/
+                    <div class="image"></div>
+                    <div class="actions">
+                      <span class="add">
+                        <a th:title="#{tooltip.add_preview_image}" class="stretched-link btn btn-link"
+                           onClick="previewImageDialog();">
+                          <i class="fa fa-plus"></i>
+                        </a>
+                      </span>
+                      <span class="edit d-none">
+                        edit delete
+                      </span>
+                    </div>
+                  </div>
+                  <script th:inline="javascript">
+                    function previewImageDialog() {
+                      /*[+
+                       const modalTitle = [[#{modal.title.add_digitalobjects}]];
+                       +]*/
 
-                        const modalDialog = $('#selectImageDialog');
-                        // $(modalDialog).find('.modal-title').text(modalTitle);
-                        // $(modalDialog).find('.modal-message').html(modalMessage);
-                        var btnOk = $(modalDialog).find('.modal-footer .btn-primary');
-                        $(btnOk).attr('onclick', "setPreviewImage();");
-                        $(modalDialog).modal('show');
-                      }
+                      const modalDialog = $('#selectImageDialog');
+                      // $(modalDialog).find('.modal-title').text(modalTitle);
+                      // $(modalDialog).find('.modal-message').html(modalMessage);
+                      var btnOk = $(modalDialog).find('.modal-footer .btn-primary');
+                      $(btnOk).attr('onclick', "setPreviewImage();");
+                      $(modalDialog).modal('show');
+                    }
 
-                      function setPreviewImage() {
-                        $('#selectImageDialog').modal('hide');
-                        let imageFileResourceJson = $("input#selectedImageFileResource-json").val();
-                        // already stringified, just copy value
-                        $("input#previewImage-json").val(imageFileResourceJson);
+                    function setPreviewImage() {
+                      /*[+
+                       const fieldLanguage = [[${fieldLanguage}]];
+                       +]*/
+
+                      const modalDialog = $('#selectImageDialog');
+                      $(modalDialog).modal('hide');
+
+                      let imageFileResourceJson = $("input#imageFileResource-json").val();
+
+                      let caption = $(modalDialog).find('#image-caption-input').val();
+                      alert(`${fieldLanguage} ${caption}`);
+
+                      const formElement = $(modalDialog).find('#image-dialog-form').get(0);
+                      const formData = new FormData(formElement);
+                      let formJson = formDataToJson(formData);
+                      alert(JSON.stringify(formJson));
+
+                      if (imageFileResourceJson) {
+                        let imageFileResource = JSON.parse(imageFileResourceJson);
+                        // add data from modal input to File Resource
+                        imageFileResource.filename = formJson.fr - filename[0];
+
+                        $("input#previewImage-json").val(JSON.stringify(imageFileResource));
 
                         // show preview image
-                        let imageFileResource = JSON.parse(imageFileResourceJson)
                         let url = getImageUrl(imageFileResource, "200,");
-                        $("#preview-image .card-body").html("<img class='img-fluid mw-100' src='" + url + "' />");
+                        $("#preview-image .card-body .image").html("<img class='img-fluid mw-100' src='" + url + "' />");
+                        $("#preview-image .card-body .actions .add").hide();
                       }
 
-                      function getImageUrl(image, width = 'full') {
-                        if (!image.httpBaseUrl || !image.mimeType) {
-                          return image.uri
-                        }
-                        const mimeExtensionMapping = {
-                          gif: 'gif',
-                          png: 'png',
-                        }
-                        const subMimeType = image.mimeType.split('/')[1]
-                        return `${image.httpBaseUrl}/full/${width}/0/default.${mimeExtensionMapping[subMimeType] ?? 'jpg'
-                          }`
-                      }
-                    </script>
-
-                  </div>
+                      let previewImageRenderingHints = {
+                        "caption": {
+                          [fieldLanguage]: formJson["hints-caption"]
+                        },
+                        "altText": {
+                          [fieldLanguage]: formJson["hints-alttext"]
+                        },
+                        "title": {
+                          [fieldLanguage]: formJson["hints-title"]
+                        },
+                        "targetLink": formJson["hints-targetLink"],
+                        "openLinkInNewWindow": formJson["hints-openLinkInNewWindow"]
+                      };
+                      let jsonHints = JSON.stringify(previewImageRenderingHints);
+                      $("input#previewImageRenderingHints-json").val(jsonHints);
+                      alert(jsonHints);
+                    }
+                  </script>
                 </div>
                 <input th:id="previewImage-json" type="hidden" th:field="*{previewImage}" />
+                <input th:id="previewImageRenderingHints-json" type="hidden" th:field="*{previewImageRenderingHints}" />
               </div>
               <div class="col-sm-10">
                 <div class="form-group" th:classappend="${#fields.hasErrors('label[__${fieldLanguage}__]')}? has-error">

@@ -2,23 +2,27 @@
 .main-sidebar {
   overflow-y: auto;
 }
-.nav-sidebar .nav-item > .nav-link {
+
+.nav-sidebar .nav-item>.nav-link {
   margin-bottom: 0rem;
 }
-.nav-sidebar .nav-link > .right:nth-child(2), .nav-sidebar .nav-link > p > .right:nth-child(2) {
+
+.nav-sidebar .nav-link>.right:nth-child(2), .nav-sidebar .nav-link>p>.right:nth-child(2) {
   right: 1rem;
 }
+
 .sidebar-mini .logo-mini {
   display: none;
 }
+
 .sidebar-mini.sidebar-collapse .logo-lg {
   display: none;
 }
+
 .sidebar-mini.sidebar-collapse .logo-mini {
   display: block;
 }
 /* admin lte */
-
 a[href^="http"]:not(.no-external):after {
   content: "\f35d";
   font-family: "Font Awesome 5 Free";
@@ -32,13 +36,16 @@ a[href^="http"]:not(.no-external):after {
   width: 100%;
   font-size: 14px;
 }
+
 .alert i {
   margin-right: 10px;
 }
+
 .badge {
   font-size: 90%;
 }
-.bootstrap-table table.table{
+
+.bootstrap-table table.table {
   background-color: #FFF;
 }
 
@@ -50,21 +57,24 @@ a[href^="http"]:not(.no-external):after {
   padding: 10px 0px;
   width: 100%;
   z-index: 1000;
-  
   position: fixed;
-/*   top: 48px; */
+  /*   top: 48px; */
 }
+
 #content-header h1 {
   font-size: 1.7em;
 }
+
 .content-wrapper {
   padding-bottom: 2rem;
 }
+
 @media only screen and (max-width: 991px) {
   #content-header {
     padding-right: 30px;
   }
 }
+
 @media only screen and (min-width: 991px) {
   #content-header {
     padding-right: 280px;
@@ -79,12 +89,17 @@ div.multilanguage {
   border-right: solid 5px #C6E2FF;
 }
 
+.dropzone {
+  border: 1px dashed lightgray !important;
+  border-radius: 0px !important;
+}
+
 .error {
   color: rgb(220, 53, 69);
 }
 
 .has-error input {
-  border-color:red;
+  border-color: red;
 }
 
 .has-error p {
@@ -104,13 +119,16 @@ label {
   padding: 0.5em;
   text-align: center;
 }
+
 .nav-sidebar .nav-item .nav-link:hover {
   color: #FFF;
 }
+
 .nav-sidebar .nav-item .nav-link.active {
-  background-color: rgba(255,255,255,.9);
+  background-color: rgba(255, 255, 255, .9);
   color: #343a40;
 }
+
 .nav-tabs .nav-tab {
   border: 1px solid transparent;
   border-top-left-radius: .25rem;
@@ -123,6 +141,7 @@ label {
   padding: .4rem .8rem;
   white-space: nowrap;
 }
+
 .nav-tabs .nav-tab .nav-link {
   display: inline;
   margin-bottom: 0px;
@@ -139,14 +158,18 @@ label {
   color: #495057;
 }
 
+div.nav-link a {
+  color: #495057;
+}
 .required::after {
   content: " *";
   color: rgb(220, 53, 69);
 }
 
-.rows-striped > .row:nth-of-type(even) {
+.rows-striped>.row:nth-of-type(even) {
   background-color: #FCFCFC;
 }
+
 .rows-striped .row:nth-of-type(odd) {
   background: transparent;
 }
@@ -154,18 +177,23 @@ label {
 .bootstrap-table .fixed-table-container .table thead th {
   padding-right: 0.5em;
 }
+
 .bootstrap-table .fixed-table-container .table thead th div {
   background-size: 0.98em;
 }
+
 .bootstrap-table .fixed-table-container .table thead th .both.asc {
   background-image: url(../images/sort-up-solid.svg);
 }
+
 .bootstrap-table .fixed-table-container .table thead th .both {
   background-image: url(../images/sort-solid-disabled.svg);
 }
+
 .bootstrap-table .fixed-table-container .table thead th .both.desc {
   background-image: url(../images/sort-down-solid.svg);
 }
+
 .welcome {
   -ms-flex-align: center;
   align-items: center;

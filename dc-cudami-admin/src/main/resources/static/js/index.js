@@ -134,6 +134,34 @@ function formatStringArray(value) {
   return html;
 }
 
+function formDataToJson(formData) {
+  var object = {};
+  formData.forEach((value, key) => {
+    // Reflect.has in favor of: object.hasOwnProperty(key)
+    if (!Reflect.has(object, key)) {
+      object[key] = value;
+      return;
+    }
+    if (!Array.isArray(object[key])) {
+      object[key] = [object[key]];
+    }
+    object[key].push(value);
+  });
+  return object;
+}
+
+function getImageUrl(image, width = 'full') {
+  if (!image.httpBaseUrl || !image.mimeType) {
+    return image.uri;
+  }
+  const mimeExtensionMapping = {
+    gif: 'gif',
+    png: 'png',
+  };
+  const subMimeType = image.mimeType.split('/')[1];
+  return `${image.httpBaseUrl}/full/${width}/0/default.${mimeExtensionMapping[subMimeType] ?? 'jpg'}`;
+}
+
 function handleFetchErrors(response) {
   if (!response.ok) {
     throw Error(response.statusText);
