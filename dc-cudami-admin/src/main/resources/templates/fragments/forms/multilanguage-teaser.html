@@ -3,98 +3,38 @@
       xmlns:sec="https://github.com/thymeleaf/thymeleaf-extras-springsecurity"
       xmlns:data="https://github.com/mxab/thymeleaf-extras-data-attribute">
 
-  <head>
-  </head>
-
   <body>
-    <th:block layout:fragment="html(fieldLanguage, active, beanName)" th:object="${__${beanName}__}">
+    <th:block th:fragment="renderHtml(fieldLanguage, active, beanName)" th:object="${__${beanName}__}">
       <div th:id="lbl-desc-__${fieldLanguage}__" class="tab-pane" th:classappend="${active} ? 'active'">
         <div class="card">
           <div class="card-body bg-light">
             <div class="row">
               <div class="col-sm-2">
-                <label for="preview-image" th:text="#{lbl.preview_image}">Preview Image</label>
-                <div id="preview-image" style="z-index: 0;" class="rounded text-center card">
+                <label th:for="preview-image-__${fieldLanguage}__" th:text="#{lbl.preview_image}">Preview Image</label>
+                <div th:id="preview-image-__${fieldLanguage}__" style="z-index: 0;" class="rounded text-center card preview-image-section">
                   <div class="card-body">
                     <div class="image"></div>
                     <div class="actions">
                       <span class="add">
                         <a th:title="#{tooltip.add_preview_image}" class="stretched-link btn btn-link"
-                           onClick="previewImageDialog();">
+                           th:onclick="|previewImageDialog('__${fieldLanguage}__','__#{modal.title.select_preview_image}__');|">
                           <i class="fa fa-plus"></i>
                         </a>
                       </span>
-                      <span class="edit d-none">
-                        edit delete
+                      <span class="edit">
+                        <div role="group" class="mt-1 btn-group">
+                          <a href="#" th:onclick="|previewImageDialog('__${fieldLanguage}__');|" title="Edit preview image" class="align-items-center d-flex p-2 btn btn-light btn-sm"><i class="fa fa-edit"></i></a>
+                          <a href="#" th:onclick="|removePreviewImage('__${fieldLanguage}__');|" title="Remove preview image" class="align-items-center d-flex p-2 btn btn-danger btn-sm"><i class="fa fa-trash"></i></a>
+                        </div>
                       </span>
                     </div>
+                    <script th:inline="javascript">
+                      /*[+
+                       renderPreviewImage([[${fieldLanguage}]]);
+                       +]*/
+                    </script>
                   </div>
-                  <script th:inline="javascript">
-                    function previewImageDialog() {
-                      /*[+
-                       const modalTitle = [[#{modal.title.add_digitalobjects}]];
-                       +]*/
-
-                      const modalDialog = $('#selectImageDialog');
-                      // $(modalDialog).find('.modal-title').text(modalTitle);
-                      // $(modalDialog).find('.modal-message').html(modalMessage);
-                      var btnOk = $(modalDialog).find('.modal-footer .btn-primary');
-                      $(btnOk).attr('onclick', "setPreviewImage();");
-                      $(modalDialog).modal('show');
-                    }
-
-                    function setPreviewImage() {
-                      /*[+
-                       const fieldLanguage = [[${fieldLanguage}]];
-                       +]*/
-
-                      const modalDialog = $('#selectImageDialog');
-                      $(modalDialog).modal('hide');
-
-                      let imageFileResourceJson = $("input#imageFileResource-json").val();
-
-                      let caption = $(modalDialog).find('#image-caption-input').val();
-                      alert(`${fieldLanguage} ${caption}`);
-
-                      const formElement = $(modalDialog).find('#image-dialog-form').get(0);
-                      const formData = new FormData(formElement);
-                      let formJson = formDataToJson(formData);
-                      alert(JSON.stringify(formJson));
-
-                      if (imageFileResourceJson) {
-                        let imageFileResource = JSON.parse(imageFileResourceJson);
-                        // add data from modal input to File Resource
-                        imageFileResource.filename = formJson.fr - filename[0];
-
-                        $("input#previewImage-json").val(JSON.stringify(imageFileResource));
-
-                        // show preview image
-                        let url = getImageUrl(imageFileResource, "200,");
-                        $("#preview-image .card-body .image").html("<img class='img-fluid mw-100' src='" + url + "' />");
-                        $("#preview-image .card-body .actions .add").hide();
-                      }
-
-                      let previewImageRenderingHints = {
-                        "caption": {
-                          [fieldLanguage]: formJson["hints-caption"]
-                        },
-                        "altText": {
-                          [fieldLanguage]: formJson["hints-alttext"]
-                        },
-                        "title": {
-                          [fieldLanguage]: formJson["hints-title"]
-                        },
-                        "targetLink": formJson["hints-targetLink"],
-                        "openLinkInNewWindow": formJson["hints-openLinkInNewWindow"]
-                      };
-                      let jsonHints = JSON.stringify(previewImageRenderingHints);
-                      $("input#previewImageRenderingHints-json").val(jsonHints);
-                      alert(jsonHints);
-                    }
-                  </script>
                 </div>
-                <input th:id="previewImage-json" type="hidden" th:field="*{previewImage}" />
-                <input th:id="previewImageRenderingHints-json" type="hidden" th:field="*{previewImageRenderingHints}" />
               </div>
               <div class="col-sm-10">
                 <div class="form-group" th:classappend="${#fields.hasErrors('label[__${fieldLanguage}__]')}? has-error">

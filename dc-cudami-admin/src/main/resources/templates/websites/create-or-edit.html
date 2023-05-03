@@ -8,6 +8,7 @@
     <title th:text="|#{page.title.websites}: | + (${mode} == 'create' ? #{page.title.website.create} : #{page.title.website.edit(${website.url})})">Websites: Create a new website / Edit website "http://demo.de/"</title>
     <script th:src="@{/webjars/dropzone/dist/dropzone-min.js}"></script>
     <link th:href="@{/webjars/dropzone/dist/dropzone.css}" rel="stylesheet" type="text/css" />
+    <script th:src="@{/js/previewImage.js}"></script>
   </head>
 
   <body>
@@ -58,8 +59,10 @@
                       </li>
                     </ul>
                     <div class="tab-content">
+                      <input type="hidden" th:id="previewImage-json" th:field="*{previewImage}" />
+                      <input type="hidden" th:id="previewImageRenderingHints-json" th:field="*{previewImageRenderingHints}" />
                       <th:block th:each="language, iter : ${existingLanguages}">
-                        <div th:replace="fragments/forms/multilanguage-teaser :: html(fieldLanguage=${language},active=${iter.index == 0},beanName='website')"></div>
+                        <div th:replace="fragments/forms/multilanguage-teaser::renderHtml(fieldLanguage='__${language}__',active=__${iter.index == 0}__,beanName='website')"></div>
                       </th:block>
                     </div>
                   </div>
@@ -83,7 +86,7 @@
           </form>
         </div>
       </div>
-      
+
       <th:block th:replace="fragments/modals/select-image :: select-image-dialog"></th:block>
     </th:block>
   </body>

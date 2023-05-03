@@ -55,9 +55,8 @@ public class WebsitesController extends AbstractEntitiesController<Website, Cuda
     model.addAttribute("website", website);
 
     List<Locale> existingLanguages = List.of(defaultLanguage);
-    List<Locale> sortedLanguages = languageService.getAllLanguages();
     model.addAttribute("existingLanguages", existingLanguages);
-    model.addAttribute("allLanguages", sortedLanguages);
+    model.addAttribute("allLanguages", languageService.getAllLanguages());
     model.addAttribute("activeLanguage", defaultLanguage);
 
     model.addAttribute("mode", "create");
@@ -70,21 +69,24 @@ public class WebsitesController extends AbstractEntitiesController<Website, Cuda
       @RequestParam(name = "activeLanguage", required = false) Locale activeLanguage,
       Model model)
       throws TechnicalException {
-    final Locale displayLocale = LocaleContextHolder.getLocale();
     Website website = service.getByUuid(uuid);
+    model.addAttribute("website", website);
+
     List<Locale> existingLanguages =
-        languageService.sortLanguages(displayLocale, website.getLabel().getLocales());
+        languageService.getExistingLanguages(
+            languageService.getDefaultLanguage(), website.getLabel());
+    model.addAttribute("existingLanguages", existingLanguages);
 
     if (activeLanguage != null && existingLanguages.contains(activeLanguage)) {
       model.addAttribute("activeLanguage", activeLanguage);
     } else {
       model.addAttribute("activeLanguage", existingLanguages.get(0));
     }
-    model.addAttribute("existingLanguages", existingLanguages);
-    model.addAttribute("url", website.getUrl());
-    model.addAttribute("uuid", website.getUuid());
 
-    return "websites/edit";
+    model.addAttribute("allLanguages", languageService.getAllLanguages());
+
+    model.addAttribute("mode", "edit");
+    return "websites/create-or-edit";
   }
 
   @GetMapping("/websites")
@@ -136,6 +138,58 @@ public class WebsitesController extends AbstractEntitiesController<Website, Cuda
         messageSource.getMessage("msg.created_successfully", null, LocaleContextHolder.getLocale());
     redirectAttributes.addFlashAttribute("success_message", message);
     return "redirect:/websites";
+  }
+
+  @PostMapping(value = "/websites/{uuid:" + ParameterHelper.UUID_PATTERN + "}/edit")
+  public String update(
+      @PathVariable UUID uuid,
+      @ModelAttribute("formData") Website websiteFormData,
+      @ModelAttribute Website website,
+      BindingResult results,
+      Model model,
+      SessionStatus status,
+      RedirectAttributes redirectAttributes)
+      throws TechnicalException {
+    model.addAttribute("mode", "edit");
+    verifyBinding(results);
+
+    // just update the fields, that were editable
+    // needed session attribute independent "formData" because session
+    // attributes just get data set, but do not remove hashmap entry (language, if
+    // tab is removed)
+    website.setLabel(websiteFormData.getLabel());
+    website.setDescription(websiteFormData.getDescription());
+    website.setPreviewImageRenderingHints(websiteFormData.getPreviewImageRenderingHints());
+
+    labelNotBlankValidator.validate(website.getLabel(), results);
+
+    // TODO: move validate() to service layer on server side using new
+    // ValidationException of dc
+    // model?
+    if (results.hasErrors()) {
+      Locale defaultLanguage = languageService.getDefaultLanguage();
+      model.addAttribute(
+          "existingLanguages",
+          languageService.getExistingLanguages(defaultLanguage, website.getLabel()));
+      model.addAttribute("allLanguages", languageService.getAllLanguages());
+      model.addAttribute("activeLanguage", defaultLanguage);
+      return "websites/create-or-edit";
+    }
+    try {
+      service.update(uuid, website);
+    } catch (TechnicalException e) {
+      String message = "Cannot update website with uuid=" + uuid + ": " + e;
+      LOGGER.error(message, e);
+      redirectAttributes.addFlashAttribute("error_message", message);
+      return "redirect:/websites/" + uuid + "/edit";
+    }
+
+    status.setComplete();
+    String message =
+        messageSource.getMessage(
+            "msg.changes_saved_successfully", null, LocaleContextHolder.getLocale());
+    redirectAttributes.addFlashAttribute("success_message", message);
+    return "redirect:/websites/" + uuid;
   }
 
   @GetMapping("/websites/{uuid:" + ParameterHelper.UUID_PATTERN + "}")

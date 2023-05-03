@@ -1,4 +1,3 @@
-:
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
@@ -18,7 +17,7 @@
               <form action="#" id="image-dialog-form">
                 <input th:id="imageFileResource-json" type="hidden" />
                 
-                <div class="card">
+                <div class="card" id="selectImageDialog-fileresource">
                   <div class="card-body p-2">
                     <ul class="nav nav-tabs" role="tablist">
                       <li class="nav-item">
@@ -138,7 +137,7 @@
                           <label for="image-link">URL</label>
                         </div>
                         <div class="custom-control custom-radio">
-                          <input type="radio" id="image-link-blank" name="hints-openLinkInNewWindow" class="custom-control-input" checked="" value="true">
+                          <input type="radio" id="image-link-blank" name="hints-openLinkInNewWindow" class="custom-control-input" value="true">
                           <label class="custom-control-label" for="image-link-blank">open in a new tab</label>
                         </div>
                         <div class="custom-control custom-radio">
@@ -174,7 +173,7 @@
         $("div#imageFileResourceDropzone").dropzone({
           url: uploadUrl,
           success: function (file, response) {
-            $("input#selectedImageFileResource-json").val(JSON.stringify(response));
+            $("input#imageFileResource-json").val(JSON.stringify(response));
           },
         });
       </script>
