@@ -2,8 +2,8 @@ package de.digitalcollections.cudami.admin.controller.identifiable.semantic;
 
 import de.digitalcollections.cudami.admin.business.i18n.LanguageService;
 import de.digitalcollections.cudami.admin.business.impl.validator.LabelNotBlankValidator;
-import de.digitalcollections.cudami.admin.controller.AbstractUniqueObjectController;
 import de.digitalcollections.cudami.admin.controller.ParameterHelper;
+import de.digitalcollections.cudami.admin.controller.identifiable.AbstractIdentifiablesController;
 import de.digitalcollections.cudami.client.CudamiClient;
 import de.digitalcollections.cudami.client.config.CudamiConfigClient;
 import de.digitalcollections.cudami.client.identifiable.entity.semantic.CudamiSubjectsClient;
@@ -11,7 +11,6 @@ import de.digitalcollections.model.exception.ResourceNotFoundException;
 import de.digitalcollections.model.exception.TechnicalException;
 import de.digitalcollections.model.identifiable.semantic.Subject;
 import de.digitalcollections.model.text.LocalizedText;
-import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
@@ -22,7 +21,6 @@ import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.util.CollectionUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -36,7 +34,8 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 /** Controller for subject management pages. */
 @Controller
 @SessionAttributes(value = {"subject"})
-public class SubjectsController extends AbstractUniqueObjectController<Subject> {
+public class SubjectsController
+    extends AbstractIdentifiablesController<Subject, CudamiSubjectsClient> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(SubjectsController.class);
 
@@ -249,17 +248,8 @@ public class SubjectsController extends AbstractUniqueObjectController<Subject> 
     }
     model.addAttribute("subject", subject);
 
-    List<Locale> existingLanguages = Collections.emptyList();
-    LocalizedText label = subject.getLabel();
-    if (!CollectionUtils.isEmpty(label)) {
-      Locale displayLocale = LocaleContextHolder.getLocale();
-      existingLanguages = languageService.sortLanguages(displayLocale, label.getLocales());
-    }
-
-    String dataLanguage = targetDataLanguage;
-    if (dataLanguage == null && languageService != null) {
-      dataLanguage = languageService.getDefaultLanguage().getLanguage();
-    }
+    List<Locale> existingLanguages = getExistingLanguagesFromIdentifiable(subject);
+    String dataLanguage = getDataLanguage(targetDataLanguage, existingLanguages, languageService);
 
     model
         .addAttribute("existingLanguages", existingLanguages)
