@@ -74,7 +74,7 @@ const CustomBulletList = Node.create({
     name: 'bullet_list',
     addOptions() {
         return {
-            itemTypeName: 'listItem',
+            itemTypeName: 'list_item',
             HTMLAttributes: {},
             keepMarks: false,
             keepAttributes: false,

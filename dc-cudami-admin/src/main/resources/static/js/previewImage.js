@@ -1,4 +1,4 @@
-function previewImageDialog(language, modalTitle) {
+function previewImageDialog(language, modalTitle, contextPath) {
   // init modal dialog
   const previewImageJson = $("input#previewImage-json").val();
   if (previewImageJson) {
@@ -12,19 +12,19 @@ function previewImageDialog(language, modalTitle) {
     $("#selectImageDialog input[name='hints-title']").val(hints.title?.[language]);
     $("#selectImageDialog input[name='hints-alttext']").val(hints.altText?.[language]);
     $("#selectImageDialog input[name='hints-targetLink']").val(hints.targetLink);
-    $("#selectImageDialog input[name='hints-openLinkInNewWindow'][value='" + hints.openLinkInNewWindow + "']").prop("checked",true);
+    $("#selectImageDialog input[name='hints-openLinkInNewWindow'][value='" + hints.openLinkInNewWindow + "']").prop("checked", true);
   } else {
     $("#selectImageDialog input[name='hints-caption']").val("");
     $("#selectImageDialog input[name='hints-title']").val("");
     $("#selectImageDialog input[name='hints-alttext']").val("");
     $("#selectImageDialog input[name='hints-targetLink']").val("");
-    $("#selectImageDialog input[name='hints-openLinkInNewWindow'][value='true']").prop("checked",true);
+    $("#selectImageDialog input[name='hints-openLinkInNewWindow'][value='true']").prop("checked", true);
   }
-  
+
   const modalDialog = $('#selectImageDialog');
   $(modalDialog).find('.modal-title').text(modalTitle);
   const btnOk = $(modalDialog).find('.modal-footer .btn-primary');
-  $(btnOk).attr('onclick', "setPreviewImage('" + language + "');");
+  $(btnOk).attr('onclick', "setPreviewImage('" + language + "','" + contextPath + "');");
   $(modalDialog).modal('show');
 }
 
@@ -71,7 +71,7 @@ function renderPreviewImage(fieldLanguage) {
   }
 }
 
-function setPreviewImage(fieldLanguage) {
+function setPreviewImage(fieldLanguage, contextPath) {
   const modalDialog = $('#selectImageDialog');
   $(modalDialog).modal('hide');
 
@@ -110,8 +110,33 @@ function setPreviewImage(fieldLanguage) {
   if (imageFileResourceJson) {
     let imageFileResource = JSON.parse(imageFileResourceJson);
     // add data from modal input to File Resource
-    imageFileResource.filename = formJson["fr-filename"][0];
-    $("input#previewImage-json").val(JSON.stringify(imageFileResource));
+    if (!imageFileResource.label) {
+      imageFileResource.label = {};
+    }
+    imageFileResource.label[fieldLanguage] = formJson["fr-label"][0];
+
+    // update fileresource
+    let updateFileResourceUrl = contextPath + "api/fileresources/" + imageFileResource.uuid;
+    fetch(updateFileResourceUrl, {
+      body: JSON.stringify(imageFileResource),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      method: 'PUT',
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw Error(`HTTP error: ${response.status}`)
+        }
+        return response.json();
+      })
+      .then((json) => {
+        $("input#previewImage-json").val(JSON.stringify(json));
+
+      })
+      .catch((error) => {
+        alert(`Could not update: ${error}`);
+      });
   }
 
   // render preview image

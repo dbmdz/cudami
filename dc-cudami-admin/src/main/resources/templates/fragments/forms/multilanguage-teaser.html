@@ -16,15 +16,23 @@
                     <div class="image"></div>
                     <div class="actions">
                       <span class="add">
-                        <a th:title="#{tooltip.add_preview_image}" class="stretched-link btn btn-link"
-                           th:onclick="|previewImageDialog('__${fieldLanguage}__','__#{modal.title.select_preview_image}__');|">
+                        <a href="#"
+                           th:onclick="|previewImageDialog('__${fieldLanguage}__','__#{modal.title.preview_image.select(${fieldLanguage})}__','__@{/}__');|"
+                           th:title="#{tooltip.preview_image.add}"
+                           class="stretched-link btn btn-link">
                           <i class="fa fa-plus"></i>
                         </a>
                       </span>
                       <span class="edit">
                         <div role="group" class="mt-1 btn-group">
-                          <a href="#" th:onclick="|previewImageDialog('__${fieldLanguage}__');|" title="Edit preview image" class="align-items-center d-flex p-2 btn btn-light btn-sm"><i class="fa fa-edit"></i></a>
-                          <a href="#" th:onclick="|removePreviewImage('__${fieldLanguage}__');|" title="Remove preview image" class="align-items-center d-flex p-2 btn btn-danger btn-sm"><i class="fa fa-trash"></i></a>
+                          <a href="#"
+                             th:onclick="|previewImageDialog('__${fieldLanguage}__','__#{modal.title.preview_image.edit(${fieldLanguage})}__','__@{/}__');|"
+                             th:title="#{tooltip.preview_image.edit}"
+                             class="align-items-center d-flex p-2 btn btn-light btn-sm"><i class="fa fa-edit"></i></a>
+                          <a href="#"
+                             th:onclick="|removePreviewImage('__${fieldLanguage}__');|"
+                             th:title="#{tooltip.preview_image.remove}"
+                             class="align-items-center d-flex p-2 btn btn-danger btn-sm"><i class="fa fa-trash"></i></a>
                         </div>
                       </span>
                     </div>
