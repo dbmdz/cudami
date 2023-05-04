@@ -2,36 +2,25 @@
 <html xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
   <body>
-
-    <th:block th:fragment="renderDates(datePresentation, navDateRange, timeValueRange)">
-      <div th:if="${(datePresentation != null || navDateRange != null || timeValueRange != null)}">
-        <span th:text="${datePresentation}">...</span>
-        <span th:if="${navDateRange}">
-            (<span th:with="df=#{date.format},date=${navDateRange.start}" th:text="${#temporals.format(date,df)}">01.01.2000</span>
-            -
-            <span th:with="df=#{date.format},date=${navDateRange.end}" th:text="${#temporals.format(date,df)}">01.01.2000</span>
-            )</span>&nbsp;
-        <th:block th:if="${(timeValueRange != null)}" th:insert="~{fragments/uniqueobject :: renderTimeValueRange(${timeValueRange})}">...</th:block>
-      </div>
-    </th:block>
-
     <th:block th:fragment="renderLocalDateRange(start, end)">
        <span th:if="${(start != null || end != null)}">
-        (<span th:with="df=#{date.format},date=${start}" th:text="${#temporals.format(date,df)}">01.01.2000</span>
+         <span th:if="${start}" th:insert="~{:: renderLocalDate(${start})}">...</span>
          -
-         <span th:with="df=#{date.format},date=${end}" th:text="${#temporals.format(date,df)}">01.01.2000</span>
-         )
+         <span th:if="${end}" th:insert="~{:: renderLocalDate(${end})}">...</span>
        </span>
     </th:block>
 
     <th:block th:fragment="renderTimeValueRange(start, end)">
       <span th:if="${(start != null || end != null)}">
-      [
-      <span th:if="${start}" th:insert="~{:: renderTimeValue(${start})}">...</span>
-      -
-      <span th:if="${end}" th:insert="~{:: renderTimeValue(${end})}">...</span>
-      ]
+        <span th:if="${start}" th:insert="~{:: renderTimeValue(${start})}">...</span>
+        -
+        <span th:if="${end}" th:insert="~{:: renderTimeValue(${end})}">...</span>
       </span>
+    </th:block>
+
+    <th:block th:fragment="renderLocalDate(localDate)">
+      <span th:if="${localDate.getYear()>=0}" th:with="df=#{date.format},date=${localDate}" th:text="${#temporals.format(date,df)}">01.01.2000</span>
+      <span th:if="${localDate.getYear()<0}" th:with="df=#{date.format.bc},date=${localDate}" th:text="${#temporals.format(date,df)}">01.01.2000</span>
     </th:block>
 
     <th:block th:fragment="renderTimeValue(timeValue)">

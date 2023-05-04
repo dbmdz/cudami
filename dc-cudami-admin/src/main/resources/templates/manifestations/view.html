@@ -236,13 +236,13 @@
     <div th:fragment="displayPublishingInfo(publishingInfo)" th:with="show_data = ${(publishingInfo != null && !publishingInfo.isEmpty())}">
       <th:block th:if="${show_data}">
         <div th:if="${(publishingInfo.datePresentation != null || publishingInfo.navDateRange != null || publishingInfo.timeValueRange != null)}">
-          <span th:text="${publishingInfo.datePresentation}">...</span>
-          <span th:if="${publishingInfo.navDateRange}" th:with="navDateRange=${publishingInfo.navDateRange}">
-            (<span th:with="df=#{date.format},date=${navDateRange.start}" th:text="${#temporals.format(date,df)}">01.01.2000</span>
-            -
-            <span th:with="df=#{date.format},date=${navDateRange.end}" th:text="${#temporals.format(date,df)}">01.01.2000</span>
-            )</span>&nbsp;
-          <th:block th:if="${(publishingInfo.timeValueRange != null)}" th:insert="~{fragments/uniqueobject :: renderTimeValueRange(${publishingInfo.timeValueRange})}">...</th:block>
+          <span style="padding-right:0.5rem;" th:if="${publishingInfo.datePresentation}">
+            "<span th:text="${publishingInfo.datePresentation}">...</span>"
+          </span>
+          <span style="padding-right:0.5rem;" th:if="${publishingInfo.timeValueRange}" th:insert="~{fragments/date::renderTimeValueRange(${publishingInfo.timeValueRange.start}, ${publishingInfo.timeValueRange.end})}">...</span>
+          <span style="padding-right:0.5rem;" th:if="${publishingInfo.navDateRange}">
+            (<span th:insert="~{fragments/date::renderLocalDateRange(${publishingInfo.navDateRange.start}, ${publishingInfo.navDateRange.end})}"></span>)
+          </span>
         </div>
         <div th:each="publisher: ${publishingInfo.publishers}">
           <th:block th:with="agent=${publisher.agent}">
