@@ -7,7 +7,7 @@ cudami:
   offsetForAlternativePaging: 5000
   repositoryFolderPath: '~/cudami/fileResources'
   urlalias:
-    generationExcludes: []
+    generationExcludes: [DIGITAL_OBJECT,TEXT_FILE_RESOURCE,IMAGE_FILE_RESOURCE,ITEM,LINKED_DATA_FILE_RESOURCE,MANIFESTATION,WORK]
     maxlength: 64
 
 iiif:

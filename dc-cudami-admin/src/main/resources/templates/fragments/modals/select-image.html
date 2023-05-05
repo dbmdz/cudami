@@ -62,13 +62,31 @@
                         </div>
 
                       </div>
+
                       <div class="tab-pane fade" id="pane-url-file" role="tabpanel">
+                        <figure id="image-url-preview" class="mx-auto" style="max-width: 250px;">
+                          <img id="imgPreview" style="display: none;" class='img-fluid mw-100' />
+                        </figure>
                         <div class="mb-0 mt-3 form-group">
                           <div class="form-label-group in-border">
                             <input id="image-url" placeholder="" name="fr-uri" type="url" class="form-control">
                             <label for="image-url" th:text="#{lbl.url}">URL</label>
                           </div>
-
+                          <script th:inline="javascript">
+                            /*[+
+                             const lblImage = [[#{lbl.image}]];
+                             +]*/
+                            const urlField = $("#selectImageDialog input[name='fr-uri']");
+                            const previewImage = $("#image-url-preview #imgPreview");
+                            $(urlField).on("input", debounce(() => {
+                              const imageSrc = $(urlField).val();
+                              if (imageSrc.match("https?:\/\/.*")) {
+                                $(previewImage).attr('alt', `${lblImage}: ${imageSrc}`);
+                                $(previewImage).attr('src', imageSrc);
+                                $(previewImage).show();
+                              }
+                            }, 1000));
+                          </script>
                           <div class="input-group form-label-group in-border">
                             <input id="image-label-input" placeholder="" name="fr-label" type="text" class="text-dark form-control" value="">
                             <label for="image-label-input" th:text="#{lbl.label}">Label</label>
@@ -78,6 +96,7 @@
                           </div>
                         </div>
                       </div>
+
                       <div class="tab-pane fade" id="pane-search-file" role="tabpanel">
                         <div class="mb-0 mt-3 form-group">
                           <div class="form-label-group in-border">

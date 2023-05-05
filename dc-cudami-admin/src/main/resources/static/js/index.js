@@ -99,6 +99,14 @@ function bindTabEvents() {
   });
 }
 
+function debounce(callback, wait) {
+  let timeout;
+  return (...args) => {
+    clearTimeout(timeout);
+    timeout = setTimeout(function() { callback.apply(this, args); }, wait);
+  };
+}
+
 function formatDate(date, language, onlyDate = false) {
   /* used to output a date or date with time */
   if (!date) {

@@ -75,7 +75,7 @@ function setPreviewImage(fieldLanguage, contextPath) {
   const modalDialog = $('#selectImageDialog');
   $(modalDialog).modal('hide');
 
-  // set previewImageRenderingHints-json
+  // set previewImageRenderingHints-json (the same for all three image tabs)
   const formElement = $(modalDialog).find('#image-dialog-form').get(0);
   const formData = new FormData(formElement);
   let formJson = formDataToJson(formData);
@@ -106,37 +106,89 @@ function setPreviewImage(fieldLanguage, contextPath) {
   $("input#previewImageRenderingHints-json").val(jsonHints);
 
   // set previewImage-json
-  let imageFileResourceJson = $("input#imageFileResource-json").val();
-  if (imageFileResourceJson) {
-    let imageFileResource = JSON.parse(imageFileResourceJson);
-    // add data from modal input to File Resource
-    if (!imageFileResource.label) {
-      imageFileResource.label = {};
-    }
-    imageFileResource.label[fieldLanguage] = formJson["fr-label"][0];
+  let imageFileResource;
 
-    // update fileresource
-    let updateFileResourceUrl = contextPath + "api/fileresources/" + imageFileResource.uuid;
-    fetch(updateFileResourceUrl, {
-      body: JSON.stringify(imageFileResource),
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      method: 'PUT',
-    })
+  // get active fileresource creation tab:
+  let activePaneId = $(modalDialog).find("#selectImageDialog-fileresource div.tab-pane.active").attr("id");
+  if ("pane-url-file" === (activePaneId)) {
+    // create a new FileResource
+    let createFileResourceUrl = contextPath + "api/imagefileresources/new";
+    fetch(createFileResourceUrl)
       .then((response) => {
         if (!response.ok) {
           throw Error(`HTTP error: ${response.status}`)
         }
         return response.json();
       })
-      .then((json) => {
-        $("input#previewImage-json").val(JSON.stringify(json));
+      .then((fileResource) => {
+        // set uri = imageSrc and label
+        const uri = formJson["fr-uri"];
+        fileResource.uri = uri;
 
+        const label = formJson["fr-label"][1]; // label in second tabpane
+        if (!fileResource.label) {
+          fileResource.label = {};
+        }
+        fileResource.label[fieldLanguage] = label;
+
+        // save it
+        let saveFileResourceUrl = contextPath + "api/imagefileresources";
+        fetch(saveFileResourceUrl, {
+          body: JSON.stringify(fileResource),
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          method: 'POST',
+        })
+          .then((response) => {
+            if (!response.ok) {
+              throw Error(`HTTP error: ${response.status}`)
+            }
+            return response.json();
+          })
+          .then((json) => {
+            $("input#previewImage-json").val(JSON.stringify(json));
+          })
+          .catch((error) => {
+            alert(`Could not update: ${error}`);
+          });
       })
       .catch((error) => {
-        alert(`Could not update: ${error}`);
+        alert(`Could not create a new fileresource: ${error}`);
       });
+  } else {
+    // "pane-upload-file" and "pane-search-file" already got fileresource from server and filled json field
+    let imageFileResourceJson = $("input#imageFileResource-json").val();
+    if (imageFileResourceJson) {
+      imageFileResource = JSON.parse(imageFileResourceJson);
+      if (!imageFileResource.label) {
+        imageFileResource.label = {};
+      }
+      imageFileResource.label[fieldLanguage] = formJson["fr-label"][0]; // label in first tabpane
+
+      // update fileresource
+      let updateFileResourceUrl = contextPath + "api/imagefileresources/" + imageFileResource.uuid;
+      fetch(updateFileResourceUrl, {
+        body: JSON.stringify(imageFileResource),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        method: 'PUT',
+      })
+        .then((response) => {
+          if (!response.ok) {
+            throw Error(`HTTP error: ${response.status}`)
+          }
+          return response.json();
+        })
+        .then((json) => {
+          $("input#previewImage-json").val(JSON.stringify(json));
+
+        })
+        .catch((error) => {
+          alert(`Could not update: ${error}`);
+        });
+    }
   }
 
   // render preview image
