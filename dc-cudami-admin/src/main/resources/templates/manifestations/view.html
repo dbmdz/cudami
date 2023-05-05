@@ -235,7 +235,7 @@
 
     <div th:fragment="renderMediaTypes(mediaTypes)">
       <div th:each="mediaTypeKey, iterStat: ${mediaTypes}">
-        <span th:with="mediaType=${#messages.msgOrNull('mediatype.' + mediaTypeKey)}" th:text="${mediaType != null ? mediaType : mediaTypeKey}">...</span>
+        <span th:with="mediaType=${#messages.msgOrNull('mediatype.' + mediaTypeKey.toLowerCase())}" th:text="${mediaType != null ? mediaType : mediaTypeKey}">...</span>
         <span th:if="${!iterStat.last ? ',&nbsp;' : ''}"></span>
       </div>
     </div>
