@@ -83,6 +83,13 @@
             </div>
 
             <div class="row">
+              <div class="col-md-3"><label th:text="#{lbl.expressiontypes}">Expression types</label></div>
+              <div class="align-items-center col-md-9 d-flex">
+                <th:block th:insert="~{::renderExpressionTypes(${manifestation.expressionTypes})}">...</th:block>
+              </div>
+            </div>
+
+            <div class="row">
               <div class="col-md-3"><label th:text="#{lbl.dimensions}">Dimensions</label></div>
               <div class="align-items-center col-md-9 d-flex">
                 <span th:text="${manifestation.dimensions}">...</span>
@@ -229,6 +236,13 @@
     <div th:fragment="renderMediaTypes(mediaTypes)">
       <div th:each="mediaTypeKey, iterStat: ${mediaTypes}">
         <span th:with="mediaType=${#messages.msgOrNull('mediatype.' + mediaTypeKey)}" th:text="${mediaType != null ? mediaType : mediaTypeKey}">...</span>
+        <span th:if="${!iterStat.last ? ',&nbsp;' : ''}"></span>
+      </div>
+    </div>
+
+    <div th:fragment="renderExpressionTypes(expressionTypes)">
+      <div th:each="expressionTypeMainSubType, iterStat: ${expressionTypes}">
+        <span th:with="expressionTypeKey=${#strings.toLowerCase(expressionTypeMainSubType.getMainType() + (expressionTypeMainSubType.getSubType().isEmpty() ? '' : ('.' + expressionTypeMainSubType.getSubType())))},expressionType=${#messages.msgOrNull('expressiontype.' + expressionTypeKey)}" th:text="${expressionType != null ? expressionType : expressionTypeKey}">...</span>
         <span th:if="${!iterStat.last ? ',&nbsp;' : ''}"></span>
       </div>
     </div>
