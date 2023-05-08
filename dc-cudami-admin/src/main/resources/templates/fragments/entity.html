@@ -9,6 +9,24 @@
       <div class="col-md-9" th:text="*{refId}">4711</div>
     </div>
     <div class="row">
+      <div class="col-md-3"><label th:text="#{lbl.custom_attributes}">CustomAttributes</label></div>
+      <div class="col-md-9" th:if="${entity.customAttributes != null && !entity.customAttributes.isEmpty()}">
+        <table class="table">
+          <tr class="table-header">
+            <th><span th:text="#{lbl_custom_attribute_key}">Key</span></th>
+            <th><span th:text="#{lbl_custom_attribute_value}">Value</span></th>
+          </tr>
+          <th:block th:each="customAttribute : *{customAttributes}">
+            <tr class="content">
+              <td><th:block th:text="${customAttribute.key}"></th:block></td>
+              <td><th:block th:text="${customAttribute.value}"></th:block></td>
+            </tr>
+          </th:block>
+        </table>
+      </div>
+    </div>
+
+    <div class="row">
       <div class="col-md-3"><label th:text="#{lbl.nav_date}">Navigation date / temporal placement</label></div>
       <div class="col-md-9"><span th:with="df=#{date.format},date=*{navDate}" th:text="${#temporals.format(date,df)}">01.01.2000</span></div>
     </div>
