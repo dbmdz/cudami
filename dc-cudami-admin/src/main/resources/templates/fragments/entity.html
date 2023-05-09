@@ -13,8 +13,8 @@
       <div class="col-md-9" th:if="${entity.customAttributes != null && !entity.customAttributes.isEmpty()}">
         <table class="table">
           <tr class="table-header">
-            <th><span th:text="#{lbl_custom_attribute_key}">Key</span></th>
-            <th><span th:text="#{lbl_custom_attribute_value}">Value</span></th>
+            <th><span th:text="#{lbl.custom_attribute_key}">Key</span></th>
+            <th><span th:text="#{lbl.custom_attribute_value}">Value</span></th>
           </tr>
           <th:block th:each="customAttribute : *{customAttributes}">
             <tr class="content">
