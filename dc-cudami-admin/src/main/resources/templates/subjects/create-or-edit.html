@@ -29,6 +29,12 @@
             <div id="content-body" class="rows-striped">
               <div th:replace="fragments/feedback-messages :: form"></div>
 
+              <th:block th:if="${mode} == 'edit'">
+                <th:block th:insert="fragments/uniqueobject::renderFields(${subject})"></th:block>
+                <th:block th:insert="fragments/identifiable::renderFields(${subject})"></th:block>
+                <hr>
+              </th:block>
+
               <div class="row">
                 <div class="col-sm-12">
                   <div class="localized-form" data-tabid-prefix="lbl-desc-">
