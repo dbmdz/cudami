@@ -60,6 +60,6 @@ public class FragmentsController {
   }
 
   public static final String getDisplayLanguage(Locale displayLocale, Locale locale) {
-    return getDisplayLanguages(displayLocale, Set.of(locale));
+    return locale == null ? null : getDisplayLanguages(displayLocale, Set.of(locale));
   }
 }
