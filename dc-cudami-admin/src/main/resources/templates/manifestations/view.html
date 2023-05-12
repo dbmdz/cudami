@@ -253,7 +253,9 @@
           <span style="padding-right:0.5rem;" th:if="${publishingInfo.datePresentation}">
             "<span th:text="${publishingInfo.datePresentation}">...</span>"
           </span>
-          <span style="padding-right:0.5rem;" th:if="${publishingInfo.timeValueRange}" th:insert="~{fragments/date::renderTimeValueRange(${publishingInfo.timeValueRange.start}, ${publishingInfo.timeValueRange.end})}">...</span>
+          <span style="padding-right:0.5rem;" th:if="${publishingInfo.timeValueRange}">
+            <span th:insert="~{fragments/date::renderTimeValueRange(${publishingInfo.timeValueRange.start}, ${publishingInfo.timeValueRange.end})}">...</span>
+          </span>
           <span style="padding-right:0.5rem;" th:if="${publishingInfo.navDateRange}">
             (<span th:insert="~{fragments/date::renderLocalDateRange(${publishingInfo.navDateRange.start}, ${publishingInfo.navDateRange.end})}"></span>)
           </span>
