@@ -153,8 +153,16 @@ public class DigitalObjectController extends AbstractEntityController<DigitalObj
         "/latest/digitalobjects/{uuid:" + ParameterHelper.UUID_PATTERN + "}"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<DigitalObject> getByUuid(@PathVariable UUID uuid) throws ServiceException {
-    return super.getByUuid(uuid);
+  public ResponseEntity<DigitalObject> getByUuid(
+      @PathVariable UUID uuid,
+      @RequestParam(name = "fill-wemi", required = false, defaultValue = "false") boolean fillWemi)
+      throws ServiceException {
+    DigitalObject digitalObject =
+        fillWemi
+            ? service.getByExampleWithWEMI(buildExampleWithUuid(uuid))
+            : service.getByExample(buildExampleWithUuid(uuid));
+    return new ResponseEntity<>(
+        digitalObject, digitalObject != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
   }
 
   @Operation(

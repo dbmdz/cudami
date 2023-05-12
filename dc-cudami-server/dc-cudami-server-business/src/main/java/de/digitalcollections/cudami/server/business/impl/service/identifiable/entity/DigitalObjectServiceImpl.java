@@ -13,15 +13,26 @@ import de.digitalcollections.cudami.server.business.api.service.identifiable.ali
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.CollectionService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.DigitalObjectService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.ProjectService;
+import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.agent.CorporateBodyService;
+import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.agent.PersonService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.work.ItemService;
+import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.work.ManifestationService;
+import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.work.WorkService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.resource.DigitalObjectLinkedDataFileResourceService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.resource.DigitalObjectRenderingFileResourceService;
 import de.digitalcollections.cudami.server.config.HookProperties;
+import de.digitalcollections.model.RelationSpecification;
 import de.digitalcollections.model.identifiable.Identifier;
 import de.digitalcollections.model.identifiable.entity.Collection;
+import de.digitalcollections.model.identifiable.entity.Entity;
 import de.digitalcollections.model.identifiable.entity.Project;
+import de.digitalcollections.model.identifiable.entity.agent.CorporateBody;
+import de.digitalcollections.model.identifiable.entity.agent.Person;
 import de.digitalcollections.model.identifiable.entity.digitalobject.DigitalObject;
 import de.digitalcollections.model.identifiable.entity.item.Item;
+import de.digitalcollections.model.identifiable.entity.manifestation.Manifestation;
+import de.digitalcollections.model.identifiable.entity.relation.EntityRelation;
+import de.digitalcollections.model.identifiable.entity.work.Work;
 import de.digitalcollections.model.identifiable.resource.FileResource;
 import de.digitalcollections.model.identifiable.resource.ImageFileResource;
 import de.digitalcollections.model.identifiable.resource.LinkedDataFileResource;
@@ -42,20 +53,27 @@ public class DigitalObjectServiceImpl extends EntityServiceImpl<DigitalObject>
     implements DigitalObjectService {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(DigitalObjectServiceImpl.class);
-
   private final CollectionService collectionService;
+  private final CorporateBodyService corporateBodyService;
   private final DigitalObjectLinkedDataFileResourceService
       digitalObjectLinkedDataFileResourceService;
   private final DigitalObjectRenderingFileResourceService digitalObjectRenderingFileResourceService;
   private final ItemService itemService;
+  private final ManifestationService manifestationService;
+  private final PersonService personService;
   private final ProjectService projectService;
+  private final WorkService workService;
 
   public DigitalObjectServiceImpl(
       DigitalObjectRepository repository,
+      CorporateBodyService corporateBodyService,
       CollectionService collectionService,
       ProjectService projectService,
       IdentifierService identifierService,
       ItemService itemService,
+      ManifestationService manifestationService,
+      PersonService personService,
+      WorkService workService,
       UrlAliasService urlAliasService,
       DigitalObjectLinkedDataFileResourceService digitalObjectLinkedDataFileResourceService,
       DigitalObjectRenderingFileResourceService digitalObjectRenderingFileResourceService,
@@ -69,9 +87,13 @@ public class DigitalObjectServiceImpl extends EntityServiceImpl<DigitalObject>
         hookProperties,
         localeService,
         cudamiConfig);
+    this.corporateBodyService = corporateBodyService;
     this.collectionService = collectionService;
     this.itemService = itemService;
     this.projectService = projectService;
+    this.manifestationService = manifestationService;
+    this.personService = personService;
+    this.workService = workService;
     this.digitalObjectRenderingFileResourceService = digitalObjectRenderingFileResourceService;
     this.digitalObjectLinkedDataFileResourceService = digitalObjectLinkedDataFileResourceService;
   }
@@ -204,6 +226,30 @@ public class DigitalObjectServiceImpl extends EntityServiceImpl<DigitalObject>
     return digitalObject;
   }
 
+  public DigitalObject getByExampleWithWEMI(DigitalObject example) throws ServiceException {
+    DigitalObject digitalObject = getByExample(example);
+    if (digitalObject == null) {
+      return null;
+    }
+
+    fillWMID(digitalObject);
+    return digitalObject;
+  }
+
+  private void fillWMID(DigitalObject digitalObject) throws ServiceException {
+    if (digitalObject.getItem() != null) {
+      Item item = itemService.getByExample(digitalObject.getItem());
+      if (item.getManifestation() != null) {
+        item.setManifestation(fillManifestation(item.getManifestation()));
+      }
+      if (item.getPartOfItem() != null) {
+        item.setPartOfItem(itemService.getByExample(item.getPartOfItem()));
+      }
+
+      digitalObject.setItem(item);
+    }
+  }
+
   @Override
   public DigitalObject getByIdentifier(Identifier identifier) throws ServiceException {
     DigitalObject digitalObject = super.getByIdentifier(identifier);
@@ -217,17 +263,8 @@ public class DigitalObjectServiceImpl extends EntityServiceImpl<DigitalObject>
     if (digitalObject == null) {
       return null;
     }
-    if (digitalObject.getItem() != null) {
-      Item item = itemService.getByExample(digitalObject.getItem());
 
-      // for later:
-      //      if (item.getManifestation() != null) {
-      //        // TODO: fetch manifestation and fill item
-      //      }
-
-      digitalObject.setItem(item);
-    }
-
+    fillWMID(digitalObject);
     return digitalObject;
   }
 
@@ -431,5 +468,72 @@ public class DigitalObjectServiceImpl extends EntityServiceImpl<DigitalObject>
       throw new ServiceException("Cannot update DigitalObject: " + e, e);
     }
     fillDigitalObject(digitalObject);
+  }
+
+  private Manifestation fillManifestation(Manifestation manifestation) throws ServiceException {
+    manifestation = manifestationService.getByExample(manifestation);
+    if (manifestation.getWork() != null) {
+      manifestation.setWork(fillWork(manifestation.getWork()));
+    }
+    List<RelationSpecification<Manifestation>> parentManifestations = manifestation.getParents();
+    if (parentManifestations != null && !parentManifestations.isEmpty()) {
+      manifestation.setParents(
+          manifestation.getParents().stream()
+              .map(
+                  r -> {
+                    try {
+                      r.setSubject(manifestationService.getByExample(r.getSubject()));
+                      return r;
+                    } catch (ServiceException e) {
+                      throw new RuntimeException(e);
+                    }
+                  })
+              .toList());
+    }
+    if (manifestation.getRelations() != null && manifestation.getRelations().isEmpty()) {
+      manifestation.setRelations(fillRelations(manifestation.getRelations()));
+    }
+    return manifestation;
+  }
+
+  private Work fillWork(Work work) throws ServiceException {
+    work = workService.getByExample(work);
+    if (work.getParents() != null && !work.getParents().isEmpty()) {
+      work.setParents(
+          work.getParents().stream()
+              .map(
+                  p -> {
+                    try {
+                      return workService.getByExample(p);
+                    } catch (ServiceException e) {
+                      throw new RuntimeException(e);
+                    }
+                  })
+              .toList());
+      if (work.getRelations() != null && !work.getRelations().isEmpty()) {
+        work.setRelations(fillRelations(work.getRelations()));
+      }
+    }
+    return work;
+  }
+
+  private List<EntityRelation> fillRelations(List<EntityRelation> relations) {
+    return relations.stream()
+        .map(
+            r -> {
+              try {
+                Entity e = r.getSubject();
+                if (e instanceof CorporateBody) {
+                  e = corporateBodyService.getByExample((CorporateBody) e);
+                } else if (e instanceof Person) {
+                  e = personService.getByExample((Person) e);
+                }
+                r.setSubject(e);
+                return r;
+              } catch (ServiceException e) {
+                throw new RuntimeException(e);
+              }
+            })
+        .toList();
   }
 }

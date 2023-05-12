@@ -30,6 +30,8 @@ public interface DigitalObjectService extends EntityService<DigitalObject> {
   PageResponse<Project> findProjects(DigitalObject digitalObject, PageRequest pageRequest)
       throws ServiceException;
 
+  DigitalObject getByExampleWithWEMI(DigitalObject digitalObject) throws ServiceException;
+
   DigitalObject getByIdentifierWithWEMI(Identifier identifier) throws ServiceException;
 
   List<FileResource> getFileResources(DigitalObject digitalObject) throws ServiceException;
