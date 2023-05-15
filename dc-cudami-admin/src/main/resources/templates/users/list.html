@@ -4,84 +4,192 @@
       xmlns:sec="https://github.com/thymeleaf/thymeleaf-extras-springsecurity"
       xmlns:data="https://github.com/mxab/thymeleaf-extras-data-attribute"
       layout:decorate="~{base}">
+
   <head>
     <title th:text="#{page.title.users}">Users</title>
-  </head>
-  <body>
-  <th:block layout:fragment="content">
-    <div class="content-header">
-      <div class="container-fluid">
 
-        <div class="row">
-          <div class="col">
-            <h1 th:text="#{page.title.users}">Users</h1>
-            <hr>
-          </div>
-        </div>
+    <link th:href="@{/webjars/github-com-Templarian-MaterialDesign-Webfont/materialdesignicons.min.css}" rel="stylesheet">
+    <link th:href="@{/webjars/vuetify/dist/vuetify.min.css}" rel="stylesheet">
+    <script th:src="@{/webjars/axios/dist/axios.min.js}"></script>
+    <script th:src="@{/webjars/vue/dist/vue.global.js}"></script>
+    <script th:src="@{/webjars/vuetify/dist/vuetify.min.js}"></script>
 
-        <div class="row">
-          <div class="col">
-
-            <div id="toolbar-users">
-
-            </div>
-            <table id="table-users"
-                   data-toggle="table"
-                   th:data-url="@{/api/users}"
-                   th:data-locale="${#locale}"
-                   data-buttons="buttonsUsers"
-                   data-cookie="true"
-                   data-cookie-id-table="table-users"
-                   data-id-field="uuid"
-                   data-pagination="true"
-                   data-pagination-v-align="both"
-                   
-                   data-search="true"
-                   data-search-highlight="true"
-                   data-search-on-enter-key="true"
-                   data-server-sort="true"
-                   data-show-search-button="true"
-                   data-show-search-clear-button="true"
-                   data-side-pagination="server"
-                   data-sort-name="lastname"
-                   data-sort-order="asc"
-                   data-toolbar="#toolbar-users"
-                   data-unique-id="uuid">
-              <thead>
-                <tr>
-                  <th data-field="index" data-formatter="formatRowNumberUsers" data-halign="right" data-align="right" th:text="#{lbl.row_number}">#</th>
-                  <th data-field="lastname" data-sortable="true" th:text="#{lbl.lastname}">Lastname</th>
-                  <th data-field="firstname" data-sortable="true" th:text="#{lbl.firstname}">Firstname</th>
-                  <th data-field="email" data-sortable="true" data-formatter="formatUsernameUsers" th:text="#{lbl.username}">Username / Email</th>
-                  <th data-field="roles" data-formatter="renderStringArray" th:text="#{lbl.roles}">Role(s)</th>
-                  <th data-field="enabled" data-formatter="renderStatus" data-halign="center" data-align="center" th:text="#{lbl.status}">Status</th>
-
-                  <th data-field="lastModified" data-sortable="true" data-formatter="renderDateTime" th:text="#{lbl.last_modified}">last modified</th>
-                  <th data-field="created" data-sortable="true" data-formatter="renderDateTime" th:text="#{lbl.created}">created</th>
-                  <th data-field="actions" data-formatter="formatActionsUsers" th:text="#{lbl.actions}">Actions</th>
-                </tr>
-              </thead>
-            </table>
-
-          </div>
-        </div>
-
-      </div>
-    </div>
-  </th:block>
-
-  <th:block layout:fragment="beforeBodyEnds">
-    <div th:replace="fragments/modals/confirm-yes-no :: confirm-yes-no-dialog"></div>
-
-    <script type="text/javascript">
-      function formatRowNumberUsers(value, row, index) {
-        return renderRowNumber($('#table-users'), index);
+    <script async th:src="@{/webjars/es-module-shims/dist/es-module-shims.js}"></script>
+    <script type="importmap">
+      {
+        "imports": {
+          "vue": "/webjars/vue/dist/vue.global.js",
+          "vuetify": "/webjars/vuetify/dist/vuetify.min.js",
+          "vuetify/components": "/webjars/vuetify/dist/vuetify.min.js",
+          "vuetify/labs/components": "/webjars/vuetify/dist/vuetify.min.js"
+        }
       }
     </script>
+  </head>
 
-    <script type="text/javascript" th:inline="javascript">
-      /*<![CDATA[*/
-      $('#table-users').bootstrapTable({
+  <body>
+    <th:block layout:fragment="content">
+      <div class="content-header">
+        <div class="container-fluid">
+
+          <div class="row">
+            <div class="col">
+              <h1 th:text="#{page.title.users}">Users</h1>
+              <hr>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col">
+              <div id="data-table-users">
+                
+                <table class="table table-striped table-bordered">
+                  <thead>
+                    <tr>
+                      <th th:text="#{lbl.id}">ID</th>
+                      <th th:text="#{lbl.firstname}">Firstname</th>
+                      <th th:text="#{lbl.lastname}">Lastname</th>
+                      <th th:text="#{lbl.email}">Email</th>
+                      <th th:text="#{lbl.roles}">Role(s)</th>
+                      <th th:text="#{lbl.actions}">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="user in users">
+                      <td>{{ user.id }}</td>
+                      <td>{{ user.firstname }}</td>
+                      <td>{{ user.lastname }}</td>
+                      <td>{{ user.email }}</td>
+                      <td>{{ user.roles }}</td>
+                      <td>
+                        <a>Edit</a>
+                        <a v-bind:href="'/users/delete/' + user.id">Delete</a>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+                <!--                <v-data-table
+                              :headers="headers"
+                              :items="users"
+                              :items-per-page="5"
+
+                              class="elevation-2 mt-3">
+                  <template v-slot:item.actions="{ item }">
+                    <v-icon small class="mr-2" @click="editItem(item)">mdi-pencil</v-icon>
+                    <v-icon small @click="deleteItem(item)">mdi-delete</v-icon>
+                  </template>
+                </v-data-table>-->
+              </div>
+
+
+              <div id="toolbar-users">
+
+              </div>
+              <table id="table-users"
+                     data-toggle="table"
+                     th:data-url="@{/api/users}"
+                     th:data-locale="${#locale}"
+                     data-buttons="buttonsUsers"
+                     data-cookie="true"
+                     data-cookie-id-table="table-users"
+                     data-id-field="uuid"
+                     data-pagination="true"
+                     data-pagination-v-align="both"
+
+                     data-search="true"
+                     data-search-highlight="true"
+                     data-search-on-enter-key="true"
+                     data-server-sort="true"
+                     data-show-search-button="true"
+                     data-show-search-clear-button="true"
+                     data-side-pagination="server"
+                     data-sort-name="lastname"
+                     data-sort-order="asc"
+                     data-toolbar="#toolbar-users"
+                     data-unique-id="uuid">
+                <thead>
+                  <tr>
+                    <th data-field="index" data-formatter="formatRowNumberUsers" data-halign="right" data-align="right" th:text="#{lbl.row_number}">#</th>
+                    <th data-field="lastname" data-sortable="true" th:text="#{lbl.lastname}">Lastname</th>
+                    <th data-field="firstname" data-sortable="true" th:text="#{lbl.firstname}">Firstname</th>
+                    <th data-field="email" data-sortable="true" data-formatter="formatUsernameUsers" th:text="#{lbl.username}">Username / Email</th>
+                    <th data-field="roles" data-formatter="renderStringArray" th:text="#{lbl.roles}">Role(s)</th>
+                    <th data-field="enabled" data-formatter="renderStatus" data-halign="center" data-align="center" th:text="#{lbl.status}">Status</th>
+
+                    <th data-field="lastModified" data-sortable="true" data-formatter="renderDateTime" th:text="#{lbl.last_modified}">last modified</th>
+                    <th data-field="created" data-sortable="true" data-formatter="renderDateTime" th:text="#{lbl.created}">created</th>
+                    <th data-field="actions" data-formatter="formatActionsUsers" th:text="#{lbl.actions}">Actions</th>
+                  </tr>
+                </thead>
+              </table>
+
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </th:block>
+
+    <th:block layout:fragment="beforeBodyEnds">
+      <script th:inline="javascript">
+        //import {createApp} from 'vue'
+
+        // Vuetify
+        //import 'vuetify/styles'
+        //import {createVuetify} from 'vuetify'
+        //import * as components from 'vuetify/components'
+        //import * as directives from 'vuetify/directives'
+        //import * as labsComponents from 'vuetify/labs/components';
+
+        const {createApp} = Vue;
+        const {createVuetify} = Vuetify;
+
+        //const vuetify = createVuetify({
+        //  components: {
+        //    ...components,
+        //    ...labsComponents,
+        //  },
+        //});
+        const vuetify = createVuetify();
+
+        const app = createApp({
+          data() {
+            return {
+              //drawer: true,
+              users: []
+              //headers: [
+              //  {text: /*[[#{lbl.id}]]*/ 'ID', value: 'id'},
+              //  {text: /*[[#{lbl.firstname}]]*/ 'Firstname', value: 'firstname'},
+              //  {text: /*[[#{lbl.lastname}]]*/ 'Lastname', value: 'lastname'},
+              //  {text: /*[[#{lbl.email}]]*/ 'Email', value: 'email'},
+              //  {text: /*[[#{lbl.roles}]]*/ 'Role(s)', value: 'roles'},
+              //  {text: /*[[#{lbl.actions}]]*/ 'Actions', value: 'actions', sortable: false},
+              //],
+            }
+          },
+          mounted() {
+            // mounted() is called when Vue.js is ready (mounted on the element specified in el above)
+            let url = /*[[@{/api/v1/users}]]*/ '';
+            axios
+              .get(url)
+              .then(response => (this.users = response.data.users))
+          },
+        });
+        app.use(vuetify).mount('#data-table-users');
+      </script>
+
+
+      <div th:replace="fragments/modals/confirm-yes-no :: confirm-yes-no-dialog"></div>
+
+      <script type="text/javascript">
+        function formatRowNumberUsers(value, row, index) {
+          return renderRowNumber($('#table-users'), index);
+        }
+      </script>
+
+      <script type="text/javascript" th:inline="javascript">
+        /*<![CDATA[*/
+        $('#table-users').bootstrapTable({
           formatSearch: function () {
             /*[+
              let columnName = [[#{lbl.lastname}]];
@@ -90,70 +198,71 @@
             return placeholder;
           }
         });
-        
-      function buttonsUsers() {
-        /*[+
-         const baseUrl = [[@{'/users'}]];
-         const textAdd = [[#{btn.add}]];
-         const tooltipAdd = [[#{tooltip.add_new_table_entry}]];
-         +]*/
-        return {
-          btnAdd: {
-            text: textAdd,
-            icon: 'fa-plus',
-            event: function () {
-              location.href = baseUrl + '/new';
-            },
-            attributes: {
-              title: tooltipAdd
+
+        function buttonsUsers() {
+          /*[+
+           const baseUrl = [[@{'/users'}]];
+           const textAdd = [[#{btn.add}]];
+           const tooltipAdd = [[#{tooltip.add_new_table_entry}]];
+           +]*/
+          return {
+            btnAdd: {
+              text: textAdd,
+              icon: 'fa-plus',
+              event: function () {
+                location.href = baseUrl + '/new';
+              },
+              attributes: {
+                title: tooltipAdd
+              }
             }
-          }
-        };
-      }
-      
-      function formatActionsUsers(value, row) {
-        /*[+
-         const baseUrl = [[@{'/users'}]] + '/' + row.uuid;
-         const itemType = [[#{lbl.user.inline}]];
-         +]*/
-        const itemId = row.email;
-        return [
-          renderViewAction(baseUrl),
-          renderEditAction(baseUrl),
-          renderStatusActionUser(baseUrl, itemType, itemId, row.enabled)
-        ].join(' ');
-      }
-      
-      function formatUsernameUsers(value, row) {
-        /*[+
-         const baseUrl = [[@{'/users'}]] + '/' + row.uuid;
-         +]*/
-        return '<a href="' + baseUrl + '">' + value + '</a>';
-      }
-      
-      function renderStatusActionUser(baseUrl, itemType, itemId, enabled) {
-        /*[+
-         const modalDeactivateMessage = `[(#{modal.msg.confirm_user_deactivation})]`;
-         const modalDeactivateTitle = [[#{modal.title.warning}]];
-         const tooltipReactivate = [[#{tooltip.activate_user}]];
-         const tooltipDeactivate = [[#{tooltip.deactivate_user}]];
-         +]*/
-        if (enabled) {
-          return '<a href="#" ' +
-                  'data-href="' + baseUrl + '/deactivate"' +
-                  'data-message="' + escape(modalDeactivateMessage) + '"' +
-                  'data-title="' + modalDeactivateTitle + '"' +
-                  'data-target="#confirmYesNoDialog"' +
-                  'data-toggle="modal">' +
-                  '<i class="fas fa-toggle-off text-danger" title="' + tooltipDeactivate + '"></i></a>';
-        } else {
-          return '<a href="' + baseUrl + '/activate">' +
-                  '<i class="fas fa-toggle-on text-success" title="' + tooltipReactivate + '"></i></a>';
+          };
         }
-      }
+
+        function formatActionsUsers(value, row) {
+          /*[+
+           const baseUrl = [[@{'/users'}]] + '/' + row.uuid;
+           const itemType = [[#{lbl.user.inline}]];
+           +]*/
+          const itemId = row.email;
+          return [
+            renderViewAction(baseUrl),
+            renderEditAction(baseUrl),
+            renderStatusActionUser(baseUrl, itemType, itemId, row.enabled)
+          ].join(' ');
+        }
+
+        function formatUsernameUsers(value, row) {
+          /*[+
+           const baseUrl = [[@{'/users'}]] + '/' + row.uuid;
+           +]*/
+          return '<a href="' + baseUrl + '">' + value + '</a>';
+        }
+
+        function renderStatusActionUser(baseUrl, itemType, itemId, enabled) {
+          /*[+
+           const modalDeactivateMessage = `[(#{modal.msg.confirm_user_deactivation})]`;
+           const modalDeactivateTitle = [[#{modal.title.warning}]];
+           const tooltipReactivate = [[#{tooltip.activate_user}]];
+           const tooltipDeactivate = [[#{tooltip.deactivate_user}]];
+           +]*/
+          if (enabled) {
+            return '<a href="#" ' +
+              'data-href="' + baseUrl + '/deactivate"' +
+              'data-message="' + escape(modalDeactivateMessage) + '"' +
+              'data-title="' + modalDeactivateTitle + '"' +
+              'data-target="#confirmYesNoDialog"' +
+              'data-toggle="modal">' +
+              '<i class="fas fa-toggle-off text-danger" title="' + tooltipDeactivate + '"></i></a>';
+          } else {
+            return '<a href="' + baseUrl + '/activate">' +
+              '<i class="fas fa-toggle-on text-success" title="' + tooltipReactivate + '"></i></a>';
+          }
+        }
       /*]]>*/
-    </script>
-    <div th:replace="fragments/bootstrap-table :: data-formatter"></div>
-  </th:block>
-</body>
+      </script>
+      <div th:replace="fragments/bootstrap-table :: data-formatter"></div>
+    </th:block>
+  </body>
+
 </html>
