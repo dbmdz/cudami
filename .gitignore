@@ -1,6 +1,7 @@
 **/target
 /.idea
 **/*.iml
+.factorypath
 /dc-cudami-admin/dc-cudami-admin-webapp/nbproject/
 /dc-cudami-admin/dc-cudami-admin-business/nbproject/
 /nb-configuration.xml
