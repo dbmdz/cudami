@@ -148,6 +148,8 @@ function setPreviewImage(fieldLanguage, contextPath) {
           })
           .then((json) => {
             $("input#previewImage-json").val(JSON.stringify(json));
+            // render preview image
+            renderPreviewImage(fieldLanguage);
           })
           .catch((error) => {
             alert(`Could not update: ${error}`);
@@ -183,14 +185,12 @@ function setPreviewImage(fieldLanguage, contextPath) {
         })
         .then((json) => {
           $("input#previewImage-json").val(JSON.stringify(json));
-
+          // render preview image
+          renderPreviewImage(fieldLanguage);
         })
         .catch((error) => {
           alert(`Could not update: ${error}`);
         });
     }
   }
-
-  // render preview image
-  renderPreviewImage(fieldLanguage);
 }
