@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<body>
+
+<th:block th:fragment="renderFields(namedEntity)">
+    <div class="row">
+        <div class="col-md-3 multilanguage"><label th:text="#{lbl.name}">Name</label></div>
+        <div class="align-items-center col-md-9 d-flex">
+            <th:block th:insert="~{fragments/text::renderLocalizedText(${namedEntity.name}, ${dataLanguage})}"></th:block>
+        </div>
+    </div>
+</th:block>
+
+</body>
+</html>
