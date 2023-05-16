@@ -6,6 +6,7 @@ import de.digitalcollections.cudami.server.business.api.service.exceptions.Servi
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.model.UniqueObject;
 import de.digitalcollections.model.list.filtering.FilterCriterion;
+import de.digitalcollections.model.list.filtering.Filtering;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.list.sorting.Order;
@@ -77,11 +78,11 @@ public abstract class AbstractUniqueObjectController<U extends UniqueObject>
   protected abstract UniqueObjectService<U> getService();
 
   protected PageResponse<U> find(
-      int pageNumber, int pageSize, List<Order> sortBy, List<FilterCriterion> filterCriteria)
+      int pageNumber, int pageSize, List<Order> sortBy, List<FilterCriterion> filterCriteria, Filtering filtering)
       throws ServiceException {
 
     PageRequest pageRequest =
-        createPageRequest(objectType, pageNumber, pageSize, sortBy, filterCriteria);
+        createPageRequest(objectType, pageNumber, pageSize, sortBy, filterCriteria, filtering);
     return getService().find(pageRequest);
   }
 

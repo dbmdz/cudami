@@ -32,6 +32,7 @@ import org.jdbi.v3.core.JdbiException;
 import org.jdbi.v3.core.statement.StatementException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.StringUtils;
 
 public abstract class JdbiRepositoryImpl<U extends UniqueObject>
     extends AbstractPagingSortingFilteringRepositoryImpl {
@@ -677,6 +678,7 @@ public abstract class JdbiRepositoryImpl<U extends UniqueObject>
       };
       String criterions = filterCriteria.stream()
         .map(filterCriterion -> getWhereClause(filterCriterion, argumentMappings, criterionCount.getAndIncrement()))
+        .filter(s -> StringUtils.hasText(s))
         .collect(Collectors.joining(logicalSqlOp, "(", ")"));
       criteriaClauses.add(criterions);
     }
