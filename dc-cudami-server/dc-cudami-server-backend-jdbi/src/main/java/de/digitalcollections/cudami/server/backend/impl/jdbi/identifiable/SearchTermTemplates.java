@@ -26,7 +26,17 @@ public enum SearchTermTemplates {
     this.placeholder = placeholder;
   }
 
-  public String renderTemplate(Object... values) {
-    return String.format(template, values);
+  /**
+   * Fill the template with {@code values}. An optional {@code placeholderSuffix} can be supplied to distinguish multiple usages.
+   * @param placeholderSuffix a string appended to the placeholder after an underscore, may be {@code null}
+   * @param values the objects passed to {@link String#format(String, Object...)}
+   * @return the formatted SQL
+   */
+  public String renderTemplate(String placeholderSuffix, Object... values) {
+    String t = template;
+    if (placeholderSuffix != null) {
+      t = t.replace(":" + placeholder, ":%s_%s".formatted(placeholder, placeholderSuffix));
+    }
+    return String.format(t, values);
   }
 }

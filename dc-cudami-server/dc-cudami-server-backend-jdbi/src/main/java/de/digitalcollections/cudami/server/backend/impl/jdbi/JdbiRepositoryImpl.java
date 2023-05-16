@@ -4,6 +4,7 @@ import de.digitalcollections.cudami.server.backend.api.repository.exceptions.Rep
 import de.digitalcollections.cudami.server.backend.impl.database.AbstractPagingSortingFilteringRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.SearchTermTemplates;
 import de.digitalcollections.model.UniqueObject;
+import de.digitalcollections.model.list.filtering.FilterCriteria;
 import de.digitalcollections.model.list.filtering.FilterCriterion;
 import de.digitalcollections.model.list.filtering.FilterOperation;
 import de.digitalcollections.model.list.filtering.Filtering;
@@ -234,8 +235,9 @@ public abstract class JdbiRepositoryImpl<U extends UniqueObject>
       Function<U, Optional<Object>> retrieveFieldFunction = entry.getValue();
 
       FilterCriterion filterCriterion =
-          pageRequest.getFiltering().getFilterCriteria().stream()
-              .filter(fc -> fc.getExpression().startsWith(fieldName))
+          pageRequest.getFiltering().getFilterCriteriaList().stream()
+              .filter(fca -> fca.hasFilterCriterionFor(fieldName))
+              .map(fca -> fca.getFilterCriterionFor(fieldName))
               .findAny()
               .orElse(null);
       if (filterCriterion != null) {
@@ -272,7 +274,7 @@ public abstract class JdbiRepositoryImpl<U extends UniqueObject>
     if (matchLanguage.find()) {
       // there is a language...
       Locale language = Locale.forLanguageTag(matchLanguage.group(1));
-      List<String> searchTerms = Arrays.asList(splitToArray((String) filter.getValue()));
+      List<String> searchTerms = Arrays.asList(splitToArray(filter.getValue()));
       List<U> filteredContent =
           pageResponse.getContent().parallelStream()
               .filter(
@@ -309,28 +311,20 @@ public abstract class JdbiRepositoryImpl<U extends UniqueObject>
    */
   protected String getTargetExpression(FilterCriterion<?> fc) throws IllegalArgumentException {
     // map expression to column name:
-    String givenExpression = fc.getExpression(); // e.g. "label_de"
+    String givenExpression = fc.getExpression(); // e.g. "parent.uuid"
     String columnName;
     if (fc.isNativeExpression()) {
       // safe (not created using user input)
       columnName = givenExpression;
     } else {
-      String basicExpression = givenExpression;
-      if (givenExpression.contains("_")) {
-        basicExpression = givenExpression.split("_")[0]; // e.g. "label"
-      }
       // may be created using user input: map expression to column name
-      columnName = getColumnName(basicExpression); // e.g. tableAlias + ".label"
+      columnName = getColumnName(givenExpression); // e.g. tableAlias + ".parent_uuid"
       if (columnName == null) {
         throw new IllegalArgumentException(
             String.format(
                 "Given expression '%s' is invalid / can not be mapped to column name.",
                 givenExpression));
       }
-
-      // FIXME: columname = tableAlias + ".split_label" if split_label column
-      // exists...
-      // and contains/equals operations are a search in an array?
     }
     return columnName;
   }
@@ -346,8 +340,7 @@ public abstract class JdbiRepositoryImpl<U extends UniqueObject>
    * @return map containing name of jsonb field and function to get the field value
    */
   protected LinkedHashMap<String, Function<U, Optional<Object>>> getJsonbFields() {
-    LinkedHashMap<String, Function<U, Optional<Object>>> jsonbFields = new LinkedHashMap<>();
-    return jsonbFields;
+    return new LinkedHashMap<String, Function<U, Optional<Object>>>();
   }
 
   public String getMappingPrefix() {
@@ -366,88 +359,60 @@ public abstract class JdbiRepositoryImpl<U extends UniqueObject>
     return tableName;
   }
 
+  private String makeConditionForJsonbColumn(FilterCriterion<?> fc, Map<String, Object> argumentMappings, int criterionCount) {
+    String expression = fc.getExpression();
+    if (!(fc.getValue() instanceof String value)) {
+      throw new IllegalArgumentException("Value of JSONB field expression must be a string!");
+    }
+
+    FilterOperation operation = fc.getOperation();
+    if (value.matches("\".+\"") && operation == FilterOperation.CONTAINS) {
+        operation = FilterOperation.EQUALS;
+    }
+
+    switch (operation) {
+      case CONTAINS:
+        if (hasSplitColumn(expression)) {
+          argumentMappings.put(
+              "%s_%d".formatted(SearchTermTemplates.ARRAY_CONTAINS.placeholder, criterionCount), splitToArray(value));
+          return SearchTermTemplates.ARRAY_CONTAINS.renderTemplate(String.valueOf(criterionCount),
+              tableAlias, "split_" + expression);
+        }
+        /* In case that there is no split column (e.g. for `description`) CONTAINS and EQUALS are actually the same.
+         * Hence we explicitly fall through (no `break`) and use JSONB_PATH instead.
+         */
+      case EQUALS:
+        Matcher matchLanguage = Pattern.compile("\\.([\\w_-]+)$").matcher(expression);
+        String language =
+            matchLanguage.find() ? "\"%s\"".formatted(matchLanguage.group(1)) : "**";
+        argumentMappings.put(
+            "%s_%d".formatted(SearchTermTemplates.JSONB_PATH.placeholder, criterionCount), escapeTermForJsonpath(value));
+        return SearchTermTemplates.JSONB_PATH.renderTemplate(String.valueOf(criterionCount),
+            tableAlias, expression, language);
+      default:
+        throw new UnsupportedOperationException(
+            "Filtering by JSONB field only supports CONTAINS (to be preferred) or EQUALS operator!");
+    }
+  }
+
   protected String getWhereClause(
       FilterCriterion<?> fc, Map<String, Object> argumentMappings, int criterionCount)
       throws IllegalArgumentException, UnsupportedOperationException {
+    if (fc == null) return "";
+
     Set<String> jsonbFields = getJsonbFields().keySet();
-    if (!jsonbFields.isEmpty()) {
-      String expression = fc.getExpression();
-      String basicExpression = expression;
-      if (!fc.isNativeExpression() && expression.contains("_")) {
-        basicExpression = expression.split("_")[0];
-      }
-
-      if (jsonbFields.contains(basicExpression)) {
-        // JSONB field handling:
-        if (!(fc.getValue() instanceof String)) {
-          throw new IllegalArgumentException("Value of JSONB field expression must be a string!");
-        }
-        String value = (String) fc.getValue();
-
-        FilterOperation operation = fc.getOperation();
-        if (value.matches("\".+\"")) {
-          if (FilterOperation.CONTAINS == operation) {
-            operation = FilterOperation.EQUALS;
-          }
-        }
-
-        switch (operation) {
-          case CONTAINS:
-            if (argumentMappings.containsKey(SearchTermTemplates.ARRAY_CONTAINS.placeholder)) {
-              throw new IllegalArgumentException(
-                  "Filtering by JSONB fields value are mutually exclusive!");
-            }
-            // FIXME: we introduced "split_xyz" column, because LocalizedText and
-            // LocalizedStructuredContent
-            // are HashMaps producing something like "{"de": "...", "en": "..."}" what is
-            // not
-            // properly handled (extremely slow) by JSONB search.
-            // TODO: 1. migrate jsonb content to proper key:value structure:
-            // "[{"lang":"de, "text": "..."}, {"lang":"en", "text":"..."}]"
-            // 2. implement new LocalizedArgumentFactory and LocalizedColumnMapper for
-            // JsonJdbiPlugin, converting
-            // between searchable json and Localized-Model-Objects
-            // 3. implement new CONTAINS search here (JdbiRepository.getWhereClause)
-            // 4. remove "split_" columns and code for that (e.g.
-            // filterBLocalizedTextFields, filterBySplitField)
-            if (hasSplitColumn(basicExpression)) {
-              argumentMappings.put(
-                  SearchTermTemplates.ARRAY_CONTAINS.placeholder, splitToArray(value));
-              return SearchTermTemplates.ARRAY_CONTAINS.renderTemplate(
-                  tableAlias, "split_" + basicExpression);
-            } else {
-              throw new UnsupportedOperationException(
-                  "Filtering on JSONB field CONTAINS only supported if split_-column for "
-                      + basicExpression
-                      + " exists (for now)!");
-            }
-          case EQUALS:
-            if (argumentMappings.containsKey(SearchTermTemplates.JSONB_PATH.placeholder)) {
-              throw new IllegalArgumentException(
-                  "Filtering by JSONB fields value are mutually exclusive!");
-            }
-            Matcher matchLanguage = Pattern.compile("\\.([\\w_-]+)$").matcher(expression);
-            String language =
-                matchLanguage.find() ? "\"%s\"".formatted(matchLanguage.group(1)) : "**";
-            argumentMappings.put(
-                SearchTermTemplates.JSONB_PATH.placeholder, escapeTermForJsonpath(value));
-            return SearchTermTemplates.JSONB_PATH.renderTemplate(
-                tableAlias, basicExpression, language);
-          default:
-            throw new UnsupportedOperationException(
-                "Filtering on JSONB field only supports CONTAINS (to be preferred) or EQUALS operator!");
-        }
-      }
+    String expression = fc.getExpression();
+    if (expression != null && jsonbFields.contains(expression)) {
+      // JSONB handling:
+      return makeConditionForJsonbColumn(fc, argumentMappings, criterionCount);
     }
 
     // normal field (non JSONB) handling:
     StringBuilder query = new StringBuilder();
     if (fc != null) {
       // e.g.: "url:like:creativeco"
-      String expression =
-          getTargetExpression(fc); // e.g. "url" -> tableAlias + ".url" or native: "parent_uuid" ->
-      // tableAlias +
-      // ".parent_uuid
+      expression = getTargetExpression(fc);
+      /* e.g. "url" -> tableAlias + ".url" or native: "parent_uuid" -> tableAlias + ".parent_uuid" */
       FilterOperation filterOperation = fc.getOperation(); // e.g. "like" -> "CONTAINS"
 
       String criterionKey = KEY_PREFIX_FILTERVALUE + criterionCount;
@@ -695,21 +660,27 @@ public abstract class JdbiRepositoryImpl<U extends UniqueObject>
   }
 
   protected String getWhereClauses(Filtering filtering, Map<String, Object> argumentMappings) {
-    if (filtering == null || filtering.getFilterCriteria().isEmpty()) {
+    if (filtering == null || filtering.isEmpty()) {
       return "";
     }
 
-    ArrayList<String> whereClauses = new ArrayList<>();
-    List<FilterCriterion> filterCriteria = filtering.getFilterCriteria();
-    int criterionCount = argumentMappings.size() + 1;
-    for (FilterCriterion filterCriterion : filterCriteria) {
-      String whereClause = getWhereClause(filterCriterion, argumentMappings, criterionCount);
-      whereClauses.add(whereClause);
-      criterionCount++;
-    }
+    // the combined clauses of the `FilterCriteria` list/object
+    ArrayList<String> criteriaClauses = new ArrayList<>();
+    AtomicInteger criterionCount = new AtomicInteger(argumentMappings.size() + 1);
+    for (FilterCriteria filterCriteria : filtering.getFilterCriteriaList()) {
+      if (filterCriteria.isEmpty()) continue;
 
-    String filterClauses = whereClauses.stream().collect(Collectors.joining(" AND "));
-    return filterClauses;
+      String logicalSqlOp = switch (filterCriteria.getCriterionLink()) {
+        case AND -> " AND ";
+        case OR -> " OR ";
+        default -> " AND ";
+      };
+      String criterions = filterCriteria.stream()
+        .map(filterCriterion -> getWhereClause(filterCriterion, argumentMappings, criterionCount.getAndIncrement()))
+        .collect(Collectors.joining(logicalSqlOp, "(", ")"));
+      criteriaClauses.add(criterions);
+    }
+    return criteriaClauses.stream().collect(Collectors.joining(" AND "));
   }
 
   /**
@@ -729,18 +700,14 @@ public abstract class JdbiRepositoryImpl<U extends UniqueObject>
    */
   protected void mapFilterExpressionsToOtherTableColumnNames(
       Filtering filtering, AbstractPagingSortingFilteringRepositoryImpl otherRepository) {
-    if (filtering != null) {
-      List<FilterCriterion> filterCriteria =
-          filtering.getFilterCriteria().stream()
-              .map(
-                  fc -> {
-                    fc.setExpression(otherRepository.getColumnName(fc.getExpression()));
-                    fc.setNativeExpression(true);
-                    return fc;
-                  })
-              .collect(Collectors.toList());
-      filtering.setFilterCriteria(filterCriteria);
-    }
+    if (filtering == null) return;
+
+    filtering.getFilterCriteriaList().stream()
+      .flatMap(FilterCriteria::stream)
+      .forEach(fc -> {
+        fc.setExpression(otherRepository.getColumnName(fc.getExpression()));
+        fc.setNativeExpression(true);
+      });
   }
 
   protected long retrieveCount(StringBuilder sqlCount, final Map<String, Object> argumentMappings)
@@ -794,9 +761,13 @@ public abstract class JdbiRepositoryImpl<U extends UniqueObject>
   public String[] splitToArray(String term) {
     term = term.toLowerCase();
     /*
-     * Remove all characters that are NOT: - space - letter or digit - underscore -
-     * hyphen and remove all standalone hyphens (space hyphen space) (flag `U`
-     * stands for Unicode)
+     * Remove all characters that are NOT:
+     * - space
+     * - letter or digit
+     * - underscore
+     * - hyphen
+     * and remove all standalone hyphens (space hyphen space)
+     * (flag `U` stands for Unicode)
      */
     term = term.replaceAll("(?iU)[^\\s\\w_-]|(?<=\\s)-(?=\\s)", "");
     // Look for words with hyphens to split them too
