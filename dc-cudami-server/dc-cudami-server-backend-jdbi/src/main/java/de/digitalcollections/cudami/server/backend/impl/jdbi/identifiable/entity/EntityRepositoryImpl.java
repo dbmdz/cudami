@@ -165,31 +165,16 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
 
   @Override
   public String getColumnName(String modelProperty) {
-    if (modelProperty == null) {
-      return null;
-    }
-    switch (modelProperty) {
-      case "navdate":
-        return tableAlias + ".navdate";
-      case "refId":
-        return tableAlias + ".refid";
-      case "name":
-        if (this instanceof NamedEntity) {
-          return "name";
-        } else {
-          return null;
-        }
-      case "nameLocalesOfOriginalScripts":
-        if (this instanceof NamedEntity) {
-          return "name_locales_original_scripts";
-        } else {
-          return null;
-        }
-      case "notes":
-        return tableAlias + ".notes";
-      default:
-        return super.getColumnName(modelProperty);
-    }
+    return switch (modelProperty) {
+      case "navdate" -> tableAlias + ".navdate";
+      case "refId" -> tableAlias + ".refid";
+      case "name" -> isRepoForNamedEntity() ? "name" : null;
+      case "nameLocalesOfOriginalScripts" -> isRepoForNamedEntity()
+          ? "name_locales_original_scripts"
+          : null;
+      case "notes" -> tableAlias + ".notes";
+      default -> super.getColumnName(modelProperty);
+    };
   }
 
   @Override
@@ -198,10 +183,7 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
     // An Entity might be a NamedEntity, too:
     jsonbFields.put(
         "name",
-        i ->
-            i instanceof NamedEntity
-                ? Optional.ofNullable(((NamedEntity) i).getName())
-                : Optional.empty());
+        i -> i instanceof NamedEntity ne ? Optional.ofNullable(ne.getName()) : Optional.empty());
     return jsonbFields;
   }
 

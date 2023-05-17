@@ -14,7 +14,7 @@ public enum SearchTermTemplates {
   // example in
   // https://www.postgresql.org/docs/12/functions-json.html#FUNCTIONS-SQLJSON-PATH
   JSONB_PATH(
-      "jsonb_path_exists(%s.%s, ('$.%s ? (@ like_regex \"' || :searchTerm || '\" flag \"iq\")')::jsonpath)",
+      "jsonb_path_exists(%s, ('$.%s ? (@ like_regex \"' || :searchTerm || '\" flag \"iq\")')::jsonpath)",
       "searchTerm"),
   ARRAY_CONTAINS("%s.%s::TEXT[] @> :searchTermArray::TEXT[]", "searchTermArray");
 
@@ -27,8 +27,11 @@ public enum SearchTermTemplates {
   }
 
   /**
-   * Fill the template with {@code values}. An optional {@code placeholderSuffix} can be supplied to distinguish multiple usages.
-   * @param placeholderSuffix a string appended to the placeholder after an underscore, may be {@code null}
+   * Fill the template with {@code values}. An optional {@code placeholderSuffix} can be supplied to
+   * distinguish multiple usages.
+   *
+   * @param placeholderSuffix a string appended to the placeholder after an underscore, may be
+   *     {@code null}
    * @param values the objects passed to {@link String#format(String, Object...)}
    * @return the formatted SQL
    */

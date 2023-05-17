@@ -318,7 +318,7 @@ public class ItemRepositoryImplTest
         Filtering.builder()
             .add(
                 FilterCriterion.builder()
-                    .withExpression("label_de")
+                    .withExpression("label.de")
                     .contains("testSetHolderAndPartofItemUuidInSearchResult")
                     .build())
             .build();

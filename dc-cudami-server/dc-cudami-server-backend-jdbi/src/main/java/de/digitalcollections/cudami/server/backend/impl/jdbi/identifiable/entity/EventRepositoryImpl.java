@@ -46,19 +46,6 @@ public class EventRepositoryImpl extends EntityRepositoryImpl<Event> implements 
   }
 
   @Override
-  public String getColumnName(String modelProperty) {
-    if (modelProperty == null) {
-      return null;
-    }
-    switch (modelProperty) {
-      case "name":
-        return tableAlias + ".name";
-      default:
-        return super.getColumnName(modelProperty);
-    }
-  }
-
-  @Override
   protected boolean supportsCaseSensitivityForProperty(String modelProperty) {
     switch (modelProperty) {
       case "name":

@@ -510,10 +510,13 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
         + ", tags_uuids=:tags_uuids::UUID[], subjects_uuids=:subjects_uuids::UUID[]";
   }
 
-  // FIXME: delete when proper jsonb contains search implemented
+  @Override
   protected boolean hasSplitColumn(String propertyName) {
     // only label for now
-    return "label".equals(propertyName);
+    return switch (propertyName) {
+      case "label" -> true;
+      default -> super.hasSplitColumn(propertyName);
+    };
   }
 
   @Override

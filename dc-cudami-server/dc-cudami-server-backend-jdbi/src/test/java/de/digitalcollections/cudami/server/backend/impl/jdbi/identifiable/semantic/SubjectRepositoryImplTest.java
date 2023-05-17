@@ -233,7 +233,7 @@ class SubjectRepositoryImplTest extends AbstractRepositoryImplTest {
                     Filtering.builder()
                         .add(
                             FilterCriterion.builder()
-                                .withExpression("label_und-Latn")
+                                .withExpression("label.und-Latn")
                                 .contains("Testsubject1")
                                 .build())
                         .build())
@@ -258,7 +258,7 @@ class SubjectRepositoryImplTest extends AbstractRepositoryImplTest {
                     Filtering.builder()
                         .add(
                             FilterCriterion.builder()
-                                .withExpression("label_und-Latn")
+                                .withExpression("label.und-Latn")
                                 .isEquals("\"Karl Ranseier\"")
                                 .build())
                         .build())
