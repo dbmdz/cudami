@@ -5,7 +5,6 @@ import de.digitalcollections.cudami.server.backend.api.repository.exceptions.Rep
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierTypeRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.UniqueObjectRepositoryImpl;
 import de.digitalcollections.model.identifiable.IdentifierType;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import org.jdbi.v3.core.Jdbi;
@@ -77,15 +76,6 @@ public class IdentifierTypeRepositoryImpl extends UniqueObjectRepositoryImpl<Ide
   @Override
   public List<IdentifierType> getRandom(int count) throws RepositoryException {
     throw new UnsupportedOperationException(); // TODO: not yet implemented
-  }
-
-  @Override
-  // FIXME: still needed?
-  protected List<String> getSearchTermTemplates(String tableAlias, String originalSearchTerm) {
-    return new ArrayList<>(
-        Arrays.asList(
-            SearchTermTemplates.ILIKE_SEARCH.renderTemplate(tableAlias, "label"),
-            SearchTermTemplates.ILIKE_SEARCH.renderTemplate(tableAlias, "namespace")));
   }
 
   @Override

@@ -4,7 +4,6 @@ import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
 import de.digitalcollections.cudami.server.backend.api.repository.semantic.HeadwordRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.UniqueObjectRepositoryImpl;
-import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.SearchTermTemplates;
 import de.digitalcollections.model.identifiable.entity.Entity;
 import de.digitalcollections.model.identifiable.resource.FileResource;
 import de.digitalcollections.model.list.buckets.Bucket;
@@ -402,11 +401,6 @@ public class HeadwordRepositoryImpl extends UniqueObjectRepositoryImpl<Headword>
   @Override
   public List<FileResource> getRelatedFileResources(UUID headwordUuid) {
     throw new UnsupportedOperationException(); // TODO: not yet implemented
-  }
-
-  @Override
-  protected List<String> getSearchTermTemplates(String tableAlias, String originalSearchTerm) {
-    return List.of(SearchTermTemplates.ILIKE_STARTS_WITH.renderTemplate(tableAlias, "label"));
   }
 
   @Override

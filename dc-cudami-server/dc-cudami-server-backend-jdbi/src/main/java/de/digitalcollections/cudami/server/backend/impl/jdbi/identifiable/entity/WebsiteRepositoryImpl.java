@@ -5,7 +5,6 @@ import de.digitalcollections.cudami.server.backend.api.repository.exceptions.Rep
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.alias.UrlAliasRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.WebsiteRepository;
-import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.SearchTermTemplates;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.web.WebpageRepositoryImpl;
 import de.digitalcollections.model.identifiable.Identifier;
 import de.digitalcollections.model.identifiable.entity.Website;
@@ -14,7 +13,6 @@ import de.digitalcollections.model.list.filtering.Filtering;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -129,16 +127,6 @@ public class WebsiteRepositoryImpl extends EntityRepositoryImpl<Website>
         webpageRepositoryImpl.retrieveList(
             webpageRepositoryImpl.getSqlSelectReducedFields(), innerQuery, argumentMappings, null);
     return result;
-  }
-
-  @Override
-  protected List<String> getSearchTermTemplates(String tblAlias, String originalSearchTerm) {
-    if (originalSearchTerm == null) {
-      return Collections.EMPTY_LIST;
-    }
-    List<String> searchTermTemplates = super.getSearchTermTemplates(tblAlias, originalSearchTerm);
-    searchTermTemplates.add(SearchTermTemplates.ILIKE_SEARCH.renderTemplate(tblAlias, "url"));
-    return searchTermTemplates;
   }
 
   @Override

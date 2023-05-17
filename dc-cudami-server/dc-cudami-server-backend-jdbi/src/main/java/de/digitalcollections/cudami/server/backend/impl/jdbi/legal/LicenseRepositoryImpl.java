@@ -4,10 +4,8 @@ import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
 import de.digitalcollections.cudami.server.backend.api.repository.legal.LicenseRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.UniqueObjectRepositoryImpl;
-import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.SearchTermTemplates;
 import de.digitalcollections.model.legal.License;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -108,12 +106,6 @@ public class LicenseRepositoryImpl extends UniqueObjectRepositoryImpl<License>
   @Override
   public List<License> getRandom(int count) throws RepositoryException {
     throw new UnsupportedOperationException(); // TODO: not yet implemented
-  }
-
-  @Override
-  protected List<String> getSearchTermTemplates(String tableAlias, String originalSearchTerm) {
-    return new ArrayList<>(
-        Arrays.asList(SearchTermTemplates.ILIKE_SEARCH.renderTemplate(tableAlias, "url")));
   }
 
   @Override

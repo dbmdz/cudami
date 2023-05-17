@@ -104,54 +104,12 @@ public abstract class JdbiRepositoryImpl<U extends UniqueObject>
     }
   }
 
-  // FIXME: delete
-  // protected String addSearchTerm(
-  // PageRequest pageRequest, StringBuilder innerQuery, Map<String, Object>
-  // argumentMappings) {
-  // // handle search term
-  // String searchTerm = pageRequest.getSearchTerm();
-  // String executedSearchTerm = null;
-  // String commonSearchSql = getCommonSearchSql(tableAlias, searchTerm);
-  // if (StringUtils.hasText(commonSearchSql) && StringUtils.hasText(searchTerm))
-  // {
-  // String commonSql = innerQuery.toString();
-  // if (commonSql.toUpperCase().contains(" WHERE ")
-  // || commonSql.toUpperCase().contains(" WHERE(")) {
-  // innerQuery.append(" AND ");
-  // } else {
-  // innerQuery.append(" WHERE ");
-  // }
-  // // select with search term
-  // innerQuery.append(commonSearchSql);
-  // executedSearchTerm = addSearchTermMappings(searchTerm, argumentMappings);
-  // }
-  // return executedSearchTerm;
-  // }
-
   public void addFiltering(
       PageRequest pageRequest, StringBuilder sqlQuery, Map<String, Object> argumentMappings) {
     if (pageRequest != null) {
       addFiltering(pageRequest.getFiltering(), sqlQuery, argumentMappings);
     }
   }
-
-  /**
-   * Add the search term to the argument map. By overriding this method custom modifications can be
-   * made. Belongs to {@link #getSearchTermTemplates(String, String)} and {@link
-   * #addSearchTerm(PageRequest, StringBuilder, Map)}.
-   *
-   * @param searchTerm original term from the {@code PageRequest}
-   * @param argumentMappings
-   * @return the search term that should be used for the {@link
-   *     PageResponse#setExecutedSearchTerm(String)}
-   */
-  // FIXME: delete
-  //  protected String addSearchTermMappings(String searchTerm, Map<String, Object>
-  // argumentMappings) {
-  //    String executedSearchTerm = escapeTermForJsonpath(searchTerm);
-  //    argumentMappings.put("searchTerm", executedSearchTerm);
-  //    return executedSearchTerm;
-  //  }
 
   public long count() throws RepositoryException {
     final String sql = "SELECT count(*) FROM " + tableName;
@@ -330,13 +288,6 @@ public abstract class JdbiRepositoryImpl<U extends UniqueObject>
     return columnName;
   }
 
-  public String getCommonSearchSql(String tblAlias, String originalSearchTerm) {
-    List<String> searchTermTemplates = getSearchTermTemplates(tblAlias, originalSearchTerm);
-    return searchTermTemplates.isEmpty()
-        ? ""
-        : "(" + searchTermTemplates.stream().collect(Collectors.joining(" OR ")) + ")";
-  }
-
   /**
    * @return map containing name of jsonb field and function to get the field value
    */
@@ -346,10 +297,6 @@ public abstract class JdbiRepositoryImpl<U extends UniqueObject>
 
   public String getMappingPrefix() {
     return mappingPrefix;
-  }
-
-  protected List<String> getSearchTermTemplates(String tableAlias, String originalSearchTerm) {
-    return new ArrayList<>(0);
   }
 
   public String getTableAlias() {

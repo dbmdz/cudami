@@ -118,20 +118,6 @@ class IdentifiableRepositoryImplTest
   }
 
   @Test
-  @DisplayName("returns expected sql string")
-  void testGetCommonSearchSql() {
-    String actual = repo.getCommonSearchSql("test", "\"phrase term\"");
-    String expected =
-        "(jsonb_path_exists(test.label, ('$.** ? (@ like_regex \"' || :searchTerm || '\" flag \"iq\")')::jsonpath) OR jsonb_path_exists(test.description, ('$.** ? (@ like_regex \"' || :searchTerm || '\" flag \"iq\")')::jsonpath))";
-    assertThat(actual).isEqualTo(expected);
-
-    actual = repo.getCommonSearchSql("test", "search term");
-    expected =
-        "(test.split_label::TEXT[] @> :searchTermArray::TEXT[] OR jsonb_path_exists(test.description, ('$.** ? (@ like_regex \"' || :searchTerm || '\" flag \"iq\")')::jsonpath))";
-    assertThat(actual).isEqualTo(expected);
-  }
-
-  @Test
   @DisplayName("test getOrderBy")
   void testGetOrderBy() {
     Sorting sorting = new Sorting(new Order(Direction.DESC, "lastModified"), new Order("uuid"));
