@@ -6,6 +6,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import de.digitalcollections.commons.jdbi.DcCommonsJdbiPlugin;
 import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.plugins.JsonbJdbiPlugin;
+import de.digitalcollections.cudami.server.config.IiifServerConfig.Identifier;
+import de.digitalcollections.cudami.server.config.IiifServerConfig.Image;
+import de.digitalcollections.cudami.server.config.IiifServerConfig.Presentation;
 import de.digitalcollections.cudami.server.config.SpringConfigBackendDatabase;
 import de.digitalcollections.model.jackson.DigitalCollectionsObjectMapper;
 import java.util.Map;
@@ -99,5 +102,23 @@ public class SpringConfigBackendTestDatabase {
     CudamiConfig cudamiConfig = Mockito.mock(CudamiConfig.class);
     when(cudamiConfig.getOffsetForAlternativePaging()).thenReturn(5000);
     return cudamiConfig;
+  }
+
+  @Bean
+  @Primary
+  Identifier testIiifServerConfigIdentifier() {
+    return Mockito.mock(Identifier.class);
+  }
+
+  @Bean
+  @Primary
+  Image testIiifServerConfigImage() {
+    return Mockito.mock(Image.class);
+  }
+
+  @Bean
+  @Primary
+  Presentation testIiifServerConfigPresentation() {
+    return Mockito.mock(Presentation.class);
   }
 }

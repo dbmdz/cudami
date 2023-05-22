@@ -109,7 +109,12 @@ class DigitalObjectRepositoryImplTest
   public void beforeEach() {
     repo =
         new DigitalObjectRepositoryImpl(
-            jdbi, cudamiConfig, identifierRepository, urlAliasRepository);
+            jdbi,
+            cudamiConfig,
+            iiifServerConfig,
+            identifierRepository,
+            urlAliasRepository,
+            iiifObjectMapper);
     repo.setAgentEntityRepository(agentEntityRepositoryImpl);
     repo.setCollectionRepository(collectionRepositoryImpl);
     repo.setCorporateBodyRepository(corporateBodyRepositoryImpl);

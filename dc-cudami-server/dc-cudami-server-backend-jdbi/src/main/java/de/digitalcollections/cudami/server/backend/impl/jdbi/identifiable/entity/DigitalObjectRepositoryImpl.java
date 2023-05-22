@@ -13,6 +13,12 @@ import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.resour
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.resource.ImageFileResourceRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.resource.LinkedDataFileResourceRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.legal.LicenseRepositoryImpl;
+import de.digitalcollections.cudami.server.config.IiifServerConfig;
+import de.digitalcollections.iiif.model.ImageContent;
+import de.digitalcollections.iiif.model.jackson.IiifObjectMapper;
+import de.digitalcollections.iiif.model.sharedcanvas.Canvas;
+import de.digitalcollections.iiif.model.sharedcanvas.Manifest;
+import de.digitalcollections.model.file.MimeType;
 import de.digitalcollections.model.identifiable.Identifier;
 import de.digitalcollections.model.identifiable.entity.Collection;
 import de.digitalcollections.model.identifiable.entity.Project;
@@ -28,8 +34,16 @@ import de.digitalcollections.model.list.filtering.Filtering;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.text.LocalizedText;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URL;
 import java.time.LocalDate;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.UUID;
 import java.util.function.BiConsumer;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.core.result.RowView;
@@ -63,20 +77,25 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
 
   @Lazy @Autowired private GeoLocationRepositoryImpl<GeoLocation> geoLocationRepositoryImpl;
 
+  private final IiifObjectMapper iiifObjectMapper;
+
+  private final IiifServerConfig iiifServerConfig;
+
   @Lazy @Autowired private ImageFileResourceRepositoryImpl imageFileResourceRepositoryImpl;
 
   @Lazy @Autowired
   private LinkedDataFileResourceRepositoryImpl linkedDataFileResourceRepositoryImpl;
 
   @Lazy @Autowired private PersonRepositoryImpl personRepositoryImpl;
-
   @Lazy @Autowired private ProjectRepositoryImpl projectRepositoryImpl;
 
   public DigitalObjectRepositoryImpl(
       Jdbi dbi,
       CudamiConfig cudamiConfig,
+      IiifServerConfig iiifServerConfig,
       IdentifierRepository identifierRepository,
-      UrlAliasRepository urlAliasRepository) {
+      UrlAliasRepository urlAliasRepository,
+      IiifObjectMapper iiifObjectMapper) {
     super(
         dbi,
         TABLE_NAME,
@@ -86,6 +105,45 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
         cudamiConfig.getOffsetForAlternativePaging(),
         identifierRepository,
         urlAliasRepository);
+    this.iiifObjectMapper = iiifObjectMapper;
+    this.iiifServerConfig = iiifServerConfig;
+  }
+
+  //
+  // "canvases":[
+  // {
+  //   "@id": "https://api.digitale-sammlungen.de/iiif/presentation/v2/bsb00107608/canvas/1",
+  //   "@type": "sc:Canvas",
+  //   "label": "(0001)",
+  //   "images": [
+  //     {
+  //       "@type":"oa:Annotation",
+  //       "motivation": "sc:painting",
+  //       "resource": {
+  //         "@id":
+  // "https://api.digitale-sammlungen.de/iiif/image/v2/bsb00107608_00001/full/full/0/default.jpg",
+  //         "@type": "dctypes:Image",
+  //         "service": {
+  //           "@context": "http://iiif.io/api/image/2/context.json",
+  //           "@id": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb00107608_00001",
+  //           "profile": "http://iiif.io/api/image/2/level2.json",
+  //           "protocol": "http://iiif.io/api/image"
+  //         },
+  //         "format": "image/jpeg","width":6700,"height":4700}
+  // ,"on":
+  // "https://api.digitale-sammlungen.de/iiif/presentation/v2/bsb00107608/canvas/1"
+  // }],"width":6700,"height":4700}, ...]
+  //
+  private ImageFileResource convertToImageFileResource(Canvas canvas) throws MalformedURLException {
+    ImageContent imageContent = (ImageContent) canvas.getImages().get(0).getResource();
+    de.digitalcollections.iiif.model.MimeType mimeType = imageContent.getFormat();
+    URL httpBaseUrl = imageContent.getServices().get(0).getIdentifier().toURL();
+
+    // TODO: add more image data as needed
+    ImageFileResource ifr = new ImageFileResource();
+    ifr.setHttpBaseUrl(httpBaseUrl);
+    ifr.setMimeType(MimeType.fromTypename(mimeType.getTypeName()));
+    return ifr;
   }
 
   @Override
@@ -407,6 +465,36 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
             fieldsSql, innerQuery, argumentMappings, "ORDER BY idx ASC");
 
     return fileResources;
+  }
+
+  /**
+   * Until now it is using IIIF-Server as structure service. Maybe it is a database backend in the
+   * future.
+   */
+  @Override
+  public List<ImageFileResource> getIiifImageFileResources(UUID digitalObjectUuid)
+      throws RepositoryException {
+    DigitalObject digitalObject = getByUuid(digitalObjectUuid);
+
+    URI iiifPresentationBaseUrl = iiifServerConfig.getPresentation().getBaseUrl();
+    String identifierNamespace = iiifServerConfig.getIdentifier().getNamespace();
+    String iiifIdentifier = digitalObject.getIdentifierByNamespace(identifierNamespace).getId();
+
+    try {
+      URL iiifManifestUrl = iiifPresentationBaseUrl.resolve(iiifIdentifier + "/manifest").toURL();
+      Manifest manifest = iiifObjectMapper.readValue(iiifManifestUrl, Manifest.class);
+      List<ImageFileResource> result = new ArrayList<>();
+      List<Canvas> canvases = manifest.getDefaultSequence().getCanvases();
+      for (Canvas canvas : canvases) {
+        ImageFileResource ifr = convertToImageFileResource(canvas);
+        result.add(ifr);
+      }
+      return result;
+    } catch (MalformedURLException e) {
+      throw new RepositoryException("can not create IIIF presentation URL for digital object", e);
+    } catch (Exception e) {
+      throw new RepositoryException("can not read IIIF presentation URL for digital object", e);
+    }
   }
 
   @Override

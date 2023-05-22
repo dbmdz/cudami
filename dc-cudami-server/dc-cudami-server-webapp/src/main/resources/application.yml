@@ -11,8 +11,12 @@ cudami:
     maxlength: 64
 
 iiif:
+  identifier:
+    namespace: "mdz-obj"
   image:
     baseUrl: "http://localhost:23232/image/v2/"
+  presentation:
+    baseUrl: "https://api-dev.digitale-sammlungen.de/iiif/presentation/v2/"
 
 info:
   app:

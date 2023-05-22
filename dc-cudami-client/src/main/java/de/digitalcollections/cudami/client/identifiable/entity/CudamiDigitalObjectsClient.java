@@ -38,11 +38,6 @@ public class CudamiDigitalObjectsClient extends CudamiEntitiesClient<DigitalObje
         String.format("%s/%s/collections", baseEndpoint, uuid), pageRequest, Collection.class);
   }
 
-  public DigitalObject getByIdentifierAndFillWEMI(String namespace, String id)
-      throws TechnicalException {
-    return getByIdentifier(namespace, id, Map.of("fill-wemi", "true"));
-  }
-
   public PageResponse<Project> findProjects(UUID uuid, PageRequest pageRequest)
       throws TechnicalException {
     return doGetRequestForPagedObjectList(
@@ -72,9 +67,20 @@ public class CudamiDigitalObjectsClient extends CudamiEntitiesClient<DigitalObje
     return find(pageRequest);
   }
 
+  public DigitalObject getByIdentifierAndFillWEMI(String namespace, String id)
+      throws TechnicalException {
+    return getByIdentifier(namespace, id, Map.of("fill-wemi", "true"));
+  }
+
   public List<FileResource> getFileResources(UUID uuid) throws TechnicalException {
     return doGetRequestForObjectList(
         String.format("%s/%s/fileresources", baseEndpoint, uuid), FileResource.class);
+  }
+
+  public List<ImageFileResource> getIiifImageFileResources(UUID uuid) throws TechnicalException {
+    return doGetRequestForObjectList(
+        String.format("%s/%s/fileresources/images/iiif", baseEndpoint, uuid),
+        ImageFileResource.class);
   }
 
   public List<ImageFileResource> getImageFileResources(UUID uuid) throws TechnicalException {
