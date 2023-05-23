@@ -11,6 +11,7 @@ import de.digitalcollections.model.identifiable.entity.Entity;
 import de.digitalcollections.model.identifiable.entity.Topic;
 import de.digitalcollections.model.identifiable.resource.FileResource;
 import de.digitalcollections.model.list.filtering.FilterCriterion;
+import de.digitalcollections.model.list.filtering.Filtering;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.list.sorting.Order;
@@ -85,9 +86,10 @@ public class TopicController extends AbstractEntityController<Topic> {
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
-      @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria)
+      @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria,
+      @RequestParam(name = "filtering", required = false) Filtering filtering)
       throws ServiceException {
-    return super.find(pageNumber, pageSize, sortBy, filterCriteria);
+    return super.find(pageNumber, pageSize, sortBy, filterCriteria, filtering);
   }
 
   @Operation(summary = "Get all entities of a topic as (paged, sorted, filtered) list")
@@ -100,10 +102,11 @@ public class TopicController extends AbstractEntityController<Topic> {
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
-      @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria)
+      @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria,
+      @RequestParam(name = "filtering", required = false) Filtering filtering)
       throws ServiceException {
     PageRequest pageRequest =
-        createPageRequest(Entity.class, pageNumber, pageSize, sortBy, filterCriteria);
+        createPageRequest(Entity.class, pageNumber, pageSize, sortBy, filterCriteria, filtering);
     return service.findEntities(buildExampleWithUuid(topicUuid), pageRequest);
   }
 
@@ -117,10 +120,12 @@ public class TopicController extends AbstractEntityController<Topic> {
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
-      @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria)
+      @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria,
+      @RequestParam(name = "filtering", required = false) Filtering filtering)
       throws ServiceException {
     PageRequest pageRequest =
-        createPageRequest(FileResource.class, pageNumber, pageSize, sortBy, filterCriteria);
+        createPageRequest(
+            FileResource.class, pageNumber, pageSize, sortBy, filterCriteria, filtering);
     return service.findFileResources(buildExampleWithUuid(topicUuid), pageRequest);
   }
 
@@ -136,10 +141,11 @@ public class TopicController extends AbstractEntityController<Topic> {
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
-      @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria)
+      @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria,
+      @RequestParam(name = "filtering", required = false) Filtering filtering)
       throws ServiceException {
     PageRequest pageRequest =
-        createPageRequest(Topic.class, pageNumber, pageSize, sortBy, filterCriteria);
+        createPageRequest(Topic.class, pageNumber, pageSize, sortBy, filterCriteria, filtering);
     return service.findChildren(buildExampleWithUuid(topicUuid), pageRequest);
   }
 
@@ -151,10 +157,11 @@ public class TopicController extends AbstractEntityController<Topic> {
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
-      @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria)
+      @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria,
+      @RequestParam(name = "filtering", required = false) Filtering filtering)
       throws ServiceException {
     PageRequest pageRequest =
-        createPageRequest(Topic.class, pageNumber, pageSize, sortBy, filterCriteria);
+        createPageRequest(Topic.class, pageNumber, pageSize, sortBy, filterCriteria, filtering);
     return service.findRootNodes(pageRequest);
   }
 

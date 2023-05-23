@@ -48,6 +48,7 @@ public class FileResourceMetadataController extends AbstractIdentifiableControll
     this.service = metadataService;
   }
 
+  @Override
   @Operation(summary = "Get all fileresources as (paged, sorted, filtered) list")
   @GetMapping(
       value = {"/v6/fileresources"},
@@ -56,9 +57,10 @@ public class FileResourceMetadataController extends AbstractIdentifiableControll
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
-      @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria)
+      @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria,
+      @RequestParam(name = "filtering", required = false) Filtering filtering)
       throws ServiceException {
-    return super.find(pageNumber, pageSize, sortBy, filterCriteria);
+    return super.find(pageNumber, pageSize, sortBy, filterCriteria, filtering);
   }
 
   @Operation(summary = "Get all fileresources of given type as (paged, sorted, filtered) list")
@@ -72,10 +74,12 @@ public class FileResourceMetadataController extends AbstractIdentifiableControll
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
-      @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria)
+      @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria,
+      @RequestParam(name = "filtering", required = false) Filtering filtering)
       throws ServiceException {
     PageRequest pageRequest =
-        createPageRequest(FileResource.class, pageNumber, pageSize, sortBy, filterCriteria);
+        createPageRequest(
+            FileResource.class, pageNumber, pageSize, sortBy, filterCriteria, filtering);
 
     String prefix;
     switch (type) {
@@ -102,11 +106,11 @@ public class FileResourceMetadataController extends AbstractIdentifiableControll
         prefix = null;
     }
     if (prefix != null) {
-      Filtering filtering =
+      Filtering mimeFiltering =
           Filtering.builder()
               .add(FilterCriterion.builder().withExpression("mimeType").startsWith(prefix).build())
               .build();
-      pageRequest.add(filtering);
+      pageRequest.add(mimeFiltering);
     }
     return service.find(pageRequest);
   }
@@ -159,6 +163,7 @@ public class FileResourceMetadataController extends AbstractIdentifiableControll
     }
   }
 
+  @Override
   @Operation(summary = "Get languages of all websites")
   @GetMapping(
       value = {
@@ -177,6 +182,7 @@ public class FileResourceMetadataController extends AbstractIdentifiableControll
     return service;
   }
 
+  @Override
   @Operation(summary = "Save a newly created fileresource")
   @PostMapping(
       value = {
@@ -191,6 +197,7 @@ public class FileResourceMetadataController extends AbstractIdentifiableControll
     return super.save(fileResource, bindingResult);
   }
 
+  @Override
   @Operation(summary = "Update a fileresource")
   @PutMapping(
       value = {

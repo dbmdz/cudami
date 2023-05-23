@@ -9,6 +9,7 @@ import de.digitalcollections.cudami.server.controller.identifiable.AbstractIdent
 import de.digitalcollections.model.identifiable.entity.Website;
 import de.digitalcollections.model.identifiable.web.Webpage;
 import de.digitalcollections.model.list.filtering.FilterCriterion;
+import de.digitalcollections.model.list.filtering.Filtering;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.list.sorting.Order;
@@ -54,6 +55,7 @@ public class WebsiteController extends AbstractIdentifiableController<Website> {
     this.service = websiteService;
   }
 
+  @Override
   @Operation(
       summary = "Get count of content trees",
       description = "Get count of content trees",
@@ -78,6 +80,7 @@ public class WebsiteController extends AbstractIdentifiableController<Website> {
     return super.count();
   }
 
+  @Override
   @Operation(summary = "Get all websites as (paged, sorted, filtered) list")
   @GetMapping(
       value = {"/v6/websites"},
@@ -86,9 +89,10 @@ public class WebsiteController extends AbstractIdentifiableController<Website> {
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
-      @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria)
+      @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria,
+      @RequestParam(name = "filtering", required = false) Filtering filtering)
       throws ServiceException {
-    return super.find(pageNumber, pageSize, sortBy, filterCriteria);
+    return super.find(pageNumber, pageSize, sortBy, filterCriteria, filtering);
   }
 
   @Operation(
@@ -141,13 +145,15 @@ public class WebsiteController extends AbstractIdentifiableController<Website> {
               example = "label_de:like:Homepage",
               schema = @Schema(type = "List<FilterCriterion>"))
           @RequestParam(name = "filter", required = false)
-          List<FilterCriterion> filterCriteria)
+          List<FilterCriterion> filterCriteria,
+      @RequestParam(name = "filtering", required = false) Filtering filtering)
       throws ServiceException {
     PageRequest pageRequest =
-        createPageRequest(Webpage.class, pageNumber, pageSize, sortBy, filterCriteria);
+        createPageRequest(Webpage.class, pageNumber, pageSize, sortBy, filterCriteria, filtering);
     return service.findRootWebpages(Website.builder().uuid(uuid).build(), pageRequest);
   }
 
+  @Override
   @Operation(
       summary = "Get a website",
       description = "Get a website by its uuid",
@@ -178,6 +184,7 @@ public class WebsiteController extends AbstractIdentifiableController<Website> {
     return super.getByUuid(uuid);
   }
 
+  @Override
   @Operation(
       summary = "Get languages of all websites",
       description = "Get languages of all websites",
@@ -199,6 +206,7 @@ public class WebsiteController extends AbstractIdentifiableController<Website> {
     return service;
   }
 
+  @Override
   @Operation(
       summary = "Create a website",
       description = "Create and return a newly created website",
@@ -219,6 +227,7 @@ public class WebsiteController extends AbstractIdentifiableController<Website> {
     return super.save(website, errors);
   }
 
+  @Override
   @Operation(
       summary = "Update an existing website",
       description = "Modify and return an existing website",

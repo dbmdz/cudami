@@ -28,7 +28,14 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @Tag(name = "Collection controller")
@@ -162,6 +169,7 @@ public class CollectionController extends AbstractEntityController<Collection> {
         : new ResponseEntity<>(HttpStatus.NOT_FOUND);
   }
 
+  @Override
   @Operation(summary = "Get count of collections")
   @GetMapping(
       value = {
@@ -175,6 +183,7 @@ public class CollectionController extends AbstractEntityController<Collection> {
     return super.count();
   }
 
+  @Override
   @Operation(summary = "Delete an existing collection")
   @DeleteMapping(
       value = {
@@ -197,14 +206,16 @@ public class CollectionController extends AbstractEntityController<Collection> {
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
       @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria,
+      @RequestParam(name = "filtering", required = false) Filtering filtering,
       @RequestParam(name = "active", required = false) String active)
       throws ServiceException {
-    PageRequest pageRequest =
-        createPageRequest(Collection.class, pageNumber, pageSize, sortBy, filterCriteria);
     if (active != null) {
+      PageRequest pageRequest =
+          createPageRequest(
+              Collection.class, pageNumber, pageSize, sortBy, filterCriteria, filtering);
       return service.findActive(pageRequest);
     }
-    return super.find(pageNumber, pageSize, sortBy, filterCriteria);
+    return super.find(pageNumber, pageSize, sortBy, filterCriteria, filtering);
   }
 
   @Operation(summary = "Get all digital objects of a collection as (paged, sorted, filtered) list")
@@ -218,12 +229,14 @@ public class CollectionController extends AbstractEntityController<Collection> {
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
       //      @RequestParam(name = "sortBy", required = false) List<Order> sortBy, // FIXME: no
       // sorting as we use sortIndex from cross table!
-      @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria)
+      @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria,
+      @RequestParam(name = "filtering", required = false) Filtering filtering)
       throws ServiceException {
     // FIXME: if we pass sortBy: down in backend we get an error because c.label is used instead
     // do.label...
     PageRequest pageRequest =
-        createPageRequest(DigitalObject.class, pageNumber, pageSize, null, filterCriteria);
+        createPageRequest(
+            DigitalObject.class, pageNumber, pageSize, null, filterCriteria, filtering);
     Collection collection = new Collection();
     collection.setUuid(collectionUuid);
     return service.findDigitalObjects(collection, pageRequest);
@@ -242,10 +255,13 @@ public class CollectionController extends AbstractEntityController<Collection> {
   public List<CorporateBody> findRelatedCorporateBodies(
       @Parameter(example = "", description = "UUID of the collection") @PathVariable("uuid")
           UUID uuid,
-      @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria)
+      @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria,
+      @RequestParam(name = "filtering", required = false) Filtering filtering)
       throws ServiceException {
     return service.findRelatedCorporateBodies(
-        buildExampleWithUuid(uuid), new Filtering(filterCriteria));
+        buildExampleWithUuid(uuid),
+        createPageRequest(CorporateBody.class, 0, 0, null, filterCriteria, filtering)
+            .getFiltering());
   }
 
   @Operation(
@@ -260,10 +276,12 @@ public class CollectionController extends AbstractEntityController<Collection> {
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
       @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria,
+      @RequestParam(name = "filtering", required = false) Filtering filtering,
       @RequestParam(name = "active", required = false) String active)
       throws ServiceException {
     PageRequest pageRequest =
-        createPageRequest(Collection.class, pageNumber, pageSize, sortBy, filterCriteria);
+        createPageRequest(
+            Collection.class, pageNumber, pageSize, sortBy, filterCriteria, filtering);
     if (active != null) {
       return service.findActiveChildren(buildExampleWithUuid(collectionUuid), pageRequest);
     }
@@ -279,10 +297,12 @@ public class CollectionController extends AbstractEntityController<Collection> {
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
       @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria,
+      @RequestParam(name = "filtering", required = false) Filtering filtering,
       @RequestParam(name = "active", required = false) String active)
       throws ServiceException {
     PageRequest pageRequest =
-        createPageRequest(Collection.class, pageNumber, pageSize, sortBy, filterCriteria);
+        createPageRequest(
+            Collection.class, pageNumber, pageSize, sortBy, filterCriteria, filtering);
     return service.findRootNodes(pageRequest);
   }
 
@@ -345,6 +365,7 @@ public class CollectionController extends AbstractEntityController<Collection> {
     return super.getByIdentifier(request);
   }
 
+  @Override
   @Operation(summary = "Get a collection by refId")
   @GetMapping(
       value = {
@@ -525,6 +546,7 @@ public class CollectionController extends AbstractEntityController<Collection> {
         : new ResponseEntity<>(HttpStatus.NOT_FOUND);
   }
 
+  @Override
   @Operation(summary = "Save a newly created collection")
   @PostMapping(
       value = {"/v6/collections", "/v5/collections", "/v2/collections", "/latest/collections"},
@@ -574,6 +596,7 @@ public class CollectionController extends AbstractEntityController<Collection> {
     return service.saveWithParent(collection, buildExampleWithUuid(parentUuid));
   }
 
+  @Override
   @Operation(summary = "Update a collection")
   @PutMapping(
       value = {

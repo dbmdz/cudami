@@ -16,6 +16,7 @@ import de.digitalcollections.model.identifiable.resource.FileResource;
 import de.digitalcollections.model.identifiable.resource.ImageFileResource;
 import de.digitalcollections.model.list.filtering.FilterCriterion;
 import de.digitalcollections.model.list.filtering.FilterOperation;
+import de.digitalcollections.model.list.filtering.Filtering;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.list.sorting.Order;
@@ -26,13 +27,21 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Stream;
 import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @Tag(name = "Digital object controller")
@@ -44,6 +53,7 @@ public class DigitalObjectController extends AbstractEntityController<DigitalObj
     this.service = digitalObjectService;
   }
 
+  @Override
   @Operation(summary = "Get count of digital objects")
   @GetMapping(
       value = {
@@ -57,6 +67,7 @@ public class DigitalObjectController extends AbstractEntityController<DigitalObj
     return super.count();
   }
 
+  @Override
   @Operation(summary = "Delete a digital object with all its relations")
   @DeleteMapping(
       value = {
@@ -73,6 +84,7 @@ public class DigitalObjectController extends AbstractEntityController<DigitalObj
     return super.delete(uuid);
   }
 
+  @Override
   @Operation(summary = "Get all digital objects as (paged, sorted, filtered) list")
   @GetMapping(
       value = {"/v6/digitalobjects"},
@@ -81,9 +93,10 @@ public class DigitalObjectController extends AbstractEntityController<DigitalObj
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
-      @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria)
+      @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria,
+      @RequestParam(name = "filtering", required = false) Filtering filtering)
       throws ServiceException {
-    return super.find(pageNumber, pageSize, sortBy, filterCriteria);
+    return super.find(pageNumber, pageSize, sortBy, filterCriteria, filtering);
   }
 
   @Operation(summary = "Get all projects of a digital object as (paged, sorted, filtered) list")
@@ -96,10 +109,11 @@ public class DigitalObjectController extends AbstractEntityController<DigitalObj
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
-      @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria)
+      @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria,
+      @RequestParam(name = "filtering", required = false) Filtering filtering)
       throws ServiceException {
     PageRequest pageRequest =
-        createPageRequest(Project.class, pageNumber, pageSize, sortBy, filterCriteria);
+        createPageRequest(Project.class, pageNumber, pageSize, sortBy, filterCriteria, filtering);
     return service.findProjects(buildExampleWithUuid(uuid), pageRequest);
   }
 
@@ -135,6 +149,7 @@ public class DigitalObjectController extends AbstractEntityController<DigitalObj
         digitalObject, digitalObject != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
   }
 
+  @Override
   @Operation(summary = "Get a digital object by refId")
   @GetMapping(
       value = {"/v5/digitalobjects/{refId:[0-9]+}"},
@@ -144,6 +159,7 @@ public class DigitalObjectController extends AbstractEntityController<DigitalObj
     return super.getByRefId(refId);
   }
 
+  @Override
   @Operation(summary = "Get a digital object by uuid")
   @GetMapping(
       value = {
@@ -170,10 +186,12 @@ public class DigitalObjectController extends AbstractEntityController<DigitalObj
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
       @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria,
+      @RequestParam(name = "filtering", required = false) Filtering filtering,
       @RequestParam(name = "active", required = false) String active)
       throws ServiceException {
     PageRequest pageRequest =
-        createPageRequest(Collection.class, pageNumber, pageSize, sortBy, filterCriteria);
+        createPageRequest(
+            Collection.class, pageNumber, pageSize, sortBy, filterCriteria, filtering);
     DigitalObject example = buildExampleWithUuid(uuid);
     if (active != null) {
       return service.findActiveCollections(example, pageRequest);
@@ -231,11 +249,14 @@ public class DigitalObjectController extends AbstractEntityController<DigitalObj
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public List<Locale> getLanguages(
-      @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria)
+      @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria,
+      @RequestParam(name = "filtering", required = false) Filtering filtering)
       throws ServiceException {
-    if (filterCriteria != null) {
+    if (filterCriteria != null || filtering != null) {
       Optional<FilterCriterion> parentUuidCriterion =
-          filterCriteria.stream()
+          Stream.concat(
+                  filterCriteria != null ? filterCriteria.stream() : Stream.empty(),
+                  filtering != null ? filtering.stream() : Stream.empty())
               .filter(
                   p ->
                       "parent.uuid".equals(p.getExpression())
@@ -291,6 +312,7 @@ public class DigitalObjectController extends AbstractEntityController<DigitalObj
     return service;
   }
 
+  @Override
   @Operation(summary = "Save a newly created digital object")
   @PostMapping(
       value = {
@@ -322,6 +344,7 @@ public class DigitalObjectController extends AbstractEntityController<DigitalObj
     return service.setFileResources(buildExampleWithUuid(uuid), fileResources);
   }
 
+  @Override
   @Operation(summary = "Update a digital object")
   @PutMapping(
       value = {
