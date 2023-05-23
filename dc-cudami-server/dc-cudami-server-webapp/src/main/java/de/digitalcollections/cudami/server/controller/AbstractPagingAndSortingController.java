@@ -44,7 +44,7 @@ public abstract class AbstractPagingAndSortingController {
   /**
    * Convert filter criterion string value(s) to type of expression field.
    *
-   * Because the generic type got lost over HTTP and the list may contain different
+   * <p>Because the generic type got lost over HTTP and the list may contain different
    * FilterCriterion types.
    */
   private FilterCriterion makeTypedFilterCriterion(FilterCriterion fc, Class<?> targetClass) {
@@ -71,12 +71,7 @@ public abstract class AbstractPagingAndSortingController {
 
       if (Comparable.class.isAssignableFrom(fieldClass)) {
         return StringToFilterCriteriaGenericConverter.createFilterCriterion(
-                fieldClass,
-                expression,
-                false,
-                filterOperation,
-                operationValue,
-                conversionService);
+            fieldClass, expression, false, filterOperation, operationValue, conversionService);
       }
       return fc;
     } catch (NoSuchFieldException | SecurityException e) {
@@ -99,11 +94,13 @@ public abstract class AbstractPagingAndSortingController {
     if (filtering != null && !filtering.isEmpty()) {
       for (FilterCriteria fca : filtering.getFilterCriteriaList()) {
         // looping over a cloned list to change the original one w/o side effects
-        ((ArrayList<FilterCriterion>) fca.clone()).forEach(fc -> {
-            fca.remove(fc);
-            FilterCriterion typedFc = makeTypedFilterCriterion(fc, targetClass);
-            if (typedFc != null) fca.add(typedFc);
-          });
+        ((ArrayList<FilterCriterion>) fca.clone())
+            .forEach(
+                fc -> {
+                  fca.remove(fc);
+                  FilterCriterion typedFc = makeTypedFilterCriterion(fc, targetClass);
+                  if (typedFc != null) fca.add(typedFc);
+                });
       }
       resultingFiltering = filtering;
     }
@@ -114,10 +111,11 @@ public abstract class AbstractPagingAndSortingController {
 
       // TODO: add datalanguage to be able to validate that multilanguage fields in
       // filtercriteria have already "_language" (it is ".lang", right?) as suffix assigned...
-      List<FilterCriterion> typedCriterions = filterCriterions.parallelStream()
-          .map(fc -> makeTypedFilterCriterion(fc, targetClass))
-          .filter(fc -> fc != null)
-          .toList();
+      List<FilterCriterion> typedCriterions =
+          filterCriterions.parallelStream()
+              .map(fc -> makeTypedFilterCriterion(fc, targetClass))
+              .filter(fc -> fc != null)
+              .toList();
       resultingFiltering.add(FilterLogicalOperator.AND, typedCriterions);
     }
     pageRequest.setFiltering(resultingFiltering);

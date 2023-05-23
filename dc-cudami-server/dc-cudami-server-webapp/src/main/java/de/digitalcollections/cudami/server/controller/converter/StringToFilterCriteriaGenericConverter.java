@@ -33,8 +33,7 @@ import org.springframework.util.StringUtils;
  * @see de.digitalcollections.model.api.filter.enums.FilterOperation
  * @see de.digitalcollections.model.api.filter.FilterCriterion
  */
-public class StringToFilterCriteriaGenericConverter
-    implements GenericConverter {
+public class StringToFilterCriteriaGenericConverter implements GenericConverter {
 
   @Autowired private ConversionService conversionService;
 
@@ -51,7 +50,8 @@ public class StringToFilterCriteriaGenericConverter
     if (source == null) {
       return null;
     }
-    if (!(source instanceof String sourceString)) throw new IllegalArgumentException("`source` parameter must be of type `String`.");
+    if (!(source instanceof String sourceString))
+      throw new IllegalArgumentException("`source` parameter must be of type `String`.");
     sourceString = URLDecoder.decode(sourceString, StandardCharsets.UTF_8);
     if (!StringUtils.hasText(sourceString)) {
       return null;
@@ -87,10 +87,12 @@ public class StringToFilterCriteriaGenericConverter
     Matcher filterCriteriaStrings = Pattern.compile("[{](.+?)[}]").matcher(filter);
     Filtering result = new Filtering();
     while (filterCriteriaStrings.find()) {
-      List<String> criterionStrings = Arrays.stream(filterCriteriaStrings.group(1).split(";", 0))
-          .collect(Collectors.toCollection(ArrayList::new));
+      List<String> criterionStrings =
+          Arrays.stream(filterCriteriaStrings.group(1).split(";", 0))
+              .collect(Collectors.toCollection(ArrayList::new));
       // obtain the logical operator (and/or)
-      AtomicReference<FilterLogicalOperator> link = new AtomicReference<>(FilterLogicalOperator.AND);
+      AtomicReference<FilterLogicalOperator> link =
+          new AtomicReference<>(FilterLogicalOperator.AND);
       criterionStrings.parallelStream()
           .filter(s -> s.matches("(?iu)\\s*\\$[[:alpha:]]\\s*"))
           .findFirst()
@@ -98,14 +100,12 @@ public class StringToFilterCriteriaGenericConverter
               s -> {
                 link.set(
                     Optional.ofNullable(FilterLogicalOperator.fromUrlOperand(s.strip()))
-                      .orElse(FilterLogicalOperator.AND)
-                );
+                        .orElse(FilterLogicalOperator.AND));
                 criterionStrings.remove(s);
               });
       // build `FilterCriterion`s and add them to `Filtering`
-      List<FilterCriterion> criterions = criterionStrings.stream()
-        .map(this::buildFilterCriterion)
-        .toList();
+      List<FilterCriterion> criterions =
+          criterionStrings.stream().map(this::buildFilterCriterion).toList();
       result.add(link.get(), criterions);
     }
     return result;
@@ -153,7 +153,8 @@ public class StringToFilterCriteriaGenericConverter
     } else {
       // old style without expression part
       int separatorPosition =
-          filterSource.indexOf(':'); // index of the first occurrence of ":" (operation value may contain
+          filterSource.indexOf(
+              ':'); // index of the first occurrence of ":" (operation value may contain
       // ":", too...
       operationAcronym = filterSource.substring(0, separatorPosition);
       operationValue = filterSource.substring(separatorPosition + 1);
@@ -237,8 +238,10 @@ public class StringToFilterCriteriaGenericConverter
       Comparable<T> maxValue = null;
 
       // Convert
-      Comparable<T> value1 = (Comparable) conversionService.convert(operationValues[0], targetClass);
-      Comparable<T> value2 = (Comparable) conversionService.convert(operationValues[1], targetClass);
+      Comparable<T> value1 =
+          (Comparable) conversionService.convert(operationValues[0], targetClass);
+      Comparable<T> value2 =
+          (Comparable) conversionService.convert(operationValues[1], targetClass);
 
       if (value1 != null && value2 != null) {
         // Set min and max values

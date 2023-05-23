@@ -78,7 +78,11 @@ public abstract class AbstractUniqueObjectController<U extends UniqueObject>
   protected abstract UniqueObjectService<U> getService();
 
   protected PageResponse<U> find(
-      int pageNumber, int pageSize, List<Order> sortBy, List<FilterCriterion> filterCriteria, Filtering filtering)
+      int pageNumber,
+      int pageSize,
+      List<Order> sortBy,
+      List<FilterCriterion> filterCriteria,
+      Filtering filtering)
       throws ServiceException {
 
     PageRequest pageRequest =
