@@ -260,7 +260,7 @@ public class CollectionController extends AbstractEntityController<Collection> {
       throws ServiceException {
     return service.findRelatedCorporateBodies(
         buildExampleWithUuid(uuid),
-        createPageRequest(CorporateBody.class, 0, 0, null, filterCriteria, filtering)
+        createPageRequest(CorporateBody.class, 0, 1, null, filterCriteria, filtering)
             .getFiltering());
   }
 
