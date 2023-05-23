@@ -59,10 +59,10 @@ public class StringToFilterCriteriaGenericConverter implements GenericConverter 
       throw new IllegalArgumentException("No separator ':' found");
     }
 
-    if (targetType.equals(TypeDescriptor.valueOf(FilterCriterion.class))) {
+    if (targetType.getType().equals(FilterCriterion.class)) {
       return buildFilterCriterion(sourceString);
 
-    } else if (targetType.equals(TypeDescriptor.valueOf(Filtering.class))) {
+    } else if (targetType.getType().equals(Filtering.class)) {
       return buildFiltering(sourceString);
 
     } else {
@@ -99,7 +99,7 @@ public class StringToFilterCriteriaGenericConverter implements GenericConverter 
           .ifPresent(
               s -> {
                 link.set(
-                    Optional.ofNullable(FilterLogicalOperator.fromUrlOperand(s.strip()))
+                    Optional.ofNullable(FilterLogicalOperator.fromValue(s.strip().substring(1)))
                         .orElse(FilterLogicalOperator.AND));
                 criterionStrings.remove(s);
               });
