@@ -523,12 +523,13 @@ public class DigitalObjectServiceImpl extends EntityServiceImpl<DigitalObject>
             r -> {
               try {
                 Entity e = r.getSubject();
-                if (e instanceof CorporateBody) {
-                  e = corporateBodyService.getByExample((CorporateBody) e);
-                } else if (e instanceof Person) {
-                  e = personService.getByExample((Person) e);
+                switch (e.getIdentifiableObjectType()) {
+                  case CORPORATE_BODY -> r.setSubject(
+                      corporateBodyService.getByExample(
+                          CorporateBody.builder().uuid(e.getUuid()).build()));
+                  case PERSON -> r.setSubject(
+                      personService.getByExample(Person.builder().uuid(e.getUuid()).build()));
                 }
-                r.setSubject(e);
                 return r;
               } catch (ServiceException e) {
                 throw new RuntimeException(e);
