@@ -61,7 +61,17 @@ public abstract class AbstractPagingAndSortingController {
         String firstExpression = expressions[0];
         String secondExpression = expressions[1];
         Class<?> firstClass = getFieldType(targetClass, firstExpression);
-        fieldClass = getFieldType(firstClass, secondExpression);
+        try {
+          fieldClass = getFieldType(firstClass, secondExpression);
+        } catch (NoSuchFieldException e) {
+          // happens for e.g. `label.und-Latn` or `name.de-Latn`
+          LOGGER.info(
+              "Field {} in property {} (class {}) not found. Taking the latter one instead.",
+              secondExpression,
+              firstExpression,
+              targetClass.getSimpleName());
+          fieldClass = firstClass;
+        }
       } else if (expression.contains("_")) {
         basicExpression = expression.split("_")[0];
         fieldClass = getFieldType(targetClass, basicExpression);
@@ -80,15 +90,8 @@ public abstract class AbstractPagingAndSortingController {
     return null;
   }
 
-  protected PageRequest createPageRequest(
-      Class<?> targetClass,
-      int pageNumber,
-      int pageSize,
-      List<Order> sortBy,
-      List<FilterCriterion> filterCriterions,
-      Filtering filtering) {
-    PageRequest pageRequest = new PageRequest(pageNumber, pageSize);
-
+  protected Filtering mergeFilters(
+      Class<?> targetClass, Filtering filtering, List<FilterCriterion> filterCriterions) {
     Filtering resultingFiltering = null;
     // process `filtering` first
     if (filtering != null && !filtering.isEmpty()) {
@@ -118,8 +121,18 @@ public abstract class AbstractPagingAndSortingController {
               .toList();
       resultingFiltering.add(FilterLogicalOperator.AND, typedCriterions);
     }
-    pageRequest.setFiltering(resultingFiltering);
+    return resultingFiltering;
+  }
 
+  protected PageRequest createPageRequest(
+      Class<?> targetClass,
+      int pageNumber,
+      int pageSize,
+      List<Order> sortBy,
+      List<FilterCriterion> filterCriterions,
+      Filtering filtering) {
+    PageRequest pageRequest = new PageRequest(pageNumber, pageSize);
+    pageRequest.setFiltering(mergeFilters(targetClass, filtering, filterCriterions));
     // add sorting
     if (sortBy != null) {
       Sorting sorting = new Sorting(sortBy);

@@ -119,7 +119,7 @@ public class StringToFilterCriteriaGenericConverter implements GenericConverter 
     // TODO: remove old style, when no longer support is needed
     boolean newStyle = false;
     String[] filterParts = filterSource.split(":");
-    if (filterParts.length > 2) {
+    if (filterParts.length > 2 && FilterOperation.fromValue(filterParts[1]) != null) {
       newStyle = true;
     } else if (filterParts.length == 2) {
       // length = 2 could also be new style of no value operations (like "set",
