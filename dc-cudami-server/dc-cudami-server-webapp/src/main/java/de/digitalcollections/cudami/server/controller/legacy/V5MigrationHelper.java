@@ -4,9 +4,13 @@ import static de.digitalcollections.model.list.sorting.Direction.ASC;
 import static de.digitalcollections.model.list.sorting.Direction.DESC;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.openjson.JSONArray;
+import com.github.openjson.JSONException;
 import com.github.openjson.JSONObject;
+import de.digitalcollections.cudami.server.controller.legacy.model.LegacyFiltering;
+import de.digitalcollections.model.list.filtering.Filtering;
 import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.list.sorting.Direction;
 import de.digitalcollections.model.list.sorting.Order;
@@ -48,7 +52,8 @@ public class V5MigrationHelper {
     return migratedJson;
   }
 
-  public static String migrateToV5(JSONObject jsonObject, ObjectMapper objectMapper) {
+  public static String migrateToV5(JSONObject jsonObject, ObjectMapper objectMapper)
+      throws JsonMappingException, JsonProcessingException, JSONException {
     if (jsonObject == null) {
       return null;
     }
@@ -69,8 +74,16 @@ public class V5MigrationHelper {
           }
           pageRequest.put("sorting", migratedSorting);
         }
-        jsonObject.put("pageRequest", pageRequest);
       }
+      if (pageRequest.has("filtering")) {
+        LegacyFiltering legacyFiltering =
+            new LegacyFiltering(
+                objectMapper.readValue(
+                    pageRequest.getJSONObject("filtering").toString(), Filtering.class));
+        pageRequest.put(
+            "filtering", new JSONObject(objectMapper.writeValueAsString(legacyFiltering)));
+      }
+      jsonObject.put("pageRequest", pageRequest);
     }
 
     if (jsonObject.has("content")) {

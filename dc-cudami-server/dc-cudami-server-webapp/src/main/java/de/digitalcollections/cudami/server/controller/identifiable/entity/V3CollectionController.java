@@ -8,6 +8,7 @@ import de.digitalcollections.cudami.server.business.api.service.LocaleService;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.CollectionService;
 import de.digitalcollections.cudami.server.controller.legacy.V5MigrationHelper;
+import de.digitalcollections.cudami.server.controller.legacy.model.LegacyFiltering;
 import de.digitalcollections.model.identifiable.entity.Collection;
 import de.digitalcollections.model.identifiable.entity.Entity;
 import de.digitalcollections.model.identifiable.entity.digitalobject.DigitalObject;
@@ -336,6 +337,13 @@ public class V3CollectionController {
       throws JsonProcessingException {
     // Fix the attributes, which are missing or different in new model
     JSONObject result = new JSONObject(objectMapper.writeValueAsString(response));
+    if (response.getRequest() != null) {
+      LegacyFiltering legacyFiltering = new LegacyFiltering(response.getRequest().getFiltering());
+      JSONObject filteringJson = new JSONObject(objectMapper.writeValueAsString(legacyFiltering));
+      if (result.has("pageRequest")) {
+        result.getJSONObject("pageRequest").put("filtering", filteringJson);
+      }
+    }
     JSONArray digitalobjects = (JSONArray) result.get("content");
     for (Iterator it = digitalobjects.iterator(); it.hasNext(); ) {
       JSONObject digitalobject = (JSONObject) it.next();
