@@ -12,6 +12,7 @@ import de.digitalcollections.model.identifiable.entity.Collection;
 import de.digitalcollections.model.identifiable.entity.agent.CorporateBody;
 import de.digitalcollections.model.identifiable.entity.digitalobject.DigitalObject;
 import de.digitalcollections.model.list.filtering.FilterCriterion;
+import de.digitalcollections.model.list.filtering.FilterLogicalOperator;
 import de.digitalcollections.model.list.filtering.Filtering;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
@@ -255,13 +256,17 @@ public class CollectionController extends AbstractEntityController<Collection> {
   public List<CorporateBody> findRelatedCorporateBodies(
       @Parameter(example = "", description = "UUID of the collection") @PathVariable("uuid")
           UUID uuid,
+      @RequestParam(name = "predicate", required = false) FilterCriterion predicateFilter,
       @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria,
       @RequestParam(name = "filtering", required = false) Filtering filtering)
       throws ServiceException {
-    return service.findRelatedCorporateBodies(
-        buildExampleWithUuid(uuid),
-        createPageRequest(CorporateBody.class, 0, 1, null, filterCriteria, filtering)
-            .getFiltering());
+    Filtering resultingFiltering = mergeFilters(CorporateBody.class, filtering, filterCriteria);
+    if (predicateFilter != null) {
+      if (resultingFiltering == null) resultingFiltering = new Filtering();
+      predicateFilter.setExpression("predicate");
+      resultingFiltering.add(FilterLogicalOperator.AND, List.of(predicateFilter));
+    }
+    return service.findRelatedCorporateBodies(buildExampleWithUuid(uuid), resultingFiltering);
   }
 
   @Operation(

@@ -71,7 +71,7 @@ class SubjectControllerTest extends BaseControllerTest {
                 Filtering.builder()
                     .add(
                         FilterCriterion.builder()
-                            .withExpression("label_und-Latn")
+                            .withExpression("label.und-Latn")
                             .isEquals("\"Antike und Altertum\"")
                             .build())
                     .build())
@@ -92,7 +92,7 @@ class SubjectControllerTest extends BaseControllerTest {
                 Filtering.builder()
                     .add(
                         FilterCriterion.builder()
-                            .withExpression("label_und-Latn")
+                            .withExpression("label.und-Latn")
                             .contains("Antike")
                             .build())
                     .build())

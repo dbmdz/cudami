@@ -90,7 +90,7 @@ class PersonControllerTest extends BaseControllerTest {
                 Filtering.builder()
                     .add(
                         FilterCriterion.builder()
-                            .withExpression("label_und-Latn")
+                            .withExpression("label.und-Latn")
                             .isEquals("\"Karl Ranseier\"")
                             .build())
                     .build())
@@ -111,7 +111,7 @@ class PersonControllerTest extends BaseControllerTest {
                 Filtering.builder()
                     .add(
                         FilterCriterion.builder()
-                            .withExpression("label_und-Latn")
+                            .withExpression("label.und-Latn")
                             .contains("Karl Ranseier")
                             .build())
                     .build())
@@ -132,7 +132,7 @@ class PersonControllerTest extends BaseControllerTest {
                 Filtering.builder()
                     .add(
                         FilterCriterion.builder()
-                            .withExpression("name_de")
+                            .withExpression("name.de")
                             .isEquals("\"Karl Ranseier\"")
                             .build())
                     .build())
@@ -153,7 +153,7 @@ class PersonControllerTest extends BaseControllerTest {
                 Filtering.builder()
                     .add(
                         FilterCriterion.builder()
-                            .withExpression("name_und-Latn")
+                            .withExpression("name.und-Latn")
                             .contains("Karl Ranseier")
                             .build())
                     .build())
