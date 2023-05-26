@@ -16,6 +16,10 @@ import de.digitalcollections.model.identifiable.alias.LocalizedUrlAliases;
 import de.digitalcollections.model.identifiable.alias.UrlAlias;
 import de.digitalcollections.model.identifiable.entity.digitalobject.DigitalObject;
 import de.digitalcollections.model.identifiable.semantic.Subject;
+import de.digitalcollections.model.list.filtering.FilterCriterion;
+import de.digitalcollections.model.list.filtering.FilterLogicalOperator;
+import de.digitalcollections.model.list.filtering.FilterOperation;
+import de.digitalcollections.model.list.filtering.Filtering;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.list.sorting.Direction;
@@ -25,9 +29,12 @@ import de.digitalcollections.model.text.LocalizedStructuredContent;
 import de.digitalcollections.model.text.LocalizedText;
 import de.digitalcollections.model.text.StructuredContent;
 import de.digitalcollections.model.text.contentblock.Paragraph;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.IntStream;
@@ -396,5 +403,45 @@ class IdentifiableRepositoryImplTest
             new String[] {
               "an", "english", "label", "no", "1", "ein", "deutsches", "label", "nr", "2"
             });
+  }
+
+  @Test
+  @DisplayName("test where clause creation with OR")
+  void testGetWhereClauses() {
+    Filtering f =
+        Filtering.builder()
+            .filterCriterion(
+                FilterLogicalOperator.OR,
+                new FilterCriterion<String>("label.de-Latn", FilterOperation.CONTAINS, "some text"))
+            .filterCriterion(
+                FilterLogicalOperator.OR,
+                new FilterCriterion<String>(
+                    "description.de-Latn", FilterOperation.CONTAINS, "some text"))
+            .filterCriterion(
+                FilterLogicalOperator.AND,
+                new FilterCriterion<LocalDate>(
+                    "lastModified", FilterOperation.GREATER_THAN, LocalDate.of(2020, 1, 1)))
+            .build();
+    StringBuilder actual = new StringBuilder();
+    Map<String, Object> mappings = new HashMap<>();
+    repo.addFiltering(f, actual, mappings);
+    String expected =
+        " "
+            + """
+        WHERE (i.split_label::TEXT[] @> :searchTermArray_1::TEXT[]
+        OR jsonb_path_exists(i.description, ('$.\"de-Latn\" ? (@ like_regex \"' || :searchTerm_2 || '\" flag \"iq\")')::jsonpath))
+        AND ((i.last_modified > :filtervalue_3))"""
+                .replace("\n", " ");
+    assertThat(actual.toString()).isEqualTo(expected);
+    assertThat(mappings).size().isEqualTo(3);
+    assertThat(mappings)
+        .containsExactlyInAnyOrderEntriesOf(
+            Map.of(
+                "searchTermArray_1",
+                new String[] {"some", "text"},
+                "searchTerm_2",
+                "some text",
+                "filtervalue_3",
+                LocalDate.of(2020, 1, 1)));
   }
 }
