@@ -2,6 +2,9 @@ package de.digitalcollections.cudami.server.controller.converter;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifiableService;
+import de.digitalcollections.cudami.server.business.api.service.identifiable.alias.UrlAliasService;
+import de.digitalcollections.cudami.server.controller.identifiable.IdentifiableController;
 import de.digitalcollections.model.list.filtering.FilterCriterion;
 import de.digitalcollections.model.list.filtering.FilterLogicalOperator;
 import de.digitalcollections.model.list.filtering.FilterOperation;
@@ -9,13 +12,20 @@ import de.digitalcollections.model.list.filtering.Filtering;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.core.convert.TypeDescriptor;
 
-@SpringBootTest
+@WebMvcTest(controllers = IdentifiableController.class)
 class StringToFilterCriteriaGenericConverterTest {
 
   @Autowired private StringToFilterCriteriaGenericConverter converter;
+
+  // needed for the IdentifiableController (although we don't use it here)
+  @MockBean(name = "identifiableService")
+  private IdentifiableService identifiableService;
+
+  @MockBean private UrlAliasService urlAliasService;
 
   @Test
   @DisplayName("check supported types")
