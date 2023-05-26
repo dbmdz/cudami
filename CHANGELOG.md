@@ -18,6 +18,18 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
 - Added status storing of new tables (navigating back to list shows list in last status)
 - Added highlighting of searched term in result lists in new table lists on `Articles`, `DigitalObjects`, `Collections`
 - Add backend and GUI for `Event`
+- Add or-linked filtering: new request parameter `filtering` with new complex syntax:
+
+  - single conditions are separated by semicolon  
+    > `?filtering=lastname:eq:foo;age:gt:30` → lastname == "foo" AND age > 30
+  - …and can be surrounded by braces (we call them "FilterCriteria")  
+    > `?filtering={lastname:eq:foo;age:gt:30}` → same
+  - `$AND` and `$OR` determines how all of the conditions within braces are logically linked
+  - by default the FilterCriteria are linked by *AND*, so `$AND` can be omitted  
+    > `?filtering={lastname:eq:foo;age:gt:30}` is same as `?filtering={$AND;lastname:eq:foo;age:gt:30}`
+  - several FilterCriteria can be appended, seperated by semicolon; these FilterCriteria are always linked by *AND*  
+    > `?filtering={$OR;lastname:eq:foo;firstname:eq:foo};{age:gt:30}` → (lastname == "foo" OR firstname == "foo") AND age > 30  
+    > `?filtering={$OR;lastname:eq:foo;firstname:eq:foo};{$OR;age:gt:30;age:lt:20}` → (lastname == "foo" OR firstname == "foo") AND (age > 30 OR age < 20)
 
 ### Changed
 
