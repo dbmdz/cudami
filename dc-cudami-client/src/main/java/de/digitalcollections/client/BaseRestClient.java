@@ -5,7 +5,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
 import de.digitalcollections.model.exception.TechnicalException;
 import de.digitalcollections.model.exception.http.HttpErrorDecoder;
+import de.digitalcollections.model.list.filtering.FilterCriteria;
 import de.digitalcollections.model.list.filtering.FilterCriterion;
+import de.digitalcollections.model.list.filtering.FilterLogicalOperator;
 import de.digitalcollections.model.list.filtering.FilterOperation;
 import de.digitalcollections.model.list.filtering.Filtering;
 import de.digitalcollections.model.list.paging.PageRequest;
@@ -23,7 +25,9 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
@@ -233,9 +237,7 @@ public abstract class BaseRestClient<T extends Object> {
   protected List doGetRequestForObjectList(
       String requestUrl, Class<?> targetType, Filtering filtering) throws TechnicalException {
     if (filtering != null) {
-      requestUrl +=
-          (requestUrl.contains("?") ? "&" : "?")
-              + getFilterParamsAsString(filtering.getFilterCriteria());
+      requestUrl += (requestUrl.contains("?") ? "&" : "?") + getFilterParamsAsString(filtering);
     }
     HttpRequest req = createGetRequest(requestUrl);
     // TODO add creation of a request id if needed
@@ -271,7 +273,7 @@ public abstract class BaseRestClient<T extends Object> {
     requestUrl = requestUrl + findParams;
     Filtering filtering = pageRequest.getFiltering();
     if (filtering != null) {
-      requestUrl += "&" + getFilterParamsAsString(filtering.getFilterCriteria());
+      requestUrl += "&" + getFilterParamsAsString(filtering);
     }
 
     HttpRequest req = createGetRequest(requestUrl);
@@ -584,12 +586,12 @@ public abstract class BaseRestClient<T extends Object> {
     }
   }
 
-  public String filterCriterionToUrlParam(FilterCriterion filterCriterion) {
+  String filterCriterionToUrlParam(FilterCriterion filterCriterion) {
     String expression = filterCriterion.getExpression();
     boolean isNativeExpression = filterCriterion.isNativeExpression();
     FilterOperation operation = filterCriterion.getOperation();
     if (expression == null || operation == null) {
-      return "";
+      return null;
     }
     String operand;
     switch (operation.getOperandCount()) {
@@ -619,9 +621,9 @@ public abstract class BaseRestClient<T extends Object> {
     if (isNativeExpression) {
       expression = URLEncoder.encode("[" + expression + "]", StandardCharsets.UTF_8);
     }
-    // filter=expression:operation:operand (non native)
-    // filter=[expression]:operation:operand (native)
-    return "filter=" + expression + ":" + operation + ":" + operand;
+    // expression:operation:operand (non native)
+    // [expression]:operation:operand (native)
+    return expression + ":" + operation + ":" + operand;
   }
 
   /**
@@ -639,10 +641,41 @@ public abstract class BaseRestClient<T extends Object> {
    * @param filterCriterias a list of filter criterias
    * @return the filter criterias as request string
    */
-  private String getFilterParamsAsString(List<FilterCriterion> filterCriterias) {
-    return filterCriterias.stream()
-        .map(this::filterCriterionToUrlParam)
-        .collect(Collectors.joining("&"));
+  String getFilterParamsAsString(Filtering filtering) {
+    List<FilterCriteria> filterCriterias = filtering.getFilterCriteriaList();
+    // braces and logical link operator can be omitted if there is only one AND-linked
+    // `FilterCriteria`
+    final boolean simpleShape =
+        filterCriterias.size() == 1
+            && filterCriterias.get(0).getCriterionLink() == FilterLogicalOperator.AND;
+    // "{${{logicalLink}};{{criterias}}}"
+    final String criteriaTemplate =
+        URLEncoder.encode("{", StandardCharsets.UTF_8)
+            + "${{logicalLink}};{{criterias}}"
+            + URLEncoder.encode("}", StandardCharsets.UTF_8);
+    List<String> criteriaStrings = new ArrayList<>();
+    for (FilterCriteria criteria : filterCriterias) {
+      String criteriaString =
+          criteria.stream()
+              .filter(Objects::nonNull)
+              .map(this::filterCriterionToUrlParam)
+              .filter(Objects::nonNull)
+              .collect(
+                  Collectors.collectingAndThen(
+                      Collectors.joining(";"),
+                      s ->
+                          simpleShape
+                              ? s
+                              : criteriaTemplate
+                                  .replace(
+                                      "{{logicalLink}}",
+                                      Optional.ofNullable(criteria.getCriterionLink())
+                                          .orElse(FilterLogicalOperator.AND)
+                                          .getOperand())
+                                  .replace("{{criterias}}", s)));
+      criteriaStrings.add(criteriaString);
+    }
+    return "filtering=" + String.join(";", criteriaStrings);
   }
 
   /**
@@ -651,7 +684,7 @@ public abstract class BaseRestClient<T extends Object> {
    * @param pageRequest source for find params
    * @return the find params as request string
    */
-  private String getFindParamsAsString(PageRequest pageRequest) {
+  String getFindParamsAsString(PageRequest pageRequest) {
     int pageNumber = pageRequest.getPageNumber();
     int pageSize = pageRequest.getPageSize();
     StringBuilder findParams =
