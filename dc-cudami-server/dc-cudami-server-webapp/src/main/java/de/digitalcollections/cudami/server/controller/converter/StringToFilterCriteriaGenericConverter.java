@@ -94,7 +94,7 @@ public class StringToFilterCriteriaGenericConverter implements GenericConverter 
       AtomicReference<FilterLogicalOperator> link =
           new AtomicReference<>(FilterLogicalOperator.AND);
       criterionStrings.parallelStream()
-          .filter(s -> s.matches("(?iu)\\s*\\$[[:alpha:]]\\s*"))
+          .filter(s -> s.matches("(?iu)\\s*\\$\\p{Alpha}+\\s*"))
           .findFirst()
           .ifPresent(
               s -> {
