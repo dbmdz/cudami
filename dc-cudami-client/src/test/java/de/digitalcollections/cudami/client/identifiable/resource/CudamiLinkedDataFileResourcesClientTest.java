@@ -11,7 +11,6 @@ import de.digitalcollections.model.list.filtering.Filtering;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import java.nio.charset.StandardCharsets;
-import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -30,12 +29,12 @@ class CudamiLinkedDataFileResourcesClientTest
     Filtering filtering = new Filtering();
     FilterCriterion filterCriterion =
         new FilterCriterion("uri", FilterOperation.EQUALS, "http://foo.bar/bla.xml");
-    filtering.setFilterCriteria(List.of(filterCriterion));
+    filtering.add(filterCriterion);
     pageRequest.setFiltering(filtering);
     PageResponse<LinkedDataFileResource> response = client.find(pageRequest);
     assertThat(response).isNotNull();
 
     verifyHttpRequestByMethodAndRelativeURL(
-        "get", "?pageNumber=0&pageSize=0&filter=uri:eq:http%3A%2F%2Ffoo.bar%2Fbla.xml");
+        "get", "?pageNumber=0&pageSize=0&filtering=uri:eq:http%3A%2F%2Ffoo.bar%2Fbla.xml");
   }
 }

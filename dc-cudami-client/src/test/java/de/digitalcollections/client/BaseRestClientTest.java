@@ -8,6 +8,9 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import de.digitalcollections.model.list.filtering.FilterCriterion;
+import de.digitalcollections.model.list.filtering.FilterLogicalOperator;
+import de.digitalcollections.model.list.filtering.Filtering;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.ParameterizedType;
@@ -16,11 +19,14 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.ByteBuffer;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Flow;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
 public abstract class BaseRestClientTest<T extends Object, C extends BaseRestClient<T>> {
@@ -64,6 +70,70 @@ public abstract class BaseRestClientTest<T extends Object, C extends BaseRestCli
     when(httpResponse.statusCode()).thenReturn(200);
     when(httpClient.send(any(HttpRequest.class), any(HttpResponse.BodyHandler.class)))
         .thenReturn(httpResponse);
+  }
+
+  @Test
+  @DisplayName("params for filtering")
+  protected void testFilteringParams() {
+    LocalDate date = LocalDate.now();
+    FilterCriterion fcDate =
+        FilterCriterion.builder().withExpression("lastModified").isEquals(date).build();
+    String expDate = String.format("lastModified:eq:%s", date.toString());
+    assertThat(client.filterCriterionToUrlParam(fcDate)).isEqualTo(expDate);
+  }
+
+  @Test
+  @DisplayName("complex Filtering with OR")
+  protected void testComplexFilterParams() {
+    Filtering filtering =
+        Filtering.builder()
+            .filterCriterion(
+                FilterLogicalOperator.OR,
+                FilterCriterion.builder()
+                    .withExpression("label.und-Latn")
+                    .contains("some search text")
+                    .build())
+            .filterCriterion(
+                FilterLogicalOperator.OR,
+                FilterCriterion.builder()
+                    .withExpression("description.und-Latn")
+                    .contains("some search text")
+                    .build())
+            .filterCriterion(
+                FilterLogicalOperator.AND,
+                FilterCriterion.builder().withExpression("active").isEquals(true).build())
+            .build();
+    String expected =
+        "filtering=%7B$OR;label.und-Latn:like:some+search+text;description.und-Latn:like:some+search+text%7D;%7B$AND;active:eq:true%7D";
+    assertThat(client.getFilterParamsAsString(filtering)).isEqualTo(expected);
+  }
+
+  @Test
+  @DisplayName("simple Filtering syntax")
+  protected void testSimpleFilterParams() {
+    LocalDate date1 = LocalDate.now();
+    LocalDate date2 = LocalDate.now().plusWeeks(1);
+    Filtering filtering =
+        Filtering.builder()
+            .filterCriterion(
+                FilterLogicalOperator.AND,
+                FilterCriterion.builder()
+                    .withExpression("label.und-Latn")
+                    .contains("some search text")
+                    .build())
+            .filterCriterion(
+                FilterLogicalOperator.AND,
+                FilterCriterion.builder()
+                    .withExpression("lastModified")
+                    .between(date1, date2)
+                    .build())
+            .build();
+    String expected =
+        "filtering=label.und-Latn:like:some+search+text;lastModified:btn:"
+            + date1.toString()
+            + ","
+            + date2.toString();
+    assertThat(client.getFilterParamsAsString(filtering)).isEqualTo(expected);
   }
 
   protected void verifyHttpRequestByMethodAndRelativeURL(String method, String url)
