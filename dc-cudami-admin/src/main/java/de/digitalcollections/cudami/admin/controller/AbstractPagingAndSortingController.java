@@ -45,6 +45,7 @@ public abstract class AbstractPagingAndSortingController extends AbstractControl
     btRequest.setSorting(sorting);
 
     // add filtering
+    // FIXME: add filtering by description additionally to label
     Filtering filtering = createFiltering(targetClass, searchProperty, searchTerm, dataLanguage);
     btRequest.setFiltering(filtering);
     return btRequest;
@@ -57,11 +58,11 @@ public abstract class AbstractPagingAndSortingController extends AbstractControl
     if (searchProperty != null && searchTerm != null && targetClass != null) {
       String expression = searchProperty;
       if (isMultiLanguageField(targetClass, searchProperty)) {
+        // FIXME: Does `dataLanguage` contain the script, e.g. "de-Latn"? What about the DB?
         dataLanguage = getDataLanguage(dataLanguage, languageService);
-        // convention: add datalanguage as "sub"-expression to expression (safe, as
-        // properties in Java do not have "_" in name) - to be handled later on
+        // convention: add datalanguage as "sub"-expression to expression - to be handled later on
         // serverside
-        expression = expression + "_" + dataLanguage;
+        expression += "." + dataLanguage;
       }
       // TODO: default operation is "contains" for now, maybe pass other operators
       // (controller) if
