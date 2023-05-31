@@ -189,14 +189,13 @@ public abstract class UniqueObjectRepositoryImpl<U extends UniqueObject>
                 (Handle handle) -> handle.createQuery(sql).mapToBean(uniqueObjectImplClass).list());
       }
       // bindings != null && basicReduceRowsBiConsumer != null
-      return (List<U>)
-          dbi.withHandle(
-              (Handle handle) ->
-                  handle
-                      .createQuery(sql)
-                      .bindMap(bindings)
-                      .reduceRows(basicReduceRowsBiConsumer)
-                      .collect(Collectors.toList()));
+      return dbi.withHandle(
+          (Handle handle) ->
+              handle
+                  .createQuery(sql)
+                  .bindMap(bindings)
+                  .reduceRows(basicReduceRowsBiConsumer)
+                  .collect(Collectors.toList()));
     } catch (StatementException e) {
       String detailMessage = e.getCause() != null ? e.getCause().getMessage() : e.getMessage();
       throw new RepositoryException(
@@ -268,7 +267,7 @@ public abstract class UniqueObjectRepositoryImpl<U extends UniqueObject>
   @Override
   public U getByUuidAndFiltering(UUID uuid, Filtering filtering) throws RepositoryException {
     if (filtering == null) {
-      filtering = Filtering.builder().build();
+      filtering = new Filtering();
     }
     filtering.add(FilterCriterion.builder().withExpression("uuid").isEquals(uuid).build());
 

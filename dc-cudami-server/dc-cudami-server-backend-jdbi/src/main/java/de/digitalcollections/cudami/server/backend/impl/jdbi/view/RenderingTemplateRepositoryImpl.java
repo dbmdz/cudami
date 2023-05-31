@@ -4,9 +4,7 @@ import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
 import de.digitalcollections.cudami.server.backend.api.repository.view.RenderingTemplateRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.UniqueObjectRepositoryImpl;
-import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.SearchTermTemplates;
 import de.digitalcollections.model.view.RenderingTemplate;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
@@ -79,14 +77,6 @@ public class RenderingTemplateRepositoryImpl extends UniqueObjectRepositoryImpl<
   @Override
   public List<RenderingTemplate> getRandom(int count) throws RepositoryException {
     throw new UnsupportedOperationException(); // TODO: not yet implemented
-  }
-
-  @Override
-  protected List<String> getSearchTermTemplates(String tableAlias, String originalSearchTerm) {
-    return new ArrayList<>(
-        Arrays.asList(
-            SearchTermTemplates.ILIKE_SEARCH.renderTemplate(tableAlias, "name"),
-            SearchTermTemplates.JSONB_PATH.renderTemplate(tableAlias, "label", "**")));
   }
 
   @Override

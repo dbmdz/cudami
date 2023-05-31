@@ -12,6 +12,7 @@ import de.digitalcollections.model.identifiable.alias.LocalizedUrlAliases;
 import de.digitalcollections.model.identifiable.alias.UrlAlias;
 import de.digitalcollections.model.identifiable.entity.Website;
 import de.digitalcollections.model.list.filtering.FilterCriterion;
+import de.digitalcollections.model.list.filtering.Filtering;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.list.sorting.Order;
@@ -97,10 +98,12 @@ public class UrlAliasController extends AbstractPagingAndSortingController {
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
-      @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria)
+      @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria,
+      @RequestParam(name = "filtering", required = false) Filtering filtering)
       throws CudamiControllerException {
     PageRequest pageRequest =
-        createPageRequest(LocalizedUrlAliases.class, pageNumber, pageSize, sortBy, filterCriteria);
+        createPageRequest(
+            LocalizedUrlAliases.class, pageNumber, pageSize, sortBy, filterCriteria, filtering);
     PageResponse<LocalizedUrlAliases> result;
     try {
       result = service.findLocalizedUrlAliases(pageRequest);

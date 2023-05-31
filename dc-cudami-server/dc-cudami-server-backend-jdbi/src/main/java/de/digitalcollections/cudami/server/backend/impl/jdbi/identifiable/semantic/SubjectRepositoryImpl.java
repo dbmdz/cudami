@@ -223,9 +223,12 @@ public class SubjectRepositoryImpl extends UniqueObjectRepositoryImpl<Subject>
   }
 
   @Override
-  protected boolean hasSplitColumn(String basicExpression) {
+  protected boolean hasSplitColumn(String propertyName) {
     // only label for now
-    return "label".equals(basicExpression);
+    return switch (propertyName) {
+      case "label" -> true;
+      default -> super.hasSplitColumn(propertyName);
+    };
   }
 
   @Override

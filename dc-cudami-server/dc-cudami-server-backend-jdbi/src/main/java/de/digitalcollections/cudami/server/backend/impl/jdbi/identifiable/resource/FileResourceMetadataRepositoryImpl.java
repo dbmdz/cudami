@@ -5,10 +5,8 @@ import de.digitalcollections.cudami.server.backend.api.repository.identifiable.I
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.alias.UrlAliasRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.resource.FileResourceMetadataRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.IdentifiableRepositoryImpl;
-import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.SearchTermTemplates;
 import de.digitalcollections.model.identifiable.resource.FileResource;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import org.jdbi.v3.core.Jdbi;
 import org.slf4j.Logger;
@@ -90,16 +88,6 @@ public class FileResourceMetadataRepositoryImpl<F extends FileResource>
       default:
         return super.getColumnName(modelProperty);
     }
-  }
-
-  @Override
-  protected List<String> getSearchTermTemplates(String tblAlias, String originalSearchTerm) {
-    if (originalSearchTerm == null) {
-      return Collections.EMPTY_LIST;
-    }
-    List<String> searchTermTemplates = super.getSearchTermTemplates(tblAlias, originalSearchTerm);
-    searchTermTemplates.add(SearchTermTemplates.ILIKE_SEARCH.renderTemplate(tblAlias, "filename"));
-    return searchTermTemplates;
   }
 
   @Override

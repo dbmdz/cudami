@@ -84,7 +84,6 @@ public class WorkServiceImpl extends EntityServiceImpl<Work> implements WorkServ
     try {
       List<EntityRelation> entityRelations = work.getRelations();
       entityRelationService.setEntityRelations(work, entityRelations, true);
-      work.setRelations(entityRelations);
     } catch (ServiceException e) {
       throw new ServiceException("Cannot save Work=" + work + ": " + e, e);
     }
@@ -96,7 +95,6 @@ public class WorkServiceImpl extends EntityServiceImpl<Work> implements WorkServ
     try {
       List<EntityRelation> entityRelations = work.getRelations();
       entityRelationService.setEntityRelations(work, entityRelations, false);
-      work.setRelations(entityRelations);
     } catch (ServiceException e) {
       throw new ServiceException("Cannot update Work=" + work + ": " + e, e);
     }

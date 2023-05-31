@@ -35,9 +35,7 @@ import de.digitalcollections.model.semantic.Tag;
 import de.digitalcollections.model.text.LocalizedText;
 import java.net.URI;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -197,6 +195,7 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
     };
   }
 
+  @Override
   protected BiConsumer<Map<UUID, I>, RowView> createFullReduceRowsBiConcumer() {
     return (map, rowView) -> {
       I identifiable =
@@ -242,15 +241,6 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
     identifierRepository.delete(identifiable.getIdentifiers());
     return true;
   }
-
-  // FIXME delete
-  // @Override
-  // protected String addSearchTermMappings(String searchTerm, Map<String, Object>
-  // argumentMappings) {
-  // argumentMappings.put(SearchTermTemplates.ARRAY_CONTAINS.placeholder,
-  // splitToArray(searchTerm));
-  // return super.addSearchTermMappings(searchTerm, argumentMappings);
-  // }
 
   /**
    * Extend the reduced Identifiable by the contents of the provided RowView
@@ -460,21 +450,6 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
   }
 
   @Override
-  protected List<String> getSearchTermTemplates(String tableAlias, String originalSearchTerm) {
-    if (originalSearchTerm == null) {
-      return Collections.EMPTY_LIST;
-    }
-    List<String> templates = new ArrayList<>(2);
-    if (originalSearchTerm.matches("\".+\"")) {
-      templates.add(SearchTermTemplates.JSONB_PATH.renderTemplate(tableAlias, "label", "**"));
-    } else {
-      templates.add(SearchTermTemplates.ARRAY_CONTAINS.renderTemplate(tableAlias, "split_label"));
-    }
-    templates.add(SearchTermTemplates.JSONB_PATH.renderTemplate(tableAlias, "description", "**"));
-    return templates;
-  }
-
-  @Override
   protected String getSqlInsertFields() {
     return super.getSqlInsertFields()
         + ", "
@@ -535,10 +510,13 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
         + ", tags_uuids=:tags_uuids::UUID[], subjects_uuids=:subjects_uuids::UUID[]";
   }
 
-  // FIXME: delete when proper jsonb contains search implemented
+  @Override
   protected boolean hasSplitColumn(String propertyName) {
     // only label for now
-    return "label".equals(propertyName);
+    return switch (propertyName) {
+      case "label" -> true;
+      default -> super.hasSplitColumn(propertyName);
+    };
   }
 
   @Override
@@ -621,6 +599,7 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
     return result;
   }
 
+  @Override
   public List<I> retrieveList(
       String fieldsSql,
       StringBuilder innerQuery,
@@ -727,6 +706,7 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
     return result;
   }
 
+  @Override
   public void save(
       I identifiable,
       Map<String, Object> bindings,
@@ -912,6 +892,7 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
     }
   }
 
+  @Override
   public void update(
       I identifiable,
       Map<String, Object> bindings,

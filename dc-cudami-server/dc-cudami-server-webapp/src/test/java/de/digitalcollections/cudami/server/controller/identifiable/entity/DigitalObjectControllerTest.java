@@ -78,7 +78,9 @@ class DigitalObjectControllerTest extends BaseControllerTest {
   @ParameterizedTest
   @ValueSource(
       strings = {
-        "/v6/digitalobjects?pageNumber=0&pageSize=10000&filter=[parent_uuid]:eq:1c419226-8d61-4efa-923a-7fbaf961eb9d"
+        "/v6/digitalobjects?pageNumber=0&pageSize=10000&filter=[parent_uuid]:eq:1c419226-8d61-4efa-923a-7fbaf961eb9d",
+        "/v6/digitalobjects?pageNumber=0&pageSize=10000&filtering=[parent_uuid]:eq:1c419226-8d61-4efa-923a-7fbaf961eb9d",
+        "/v6/digitalobjects?pageNumber=0&pageSize=10000&filtering=%7B$AND;[parent_uuid]:eq:1c419226-8d61-4efa-923a-7fbaf961eb9d%7D"
       })
   public void filterByParentUUID(String path) throws Exception {
     String parentUuidStr = "1c419226-8d61-4efa-923a-7fbaf961eb9d";
@@ -89,7 +91,7 @@ class DigitalObjectControllerTest extends BaseControllerTest {
     expectedPageRequest.setPageNumber(0);
     FilterCriterion filterCriterion =
         new FilterCriterion("parent_uuid", true, FilterOperation.EQUALS, parentUuidStr);
-    Filtering filtering = new Filtering(List.of(filterCriterion));
+    Filtering filtering = Filtering.builder().add(filterCriterion).build();
     expectedPageRequest.setFiltering(filtering);
 
     PageResponse<DigitalObject> expected = new PageResponse<>();

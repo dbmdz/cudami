@@ -8,6 +8,7 @@ import de.digitalcollections.cudami.server.controller.ParameterHelper;
 import de.digitalcollections.cudami.server.controller.identifiable.AbstractIdentifiableController;
 import de.digitalcollections.model.identifiable.agent.FamilyName;
 import de.digitalcollections.model.list.filtering.FilterCriterion;
+import de.digitalcollections.model.list.filtering.Filtering;
 import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.list.sorting.Order;
 import io.swagger.v3.oas.annotations.Operation;
@@ -40,6 +41,7 @@ public class FamilyNameController extends AbstractIdentifiableController<FamilyN
     this.service = familyNameservice;
   }
 
+  @Override
   @Operation(summary = "Get all family names as (paged, sorted, filtered) list")
   @GetMapping(
       value = {"/v6/familynames"},
@@ -48,9 +50,10 @@ public class FamilyNameController extends AbstractIdentifiableController<FamilyN
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
-      @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria)
+      @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria,
+      @RequestParam(name = "filtering", required = false) Filtering filtering)
       throws ServiceException {
-    return super.find(pageNumber, pageSize, sortBy, filterCriteria);
+    return super.find(pageNumber, pageSize, sortBy, filterCriteria, filtering);
   }
 
   @Operation(
@@ -109,6 +112,7 @@ public class FamilyNameController extends AbstractIdentifiableController<FamilyN
     }
   }
 
+  @Override
   @Operation(summary = "Get languages of all family names")
   @GetMapping(
       value = {"/v6/familynames/languages"},
@@ -122,6 +126,7 @@ public class FamilyNameController extends AbstractIdentifiableController<FamilyN
     return service;
   }
 
+  @Override
   @Operation(summary = "save a newly created family")
   @PostMapping(
       value = {"/v6/familynames", "/v5/familynames"},
@@ -131,6 +136,7 @@ public class FamilyNameController extends AbstractIdentifiableController<FamilyN
     return super.save(familyName, errors);
   }
 
+  @Override
   @Operation(summary = "update a familyname")
   @PutMapping(
       value = {

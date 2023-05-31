@@ -10,7 +10,6 @@ import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
-import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -118,14 +117,7 @@ public class EntityToEntityRelationServiceImpl implements EntityToEntityRelation
     }
 
     // save all entity relations and set the UUID of the object
-    List<EntityRelation> relationsToSave =
-        relations.stream()
-            .map(
-                r -> {
-                  r.setObject(extractEntityWithUuidOnly(entity));
-                  return r;
-                })
-            .collect(Collectors.toList());
-    save(relationsToSave);
+    relations.stream().forEach(r -> r.setObject(extractEntityWithUuidOnly(entity)));
+    save(relations);
   }
 }

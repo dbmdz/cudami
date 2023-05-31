@@ -79,10 +79,11 @@ public class HeadwordController extends AbstractUniqueObjectController<Headword>
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
-      @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria)
+      @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria,
+      @RequestParam(name = "filtering", required = false) Filtering filtering)
       throws ServiceException {
     PageRequest pageRequest =
-        createPageRequest(Headword.class, pageNumber, pageSize, sortBy, filterCriteria);
+        createPageRequest(Headword.class, pageNumber, pageSize, sortBy, filterCriteria, filtering);
     if (filterCriteria != null) {
       Optional<FilterCriterion> localeCriterionOpt =
           filterCriteria.stream().filter(p -> "locale".equals(p.getExpression())).findAny();

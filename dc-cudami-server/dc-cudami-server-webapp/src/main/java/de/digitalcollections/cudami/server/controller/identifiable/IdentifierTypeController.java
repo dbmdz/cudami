@@ -8,6 +8,7 @@ import de.digitalcollections.cudami.server.controller.AbstractUniqueObjectContro
 import de.digitalcollections.cudami.server.controller.ParameterHelper;
 import de.digitalcollections.model.identifiable.IdentifierType;
 import de.digitalcollections.model.list.filtering.FilterCriterion;
+import de.digitalcollections.model.list.filtering.Filtering;
 import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.list.sorting.Order;
 import io.swagger.v3.oas.annotations.Operation;
@@ -36,6 +37,7 @@ public class IdentifierTypeController extends AbstractUniqueObjectController<Ide
     this.service = identifierTypeService;
   }
 
+  @Override
   @Operation(summary = "Get all identifier types as (paged, sorted, filtered) list")
   @GetMapping(
       value = {"/v6/identifiertypes"},
@@ -44,9 +46,10 @@ public class IdentifierTypeController extends AbstractUniqueObjectController<Ide
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
-      @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria)
+      @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria,
+      @RequestParam(name = "filtering", required = false) Filtering filtering)
       throws ServiceException {
-    return super.find(pageNumber, pageSize, sortBy, filterCriteria);
+    return super.find(pageNumber, pageSize, sortBy, filterCriteria, filtering);
   }
 
   @Operation(summary = "get identifier type by namespace (which is unique)")
@@ -60,6 +63,7 @@ public class IdentifierTypeController extends AbstractUniqueObjectController<Ide
         identifierType, identifierType != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
   }
 
+  @Override
   @Operation(summary = "get identifier type by uuid")
   @GetMapping(
       value = {
@@ -78,6 +82,7 @@ public class IdentifierTypeController extends AbstractUniqueObjectController<Ide
     return service;
   }
 
+  @Override
   @Operation(summary = "save a newly created identifier type")
   @PostMapping(
       value = {
@@ -92,6 +97,7 @@ public class IdentifierTypeController extends AbstractUniqueObjectController<Ide
     return super.save(identifierType, errors);
   }
 
+  @Override
   @Operation(summary = "update an identifier type")
   @PutMapping(
       value = {

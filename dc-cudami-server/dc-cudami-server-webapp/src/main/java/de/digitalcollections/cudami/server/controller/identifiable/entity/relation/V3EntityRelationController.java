@@ -6,6 +6,7 @@ import com.github.openjson.JSONArray;
 import com.github.openjson.JSONObject;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.relation.EntityToEntityRelationService;
+import de.digitalcollections.cudami.server.controller.legacy.model.LegacyFiltering;
 import de.digitalcollections.model.identifiable.entity.relation.EntityRelation;
 import de.digitalcollections.model.list.filtering.FilterCriterion;
 import de.digitalcollections.model.list.filtering.Filtering;
@@ -107,6 +108,12 @@ public class V3EntityRelationController {
           "className",
           "de.digitalcollections.model.impl.identifiable.entity.relation.EntityRelationImpl");
     }
+    JSONObject responsePageRequest = result.getJSONObject("pageRequest");
+    responsePageRequest.put(
+        "filtering",
+        new JSONObject(
+            objectMapper.writeValueAsString(
+                new LegacyFiltering(response.getRequest().getFiltering()))));
 
     return new ResponseEntity<>(result.toString(), HttpStatus.OK);
   }

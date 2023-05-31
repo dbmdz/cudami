@@ -4,13 +4,11 @@ import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
 import de.digitalcollections.cudami.server.backend.api.repository.security.UserRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.UniqueObjectRepositoryImpl;
-import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.SearchTermTemplates;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.security.Role;
 import de.digitalcollections.model.security.User;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -157,15 +155,6 @@ public class UserRepositoryImpl extends UniqueObjectRepositoryImpl<User> impleme
   @Override
   public List<User> getRandom(int count) throws RepositoryException {
     throw new UnsupportedOperationException(); // TODO: not yet implemented
-  }
-
-  @Override
-  protected List<String> getSearchTermTemplates(String tableAlias, String originalSearchTerm) {
-    return new ArrayList<>(
-        Arrays.asList(
-            SearchTermTemplates.ILIKE_SEARCH.renderTemplate(tableAlias, "email"),
-            SearchTermTemplates.ILIKE_SEARCH.renderTemplate(tableAlias, "firstname"),
-            SearchTermTemplates.ILIKE_SEARCH.renderTemplate(tableAlias, "lastname")));
   }
 
   @Override

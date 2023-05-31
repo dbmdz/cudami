@@ -28,7 +28,7 @@ class CudamiDigitalObjectsClientTest
         "get",
         "/"
             + uuid
-            + "/collections?active=true&pageNumber=1&pageSize=2&sortBy=sortable.desc.nullsfirst.ignorecase&filter=foo:eq:bar&filter=gnarf:eq:krchch");
+            + "/collections?active=true&pageNumber=1&pageSize=2&sortBy=sortable.desc.nullsfirst.ignorecase&filtering=foo:eq:bar;gnarf:eq:krchch");
   }
 
   @Test
@@ -40,7 +40,7 @@ class CudamiDigitalObjectsClientTest
         "get",
         "/"
             + uuid
-            + "/collections?pageNumber=1&pageSize=2&sortBy=sortable.desc.nullsfirst.ignorecase&filter=foo:eq:bar&filter=gnarf:eq:krchch");
+            + "/collections?pageNumber=1&pageSize=2&sortBy=sortable.desc.nullsfirst.ignorecase&filtering=foo:eq:bar;gnarf:eq:krchch");
   }
 
   @Test
@@ -101,7 +101,7 @@ class CudamiDigitalObjectsClientTest
         "get",
         "/"
             + uuid
-            + "/projects?pageNumber=1&pageSize=2&sortBy=sortable.desc.nullsfirst.ignorecase&filter=foo:eq:bar&filter=gnarf:eq:krchch");
+            + "/projects?pageNumber=1&pageSize=2&sortBy=sortable.desc.nullsfirst.ignorecase&filtering=foo:eq:bar;gnarf:eq:krchch");
   }
 
   @Test
@@ -126,6 +126,6 @@ class CudamiDigitalObjectsClientTest
     client.getAllForParent(parent);
 
     verifyHttpRequestByMethodAndRelativeURL(
-        "get", "?pageNumber=0&pageSize=10000&filter=parent.uuid:eq:" + parent.getUuid());
+        "get", "?pageNumber=0&pageSize=10000&filtering=parent.uuid:eq:" + parent.getUuid());
   }
 }

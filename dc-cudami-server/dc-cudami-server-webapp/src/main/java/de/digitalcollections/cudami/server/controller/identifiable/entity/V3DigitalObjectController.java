@@ -6,6 +6,7 @@ import com.github.openjson.JSONArray;
 import com.github.openjson.JSONObject;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.DigitalObjectService;
+import de.digitalcollections.cudami.server.controller.legacy.model.LegacyFiltering;
 import de.digitalcollections.model.identifiable.entity.Collection;
 import de.digitalcollections.model.identifiable.entity.Project;
 import de.digitalcollections.model.identifiable.entity.digitalobject.DigitalObject;
@@ -116,7 +117,12 @@ public class V3DigitalObjectController {
       website.put(
           "className", "de.digitalcollections.model.impl.identifiable.entity.CollectionImpl");
     }
-
+    JSONObject pageRequest = result.getJSONObject("pageRequest");
+    pageRequest.put(
+        "filtering",
+        new JSONObject(
+            objectMapper.writeValueAsString(
+                new LegacyFiltering(response.getRequest().getFiltering()))));
     String resultStr = result.toString();
 
     // TODO replace "query"

@@ -144,7 +144,7 @@ class V5DigitalObjectControllerTest extends BaseControllerTest {
     expectedPageRequest.setPageSize(10000);
     expectedPageRequest.setPageNumber(0);
     FilterCriterion filterCriterion =
-        new FilterCriterion("parent.uuid", FilterOperation.EQUALS, parentUuid);
+        new FilterCriterion("parent.uuid", FilterOperation.EQUALS, parentUuid.toString());
     Filtering filtering = new Filtering(List.of(filterCriterion));
     expectedPageRequest.setFiltering(filtering);
 

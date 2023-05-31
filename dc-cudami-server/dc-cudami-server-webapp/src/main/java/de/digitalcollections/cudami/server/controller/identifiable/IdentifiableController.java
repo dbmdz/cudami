@@ -9,6 +9,7 @@ import de.digitalcollections.cudami.server.controller.ParameterHelper;
 import de.digitalcollections.model.identifiable.Identifiable;
 import de.digitalcollections.model.identifiable.alias.LocalizedUrlAliases;
 import de.digitalcollections.model.list.filtering.FilterCriterion;
+import de.digitalcollections.model.list.filtering.Filtering;
 import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.list.sorting.Order;
 import io.swagger.v3.oas.annotations.Operation;
@@ -40,6 +41,7 @@ public class IdentifiableController extends AbstractIdentifiableController<Ident
     this.urlAliasService = urlAliasService;
   }
 
+  @Override
   @Operation(summary = "Get all identifiables as (paged, sorted, filtered) list")
   @GetMapping(
       value = {
@@ -53,9 +55,10 @@ public class IdentifiableController extends AbstractIdentifiableController<Ident
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
-      @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria)
+      @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria,
+      @RequestParam(name = "filtering", required = false) Filtering filtering)
       throws ServiceException {
-    return super.find(pageNumber, pageSize, sortBy, filterCriteria);
+    return super.find(pageNumber, pageSize, sortBy, filterCriteria, filtering);
   }
 
   @Operation(
@@ -76,6 +79,7 @@ public class IdentifiableController extends AbstractIdentifiableController<Ident
     return super.getByIdentifier(request);
   }
 
+  @Override
   @Operation(summary = "Get identifiable by uuid")
   @GetMapping(
       value = {

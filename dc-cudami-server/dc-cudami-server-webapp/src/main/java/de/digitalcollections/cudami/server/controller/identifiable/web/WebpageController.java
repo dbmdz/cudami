@@ -11,6 +11,7 @@ import de.digitalcollections.model.identifiable.entity.Website;
 import de.digitalcollections.model.identifiable.resource.FileResource;
 import de.digitalcollections.model.identifiable.web.Webpage;
 import de.digitalcollections.model.list.filtering.FilterCriterion;
+import de.digitalcollections.model.list.filtering.Filtering;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.list.sorting.Order;
@@ -77,9 +78,10 @@ public class WebpageController extends AbstractIdentifiableController<Webpage> {
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
-      @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria)
+      @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria,
+      @RequestParam(name = "filtering", required = false) Filtering filtering)
       throws ServiceException {
-    return super.find(pageNumber, pageSize, sortBy, filterCriteria);
+    return super.find(pageNumber, pageSize, sortBy, filterCriteria, filtering);
   }
 
   @Operation(summary = "Get all (active) children of a webpage as (paged, sorted, filtered) list")
@@ -97,10 +99,11 @@ public class WebpageController extends AbstractIdentifiableController<Webpage> {
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
       @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria,
+      @RequestParam(name = "filtering", required = false) Filtering filtering,
       @RequestParam(name = "active", required = false) String active)
       throws ServiceException {
     PageRequest pageRequest =
-        createPageRequest(Webpage.class, pageNumber, pageSize, sortBy, filterCriteria);
+        createPageRequest(Webpage.class, pageNumber, pageSize, sortBy, filterCriteria, filtering);
     if (active != null) {
       return service.findActiveChildren(buildExampleWithUuid(uuid), pageRequest);
     }

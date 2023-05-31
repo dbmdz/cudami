@@ -79,7 +79,7 @@ class PersonControllerTest extends BaseControllerTest {
 
   @DisplayName("can retrieve by localized exact label")
   @ParameterizedTest
-  @ValueSource(strings = {"/v6/persons?filter=label_und-Latn:eq:\"Karl Ranseier\""})
+  @ValueSource(strings = {"/v6/persons?filter=label.und-Latn:eq:\"Karl Ranseier\""})
   public void findByLocalizedExactLabel(String path) throws Exception {
     testHttpGet(path);
     PageRequest expectedPageRequest =
@@ -90,7 +90,7 @@ class PersonControllerTest extends BaseControllerTest {
                 Filtering.builder()
                     .add(
                         FilterCriterion.builder()
-                            .withExpression("label_und-Latn")
+                            .withExpression("label.und-Latn")
                             .isEquals("\"Karl Ranseier\"")
                             .build())
                     .build())
@@ -100,7 +100,7 @@ class PersonControllerTest extends BaseControllerTest {
 
   @DisplayName("can retrieve by localized 'like' label")
   @ParameterizedTest
-  @ValueSource(strings = {"/v6/persons?filter=label_und-Latn:like:Karl Ranseier"})
+  @ValueSource(strings = {"/v6/persons?filter=label.und-Latn:like:Karl Ranseier"})
   public void findByLocalizedLikeLabel(String path) throws Exception {
     testHttpGet(path);
     PageRequest expectedPageRequest =
@@ -111,7 +111,7 @@ class PersonControllerTest extends BaseControllerTest {
                 Filtering.builder()
                     .add(
                         FilterCriterion.builder()
-                            .withExpression("label_und-Latn")
+                            .withExpression("label.und-Latn")
                             .contains("Karl Ranseier")
                             .build())
                     .build())
@@ -121,7 +121,7 @@ class PersonControllerTest extends BaseControllerTest {
 
   @DisplayName("can retrieve by localized exact name")
   @ParameterizedTest
-  @ValueSource(strings = {"/v6/persons?filter=name_de:eq:\"Karl Ranseier\""})
+  @ValueSource(strings = {"/v6/persons?filter=name.de:eq:\"Karl Ranseier\""})
   public void findByLocalizedExactName(String path) throws Exception {
     testHttpGet(path);
     PageRequest expectedPageRequest =
@@ -132,7 +132,7 @@ class PersonControllerTest extends BaseControllerTest {
                 Filtering.builder()
                     .add(
                         FilterCriterion.builder()
-                            .withExpression("name_de")
+                            .withExpression("name.de")
                             .isEquals("\"Karl Ranseier\"")
                             .build())
                     .build())
@@ -142,7 +142,7 @@ class PersonControllerTest extends BaseControllerTest {
 
   @DisplayName("can retrieve by localized 'like' name")
   @ParameterizedTest
-  @ValueSource(strings = {"/v6/persons?filter=name_und-Latn:like:Karl Ranseier"})
+  @ValueSource(strings = {"/v6/persons?filter=name.und-Latn:like:Karl Ranseier"})
   public void findByLocalizedLikeName(String path) throws Exception {
     testHttpGet(path);
     PageRequest expectedPageRequest =
@@ -153,7 +153,7 @@ class PersonControllerTest extends BaseControllerTest {
                 Filtering.builder()
                     .add(
                         FilterCriterion.builder()
-                            .withExpression("name_und-Latn")
+                            .withExpression("name.und-Latn")
                             .contains("Karl Ranseier")
                             .build())
                     .build())

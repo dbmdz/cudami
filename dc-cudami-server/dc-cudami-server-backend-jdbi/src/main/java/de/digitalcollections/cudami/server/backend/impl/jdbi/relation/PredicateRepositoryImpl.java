@@ -4,10 +4,8 @@ import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
 import de.digitalcollections.cudami.server.backend.api.repository.relation.PredicateRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.UniqueObjectRepositoryImpl;
-import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.SearchTermTemplates;
 import de.digitalcollections.model.relation.Predicate;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
@@ -116,16 +114,6 @@ public class PredicateRepositoryImpl extends UniqueObjectRepositoryImpl<Predicat
   @Override
   public List<Predicate> getRandom(int count) throws RepositoryException {
     throw new UnsupportedOperationException(); // TODO: not yet implemented
-  }
-
-  @Override
-  protected List<String> getSearchTermTemplates(String tblAlias, String originalSearchTerm) {
-    if (originalSearchTerm == null) {
-      return Collections.EMPTY_LIST;
-    }
-    List<String> searchTermTemplates = super.getSearchTermTemplates(tblAlias, originalSearchTerm);
-    searchTermTemplates.add(SearchTermTemplates.ILIKE_SEARCH.renderTemplate(tblAlias, "value"));
-    return searchTermTemplates;
   }
 
   @Override
