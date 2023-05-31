@@ -30,6 +30,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
   - several FilterCriteria can be appended, seperated by semicolon; these FilterCriteria are always linked by *AND*  
     > `?filtering={$OR;lastname:eq:foo;firstname:eq:foo};{age:gt:30}` → (lastname == "foo" OR firstname == "foo") AND age > 30  
     > `?filtering={$OR;lastname:eq:foo;firstname:eq:foo};{$OR;age:gt:30;age:lt:20}` → (lastname == "foo" OR firstname == "foo") AND (age > 30 OR age < 20)
+  - within the value(s) of a condition semicolons and braces (i.e. `;{}`) must be backslash escaped; URL encoding is necessary as usual
 
 ### Changed
 
