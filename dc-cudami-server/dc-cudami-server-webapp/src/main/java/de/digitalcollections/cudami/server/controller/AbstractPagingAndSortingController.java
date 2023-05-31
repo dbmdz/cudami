@@ -65,7 +65,7 @@ public abstract class AbstractPagingAndSortingController {
           fieldClass = getFieldType(firstClass, secondExpression);
         } catch (NoSuchFieldException e) {
           // happens for e.g. `label.und-Latn` or `name.de-Latn`
-          LOGGER.info(
+          LOGGER.debug(
               "Field {} in property {} (class {}) not found. Taking the latter one instead.",
               secondExpression,
               firstExpression,
