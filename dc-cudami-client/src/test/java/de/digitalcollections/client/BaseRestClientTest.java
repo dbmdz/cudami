@@ -97,14 +97,14 @@ public abstract class BaseRestClientTest<T extends Object, C extends BaseRestCli
                 FilterLogicalOperator.OR,
                 FilterCriterion.builder()
                     .withExpression("description.und-Latn")
-                    .contains("some search text")
+                    .contains("some {search} \\ text")
                     .build())
             .filterCriterion(
                 FilterLogicalOperator.AND,
                 FilterCriterion.builder().withExpression("active").isEquals(true).build())
             .build();
     String expected =
-        "filtering=%7B$OR;label.und-Latn:like:some+search+text;description.und-Latn:like:some+search+text%7D;%7B$AND;active:eq:true%7D";
+        "filtering=%7B$OR;label.und-Latn:like:some+search+text;description.und-Latn:like:some+%5C%7Bsearch%5C%7D+%5C+text%7D;%7B$AND;active:eq:true%7D";
     assertThat(client.getFilterParamsAsString(filtering)).isEqualTo(expected);
   }
 

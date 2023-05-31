@@ -40,18 +40,19 @@ class StringToFilterCriteriaGenericConverterTest {
         Filtering.builder()
             .filterCriterion(
                 FilterLogicalOperator.OR,
-                new FilterCriterion<String>("label.de-Latn", FilterOperation.CONTAINS, "some text"))
+                new FilterCriterion<String>(
+                    "label.de-Latn", FilterOperation.CONTAINS, "some { text }"))
             .filterCriterion(
                 FilterLogicalOperator.OR,
                 new FilterCriterion<String>(
-                    "description.de-Latn", FilterOperation.CONTAINS, "some text"))
+                    "description.de-Latn", FilterOperation.CONTAINS, "some\\; text"))
             .filterCriterion(
                 FilterLogicalOperator.AND,
                 new FilterCriterion<String>(
                     "lastModified", FilterOperation.GREATER_THAN, "2020-01-01"))
             .build();
     String source =
-        "%7B$OR;label.de-Latn:like:some+text;description.de-Latn:like:some+text%7D;%7BlastModified:gt:2020-01-01%7D";
+        "%7B$OR;label.de-Latn:like:some+%5C%7B+text+%5C%7D;description.de-Latn:like:some%5C%5C%3B+text%7D;%7BlastModified:gt:2020-01-01%7D";
     Object actual =
         converter.convert(
             source, TypeDescriptor.forObject(source), TypeDescriptor.valueOf(Filtering.class));

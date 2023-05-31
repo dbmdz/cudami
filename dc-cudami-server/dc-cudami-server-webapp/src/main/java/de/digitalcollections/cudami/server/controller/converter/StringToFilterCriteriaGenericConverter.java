@@ -83,17 +83,18 @@ public class StringToFilterCriteriaGenericConverter implements GenericConverter 
     /* Filtering style, e.g.
      * `{$OR;label:like:blubb;description:like:blubb};{active:eq:true}`
      * or `{lastname:eq:meier;age:gt:30}`
+     * or escaped chars (i.e. `;{}`) `{name:like:\{Kröner\} \; Union}`
      */
-    Matcher filterCriteriaStrings = Pattern.compile("[{](.+?)[}]").matcher(filter);
+    Matcher filterCriteriaStrings = Pattern.compile("[^\\\\]?[{](.+?[^\\\\])[}]").matcher(filter);
     Filtering result = new Filtering();
     while (filterCriteriaStrings.find()) {
       List<String> criterionStrings =
-          Arrays.stream(filterCriteriaStrings.group(1).split(";", 0))
+          Arrays.stream(filterCriteriaStrings.group(1).split("(?<=[^\\\\]);", 0))
               .collect(Collectors.toCollection(ArrayList::new));
       // obtain the logical operator (and/or)
       AtomicReference<FilterLogicalOperator> link =
           new AtomicReference<>(FilterLogicalOperator.AND);
-      criterionStrings.parallelStream()
+      criterionStrings.stream()
           .filter(s -> s.matches("(?iu)\\s*\\$\\p{Alpha}+\\s*"))
           .findFirst()
           .ifPresent(
@@ -105,7 +106,11 @@ public class StringToFilterCriteriaGenericConverter implements GenericConverter 
               });
       // build `FilterCriterion`s and add them to `Filtering`
       List<FilterCriterion> criterions =
-          criterionStrings.stream().map(this::buildFilterCriterion).toList();
+          criterionStrings.stream()
+              // remove escapes
+              .map(s -> s.replaceAll("\\\\([;{}])", "$1"))
+              .map(this::buildFilterCriterion)
+              .toList();
       result.add(link.get(), criterions);
     }
     return result;

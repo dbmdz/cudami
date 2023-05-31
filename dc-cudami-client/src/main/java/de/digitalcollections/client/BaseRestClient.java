@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -593,22 +594,27 @@ public abstract class BaseRestClient<T extends Object> {
     if (expression == null || operation == null) {
       return null;
     }
+    // in values the special chars `;`, `{` and `}` must be escaped by `\`
+    final Function<Object, String> escapeValue = o -> o.toString().replaceAll("[;{}]", "\\\\$0");
     String operand;
     switch (operation.getOperandCount()) {
       case SINGLEVALUE:
-        operand = URLEncoder.encode(filterCriterion.getValue().toString(), StandardCharsets.UTF_8);
+        operand =
+            URLEncoder.encode(
+                escapeValue.apply(filterCriterion.getValue()), StandardCharsets.UTF_8);
         break;
       case MIN_MAX_VALUES:
         operand =
-            URLEncoder.encode(filterCriterion.getMinValue().toString(), StandardCharsets.UTF_8)
+            URLEncoder.encode(
+                    escapeValue.apply(filterCriterion.getMinValue()), StandardCharsets.UTF_8)
                 + ","
                 + URLEncoder.encode(
-                    filterCriterion.getMaxValue().toString(), StandardCharsets.UTF_8);
+                    escapeValue.apply(filterCriterion.getMaxValue()), StandardCharsets.UTF_8);
         break;
       case MULTIVALUE:
         operand =
             filterCriterion.getValues().stream()
-                .map(value -> URLEncoder.encode(value.toString(), StandardCharsets.UTF_8))
+                .map(value -> URLEncoder.encode(escapeValue.apply(value), StandardCharsets.UTF_8))
                 .collect(Collectors.joining(","))
                 .toString();
         break;
