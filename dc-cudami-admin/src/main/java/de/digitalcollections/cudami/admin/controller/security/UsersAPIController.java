@@ -7,9 +7,13 @@ import de.digitalcollections.cudami.admin.controller.ParameterHelper;
 import de.digitalcollections.cudami.admin.model.bootstraptable.BTRequest;
 import de.digitalcollections.cudami.admin.model.bootstraptable.BTResponse;
 import de.digitalcollections.model.exception.TechnicalException;
+import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.security.User;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,6 +56,29 @@ public class UsersAPIController extends AbstractUniqueObjectController<User> {
             User.class, offset, limit, sortProperty, sortOrder, "lastname", searchTerm, null);
     PageResponse<User> pageResponse = service.find(btRequest);
     return new BTResponse<>(pageResponse);
+  }
+
+  @GetMapping("/api/v1/users")
+  public ResponseEntity<Map<String, Object>> findAll(
+      @RequestParam(required = false) String email,
+      @RequestParam(defaultValue = "0") int page,
+      @RequestParam(defaultValue = "10") int size)
+      throws ServiceException {
+    try {
+      PageRequest pageRequest = PageRequest.builder().pageNumber(page).pageSize(size).build();
+      PageResponse<User> pageResponse = service.find(pageRequest);
+
+      List<User> users = pageResponse.getContent();
+
+      Map<String, Object> response = new HashMap<>(4);
+      response.put("users", users);
+      response.put("currentPage", pageResponse.getPageNumber());
+      response.put("totalItems", pageResponse.getTotalElements());
+      response.put("totalPages", pageResponse.getTotalPages());
+      return new ResponseEntity<>(response, HttpStatus.OK);
+    } catch (Exception e) {
+      return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+    }
   }
 
   /* endpoint for addUserStatusChangeHandler in index.js, see users/view.html */

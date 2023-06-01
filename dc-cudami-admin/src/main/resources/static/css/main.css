@@ -104,6 +104,11 @@ label {
   padding: 0.5em;
   text-align: center;
 }
+
+div.nav-link a {
+  color: #495057;
+}
+
 .nav-sidebar .nav-item .nav-link:hover {
   color: #FFF;
 }

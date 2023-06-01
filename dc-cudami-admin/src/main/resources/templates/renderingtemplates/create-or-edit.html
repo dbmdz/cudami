@@ -57,7 +57,7 @@
                            role="tab"
                            th:href="${'#lbl-' + language}"
                            th:with="languageToDisplay=${language.getDisplayName(#locale)}"
-                           th:text="${#strings.isEmpty(languageToDisplay)} ? #{language_not_specified} : ${languageToDisplay}">
+                           th:text="${#strings.isEmpty(languageToDisplay)} ? #{lbl.language_not_specified} : ${languageToDisplay}">
                           language
                         </a>
                       </li>

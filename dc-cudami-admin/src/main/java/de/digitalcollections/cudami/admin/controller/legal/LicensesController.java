@@ -92,8 +92,7 @@ public class LicensesController extends AbstractUniqueObjectController<License> 
       model.addAttribute("activeLanguage", existingLanguages.get(0));
     }
 
-    List<Locale> sortedLanguages = languageService.getAllLanguages();
-    model.addAttribute("allLanguages", sortedLanguages);
+    model.addAttribute("allLanguages", languageService.getAllLanguages());
 
     model.addAttribute("mode", "edit");
     return "licenses/create-or-edit";
