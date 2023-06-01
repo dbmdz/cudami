@@ -76,6 +76,17 @@ public class ManifestationServiceImpl extends EntityServiceImpl<Manifestation>
   }
 
   @Override
+  public boolean removeParent(Manifestation manifestation, Manifestation parentManifestation)
+      throws ServiceException {
+    try {
+      return ((ManifestationRepository) repository)
+          .removeParent(manifestation, parentManifestation);
+    } catch (RepositoryException e) {
+      throw new ServiceException("Backend failure", e);
+    }
+  }
+
+  @Override
   public void save(Manifestation manifestation) throws ServiceException, ValidationException {
     super.save(manifestation);
     try {

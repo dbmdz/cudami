@@ -18,4 +18,7 @@ public interface ManifestationService extends EntityService<Manifestation> {
       throws ServiceException;
 
   List<Locale> getLanguagesOfManifestationsForWork(Work work) throws ServiceException;
+
+  boolean removeParent(Manifestation manifestation, Manifestation parentManifestation)
+      throws ServiceException;
 }
