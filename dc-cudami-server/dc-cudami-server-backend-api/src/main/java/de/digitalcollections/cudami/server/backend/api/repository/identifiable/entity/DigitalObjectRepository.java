@@ -79,6 +79,16 @@ public interface DigitalObjectRepository extends EntityRepository<DigitalObject>
   // FIXME: replace with pagerequest method
   List<FileResource> getFileResources(UUID digitalObjectUuid) throws RepositoryException;
 
+  default List<ImageFileResource> getIiifImageFileResources(DigitalObject digitalObject)
+      throws RepositoryException {
+    if (digitalObject == null) {
+      throw new IllegalArgumentException("get failed: given object must not be null");
+    }
+    return getIiifImageFileResources(digitalObject.getUuid());
+  }
+
+  List<ImageFileResource> getIiifImageFileResources(UUID uuid) throws RepositoryException;
+
   default List<ImageFileResource> getImageFileResources(DigitalObject digitalObject)
       throws RepositoryException {
     if (digitalObject == null) {

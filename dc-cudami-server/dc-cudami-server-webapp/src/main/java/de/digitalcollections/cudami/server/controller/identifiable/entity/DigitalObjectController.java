@@ -212,6 +212,17 @@ public class DigitalObjectController extends AbstractEntityController<DigitalObj
     return service.getFileResources(buildExampleWithUuid(uuid));
   }
 
+  @Operation(summary = "Get IIIF image file resources of a digital object")
+  @GetMapping(
+      value = {
+        "/v6/digitalobjects/{uuid:" + ParameterHelper.UUID_PATTERN + "}/fileresources/images/iiif",
+      },
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  public List<ImageFileResource> getIiifImageFileResources(@PathVariable UUID uuid)
+      throws ServiceException {
+    return service.getIiifImageFileResources(buildExampleWithUuid(uuid));
+  }
+
   @Operation(summary = "Get image file resources of a digital object")
   @GetMapping(
       value = {

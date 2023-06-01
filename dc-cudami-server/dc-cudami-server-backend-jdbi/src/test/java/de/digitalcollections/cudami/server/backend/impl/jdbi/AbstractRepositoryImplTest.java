@@ -5,6 +5,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.backend.impl.database.config.SpringConfigBackendTestDatabase;
+import de.digitalcollections.cudami.server.config.BackendIiifServerConfig;
+import de.digitalcollections.iiif.model.jackson.IiifObjectMapper;
 import de.digitalcollections.model.identifiable.Identifiable;
 import de.digitalcollections.model.identifiable.IdentifiableObjectType;
 import de.digitalcollections.model.identifiable.IdentifiableType;
@@ -34,6 +36,8 @@ public class AbstractRepositoryImplTest {
   @Autowired protected PostgreSQLContainer postgreSQLContainer;
   @Autowired protected Jdbi jdbi;
   @Autowired protected CudamiConfig cudamiConfig;
+  @Autowired protected IiifObjectMapper iiifObjectMapper;
+  @Autowired protected BackendIiifServerConfig iiifServerConfig;
   @Autowired private DigitalCollectionsObjectMapper mapper;
 
   @Test

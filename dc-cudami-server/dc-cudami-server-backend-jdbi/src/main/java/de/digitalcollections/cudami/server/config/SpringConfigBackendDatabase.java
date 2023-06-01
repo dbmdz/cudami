@@ -8,6 +8,7 @@ import de.digitalcollections.cudami.server.backend.impl.jdbi.type.LocalDateRange
 import de.digitalcollections.cudami.server.backend.impl.jdbi.type.MainSubTypeMapper;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.type.MainSubTypeMapper.TitleTypeMapper;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.type.TitleMapper;
+import de.digitalcollections.iiif.model.jackson.IiifObjectMapper;
 import de.digitalcollections.model.view.BreadcrumbNode;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
@@ -79,6 +80,11 @@ public class SpringConfigBackendDatabase {
   @Bean
   public DbIdentifierMapper dbIdentifierMapper() {
     return new DbIdentifierMapper();
+  }
+
+  @Bean
+  public IiifObjectMapper iiifObjectMapper() {
+    return new IiifObjectMapper();
   }
 
   @Bean
