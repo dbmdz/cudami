@@ -138,13 +138,13 @@
             <div class="row">
               <div class="col-md-3 multilanguage"><label th:text="#{lbl.parent_manifestation_s}">Parents</label></div>
               <div class="align-items-center col-md-9">
-                <table style="border-collapse: separate; border-spacing: 0;">
+                <table>
                   <th:block th:each="parent, iterStat: ${manifestation.parents}">
                     <tr>
-                      <td style="vertical-align: top; padding-right: 1rem;"><span th:text="${parent.title}" style="font-weight: bold"></span></td>
-                      <td style="vertical-align: top; padding-right: 1rem;"><span th:text="#{in}"></span></td>
-                      <td style="vertical-align: top; padding-right: 1rem;"><a th:href="@{/manifestations/{uuid}(uuid=${parent.subject?.uuid})}" th:text="${parent.subject?.label?.getText(dataLanguage)} ?: ${parent.subject?.uuid}">parent label</a>&nbsp</td>
-                      <td style="vertical-align: top;"><span th:if="${parent.sortKey != null}" th:text="#{with_sortkey(${parent.sortKey})}">...</span></td>
+                      <td class="align-top pr-1"><span th:text="${parent.title}" style="font-weight: bold"></span></td>
+                      <td class="align-top pr-1"><span th:text="#{in}"></span></td>
+                      <td class="align-top pr-1"><a th:href="@{/manifestations/{uuid}(uuid=${parent.subject?.uuid})}" th:text="${parent.subject?.label?.getText(dataLanguage)} ?: ${parent.subject?.uuid}">parent label</a>&nbsp</td>
+                      <td class="align-top"><span th:if="${parent.sortKey != null}" th:text="#{with_sortkey(${parent.sortKey})}">...</span></td>
                     </tr>
                   </th:block>
                 </table>
