@@ -20,13 +20,7 @@ import de.digitalcollections.model.identifiable.entity.agent.CorporateBody;
 import de.digitalcollections.model.identifiable.entity.agent.Family;
 import de.digitalcollections.model.identifiable.entity.agent.Person;
 import de.digitalcollections.model.identifiable.entity.geo.location.HumanSettlement;
-import de.digitalcollections.model.identifiable.entity.manifestation.DistributionInfo;
-import de.digitalcollections.model.identifiable.entity.manifestation.ExpressionType;
-import de.digitalcollections.model.identifiable.entity.manifestation.Manifestation;
-import de.digitalcollections.model.identifiable.entity.manifestation.ProductionInfo;
-import de.digitalcollections.model.identifiable.entity.manifestation.PublicationInfo;
-import de.digitalcollections.model.identifiable.entity.manifestation.Publisher;
-import de.digitalcollections.model.identifiable.entity.manifestation.PublishingInfo;
+import de.digitalcollections.model.identifiable.entity.manifestation.*;
 import de.digitalcollections.model.identifiable.entity.relation.EntityRelation;
 import de.digitalcollections.model.identifiable.entity.work.Work;
 import de.digitalcollections.model.list.filtering.Filtering;
@@ -39,21 +33,15 @@ import de.digitalcollections.model.time.LocalDateRange;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.lang.reflect.InvocationTargetException;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.UUID;
-import java.util.Vector;
+import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.stream.Stream;
 import org.jdbi.v3.core.Jdbi;
+import org.jdbi.v3.core.JdbiException;
 import org.jdbi.v3.core.generic.GenericType;
 import org.jdbi.v3.core.result.RowView;
 import org.jdbi.v3.core.statement.PreparedBatch;
+import org.jdbi.v3.core.statement.StatementException;
 import org.springframework.stereotype.Repository;
 
 @SuppressFBWarnings(
@@ -596,6 +584,28 @@ public class ManifestationRepositoryImpl extends EntityRepositoryImpl<Manifestat
             .toList();
     result.setPublishers(publishers);
     return result;
+  }
+
+  @Override
+  public boolean removeParent(Manifestation manifestation, Manifestation parentManifestation)
+      throws RepositoryException {
+    final String sql =
+        "DELETE FROM manifestation_manifestations WHERE subject_uuid=:subject_uuid and object_uuid=:object_uuid";
+    try {
+      return dbi.withHandle(
+              h ->
+                  h.createUpdate(sql)
+                      .bind("object_uuid", manifestation.getUuid())
+                      .bind("subject_uuid", parentManifestation.getUuid())
+                      .execute())
+          == 1;
+    } catch (StatementException e) {
+      String detailMessage = e.getCause() != null ? e.getCause().getMessage() : e.getMessage();
+      throw new RepositoryException(
+          String.format("The SQL statement is defective: %s", detailMessage), e);
+    } catch (JdbiException e) {
+      throw new RepositoryException(e);
+    }
   }
 
   @Override

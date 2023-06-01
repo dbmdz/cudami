@@ -46,4 +46,7 @@ public interface ManifestationRepository extends EntityRepository<Manifestation>
   }
 
   List<Locale> getLanguagesOfManifestationsForWork(UUID workUuid);
+
+  boolean removeParent(Manifestation manifestation, Manifestation parentManifestation)
+      throws RepositoryException;
 }

@@ -24,22 +24,14 @@ import de.digitalcollections.model.identifiable.entity.agent.Agent;
 import de.digitalcollections.model.identifiable.entity.agent.CorporateBody;
 import de.digitalcollections.model.identifiable.entity.agent.Person;
 import de.digitalcollections.model.identifiable.entity.geo.location.HumanSettlement;
-import de.digitalcollections.model.identifiable.entity.manifestation.ExpressionType;
-import de.digitalcollections.model.identifiable.entity.manifestation.Manifestation;
-import de.digitalcollections.model.identifiable.entity.manifestation.ProductionInfo;
-import de.digitalcollections.model.identifiable.entity.manifestation.PublicationInfo;
-import de.digitalcollections.model.identifiable.entity.manifestation.Publisher;
+import de.digitalcollections.model.identifiable.entity.manifestation.*;
 import de.digitalcollections.model.identifiable.entity.relation.EntityRelation;
 import de.digitalcollections.model.identifiable.entity.work.Work;
 import de.digitalcollections.model.identifiable.semantic.Subject;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.relation.Predicate;
-import de.digitalcollections.model.text.LocalizedStructuredContent;
-import de.digitalcollections.model.text.LocalizedText;
-import de.digitalcollections.model.text.StructuredContent;
-import de.digitalcollections.model.text.Title;
-import de.digitalcollections.model.text.TitleType;
+import de.digitalcollections.model.text.*;
 import de.digitalcollections.model.text.contentblock.Text;
 import de.digitalcollections.model.time.LocalDateRange;
 import java.time.LocalDate;
@@ -48,11 +40,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.stream.Stream;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.MethodOrderer;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
@@ -349,6 +337,46 @@ class ManifestationRepositoryImplTest
             .toList();
 
     assertThat(actual).containsExactlyInAnyOrderElementsOf(expected);
+  }
+
+  @DisplayName("can remove a parent manifestation from a manifestation")
+  @Test
+  public void removeParentManifestation() throws RepositoryException {
+    Manifestation parent =
+        Manifestation.builder()
+            .label(Locale.GERMAN, "Parent")
+            .title(
+                Title.builder()
+                    .titleType(new TitleType("main", "main"))
+                    .text(new LocalizedText(Locale.GERMAN, "Parent"))
+                    .build())
+            .build();
+    repo.save(parent);
+
+    Manifestation manifestation =
+        Manifestation.builder()
+            .label(Locale.GERMAN, "Manifestation")
+            .title(
+                Title.builder()
+                    .titleType(new TitleType("main", "main"))
+                    .text(new LocalizedText(Locale.GERMAN, "Manifestation"))
+                    .build())
+            .parent(
+                RelationSpecification.<Manifestation>builder()
+                    .subject(parent)
+                    .title("Manifestation")
+                    .build())
+            .build();
+    repo.save(manifestation);
+
+    Manifestation actual = repo.getByUuid(manifestation.getUuid());
+    assertThat(actual.getParents()).hasSize(1);
+    assertThat(actual.getParents().get(0).getSubject().getUuid()).isEqualTo(parent.getUuid());
+
+    repo.removeParent(manifestation, parent);
+
+    actual = repo.getByUuid(manifestation.getUuid());
+    assertThat(actual.getParents()).isEmpty();
   }
 
   // -------------------------------------------------------------------

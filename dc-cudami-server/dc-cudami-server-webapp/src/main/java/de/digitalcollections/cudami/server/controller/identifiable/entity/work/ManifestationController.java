@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -59,6 +60,30 @@ public class ManifestationController extends AbstractEntityController<Manifestat
           UUID uuid)
       throws ConflictException, ServiceException {
     return super.delete(uuid);
+  }
+
+  @Operation(summary = "Remove an existing parent manifestation from an existing manifestation")
+  @DeleteMapping(
+      value = {
+        "/v6/manifestations/{uuid:"
+            + ParameterHelper.UUID_PATTERN
+            + "}/parent/{parentManifestationUuid}"
+      },
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity removeParentManifestation(
+      @Parameter(example = "", description = "UUID of the manifestation") @PathVariable("uuid")
+          UUID uuid,
+      @Parameter(example = "", description = "UUID of the parent manifestation")
+          @PathVariable("parentManifestationUuid")
+          UUID parentManifestationUuid)
+      throws ServiceException {
+    Manifestation manifestation = buildExampleWithUuid(uuid);
+    Manifestation parentManifestation = buildExampleWithUuid(parentManifestationUuid);
+
+    boolean successful = service.removeParent(manifestation, parentManifestation);
+    return successful
+        ? new ResponseEntity<>(HttpStatus.NO_CONTENT)
+        : new ResponseEntity<>(HttpStatus.NOT_FOUND);
   }
 
   @Operation(summary = "Get all manifestations as (paged, sorted, filtered) list")
