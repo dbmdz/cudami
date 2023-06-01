@@ -13,7 +13,7 @@ import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.resour
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.resource.ImageFileResourceRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.resource.LinkedDataFileResourceRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.legal.LicenseRepositoryImpl;
-import de.digitalcollections.cudami.server.config.IiifServerConfig;
+import de.digitalcollections.cudami.server.config.BackendIiifServerConfig;
 import de.digitalcollections.iiif.model.ImageContent;
 import de.digitalcollections.iiif.model.jackson.IiifObjectMapper;
 import de.digitalcollections.iiif.model.sharedcanvas.Canvas;
@@ -79,7 +79,7 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
 
   private final IiifObjectMapper iiifObjectMapper;
 
-  private final IiifServerConfig iiifServerConfig;
+  private final BackendIiifServerConfig iiifServerConfig;
 
   @Lazy @Autowired private ImageFileResourceRepositoryImpl imageFileResourceRepositoryImpl;
 
@@ -92,7 +92,7 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
   public DigitalObjectRepositoryImpl(
       Jdbi dbi,
       CudamiConfig cudamiConfig,
-      IiifServerConfig iiifServerConfig,
+      BackendIiifServerConfig iiifServerConfig,
       IdentifierRepository identifierRepository,
       UrlAliasRepository urlAliasRepository,
       IiifObjectMapper iiifObjectMapper) {
@@ -112,24 +112,25 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
   //
   // "canvases":[
   // {
-  //   "@id": "https://api.digitale-sammlungen.de/iiif/presentation/v2/bsb00107608/canvas/1",
-  //   "@type": "sc:Canvas",
-  //   "label": "(0001)",
-  //   "images": [
-  //     {
-  //       "@type":"oa:Annotation",
-  //       "motivation": "sc:painting",
-  //       "resource": {
-  //         "@id":
+  // "@id":
+  // "https://api.digitale-sammlungen.de/iiif/presentation/v2/bsb00107608/canvas/1",
+  // "@type": "sc:Canvas",
+  // "label": "(0001)",
+  // "images": [
+  // {
+  // "@type":"oa:Annotation",
+  // "motivation": "sc:painting",
+  // "resource": {
+  // "@id":
   // "https://api.digitale-sammlungen.de/iiif/image/v2/bsb00107608_00001/full/full/0/default.jpg",
-  //         "@type": "dctypes:Image",
-  //         "service": {
-  //           "@context": "http://iiif.io/api/image/2/context.json",
-  //           "@id": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb00107608_00001",
-  //           "profile": "http://iiif.io/api/image/2/level2.json",
-  //           "protocol": "http://iiif.io/api/image"
-  //         },
-  //         "format": "image/jpeg","width":6700,"height":4700}
+  // "@type": "dctypes:Image",
+  // "service": {
+  // "@context": "http://iiif.io/api/image/2/context.json",
+  // "@id": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb00107608_00001",
+  // "profile": "http://iiif.io/api/image/2/level2.json",
+  // "protocol": "http://iiif.io/api/image"
+  // },
+  // "format": "image/jpeg","width":6700,"height":4700}
   // ,"on":
   // "https://api.digitale-sammlungen.de/iiif/presentation/v2/bsb00107608/canvas/1"
   // }],"width":6700,"height":4700}, ...]
@@ -477,8 +478,19 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
     DigitalObject digitalObject = getByUuid(digitalObjectUuid);
 
     URI iiifPresentationBaseUrl = iiifServerConfig.getPresentation().getBaseUrl();
-    String identifierNamespace = iiifServerConfig.getIdentifier().getNamespace();
-    String iiifIdentifier = digitalObject.getIdentifierByNamespace(identifierNamespace).getId();
+
+    // default: iiif identifier = uuid
+    String iiifIdentifier = digitalObjectUuid.toString();
+
+    // custom: get iiif identifier from one of the identifiers of the digital object
+    List<String> identifierNamespaces = iiifServerConfig.getIdentifier().getNamespaces();
+    for (String identifierNamespace : identifierNamespaces) {
+      Identifier identifier = digitalObject.getIdentifierByNamespace(identifierNamespace);
+      if (identifier != null) {
+        iiifIdentifier = identifier.getId();
+        break;
+      }
+    }
 
     try {
       URL iiifManifestUrl = iiifPresentationBaseUrl.resolve(iiifIdentifier + "/manifest").toURL();

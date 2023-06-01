@@ -1,25 +1,22 @@
-package de.digitalcollections.cudami.server.config;
+package de.digitalcollections.cudami.model.config;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.net.URI;
-import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.context.annotation.Configuration;
+import java.util.List;
 
-@Configuration
-@ConfigurationProperties(prefix = "iiif")
 @SuppressFBWarnings
 public class IiifServerConfig {
 
   public static class Identifier {
 
-    private String namespace;
+    private List<String> namespaces;
 
-    public String getNamespace() {
-      return namespace;
+    public List<String> getNamespaces() {
+      return namespaces;
     }
 
-    public void setNamespace(String namespace) {
-      this.namespace = namespace;
+    public void setNamespaces(List<String> namespaces) {
+      this.namespaces = namespaces;
     }
   }
 

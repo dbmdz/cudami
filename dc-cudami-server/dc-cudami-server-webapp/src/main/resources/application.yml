@@ -12,11 +12,11 @@ cudami:
 
 iiif:
   identifier:
-    namespace: "mdz-obj"
+    namespaces: []
   image:
     baseUrl: "http://localhost:23232/image/v2/"
   presentation:
-    baseUrl: "https://api-dev.digitale-sammlungen.de/iiif/presentation/v2/"
+    baseUrl: "http://localhost:23232/presentation/v2/"
 
 info:
   app:

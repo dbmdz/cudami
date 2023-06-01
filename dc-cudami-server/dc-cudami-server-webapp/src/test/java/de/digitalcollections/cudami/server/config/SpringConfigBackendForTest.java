@@ -1,8 +1,8 @@
 package de.digitalcollections.cudami.server.config;
 
-import de.digitalcollections.cudami.server.config.IiifServerConfig.Identifier;
-import de.digitalcollections.cudami.server.config.IiifServerConfig.Image;
-import de.digitalcollections.cudami.server.config.IiifServerConfig.Presentation;
+import de.digitalcollections.cudami.model.config.IiifServerConfig.Identifier;
+import de.digitalcollections.cudami.model.config.IiifServerConfig.Image;
+import de.digitalcollections.cudami.model.config.IiifServerConfig.Presentation;
 import java.sql.Connection;
 import java.sql.SQLException;
 import javax.sql.DataSource;
