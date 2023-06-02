@@ -7,6 +7,7 @@ import com.github.openjson.JSONObject;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.agent.CorporateBodyService;
 import de.digitalcollections.cudami.server.controller.legacy.V5MigrationHelper;
+import de.digitalcollections.cudami.server.controller.legacy.model.LegacyPageRequest;
 import de.digitalcollections.model.identifiable.entity.agent.CorporateBody;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
@@ -95,7 +96,7 @@ public class V2CorporateBodyController {
           @RequestParam(name = "searchTerm", required = false)
           String searchTerm)
       throws JsonProcessingException, ServiceException {
-    PageRequest pageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
+    PageRequest pageRequest = new LegacyPageRequest(searchTerm, pageNumber, pageSize);
     if (sortBy != null) {
       Sorting sorting = new Sorting(V5MigrationHelper.migrate(sortBy));
       pageRequest.setSorting(sorting);

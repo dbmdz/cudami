@@ -6,6 +6,7 @@ import de.digitalcollections.cudami.server.business.api.service.exceptions.Servi
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.DigitalObjectService;
 import de.digitalcollections.cudami.server.controller.CudamiControllerException;
 import de.digitalcollections.cudami.server.controller.legacy.V5MigrationHelper;
+import de.digitalcollections.cudami.server.controller.legacy.model.LegacyPageRequest;
 import de.digitalcollections.model.identifiable.entity.Collection;
 import de.digitalcollections.model.identifiable.entity.Project;
 import de.digitalcollections.model.identifiable.entity.digitalobject.DigitalObject;
@@ -56,7 +57,7 @@ public class V5DigitalObjectController {
       @RequestParam(name = "parent.uuid", required = false)
           FilterCriterion<UUID> parentUuidFilterCriterion)
       throws CudamiControllerException, ServiceException {
-    PageRequest pageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
+    PageRequest pageRequest = new LegacyPageRequest(searchTerm, pageNumber, pageSize);
     if (sortBy != null) {
       Sorting sorting = new Sorting(V5MigrationHelper.migrate(sortBy));
       pageRequest.setSorting(sorting);
@@ -94,7 +95,7 @@ public class V5DigitalObjectController {
       @RequestParam(name = "parent.uuid", required = false)
           FilterCriterion<UUID> parentUuidFilterCriterion)
       throws CudamiControllerException, ServiceException {
-    PageRequest pageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
+    PageRequest pageRequest = new LegacyPageRequest(searchTerm, pageNumber, pageSize);
     if (sortBy != null) {
       Sorting sorting = new Sorting(V5MigrationHelper.migrate(sortBy));
       pageRequest.setSorting(sorting);
@@ -124,7 +125,7 @@ public class V5DigitalObjectController {
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
       @RequestParam(name = "searchTerm", required = false) String searchTerm)
       throws CudamiControllerException, ServiceException {
-    PageRequest pageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
+    PageRequest pageRequest = new LegacyPageRequest(searchTerm, pageNumber, pageSize);
 
     DigitalObject digitalObject = new DigitalObject();
     digitalObject.setUuid(uuid);
@@ -150,7 +151,7 @@ public class V5DigitalObjectController {
       @RequestParam(name = "active", required = false) String active,
       @RequestParam(name = "searchTerm", required = false) String searchTerm)
       throws CudamiControllerException, ServiceException {
-    PageRequest searchPageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
+    PageRequest searchPageRequest = new LegacyPageRequest(searchTerm, pageNumber, pageSize);
 
     DigitalObject digitalObject = new DigitalObject();
     digitalObject.setUuid(uuid);

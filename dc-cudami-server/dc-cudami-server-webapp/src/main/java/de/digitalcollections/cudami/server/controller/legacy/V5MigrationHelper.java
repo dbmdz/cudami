@@ -82,6 +82,10 @@ public class V5MigrationHelper {
                     pageRequest.getJSONObject("filtering").toString(), Filtering.class));
         pageRequest.put(
             "filtering", new JSONObject(objectMapper.writeValueAsString(legacyFiltering)));
+        if (legacyFiltering.getFilterCriterionFor("label") != null) {
+          pageRequest.put("query", legacyFiltering.getFilterCriterionFor("label").getValue());
+          jsonObject.put("query", legacyFiltering.getFilterCriterionFor("label").getValue());
+        }
       }
       jsonObject.put("pageRequest", pageRequest);
     }
