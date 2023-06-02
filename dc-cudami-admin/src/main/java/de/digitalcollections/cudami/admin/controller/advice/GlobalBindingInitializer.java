@@ -3,10 +3,12 @@ package de.digitalcollections.cudami.admin.controller.advice;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.digitalcollections.cudami.admin.propertyeditor.JsonObjectEditor;
 import de.digitalcollections.cudami.admin.propertyeditor.RoleEditor;
+import de.digitalcollections.model.identifiable.resource.ImageFileResource;
 import de.digitalcollections.model.security.Role;
 import de.digitalcollections.model.text.LocalizedStructuredContent;
 import de.digitalcollections.model.text.LocalizedText;
 import de.digitalcollections.model.text.StructuredContent;
+import de.digitalcollections.model.view.RenderingHintsPreviewImage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.StringTrimmerEditor;
 import org.springframework.web.bind.WebDataBinder;
@@ -23,10 +25,15 @@ public class GlobalBindingInitializer {
   @InitBinder
   public void registerCustomEditors(WebDataBinder binder, WebRequest request) {
     binder.registerCustomEditor(
+        ImageFileResource.class, new JsonObjectEditor(objectMapper, ImageFileResource.class));
+    binder.registerCustomEditor(
         LocalizedStructuredContent.class,
         new JsonObjectEditor(objectMapper, LocalizedStructuredContent.class));
     binder.registerCustomEditor(
         LocalizedText.class, new JsonObjectEditor(objectMapper, LocalizedText.class));
+    binder.registerCustomEditor(
+        RenderingHintsPreviewImage.class,
+        new JsonObjectEditor(objectMapper, RenderingHintsPreviewImage.class));
     binder.registerCustomEditor(Role.class, roleEditor);
     binder.registerCustomEditor(String.class, new StringTrimmerEditor(true));
     binder.registerCustomEditor(

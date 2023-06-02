@@ -99,6 +99,42 @@ function bindTabEvents() {
   });
 }
 
+function debounce(callback, wait) {
+  let timeout;
+  return (...args) => {
+    clearTimeout(timeout);
+    timeout = setTimeout(function() { callback.apply(this, args); }, wait);
+  };
+}
+
+function formDataToJson(formData) {
+  var object = {};
+  formData.forEach((value, key) => {
+    // Reflect.has in favor of: object.hasOwnProperty(key)
+    if (!Reflect.has(object, key)) {
+      object[key] = value;
+      return;
+    }
+    if (!Array.isArray(object[key])) {
+      object[key] = [object[key]];
+    }
+    object[key].push(value);
+  });
+  return object;
+}
+
+function getImageUrl(image, width = 'full') {
+  if (!image.httpBaseUrl || !image.mimeType) {
+    return image.uri;
+  }
+  const mimeExtensionMapping = {
+    gif: 'gif',
+    png: 'png',
+  };
+  const subMimeType = image.mimeType.split('/')[1];
+  return `${image.httpBaseUrl}/full/${width}/0/default.${mimeExtensionMapping[subMimeType] ?? 'jpg'}`;
+}
+
 function formatDate(date, language, onlyDate = false) {
   /* used to output a date or date with time */
   if (!date) {

@@ -5,7 +5,10 @@
       layout:decorate="~{base-form}">
 
   <head>
-    <title th:text="|#{page.title.licenses}: | + (${mode} == 'create' ? #{page.title.license.create} : #{page.title.license.edit(${license.url})})">Licenses: Create a new license / Edit license "https://licenses.org/lic-1"</title>
+    <title th:text="|#{page.title.websites}: | + (${mode} == 'create' ? #{page.title.website.create} : #{page.title.website.edit(${website.url})})">Websites: Create a new website / Edit website "http://demo.de/"</title>
+    <script th:src="@{/webjars/dropzone/dist/dropzone-min.js}"></script>
+    <link th:href="@{/webjars/dropzone/dist/dropzone.css}" rel="stylesheet" type="text/css" />
+    <script th:src="@{/js/previewImage.js}"></script>
   </head>
 
   <body>
@@ -13,11 +16,11 @@
       <div class="content">
         <div class="container-fluid">
 
-          <form action="#" th:action="@{#}" th:object="${license}" method="post" role="form">
+          <form action="#" th:action="@{#}" th:object="${website}" method="post" role="form">
             <div id="content-header">
               <div class="row">
                 <div class="col d-flex justify-content-between">
-                  <h1 th:text="${mode} == 'create' ? #{page.title.license.create} : #{page.title.license.edit(${license.url})}">Create a new license / Edit license "https://licenses.org/lic-1"</h1>
+                  <h1 th:text="${mode} == 'create' ? #{page.title.website.create} : #{page.title.website.edit(*{url})}">Create a new website / Edit website "http://demo.de/"</h1>
                   <div>
                     <button type="submit" class="btn btn-primary" th:text="#{save}">Save</button>
                   </div>
@@ -29,13 +32,13 @@
               <div th:replace="fragments/feedback-messages :: form"></div>
 
               <th:block th:if="${mode} == 'edit'">
-                <th:block th:insert="fragments/uniqueobject::renderFields(${license})"></th:block>
+                <th:block th:insert="fragments/uniqueobject::renderFields(${website})"></th:block>
                 <hr>
               </th:block>
 
-              <div class="form-row">
-                <div class="col">
-                  <div class="localized-form" data-tabid-prefix="lbl-">
+              <div class="row">
+                <div class="col-sm-12">
+                  <div class="localized-form" data-tabid-prefix="lbl-desc-">
                     <ul class="nav nav-tabs" role="tablist">
                       <li class="nav-tab language-tab" th:each="language,iter : ${existingLanguages}" th:classappend="${iter.index} == 0 ? active">
                         <a
@@ -43,24 +46,27 @@
                            th:classappend="${iter.index} == 0 ? active"
                            data-toggle="tab"
                            role="tab"
-                           th:href="${'#lbl-' + language}"
+                           th:href="${'#lbl-desc-' + language}"
                            th:with="languageToDisplay=${language.getDisplayName(#locale)}"
                            th:text="${#strings.isEmpty(languageToDisplay)} ? #{lbl.language_not_specified} : ${languageToDisplay}">
                           language
                         </a>
                       </li>
                       <li class="nav-tab">
-                        <a th:title="#{tooltip.add_new_language}" class="nav-link" data-toggle="modal" data-target="#addLanguageDialog" data-fragment="label">
+                        <a th:title="#{tooltip.add_new_language}" class="nav-link" data-toggle="modal" data-target="#addLanguageDialog" data-fragment="teaser">
                           <i class="fa fa-plus"></i>
                         </a>
                       </li>
                     </ul>
                     <div class="tab-content">
+                      <input type="hidden" th:id="previewImage-json" th:field="*{previewImage}" />
+                      <input type="hidden" th:id="previewImageRenderingHints-json" th:field="*{previewImageRenderingHints}" />
                       <th:block th:each="language, iter : ${existingLanguages}">
-                        <div th:replace="fragments/forms/multilanguage-label-form :: html(fieldLanguage=${language},active=${iter.index == 0},beanName='license')"></div>
+                        <div th:replace="fragments/forms/multilanguage-teaser::renderHtml(fieldLanguage='__${language}__',active=__${iter.index == 0}__,beanName='website')"></div>
                       </th:block>
                     </div>
                   </div>
+
                 </div>
               </div>
 
@@ -76,21 +82,12 @@
                 </div>
               </div>
 
-              <div class="form-row">
-                <div class="col">
-                  <div class="form-group" th:classappend="${#fields.hasErrors('acronym')}? has-error">
-                    <label for="acronym" class="required" th:text="#{lbl.acronym}">Acronym</label>
-                    <input id="acronym" type="text" class="form-control" autofocus="autofocus" required="" value=""
-                           th:field="*{acronym}"
-                           th:classappend="${#fields.hasErrors('acronym')}? 'is-invalid'">
-                    <p th:if="${#fields.hasErrors('acronym')}" th:errors="*{acronym}">...</p>
-                  </div>
-                </div>
-              </div>
             </div>
           </form>
         </div>
       </div>
+
+      <th:block th:replace="fragments/modals/select-image :: select-image-dialog"></th:block>
     </th:block>
   </body>
 

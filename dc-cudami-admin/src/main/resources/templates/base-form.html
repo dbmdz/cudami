@@ -5,6 +5,7 @@
       xmlns:data="https://github.com/mxab/thymeleaf-extras-data-attribute"
       layout:decorate="~{base}">
   <head>
+    <link th:href="@{/css/floating-labels.css}" rel="stylesheet">
     <link th:href="@{/css/tiptap.css}" rel="stylesheet">
     <script async th:src="@{/webjars/es-module-shims/dist/es-module-shims.js}"></script>
     <script type="importmap">
@@ -12,7 +13,9 @@
       "imports": {
       "@cudami/tiptap/extension-custom-bold": "/js/tiptap/extension-custom-bold.js",
       "@cudami/tiptap/extension-custom-bulletlist": "/js/tiptap/extension-custom-bulletlist.js",
+      "@cudami/tiptap/extension-custom-hardbreak": "/js/tiptap/extension-custom-hardbreak.js",
       "@cudami/tiptap/extension-custom-italic": "/js/tiptap/extension-custom-italic.js",
+      "@cudami/tiptap/extension-custom-listitem": "/js/tiptap/extension-custom-listitem.js",
       "@cudami/tiptap/extension-custom-orderedlist": "/js/tiptap/extension-custom-orderedlist.js",
       "@cudami/tiptap/extension-custom-strike": "/js/tiptap/extension-custom-strike.js",
       "@cudami/tiptap": "/js/tiptap/tiptap-customizations.js",

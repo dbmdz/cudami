@@ -7,13 +7,13 @@ import { CodeBlock } from '@tiptap/extension-code-block';
 import { Document } from '@tiptap/extension-document';
 import { Dropcursor } from '@tiptap/extension-dropcursor';
 import { Gapcursor } from '@tiptap/extension-gapcursor';
-import { HardBreak } from '@tiptap/extension-hard-break';
+// import { HardBreak } from '@tiptap/extension-hard-break';
 import { Heading } from '@tiptap/extension-heading';
 import { History } from '@tiptap/extension-history';
 import { HorizontalRule } from '@tiptap/extension-horizontal-rule';
 // import { Italic } from '@tiptap/extension-italic';
 import { Link } from '@tiptap/extension-link';
-import { ListItem } from '@tiptap/extension-list-item';
+// import { ListItem } from '@tiptap/extension-list-item';
 // import { OrderedList } from '@tiptap/extension-ordered-list';
 import { Paragraph } from '@tiptap/extension-paragraph';
 // import { Strike } from '@tiptap/extension-strike';
@@ -24,8 +24,10 @@ import { Underline } from '@tiptap/extension-underline';
 
 import { CustomBold } from '@cudami/tiptap/extension-custom-bold';
 import { CustomBulletList } from '@cudami/tiptap/extension-custom-bulletlist';
+import { CustomHardBreak } from '@cudami/tiptap/extension-custom-hardbreak';
 import { CustomItalic } from '@cudami/tiptap/extension-custom-italic';
 import { CustomOrderedList } from '@cudami/tiptap/extension-custom-orderedlist';
+import { CustomListItem } from '@cudami/tiptap/extension-custom-listitem';
 import { CustomStrike } from '@cudami/tiptap/extension-custom-strike';
 
 const CustomLink = Link.extend({
@@ -51,21 +53,23 @@ class MiniEditor extends Editor {
         CodeBlock,
         CustomBold,
         CustomBulletList,
+        CustomHardBreak,
         CustomItalic,
         CustomLink.configure({
           openOnClick: false
         }),
+        CustomListItem,
         CustomOrderedList,
         CustomStrike,
         Document,
         Dropcursor,
         Gapcursor,
-        HardBreak,
+        // HardBreak,
         Heading,
         History,
         HorizontalRule,
         // Italic,
-        ListItem,
+        // ListItem,
         // OrderedList,
         Paragraph,
         // Strike,

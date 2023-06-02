@@ -79,6 +79,11 @@ div.multilanguage {
   border-right: solid 5px #C6E2FF;
 }
 
+.dropzone {
+  border: 1px dashed lightgray !important;
+  border-radius: 0px !important;
+}
+
 .error {
   color: rgb(220, 53, 69);
 }
@@ -104,6 +109,11 @@ label {
   padding: 0.5em;
   text-align: center;
 }
+
+div.nav-link a {
+  color: #495057;
+}
+
 .nav-sidebar .nav-item .nav-link:hover {
   color: #FFF;
 }
