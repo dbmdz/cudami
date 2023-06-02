@@ -1,6 +1,6 @@
 import { Node, mergeAttributes } from '@tiptap/core';
 
-// same as HardBreak extension: just name and class name changed to match JSON "list_item" instead "listItem"
+// same as HardBreak extension: just name and class name changed to match JSON "hard_break" instead "hardBreak"
 // and removed sourcemap comment at bottom
 const CustomHardBreak = Node.create({
   name: 'hard_break',
