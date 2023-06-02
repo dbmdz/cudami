@@ -6,6 +6,7 @@ import de.digitalcollections.cudami.server.business.api.service.exceptions.Servi
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.ArticleService;
 import de.digitalcollections.cudami.server.controller.CudamiControllerException;
 import de.digitalcollections.cudami.server.controller.legacy.V5MigrationHelper;
+import de.digitalcollections.cudami.server.controller.legacy.model.LegacyPageRequest;
 import de.digitalcollections.model.identifiable.entity.Article;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
@@ -44,7 +45,7 @@ public class V5ArticleController {
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
       @RequestParam(name = "searchTerm", required = false) String searchTerm)
       throws CudamiControllerException, ServiceException {
-    PageRequest pageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
+    PageRequest pageRequest = new LegacyPageRequest(searchTerm, pageNumber, pageSize);
     if (sortBy != null) {
       Sorting sorting = new Sorting(V5MigrationHelper.migrate(sortBy));
       pageRequest.setSorting(sorting);

@@ -6,6 +6,7 @@ import de.digitalcollections.cudami.server.business.api.service.exceptions.Servi
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifiableService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.alias.UrlAliasService;
 import de.digitalcollections.cudami.server.controller.legacy.V5MigrationHelper;
+import de.digitalcollections.cudami.server.controller.legacy.model.LegacyPageRequest;
 import de.digitalcollections.model.identifiable.Identifiable;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
@@ -55,7 +56,7 @@ public class V5IdentifiableController {
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
       @RequestParam(name = "searchTerm", required = false) String searchTerm)
       throws JsonProcessingException, ServiceException {
-    PageRequest pageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
+    PageRequest pageRequest = new LegacyPageRequest(searchTerm, pageNumber, pageSize);
     if (sortBy != null) {
       Sorting sorting = new Sorting(V5MigrationHelper.migrate(sortBy));
       pageRequest.setSorting(sorting);

@@ -6,6 +6,7 @@ import de.digitalcollections.cudami.server.business.api.service.exceptions.Servi
 import de.digitalcollections.cudami.server.business.api.service.identifiable.agent.FamilyNameService;
 import de.digitalcollections.cudami.server.controller.CudamiControllerException;
 import de.digitalcollections.cudami.server.controller.legacy.V5MigrationHelper;
+import de.digitalcollections.cudami.server.controller.legacy.model.LegacyPageRequest;
 import de.digitalcollections.model.identifiable.agent.FamilyName;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
@@ -46,7 +47,7 @@ public class V5FamilyNameController {
       @RequestParam(name = "searchTerm", required = false) String searchTerm,
       @RequestParam(name = "initial", required = false) String initial)
       throws JsonProcessingException, CudamiControllerException, ServiceException {
-    PageRequest pageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
+    PageRequest pageRequest = new LegacyPageRequest(searchTerm, pageNumber, pageSize);
     if (sortBy != null) {
       Sorting sorting = new Sorting(sortBy);
       pageRequest.setSorting(sorting);
