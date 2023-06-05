@@ -142,6 +142,49 @@
     </th:block>
   </th:block>
 
+  <th:block th:fragment="renderEntity(entity)">
+    <th:block th:if="${(entity != null)}">
+      <span th:switch="${entity.identifiableObjectType?.name()}">
+        <a
+                th:case="'DIGITAL_OBJECT'"
+                th:href="@{/digitalobjects/{uuid}(uuid=${entity.uuid})}"
+                th:text="${entity.label?.getText(defaultLanguage)} ?: ${entity.uuid}"
+        >
+          digital object label
+        </a>
+        <a
+                th:case="'ITEM'"
+                th:href="@{/items/{uuid}(uuid=${entity.uuid})}"
+                th:text="${entity.label?.getText(defaultLanguage)} ?: ${entity.uuid}"
+        >
+          item label
+        </a>
+        <a
+                th:case="'MANIFESTATION'"
+                th:href="@{/manifestations/{uuid}(uuid=${entity.uuid})}"
+                th:text="${entity.label?.getText(defaultLanguage)} ?: ${entity.uuid}"
+        >
+          manifestation label
+        </a>
+        <a
+                th:case="'WORK'"
+                th:href="@{/works/{uuid}(uuid=${entity.uuid})}"
+                th:text="${entity.label?.getText(defaultLanguage)} ?: ${entity.uuid}"
+        >
+          work label
+        </a>
+        <a
+                th:case="'ITEM'"
+                th:href="@{/items/{uuid}(uuid=${entity.uuid})}"
+                th:text="${entity.label?.getText(defaultLanguage)} ?: ${entity.uuid}"
+        >
+          item label
+        </a>
+        <span th:case="*" th:text="${geolocation.label?.getText(defaultLanguage)} ?: ${geolocation.uuid}">geolocation label</span>
+      </span>
+    </th:block>
+  </th:block>
+
 
   <th:block th:fragment="renderRelations(relations)">
     <div class="row">
@@ -157,6 +200,10 @@
                       <th:block th:case="'GEOLOCATION'" th:insert="~{::renderGeolocation(${subject})}"></th:block>
                       <th:block th:case="'GEO_LOCATION'" th:insert="~{::renderGeolocation(${subject})}"></th:block>
                       <th:block th:case="'EVENT'" th:insert="~{::renderEvent(${subject})}"></th:block>
+                      <th:block th:case="'DIGITAL_OBJECT'" th:insert="~{::renderEntity(${subject})}"></th:block>
+                      <th:block th:case="'ITEM'" th:insert="~{::renderEntity(${subject})}"></th:block>
+                      <th:block th:case="'MANIFESTATION'" th:insert="~{::renderEntity(${subject})}"></th:block>
+                      <th:block th:case="'WORK'" th:insert="~{::renderEntity(${subject})}"></th:block>
                     </span>
             &nbsp;
             <span class="border border-dark p-2 badge badge-light mr-2">
