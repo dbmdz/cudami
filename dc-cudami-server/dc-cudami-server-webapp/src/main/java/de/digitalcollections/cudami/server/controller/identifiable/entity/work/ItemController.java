@@ -249,6 +249,23 @@ public class ItemController extends AbstractEntityController<Item> {
         : new ResponseEntity<>(HttpStatus.NOT_FOUND);
   }
 
+  @Operation(summary = "Remove the parent item relation(attribute partOf) from all of its children")
+  @DeleteMapping(
+      value = {"/v6/items/{parentItemUuid:" + ParameterHelper.UUID_PATTERN + "}/children/all"},
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity removeAllChildrenOfParentItem(
+      @Parameter(example = "", description = "UUID of the parent item")
+          @PathVariable("parentItemUuid")
+          UUID parentItemUuid)
+      throws ServiceException {
+    Item parentItem = buildExampleWithUuid(parentItemUuid);
+
+    boolean successful = service.removeParentItemChildren(parentItem);
+    return successful
+        ? new ResponseEntity<>(HttpStatus.NO_CONTENT)
+        : new ResponseEntity<>(HttpStatus.NOT_FOUND);
+  }
+
   @Operation(summary = "save a newly created item")
   @PostMapping(
       value = {"/v6/items", "/v5/items", "/v2/items", "/latest/items"},

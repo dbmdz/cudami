@@ -32,4 +32,6 @@ public interface ItemService extends EntityService<Item> {
    * @throws ServiceException
    */
   boolean clearPartOfItem(Item item, Item parentItem) throws ServiceException;
+
+  boolean removeParentItemChildren(Item parentItem) throws ServiceException;
 }
