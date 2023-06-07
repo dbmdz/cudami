@@ -22,4 +22,14 @@ public interface ItemService extends EntityService<Item> {
 
   List<Locale> getLanguagesOfItemsForManifestation(Manifestation manifestation)
       throws ServiceException;
+
+  /**
+   * Clears and saves the partOfItem attribute of an item
+   *
+   * @param item
+   * @param parentItem
+   * @return boolean value for success
+   * @throws ServiceException
+   */
+  boolean clearPartOfItem(Item item, Item parentItem) throws ServiceException;
 }

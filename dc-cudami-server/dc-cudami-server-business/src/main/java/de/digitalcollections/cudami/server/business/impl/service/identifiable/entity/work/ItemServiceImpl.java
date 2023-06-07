@@ -5,6 +5,7 @@ import de.digitalcollections.cudami.server.backend.api.repository.exceptions.Rep
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.work.ItemRepository;
 import de.digitalcollections.cudami.server.business.api.service.LocaleService;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifierService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.alias.UrlAliasService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.work.ItemService;
@@ -43,6 +44,26 @@ public class ItemServiceImpl extends EntityServiceImpl<Item> implements ItemServ
         hookProperties,
         localeService,
         cudamiConfig);
+  }
+
+  @Override
+  public boolean clearPartOfItem(Item item, Item parentItem) throws ServiceException {
+    item = getByExample(item);
+    if (item == null) {
+      return false;
+    }
+    if (item.getPartOfItem() == null
+        || !item.getPartOfItem().getUuid().equals(parentItem.getUuid())) {
+      return false;
+    }
+
+    item.setPartOfItem(null);
+    try {
+      update(item);
+    } catch (ValidationException e) {
+      throw new ServiceException("Cannot not clear part of item: " + e, e);
+    }
+    return true;
   }
 
   @Override

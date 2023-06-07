@@ -230,6 +230,25 @@ public class ItemController extends AbstractEntityController<Item> {
     return Set.of(workService.getByItem(buildExampleWithUuid(uuid)));
   }
 
+  @Operation(summary = "Remove an existing parent item (attribute partOf) from an existing item")
+  @DeleteMapping(
+      value = {"/v6/items/{uuid:" + ParameterHelper.UUID_PATTERN + "}/parent/{parentItemUuid}"},
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity removeParentItem(
+      @Parameter(example = "", description = "UUID of the item") @PathVariable("uuid") UUID uuid,
+      @Parameter(example = "", description = "UUID of the parent item")
+          @PathVariable("parentItemUuid")
+          UUID parentItemUuid)
+      throws ServiceException {
+    Item item = buildExampleWithUuid(uuid);
+    Item parentItem = buildExampleWithUuid(parentItemUuid);
+
+    boolean successful = service.clearPartOfItem(item, parentItem);
+    return successful
+        ? new ResponseEntity<>(HttpStatus.NO_CONTENT)
+        : new ResponseEntity<>(HttpStatus.NOT_FOUND);
+  }
+
   @Operation(summary = "save a newly created item")
   @PostMapping(
       value = {"/v6/items", "/v5/items", "/v2/items", "/latest/items"},
