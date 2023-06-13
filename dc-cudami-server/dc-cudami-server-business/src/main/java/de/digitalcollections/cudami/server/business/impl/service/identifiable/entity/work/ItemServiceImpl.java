@@ -5,6 +5,7 @@ import de.digitalcollections.cudami.server.backend.api.repository.exceptions.Rep
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.work.ItemRepository;
 import de.digitalcollections.cudami.server.business.api.service.LocaleService;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifierService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.alias.UrlAliasService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.work.ItemService;
@@ -13,6 +14,8 @@ import de.digitalcollections.cudami.server.config.HookProperties;
 import de.digitalcollections.model.identifiable.entity.digitalobject.DigitalObject;
 import de.digitalcollections.model.identifiable.entity.item.Item;
 import de.digitalcollections.model.identifiable.entity.manifestation.Manifestation;
+import de.digitalcollections.model.list.filtering.FilterCriterion;
+import de.digitalcollections.model.list.filtering.Filtering;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import java.util.List;
@@ -43,6 +46,26 @@ public class ItemServiceImpl extends EntityServiceImpl<Item> implements ItemServ
         hookProperties,
         localeService,
         cudamiConfig);
+  }
+
+  @Override
+  public boolean clearPartOfItem(Item item, Item parentItem) throws ServiceException {
+    item = getByExample(item);
+    if (item == null) {
+      return false;
+    }
+    if (item.getPartOfItem() == null
+        || !item.getPartOfItem().getUuid().equals(parentItem.getUuid())) {
+      return false;
+    }
+
+    item.setPartOfItem(null);
+    try {
+      update(item);
+    } catch (ValidationException e) {
+      throw new ServiceException("Cannot not clear part of item: " + e, e);
+    }
+    return true;
   }
 
   @Override
@@ -80,6 +103,39 @@ public class ItemServiceImpl extends EntityServiceImpl<Item> implements ItemServ
       throws ServiceException {
     try {
       return ((ItemRepository) repository).getLanguagesOfItemsForManifestation(manifestation);
+    } catch (RepositoryException e) {
+      throw new ServiceException("Backend failure", e);
+    }
+  }
+
+  @Override
+  public boolean removeParentItemChildren(Item parentItem) throws ServiceException {
+    PageRequest pageRequest =
+        PageRequest.builder()
+            .filtering(
+                Filtering.builder()
+                    .add(
+                        FilterCriterion.builder()
+                            .withExpression("partOfItem.uuid")
+                            .isEquals(parentItem.getUuid())
+                            .build())
+                    .build())
+            .pageSize(99999)
+            .pageNumber(0)
+            .build();
+    try {
+      PageResponse<Item> pageResponse = repository.find(pageRequest);
+      if (pageResponse == null
+          || pageResponse.getContent() == null
+          || pageResponse.getContent().isEmpty()) {
+        return false;
+      }
+      for (Item childItem : pageResponse.getContent()) {
+        if (!clearPartOfItem(childItem, parentItem)) {
+          return false;
+        }
+      }
+      return true;
     } catch (RepositoryException e) {
       throw new ServiceException("Backend failure", e);
     }
