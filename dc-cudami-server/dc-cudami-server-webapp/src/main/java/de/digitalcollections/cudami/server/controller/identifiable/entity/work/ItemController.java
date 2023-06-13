@@ -230,9 +230,16 @@ public class ItemController extends AbstractEntityController<Item> {
     return Set.of(workService.getByItem(buildExampleWithUuid(uuid)));
   }
 
-  @Operation(summary = "Remove an existing parent item (attribute partOfItem) from an existing item")
+  @Operation(
+      summary = "Remove an existing parent item (attribute partOfItem) from an existing item")
   @DeleteMapping(
-      value = {"/v6/items/{uuid:" + ParameterHelper.UUID_PATTERN + "}/parent/{parentItemUuid:" + ParameterHelper.UUID_PATTERN + "}"},
+      value = {
+        "/v6/items/{uuid:"
+            + ParameterHelper.UUID_PATTERN
+            + "}/parent/{parentItemUuid:"
+            + ParameterHelper.UUID_PATTERN
+            + "}"
+      },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity removeParentItem(
       @Parameter(example = "", description = "UUID of the item") @PathVariable("uuid") UUID uuid,
@@ -249,7 +256,8 @@ public class ItemController extends AbstractEntityController<Item> {
         : new ResponseEntity<>(HttpStatus.NOT_FOUND);
   }
 
-  @Operation(summary = "Remove the parent item relation(attribute partOfItem) from all of its children")
+  @Operation(
+      summary = "Remove the parent item relation(attribute partOfItem) from all of its children")
   @DeleteMapping(
       value = {"/v6/items/{parentItemUuid:" + ParameterHelper.UUID_PATTERN + "}/children/all"},
       produces = MediaType.APPLICATION_JSON_VALUE)
