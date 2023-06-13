@@ -18,7 +18,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
 - Added status storing of new tables (navigating back to list shows list in last status)
 - Added highlighting of searched term in result lists in new table lists on `Articles`, `DigitalObjects`, `Collections`
 - Add backend and GUI for `Event`
-- Add convenience controller endpointis for items to remove a parent (attribute `partOf`)
+- Add convenience controller endpoints for items to remove a parent (attribute `partOf`)
 - Add or-linked filtering: new request parameter `filtering` with new complex syntax:
 
   - single conditions are separated by semicolon  
