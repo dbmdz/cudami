@@ -97,3 +97,5 @@ cudami:
         subType: PART
       - mainType: UNI
         subType: SUB
+      - mainType: ISSN
+        subType: MAIN
