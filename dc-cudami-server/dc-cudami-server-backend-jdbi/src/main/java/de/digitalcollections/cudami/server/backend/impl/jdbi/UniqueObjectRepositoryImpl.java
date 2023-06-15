@@ -549,11 +549,12 @@ public abstract class UniqueObjectRepositoryImpl<U extends UniqueObject>
       // save) to make saving on storage using uuid is possible
       uniqueObject.setUuid(UUID.randomUUID());
     }
+    LocalDateTime now = LocalDateTime.now();
     if (uniqueObject.getCreated() == null) {
-      uniqueObject.setCreated(LocalDateTime.now());
+      uniqueObject.setCreated(now);
     }
     if (uniqueObject.getLastModified() == null) {
-      uniqueObject.setLastModified(LocalDateTime.now());
+      uniqueObject.setLastModified(now);
     }
     boolean hasReturningStmt = !getReturnedFieldsOnInsertUpdate().isEmpty();
     String sql =
