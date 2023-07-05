@@ -79,4 +79,9 @@ public class CudamiItemsClient extends CudamiEntitiesClient<Item> {
   public List getWorks(UUID uuid) throws TechnicalException {
     return doGetRequestForObjectList(String.format("%s/%s/works", baseEndpoint, uuid), Work.class);
   }
+
+  public void removeParentFromAllChildren(Item parentItem) throws TechnicalException {
+    doDeleteRequestForString(
+        String.format("%s/%s/children/all", baseEndpoint, parentItem.getUuid()));
+  }
 }
