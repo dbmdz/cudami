@@ -4,10 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.web.WebpageRepository;
@@ -162,12 +159,14 @@ class WebpageServiceImplTest extends AbstractServiceImplTest {
   public void rejectsEmptyWebpage() {
     Webpage webpage = new Webpage();
     UrlAlias urlAlias1 = new UrlAlias();
+    urlAlias1.setTargetLanguage(Locale.GERMAN);
     urlAlias1.setSlug("foo");
     urlAlias1.setPrimary(true);
     Website website = new Website();
     website.setUuid(UUID.randomUUID());
     urlAlias1.setWebsite(website);
     UrlAlias urlAlias2 = new UrlAlias();
+    urlAlias2.setTargetLanguage(Locale.GERMAN);
     urlAlias2.setSlug("bar");
     urlAlias2.setPrimary(false);
     LocalizedUrlAliases localizedUrlAliases = new LocalizedUrlAliases(urlAlias1, urlAlias2);
