@@ -12,8 +12,12 @@ import de.digitalcollections.model.identifiable.entity.HeadwordEntry;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.list.sorting.Order;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import org.apache.commons.codec.binary.Base64;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -131,6 +135,26 @@ public class IdentifiableController
   @GetMapping(value = {"/identifiables/{namespace:[a-zA-Z_\\-]+}:{id:.+}"})
   public String view(@PathVariable String namespace, @PathVariable String id, Model model)
       throws TechnicalException, ResourceNotFoundException {
+    Identifiable identifiable =
+        ((CudamiIdentifiablesClient) service).getByIdentifier(namespace, id);
+    if (identifiable == null) {
+      throw new ResourceNotFoundException("get entity by identifier with " + namespace + ":" + id);
+    }
+    return doForward(identifiable, model);
+  }
+
+  @GetMapping(value = {"/identifiables/{base64:[^:]+}"})
+  public String viewBase64Encoded(@PathVariable String base64, Model model)
+      throws TechnicalException, ResourceNotFoundException {
+    String paramString = new String(Base64.decodeBase64(base64), StandardCharsets.UTF_8);
+    Pattern identifierParamPattern = Pattern.compile("^([^:]+?):(.*)$");
+    Matcher identifierParamMatcher = identifierParamPattern.matcher(paramString);
+    if (!identifierParamMatcher.matches()) {
+      throw new ResourceNotFoundException("get entity by identifier with " + paramString);
+    }
+    String namespace = identifierParamMatcher.group(1);
+    String id = identifierParamMatcher.group(2);
+
     Identifiable identifiable =
         ((CudamiIdentifiablesClient) service).getByIdentifier(namespace, id);
     if (identifiable == null) {

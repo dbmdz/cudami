@@ -8,11 +8,7 @@ import de.digitalcollections.model.exception.TechnicalException;
 import de.digitalcollections.model.identifiable.Identifiable;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Locale;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.apache.commons.lang3.tuple.Pair;
@@ -39,11 +35,13 @@ public class AbstractIdentifiablesController<
           identifiables.stream()
               .flatMap(
                   child ->
-                      Stream.concat(
-                          child.getLabel().getLocales().stream(),
-                          child.getDescription() != null
-                              ? child.getDescription().keySet().stream()
-                              : Stream.of()))
+                      child.getLabel() != null
+                          ? Stream.concat(
+                              child.getLabel().getLocales().stream(),
+                              child.getDescription() != null
+                                  ? child.getDescription().keySet().stream()
+                                  : Stream.of())
+                          : Stream.of())
               .collect(Collectors.toList());
       existingLanguages =
           languageService.sortLanguages(LocaleContextHolder.getLocale(), existingLanguages);

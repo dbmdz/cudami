@@ -1,7 +1,6 @@
 package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable;
 
 import static de.digitalcollections.cudami.server.backend.impl.asserts.CudamiAssertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThat;
 
 import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
@@ -31,12 +30,7 @@ import de.digitalcollections.model.text.StructuredContent;
 import de.digitalcollections.model.text.contentblock.Paragraph;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.IntStream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -84,6 +78,7 @@ class IdentifiableRepositoryImplTest
     LocalizedUrlAliases localizedUrlAliases = new LocalizedUrlAliases();
     UrlAlias urlAlias = new UrlAlias();
     urlAlias.setPrimary(true);
+    urlAlias.setTargetLanguage(Locale.GERMAN);
     urlAlias.setSlug("label1");
     urlAlias.setTarget(identifiable1);
     localizedUrlAliases.add(urlAlias);
@@ -92,9 +87,10 @@ class IdentifiableRepositoryImplTest
     Identifiable identifiable2 = createIdentifiable();
     LocalizedUrlAliases localizedUrlAliases2 = new LocalizedUrlAliases();
     UrlAlias urlAlias2 = new UrlAlias();
-    urlAlias.setPrimary(true);
-    urlAlias.setSlug("label2");
-    urlAlias.setTarget(identifiable2);
+    urlAlias2.setPrimary(true);
+    urlAlias2.setTargetLanguage(Locale.GERMAN);
+    urlAlias2.setSlug("label2");
+    urlAlias2.setTarget(identifiable2);
     localizedUrlAliases2.add(urlAlias2);
     identifiable2.setLocalizedUrlAliases(localizedUrlAliases2);
 
