@@ -12,15 +12,14 @@ import java.util.Locale;
 import java.util.Optional;
 import java.util.function.Function;
 import org.jdbi.v3.core.Jdbi;
+import org.jdbi.v3.core.mapper.reflect.BeanMapper;
 import org.springframework.stereotype.Repository;
 
 @Repository
-// FIXME: using the mapping prefix leads to mapping issues (the corresponding test in
-// EntityRelationRepositoryTest#L71 fails)
 public class PredicateRepositoryImpl extends UniqueObjectRepositoryImpl<Predicate>
     implements PredicateRepository {
 
-  public static final String MAPPING_PREFIX = "pred";
+  public static final String MAPPING_PREFIX = "pr";
   public static final String TABLE_ALIAS = "pred";
   public static final String TABLE_NAME = "predicates";
 
@@ -32,6 +31,7 @@ public class PredicateRepositoryImpl extends UniqueObjectRepositoryImpl<Predicat
         MAPPING_PREFIX,
         Predicate.class,
         cudamiConfig.getOffsetForAlternativePaging());
+    dbi.registerRowMapper(BeanMapper.factory(Predicate.class, MAPPING_PREFIX));
   }
 
   @Override
@@ -69,7 +69,7 @@ public class PredicateRepositoryImpl extends UniqueObjectRepositoryImpl<Predicat
             + " WHERE value = :value";
     Optional<Predicate> result =
         dbi.withHandle(
-            h -> h.createQuery(query).bind("value", value).mapToBean(Predicate.class).findFirst());
+            h -> h.createQuery(query).bind("value", value).mapTo(Predicate.class).findFirst());
     return result.orElse(null);
   }
 
