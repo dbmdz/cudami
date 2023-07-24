@@ -136,6 +136,9 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
   // }],"width":6700,"height":4700}, ...]
   //
   private ImageFileResource convertToImageFileResource(Canvas canvas) throws MalformedURLException {
+    if (canvas.getImages() == null) {
+      return null;
+    }
     ImageContent imageContent = (ImageContent) canvas.getImages().get(0).getResource();
     de.digitalcollections.iiif.model.MimeType mimeType = imageContent.getFormat();
     URL httpBaseUrl = imageContent.getServices().get(0).getIdentifier().toURL();
@@ -499,7 +502,9 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
       List<Canvas> canvases = manifest.getDefaultSequence().getCanvases();
       for (Canvas canvas : canvases) {
         ImageFileResource ifr = convertToImageFileResource(canvas);
-        result.add(ifr);
+        if (ifr != null) {
+          result.add(ifr);
+        }
       }
       return result;
     } catch (MalformedURLException e) {
