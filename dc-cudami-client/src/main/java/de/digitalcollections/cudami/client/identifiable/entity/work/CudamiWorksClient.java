@@ -29,6 +29,7 @@ public class CudamiWorksClient extends CudamiEntitiesClient<Work> {
   }
 
   public List getItems(UUID uuid) throws TechnicalException {
+    // FIXME: not supported/existing in server controller WorkController?
     return doGetRequestForObjectList(String.format("%s/%s/items", baseEndpoint, uuid), Item.class);
   }
 
