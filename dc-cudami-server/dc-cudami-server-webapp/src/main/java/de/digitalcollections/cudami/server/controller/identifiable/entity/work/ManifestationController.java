@@ -123,7 +123,7 @@ public class ManifestationController extends AbstractEntityController<Manifestat
   @GetMapping(
       value = {"/v6/manifestations/{uuid:" + ParameterHelper.UUID_PATTERN + "}/children"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public PageResponse<Manifestation> findSubcollections(
+  public PageResponse<Manifestation> findChildren(
       @Parameter(example = "", description = "UUID of the manifestation") @PathVariable("uuid")
           UUID uuid,
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
