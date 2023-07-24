@@ -128,6 +128,7 @@ public class CudamiIdentifiablesClient<I extends Identifiable> extends CudamiRes
   }
 
   public List<Locale> getLanguages() throws TechnicalException {
+    // FIXME: endoint on server side missing?
     return this.doGetRequestForObjectList(baseEndpoint + "/languages", Locale.class);
   }
 
