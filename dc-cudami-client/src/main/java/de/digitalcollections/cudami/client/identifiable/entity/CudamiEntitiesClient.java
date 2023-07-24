@@ -7,6 +7,8 @@ import de.digitalcollections.model.exception.http.client.ResourceNotFoundExcepti
 import de.digitalcollections.model.identifiable.entity.Entity;
 import de.digitalcollections.model.identifiable.entity.relation.EntityRelation;
 import de.digitalcollections.model.identifiable.resource.FileResource;
+import de.digitalcollections.model.list.paging.PageRequest;
+import de.digitalcollections.model.list.paging.PageResponse;
 import java.net.http.HttpClient;
 import java.util.List;
 import java.util.UUID;
@@ -66,20 +68,43 @@ public class CudamiEntitiesClient<E extends Entity> extends CudamiIdentifiablesC
         String.format("%s/random?count=%d", BASE_ENDPOINT_ENTITIES, count), Entity.class);
   }
 
+  @Deprecated(forRemoval = true)
   public List<FileResource> getRelatedFileResources(UUID uuid) throws TechnicalException {
-    return doGetRequestForObjectList(
-        String.format("%s/%s/related/fileresources", BASE_ENDPOINT_ENTITIES, uuid),
-        FileResource.class);
+    PageResponse<FileResource> pageResponse =
+        getRelatedFileResources(uuid, PageRequest.builder().pageNumber(0).pageSize(1000).build());
+    return pageResponse.getContent();
   }
 
+  public PageResponse<FileResource> getRelatedFileResources(UUID uuid, PageRequest pageRequest)
+      throws TechnicalException {
+    PageResponse pageResponse =
+        doGetRequestForPagedObjectList(
+            String.format("%s/%s/related/fileresources", BASE_ENDPOINT_ENTITIES, uuid),
+            pageRequest,
+            FileResource.class);
+    return pageResponse;
+  }
+
+  @Deprecated(forRemoval = true)
   public List<EntityRelation> getRelations(UUID subjectEntityUuid) throws TechnicalException {
-    return doGetRequestForObjectList(
-        String.format("%s/relations/%s", BASE_ENDPOINT_ENTITIES, subjectEntityUuid),
-        EntityRelation.class);
+    PageResponse<EntityRelation> pageResponse =
+        getRelations(subjectEntityUuid, PageRequest.builder().pageNumber(0).pageSize(1000).build());
+    return pageResponse.getContent();
+  }
+
+  public PageResponse<EntityRelation> getRelations(UUID subjectEntityUuid, PageRequest pageRequest)
+      throws TechnicalException {
+    PageResponse pageResponse =
+        doGetRequestForPagedObjectList(
+            String.format("%s/relations/%s", BASE_ENDPOINT_ENTITIES, subjectEntityUuid),
+            pageRequest,
+            EntityRelation.class);
+    return pageResponse;
   }
 
   public List<FileResource> setRelatedFileResources(UUID uuid, List fileResources)
       throws TechnicalException {
+    // FIXME: endoint on server side missing?
     return doPostRequestForObjectList(
         String.format("%s/%s/related/fileresources", BASE_ENDPOINT_ENTITIES, uuid),
         fileResources,
