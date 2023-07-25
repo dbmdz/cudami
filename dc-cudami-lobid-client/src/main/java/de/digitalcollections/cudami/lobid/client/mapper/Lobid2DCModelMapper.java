@@ -181,11 +181,6 @@ public class Lobid2DCModelMapper {
       return cl;
     }
 
-    /*
-     * geoLocation.getHasGeometry().get(0).getType()).isEqualTo("Point");
-    assertThat(geoLocation.getHasGeometry().get(0).getAsWKT())
-        .containsExactly("Point ( +012.573850 +048.881259 )")
-     */
     return null;
   }
 
