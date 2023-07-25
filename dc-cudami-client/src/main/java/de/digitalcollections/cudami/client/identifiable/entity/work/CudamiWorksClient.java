@@ -5,7 +5,6 @@ import de.digitalcollections.cudami.client.identifiable.entity.CudamiEntitiesCli
 import de.digitalcollections.model.exception.TechnicalException;
 import de.digitalcollections.model.identifiable.entity.agent.Agent;
 import de.digitalcollections.model.identifiable.entity.digitalobject.DigitalObject;
-import de.digitalcollections.model.identifiable.entity.item.Item;
 import de.digitalcollections.model.identifiable.entity.manifestation.Manifestation;
 import de.digitalcollections.model.identifiable.entity.work.Work;
 import de.digitalcollections.model.list.paging.PageRequest;
@@ -26,11 +25,6 @@ public class CudamiWorksClient extends CudamiEntitiesClient<Work> {
     return (Set<Agent>)
         doGetRequestForObjectList(
             String.format("%s/%s/creators", baseEndpoint, uuid), DigitalObject.class);
-  }
-
-  public List getItems(UUID uuid) throws TechnicalException {
-    // FIXME: not supported/existing in server controller WorkController?
-    return doGetRequestForObjectList(String.format("%s/%s/items", baseEndpoint, uuid), Item.class);
   }
 
   public PageResponse<Work> findChildren(UUID uuid, PageRequest pageRequest)
