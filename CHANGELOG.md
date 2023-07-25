@@ -51,6 +51,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
 - Locale handling:
   - Switch language of displayed multilanguage data fields now using a select drop down instead of tabs in view and list pages
   - Switch language of displayed multilanguage data fields now also handling languages with script
+- Thymeleaf Date and TimeValue rendering fragment (date.html) and messages properties moved from cudami admin webapp to cudami client for easy reuse in frontend clients
 
 ### Fixed
 
