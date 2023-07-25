@@ -19,7 +19,7 @@ import org.springframework.stereotype.Repository;
 public class PredicateRepositoryImpl extends UniqueObjectRepositoryImpl<Predicate>
     implements PredicateRepository {
 
-  public static final String MAPPING_PREFIX = "pr";
+  public static final String MAPPING_PREFIX = "pred";
   public static final String TABLE_ALIAS = "pred";
   public static final String TABLE_NAME = "predicates";
 

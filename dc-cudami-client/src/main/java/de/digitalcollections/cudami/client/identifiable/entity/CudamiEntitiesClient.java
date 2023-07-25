@@ -104,7 +104,7 @@ public class CudamiEntitiesClient<E extends Entity> extends CudamiIdentifiablesC
 
   public List<FileResource> setRelatedFileResources(UUID uuid, List fileResources)
       throws TechnicalException {
-    // FIXME: endoint on server side missing?
+    // FIXME: endoint on server side missing! Implement it!
     return doPostRequestForObjectList(
         String.format("%s/%s/related/fileresources", BASE_ENDPOINT_ENTITIES, uuid),
         fileResources,
