@@ -15,7 +15,7 @@ class Lobid2DCModelMapperTest {
     lobidGeometry.setAsWKT(new String[] {"Point ( +012.573850 -048.881259 )"});
     CoordinateLocation coordinateLocation =
         Lobid2DCModelMapper.mapGeometryToCoordinateLocation(lobidGeometry);
-    assertEquals(coordinateLocation.getLatitude(), 12.573850d);
-    assertEquals(coordinateLocation.getLongitude(), -48.881259d);
+    assertEquals(coordinateLocation.getLatitude(), -48.881259d);
+    assertEquals(coordinateLocation.getLongitude(), 12.573850d);
   }
 }
