@@ -24,6 +24,7 @@ import de.digitalcollections.model.identifiable.entity.work.Work;
 import de.digitalcollections.model.identifiable.resource.ImageFileResource;
 import de.digitalcollections.model.identifiable.semantic.Subject;
 import de.digitalcollections.model.text.LocalizedText;
+import de.digitalcollections.model.text.Title;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
@@ -283,6 +284,9 @@ public class Lobid2DCModelMapper {
       work = new Work();
     }
     mapToIdentifiable(lobidWork, work);
+
+    // title
+    work.setTitles(List.of(Title.builder().text(work.getLabel()).build()));
     return work;
   }
 }
