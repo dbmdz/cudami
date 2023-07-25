@@ -33,6 +33,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
     > `?filtering={$OR;lastname:eq:foo;firstname:eq:foo};{$OR;age:gt:30;age:lt:20}` → (lastname == "foo" OR firstname == "foo") AND (age > 30 OR age < 20)
   - within the value(s) of a condition semicolons and braces (i.e. `;{}`) must be backslash escaped; URL encoding is necessary as usual
 
+- Added Lobid-Clients for missing Lobid objects
+
 ### Changed
 
 - WEMI parts: Manifestations, Works
@@ -55,10 +57,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
 - UrlAlias does actively ignore any script of the target's locale
 - **SQL migration** (can be **long running**) replaces every emtpy string key in the labels (that comes from `Locale.ROOT` as language)
 by `"und"`
+- `getByValue` method in `PredicateRepositoryImpl`
 
 ### Removed
 
 - **Breaking** Due to model changes, the tables `item_works` and `work_creators` are removed and their contents, if ever used, are lost.
+- Method `getItems` from `WorksClient`
 
 ## [6.2.3](https://github.com/dbmdz/cudami/releases/tag/6.2.3) - 2023-04-14
 
