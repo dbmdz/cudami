@@ -166,12 +166,12 @@ public class Lobid2DCModelMapper {
   public static CoordinateLocation mapGeometryToCoordinateLocation(LobidGeometry lobidGeometry) {
     if ("Point".equals(lobidGeometry.getType()) && lobidGeometry.getAsWKT() != null) {
       String wkt = lobidGeometry.getAsWKT()[0];
-      // Point ( +012.573850 +048.881259 ): latitude, longitude, precision:
+      // Point ( +012.573850 +048.881259 ): longitude, latitude, precision:
       wkt = wkt.substring(wkt.indexOf("(") + 1, wkt.indexOf(")")).trim();
-      String latitude = wkt.split(" ")[0];
-      Double lat = Double.parseDouble(latitude);
-      String longitude = wkt.split(" ")[1];
+      String longitude = wkt.split(" ")[0];
       Double lon = Double.parseDouble(longitude);
+      String latitude = wkt.split(" ")[1];
+      Double lat = Double.parseDouble(latitude);
       CoordinateLocation cl = new CoordinateLocation(lat, lon, 0d, 0.000001d);
 
       // TODO: maybe make use of library (already in pom.xml)
