@@ -259,10 +259,10 @@
             "<span th:text="${publishingInfo.datePresentation}">...</span>"
           </span>
           <span style="padding-right:0.5rem;" th:if="${publishingInfo.timeValueRange}">
-            <span th:insert="~{fragments/date::renderTimeValueRange(${publishingInfo.timeValueRange.start}, ${publishingInfo.timeValueRange.end})}">...</span>
+            <span th:insert="~{cudami/fragments/date::renderTimeValueRange(${publishingInfo.timeValueRange.start}, ${publishingInfo.timeValueRange.end})}">...</span>
           </span>
           <span style="padding-right:0.5rem;" th:if="${publishingInfo.navDateRange}">
-            (<span th:insert="~{fragments/date::renderLocalDateRange(${publishingInfo.navDateRange.start}, ${publishingInfo.navDateRange.end})}"></span>)
+            (<span th:insert="~{cudami/fragments/date::renderLocalDateRange(${publishingInfo.navDateRange.start}, ${publishingInfo.navDateRange.end})}"></span>)
           </span>
         </div>
         <div th:each="publisher: ${publishingInfo.publishers}">

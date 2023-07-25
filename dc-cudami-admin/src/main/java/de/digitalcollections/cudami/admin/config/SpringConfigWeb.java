@@ -15,12 +15,14 @@ import nz.net.ultraq.thymeleaf.layoutdialect.LayoutDialect;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
+import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Primary;
+import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 import org.springframework.format.FormatterRegistry;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistration;
@@ -114,6 +116,22 @@ public class SpringConfigWeb implements WebMvcConfigurer {
     // In case you want the filter to apply to specific URL patterns only (defaults to "/*")
     registration.addUrlPatterns("/*");
     return registration;
+  }
+
+  /**
+   * Create a resource bundle for your messages ("messages.properties"). This file goes in
+   * src/main/resources because you want it to appear at the root of the classpath on deployment.
+   *
+   * @return message source
+   */
+  @Bean(name = "messageSource")
+  public MessageSource messageSource() {
+    ReloadableResourceBundleMessageSource messageSource =
+        new ReloadableResourceBundleMessageSource();
+    messageSource.setBasenames("classpath:messages", "classpath:messages-cudami-client");
+    messageSource.setCacheSeconds(600);
+    messageSource.setDefaultEncoding("UTF-8");
+    return messageSource;
   }
 
   @Override

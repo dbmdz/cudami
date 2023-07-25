@@ -46,9 +46,9 @@
             <div class="row">
               <div class="col-md-3"><label th:text="#{lbl.life_data}">Life data</label></div>
               <div class="align-items-center col-md-9 d-flex">
-                <th:block th:insert="~{fragments/date::renderTimeValueRange(${person.getTimeValueOfBirth()}, ${person.getTimeValueOfDeath()})}"></th:block>
+                <th:block th:insert="~{cudami/fragments/date::renderTimeValueRange(${person.getTimeValueOfBirth()}, ${person.getTimeValueOfDeath()})}"></th:block>
                 &nbsp;<th:block th:if="${person.getDateOfBirth() != null || person.getDateOfDeath() != null}">
-                  (<span th:insert="~{fragments/date::renderLocalDateRange(${person.getDateOfBirth()}, ${person.getDateOfDeath()})}"></span>)
+                  (<span th:insert="~{cudami/fragments/date::renderLocalDateRange(${person.getDateOfBirth()}, ${person.getDateOfDeath()})}"></span>)
                  </th:block>
               </div>
             </div>

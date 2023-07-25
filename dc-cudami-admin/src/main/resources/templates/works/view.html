@@ -55,7 +55,7 @@
                   <span th:with="df=#{date.format},date=${creationDateRange.end}" th:text="${#temporals.format(date,df)}">01.01.2000</span>
                 </span>
                 <span th:if="${work.creationTimeValue}">
-                  ( <span th:insert="~{fragments/date :: renderTimeValue(${work.creationtimeValue})}">...</span> )
+                  ( <span th:insert="~{cudami/fragments/date :: renderTimeValue(${work.creationtimeValue})}">...</span> )
                 </span>
               </div>
             </div>
@@ -68,7 +68,7 @@
                   ( <span th:with="df=#{date.format},date=${work.firstAppearedDate}" th:text="${#temporals.format(date,df)}">01.01.2000</span> )
                 </span>
                 <span th:if="${work.firstAppearedTimeValue}">
-                  ( <span th:insert="~{fragments/date :: renderTimeValue(${work.firstAppearedTimeValue})}">...</span> )
+                  ( <span th:insert="~{cudami/fragments/date :: renderTimeValue(${work.firstAppearedTimeValue})}">...</span> )
                 </span>
               </div>
             </div>
