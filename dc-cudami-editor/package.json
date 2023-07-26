@@ -65,7 +65,7 @@
     "@babel/plugin-transform-runtime": "^7.19.6",
     "@fisker/prettier-config": "^5.0.6",
     "@types/lodash-es": "^4.17.6",
-    "@types/node": "^18.11.9",
+    "@types/node": "^20.4.5",
     "@types/react": "^18.0.15",
     "@types/react-dom": "^18.0.6",
     "eslint-plugin-react": "^7.31.11",
