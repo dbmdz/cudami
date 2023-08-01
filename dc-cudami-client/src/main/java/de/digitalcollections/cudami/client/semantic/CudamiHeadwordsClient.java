@@ -29,14 +29,7 @@ public class CudamiHeadwordsClient extends CudamiRestClient<Headword> {
     url = url + "?startId=" + startObject.getUuid();
     url = url + "&endId=" + endObject.getUuid();
 
-    int pageNumber = bucketObjectsRequest.getPageNumber();
-    if (pageNumber >= 0) {
-      url = url + "&pageNumber=" + pageNumber;
-    }
-    int pageSize = bucketObjectsRequest.getPageSize();
-    if (pageSize > 0) {
-      url = url + "&pageSize=" + pageSize;
-    }
+    url = url + "&" + getFindParamsAsString(bucketObjectsRequest);
 
     BucketObjectsResponse<Headword> result =
         (BucketObjectsResponse<Headword>) doGetRequestForObject(url, BucketObjectsResponse.class);
@@ -55,6 +48,8 @@ public class CudamiHeadwordsClient extends CudamiRestClient<Headword> {
       url = url + "&startId=" + startObject.getUuid();
       url = url + "&endId=" + endObject.getUuid();
     }
+
+    url = url + "&" + getSortParams(bucketsRequest);
 
     BucketsResponse<Headword> result =
         (BucketsResponse<Headword>) doGetRequestForObject(url, BucketsResponse.class);

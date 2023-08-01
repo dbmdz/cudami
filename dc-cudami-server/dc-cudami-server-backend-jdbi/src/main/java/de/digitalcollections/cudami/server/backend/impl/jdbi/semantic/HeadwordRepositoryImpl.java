@@ -6,6 +6,7 @@ import de.digitalcollections.cudami.server.backend.api.repository.semantic.Headw
 import de.digitalcollections.cudami.server.backend.impl.jdbi.UniqueObjectRepositoryImpl;
 import de.digitalcollections.model.identifiable.entity.Entity;
 import de.digitalcollections.model.identifiable.resource.FileResource;
+import de.digitalcollections.model.list.ListRequest;
 import de.digitalcollections.model.list.buckets.Bucket;
 import de.digitalcollections.model.list.buckets.BucketObjectsRequest;
 import de.digitalcollections.model.list.buckets.BucketObjectsResponse;
@@ -153,12 +154,24 @@ public class HeadwordRepositoryImpl extends UniqueObjectRepositoryImpl<Headword>
     argumentMappings.put("startUuid", startUuid);
     argumentMappings.put("endUuid", endUuid);
 
+    String sortColumn = getSortColumn(bucketObjectsRequest);
+
+    // to avoid duplicate "hw.label, hw.label" if sortColumn = "label",
+    // just add sortColumn in other cases:
+    String selectForLabel = getColumnName("label");
+    if (!sortColumn.equals(selectForLabel)) {
+      selectForLabel = selectForLabel + ", " + sortColumn;
+    }
+
     String baseQuery =
-        "WITH"
-            + " headwords_list AS (SELECT row_number() OVER (ORDER BY label) as num, uuid, label FROM "
-            + tableName
-            + "),"
-            + " hws AS (SELECT * FROM headwords_list WHERE num <@ int8range((SELECT num FROM headwords_list WHERE uuid = :startUuid), (SELECT num FROM headwords_list WHERE uuid = :endUuid), '[]'))";
+        """
+        WITH headwords_list AS (SELECT row_number() OVER (ORDER BY {{sortColumn}}) as num, {{tableAlias}}.uuid, {{selectForLabel}} FROM {{tableName}} AS {{tableAlias}}),
+          hws AS (SELECT * FROM headwords_list WHERE num <@ int8range((SELECT num FROM headwords_list WHERE uuid = :startUuid), (SELECT num FROM headwords_list WHERE uuid = :endUuid), '[]'))
+        """
+            .replace("{{selectForLabel}}", selectForLabel)
+            .replace("{{sortColumn}}", sortColumn)
+            .replace("{{tableAlias}}", tableAlias)
+            .replace("{{tableName}}", tableName);
 
     // query data
     StringBuilder dataQuery = new StringBuilder(baseQuery);
@@ -207,12 +220,22 @@ public class HeadwordRepositoryImpl extends UniqueObjectRepositoryImpl<Headword>
     int numberOfBuckets = bucketsRequest.getNumberOfBuckets();
     argumentMappings.put("numberOfBuckets", numberOfBuckets);
 
+    String sortColumn = getSortColumn(bucketsRequest);
+
     /*
      * - get an alphabetically sorted (ASC: A-Z) and numbered list, - divide it in
      * e.g. 100 (numberOfBuckets) same sized sublists (buckets), - get first and
      * last result of each bucket (lower and upper border)
      */
     StringBuilder sqlQuery = new StringBuilder(0);
+
+    // to avoid duplicate "hw.label, hw.label" if sortColumn = "label",
+    // just add sortColumn in other cases:
+    String selectForLabel = getColumnName("label");
+    if (!sortColumn.equals(selectForLabel)) {
+      selectForLabel = selectForLabel + ", " + sortColumn;
+    }
+
     Bucket<Headword> parentBucket = bucketsRequest.getParentBucket();
     if (parentBucket != null) {
       UUID startUuid = parentBucket.getStartObject().getUuid();
@@ -221,23 +244,33 @@ public class HeadwordRepositoryImpl extends UniqueObjectRepositoryImpl<Headword>
       argumentMappings.put("endUuid", endUuid);
 
       sqlQuery.append(
-          "WITH"
-              + " headwords_list AS (SELECT row_number() OVER (ORDER BY label) AS num, uuid, label FROM "
-              + tableName
-              + "),"
-              + " hws AS (SELECT * FROM headwords_list WHERE num <@ int8range((SELECT num FROM headwords_list WHERE uuid = :startUuid), (SELECT num FROM headwords_list WHERE uuid = :endUuid), '[]')),");
+          """
+          WITH headwords_list AS (SELECT row_number() OVER (ORDER BY {{sortColumn}}) AS num, {{tableAlias}}.uuid, {{selectForLabel}} FROM {{tableName}} AS {{tableAlias}}),
+            hws AS (SELECT * FROM headwords_list WHERE num <@ int8range((SELECT num FROM headwords_list WHERE uuid = :startUuid), (SELECT num FROM headwords_list WHERE uuid = :endUuid), '[]')),
+          """
+              .replace("{{selectForLabel}}", selectForLabel)
+              .replace("{{sortColumn}}", sortColumn)
+              .replace("{{tableAlias}}", tableAlias)
+              .replace("{{tableName}}", tableName));
     } else {
       sqlQuery.append(
-          "WITH"
-              + " hws AS (SELECT row_number() OVER (ORDER BY label) AS num, uuid, label FROM "
-              + tableName
-              + "),");
+          """
+          WITH hws AS (SELECT row_number() OVER (ORDER BY {{sortColumn}}) AS num, {{tableAlias}}.uuid, {{selectForLabel}} FROM {{tableName}} AS {{tableAlias}}),
+          """
+              .replace("{{selectForLabel}}", selectForLabel)
+              .replace("{{sortColumn}}", sortColumn)
+              .replace("{{tableAlias}}", tableAlias)
+              .replace("{{tableName}}", tableName));
     }
     sqlQuery.append(
-        " buckets AS (SELECT num, uuid, label, ntile(:numberOfBuckets) OVER (ORDER BY label ASC) AS tile_number FROM hws),"
-            + " buckets_borders_nums AS (SELECT min(num) AS minNum, max(num) AS maxNum, tile_number FROM buckets GROUP BY tile_number ORDER BY tile_number)"
-            + " SELECT num, uuid, label, tile_number FROM buckets"
-            + " WHERE num IN (SELECT minNum FROM buckets_borders_nums UNION SELECT maxNum FROM buckets_borders_nums)");
+        """
+        buckets AS (SELECT {{tableAlias}}.num, {{tableAlias}}.uuid, {{tableAlias}}.label, ntile(:numberOfBuckets) OVER (ORDER BY {{sortColumn}} ASC) AS tile_number FROM hws AS {{tableAlias}}),
+          buckets_borders_nums AS (SELECT min(num) AS minNum, max(num) AS maxNum, tile_number FROM buckets GROUP BY tile_number ORDER BY tile_number)
+          SELECT bu.num, bu.uuid, bu.label, bu.tile_number FROM buckets AS bu WHERE bu.num IN (SELECT minNum FROM buckets_borders_nums UNION SELECT maxNum FROM buckets_borders_nums)
+        """
+            .replace("{{sortColumn}}", sortColumn)
+            .replace("{{tableAlias}}", tableAlias)
+            .replace("{{tableName}}", tableName));
 
     List<Map<String, Object>> rows =
         dbi.withHandle(
@@ -276,6 +309,18 @@ public class HeadwordRepositoryImpl extends UniqueObjectRepositoryImpl<Headword>
 
     BucketsResponse<Headword> bucketsResponse = new BucketsResponse<>(bucketsRequest, content);
     return bucketsResponse;
+  }
+
+  private String getSortColumn(ListRequest bucketsRequest) {
+    // default sorting is by label
+    String sortProperty = "label";
+    Sorting sorting = bucketsRequest.getSorting();
+    if (sorting != null) {
+      // sorting by labelNormalized may be wanted:
+      sortProperty = sorting.getOrders().get(0).getProperty();
+    }
+    String sortColumn = getColumnName(sortProperty);
+    return sortColumn;
   }
 
   @Override
@@ -334,7 +379,7 @@ public class HeadwordRepositoryImpl extends UniqueObjectRepositoryImpl<Headword>
   @Override
   protected List<String> getAllowedOrderByFields() {
     List<String> allowedOrderByFields = super.getAllowedOrderByFields();
-    allowedOrderByFields.addAll(Arrays.asList("label", "locale"));
+    allowedOrderByFields.addAll(Arrays.asList("label", "labelNormalized", "locale"));
     return allowedOrderByFields;
   }
 
@@ -374,6 +419,8 @@ public class HeadwordRepositoryImpl extends UniqueObjectRepositoryImpl<Headword>
     switch (modelProperty) {
       case "label":
         return tableAlias + ".label";
+      case "labelNormalized":
+        return tableAlias + ".label_normalized";
       case "locale":
         return tableAlias + ".locale";
       default:
@@ -405,12 +452,12 @@ public class HeadwordRepositoryImpl extends UniqueObjectRepositoryImpl<Headword>
 
   @Override
   protected String getSqlInsertFields() {
-    return super.getSqlInsertFields() + ", label, locale";
+    return super.getSqlInsertFields() + ", label, locale, label_normalized";
   }
 
   @Override
   protected String getSqlInsertValues() {
-    return super.getSqlInsertValues() + ", :label, :locale";
+    return super.getSqlInsertValues() + ", :label, :locale, :labelNormalized";
   }
 
   @Override
@@ -427,6 +474,10 @@ public class HeadwordRepositoryImpl extends UniqueObjectRepositoryImpl<Headword>
         + mappingPrefix
         + "_label, "
         + tableAlias
+        + ".label_normalized "
+        + mappingPrefix
+        + "_labelNormalized, "
+        + tableAlias
         + ".locale "
         + mappingPrefix
         + "_locale";
@@ -434,7 +485,8 @@ public class HeadwordRepositoryImpl extends UniqueObjectRepositoryImpl<Headword>
 
   @Override
   protected String getSqlUpdateFieldValues() {
-    return super.getSqlUpdateFieldValues() + ", label=:label, locale=:locale";
+    return super.getSqlUpdateFieldValues()
+        + ", label=:label, locale=:locale, label_normalized=:labelNormalized";
   }
 
   @Override
@@ -452,6 +504,7 @@ public class HeadwordRepositoryImpl extends UniqueObjectRepositoryImpl<Headword>
   protected boolean supportsCaseSensitivityForProperty(String modelProperty) {
     switch (modelProperty) {
       case "label":
+      case "labelNormalized":
       case "locale":
         return true;
       default:
