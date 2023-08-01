@@ -158,8 +158,7 @@ public class HeadwordRepositoryImpl extends UniqueObjectRepositoryImpl<Headword>
 
     // to avoid duplicate "hw.label, hw.label" if sortColumn = "label",
     // just add sortColumn in other cases:
-    String columnNameLabel = getColumnName("label");
-    String selectForLabel = columnNameLabel;
+    String selectForLabel = getColumnName("label");
     if (!sortColumn.equals(selectForLabel)) {
       selectForLabel = selectForLabel + ", " + sortColumn;
     }
