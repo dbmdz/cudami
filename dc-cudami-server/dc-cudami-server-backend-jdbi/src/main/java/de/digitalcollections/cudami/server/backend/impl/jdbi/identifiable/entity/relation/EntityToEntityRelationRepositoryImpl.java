@@ -118,7 +118,9 @@ public class EntityToEntityRelationRepositoryImpl extends JdbiRepositoryImpl
         new StringBuilder(
             "SELECT rel.subject_uuid rel_subject, rel.predicate rel_predicate, rel.object_uuid rel_object, rel.additional_predicates rel_addpredicates"
                 + commonSql);
-    pageRequest.setSorting(new Sorting(new Order(Direction.ASC, "rel.sortindex")));
+    // FIXME: we get always a warning "rel.sortindex not in allowed sort fields! Ignoring it.",
+    // because "rel.sortindex" is not in allowed order by fields:
+    //    pageRequest.setSorting(new Sorting(new Order(Direction.ASC, "rel.sortindex")));
     addPagingAndSorting(pageRequest, query);
     List<EntityRelation> list =
         dbi.withHandle(
