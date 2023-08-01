@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
 import de.digitalcollections.model.exception.TechnicalException;
 import de.digitalcollections.model.exception.http.HttpErrorDecoder;
+import de.digitalcollections.model.list.ListRequest;
 import de.digitalcollections.model.list.filtering.FilterCriteria;
 import de.digitalcollections.model.list.filtering.FilterCriterion;
 import de.digitalcollections.model.list.filtering.FilterLogicalOperator;
@@ -647,7 +648,7 @@ public abstract class BaseRestClient<T extends Object> {
    * @param filterCriterias a list of filter criterias
    * @return the filter criterias as request string
    */
-  String getFilterParamsAsString(Filtering filtering) {
+  public String getFilterParamsAsString(Filtering filtering) {
     List<FilterCriteria> filterCriterias = filtering.getFilterCriteriaList();
     // braces and logical link operator can be omitted if there is only one AND-linked
     // `FilterCriteria`
@@ -690,18 +691,30 @@ public abstract class BaseRestClient<T extends Object> {
    * @param pageRequest source for find params
    * @return the find params as request string
    */
-  String getFindParamsAsString(PageRequest pageRequest) {
+  public String getFindParamsAsString(PageRequest pageRequest) {
+    // PageRequest params
     int pageNumber = pageRequest.getPageNumber();
     int pageSize = pageRequest.getPageSize();
     StringBuilder findParams =
         new StringBuilder(String.format("pageNumber=%d&pageSize=%d", pageNumber, pageSize));
-    Sorting sorting = pageRequest.getSorting();
-    if (sorting == null) {
+
+    // ListRequest params
+    String sortParams = getSortParams(pageRequest);
+    if (sortParams == null) {
       return findParams.toString();
+    }
+    findParams.append("&").append(sortParams);
+    return findParams.toString();
+  }
+
+  public String getSortParams(ListRequest listRequest) {
+    Sorting sorting = listRequest.getSorting();
+    if (sorting == null) {
+      return null;
     }
     List<Order> orders = sorting.getOrders();
     if (orders == null || orders.isEmpty()) {
-      return findParams.toString();
+      return null;
     }
     String sortBy =
         orders.stream()
@@ -732,7 +745,6 @@ public abstract class BaseRestClient<T extends Object> {
                   return order.toString();
                 })
             .collect(Collectors.joining(","));
-    findParams.append("&sortBy=").append(sortBy);
-    return findParams.toString();
+    return "sortBy=" + sortBy;
   }
 }
