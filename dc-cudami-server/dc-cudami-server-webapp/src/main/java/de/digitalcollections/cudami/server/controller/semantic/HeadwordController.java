@@ -19,6 +19,7 @@ import de.digitalcollections.model.list.filtering.Filtering;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.list.sorting.Order;
+import de.digitalcollections.model.list.sorting.Sorting;
 import de.digitalcollections.model.semantic.Headword;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -105,6 +106,7 @@ public class HeadwordController extends AbstractUniqueObjectController<Headword>
   public BucketObjectsResponse<Headword> findBucketObjects(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
+      @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
       @RequestParam(name = "startId", required = true) UUID startId,
       @RequestParam(name = "endId", required = true) UUID endId)
       throws ServiceException {
@@ -113,9 +115,18 @@ public class HeadwordController extends AbstractUniqueObjectController<Headword>
     Headword endHeadword = new Headword();
     endHeadword.setUuid(endId);
     Bucket<Headword> bucket = new Bucket<>(startHeadword, endHeadword);
-    // TODO: sorting is fix (on label), no filtering (e.g. on locale) available:
+
+    // TODO add filtering (e.g. on label or locale) to bucketObjectsRequest
+
     BucketObjectsRequest<Headword> bucketObjectsRequest =
         new BucketObjectsRequest<>(bucket, pageNumber, pageSize, null, null);
+
+    // add sorting
+    if (sortBy != null) {
+      Sorting sorting = new Sorting(sortBy);
+      bucketObjectsRequest.setSorting(sorting);
+    }
+
     return service.find(bucketObjectsRequest);
   }
 
@@ -126,6 +137,7 @@ public class HeadwordController extends AbstractUniqueObjectController<Headword>
   public BucketsResponse<Headword> findBuckets(
       @RequestParam(name = "numberOfBuckets", required = false, defaultValue = "25")
           int numberOfBuckets,
+      @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
       @RequestParam(name = "startId", required = false) UUID startId,
       @RequestParam(name = "endId", required = false) UUID endId)
       throws ServiceException {
@@ -137,9 +149,18 @@ public class HeadwordController extends AbstractUniqueObjectController<Headword>
       endHeadword.setUuid(endId);
       parentBucket = new Bucket<>(startHeadword, endHeadword);
     }
-    // TODO: sorting is fix (on label), no filtering (e.g. on locale) available:
+
+    // TODO add filtering (e.g. on label or locale) to bucketsRequest
+
     BucketsRequest<Headword> bucketsRequest =
         new BucketsRequest<>(numberOfBuckets, parentBucket, null, null);
+
+    // add sorting
+    if (sortBy != null) {
+      Sorting sorting = new Sorting(sortBy);
+      bucketsRequest.setSorting(sorting);
+    }
+
     return service.find(bucketsRequest);
   }
 
