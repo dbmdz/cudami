@@ -54,7 +54,7 @@ public interface UniqueObjectRepository<U extends UniqueObject>
   /**
    * Delete a single {@code UniqueObject} by its UUID
    *
-   * @param uuid the UUID
+   * @param uniqueObjectUuid the UUID
    * @return true if the {@code UniqueObject} existed and could be deleted or false, if it did not
    *     exist and thus could not be deleted
    * @throws RepositoryException in case of an error
@@ -90,7 +90,7 @@ public interface UniqueObjectRepository<U extends UniqueObject>
    * @param uniqueObject example instance containing unique property
    * @param filtering filtering params
    * @return the found {@code UniqueObject} or {@code null}
-   * @throws ServiceException in case of problems
+   * @throws RepositoryException in case of problems
    */
   default U getByExampleAndFiltering(U uniqueObject, Filtering filtering)
       throws RepositoryException {

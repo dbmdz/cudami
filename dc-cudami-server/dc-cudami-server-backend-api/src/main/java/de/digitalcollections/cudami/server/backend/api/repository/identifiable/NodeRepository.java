@@ -119,7 +119,7 @@ public interface NodeRepository<N extends Identifiable> extends IdentifiableRepo
    * @return saved child node
    * @throws RepositoryException if saving fails
    */
-  N saveWithParent(UUID childUuid, UUID parentUUID) throws RepositoryException;
+  N saveWithParent(UUID childUuid, UUID parentUuid) throws RepositoryException;
 
   default boolean updateChildrenOrder(N parent, List<N> children) throws RepositoryException {
     if (parent == null || children == null) {
