@@ -31,7 +31,6 @@ public interface PredicateService extends UniqueObjectService<Predicate> {
    * Update an existing or insert a new predicate.
    *
    * @param predicate the predicate to be updated or inserted
-   * @return the updated or inserted predicate
    * @throws ServiceException
    * @throws ValidationException
    */

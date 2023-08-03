@@ -645,7 +645,7 @@ public abstract class BaseRestClient<T extends Object> {
   /**
    * Converts the given list of filter criterias to a request string
    *
-   * @param filterCriterias a list of filter criterias
+   * @param filtering a filtering with a list of filter criterias
    * @return the filter criterias as request string
    */
   public String getFilterParamsAsString(Filtering filtering) {
