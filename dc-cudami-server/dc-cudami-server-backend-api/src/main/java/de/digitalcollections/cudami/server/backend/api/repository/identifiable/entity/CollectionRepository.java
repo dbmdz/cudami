@@ -83,7 +83,7 @@ public interface CollectionRepository
   /**
    * Removes a digitalObject from all collections, to which is was connected to
    *
-   * @param digitalObject the DigitalObject
+   * @param digitalObjectUuid the UUID of the DigitalObject
    * @return boolean value for success
    */
   boolean removeDigitalObjectFromAllCollections(UUID digitalObjectUuid) throws RepositoryException;

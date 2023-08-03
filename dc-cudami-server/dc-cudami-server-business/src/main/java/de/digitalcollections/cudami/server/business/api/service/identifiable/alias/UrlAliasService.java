@@ -20,7 +20,8 @@ public interface UrlAliasService extends UniqueObjectService<UrlAlias> {
    * Delete all UrlAliases targetting the passed {@code Identifiable} except those that have already
    * been published.
    *
-   * @param uuid the {@code targetUuid} whose UrlAliases should be deleted
+   * @param targetIdentifiable the identifiable with the {@code targetUuid} whose UrlAliases should
+   *     be deleted
    * @return true if at least one UrlAlias existed and could be deleted or false, if no UrlAlias
    *     existed at all and thus nothing could be deleted
    * @throws ServiceException
@@ -33,7 +34,8 @@ public interface UrlAliasService extends UniqueObjectService<UrlAlias> {
   /**
    * Delete all UrlAliases targetting the passed UUID except those that have already been published.
    *
-   * @param uuid the {@code targetUuid} whose UrlAliases should be deleted
+   * @param targetIdentifiable the identifiable with the {@code targetUuid} whose UrlAliases should
+   *     be deleted
    * @param force if {@code true} remove published ones as well
    * @return true if at least one UrlAlias existed and could be deleted or false, if no UrlAlias
    *     existed at all and thus nothing could be deleted
@@ -61,8 +63,8 @@ public interface UrlAliasService extends UniqueObjectService<UrlAlias> {
    *
    * @param pLocale The locale for which the slug is generated.
    * @param label The label as a string
-   * @param websiteUuid The uuid of the website, for which the slug is generated. If not set, the
-   *     UUID of the default website is used
+   * @param website The website, for which the slug is generated. If not set, the UUID of the
+   *     default website is used
    * @return slug as String, or null, if no website under the provided websiteUuid exists
    * @throws ServiceException
    */
@@ -71,7 +73,7 @@ public interface UrlAliasService extends UniqueObjectService<UrlAlias> {
   /**
    * Returns the LocalizedUrlAliases for an identifiable, identified by its UUID
    *
-   * @param uuid the UUID of the identifiable
+   * @param identifiable the identifiable
    * @return the LocalizedUrlAliases, if found, or null
    * @throws ServiceException in case of an error
    */
@@ -83,7 +85,7 @@ public interface UrlAliasService extends UniqueObjectService<UrlAlias> {
    * provide a {@code Locale} language to retrieve primary links of this particular target language
    * only.
    *
-   * @param websiteUuid the UUID of the website, the slug belongs to, or null
+   * @param website the website, the slug belongs to, or null
    * @param slug the slug (=relative path)
    * @param pLocale the locale for which the result is filtered. Optional.
    * @return LocalizedUrlAliases, if a primary link exists; otherwise: null.
@@ -95,7 +97,7 @@ public interface UrlAliasService extends UniqueObjectService<UrlAlias> {
   /**
    * Returns all primary links of the passed target identifiable.
    *
-   * @param targetUuid UUID of the identifiable that the primaries should be found for
+   * @param identifiable the identifiable that the primaries should be found for
    * @return {@code List}, not {@code null}
    * @throws ServiceException in case of an error
    */
@@ -105,7 +107,6 @@ public interface UrlAliasService extends UniqueObjectService<UrlAlias> {
   /**
    * Persist an {@code UniqueObject} (with validation)
    *
-   * @param uniqueObject the {@code UniqueObject} (with yet empty UUID)
    * @throws ServiceException in case of an error
    * @throws ValidationException in case of a validation error
    */
