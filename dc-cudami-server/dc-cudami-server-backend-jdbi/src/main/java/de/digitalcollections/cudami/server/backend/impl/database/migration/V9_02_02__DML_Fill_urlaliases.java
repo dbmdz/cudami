@@ -322,7 +322,7 @@ public class V9_02_02__DML_Fill_urlaliases extends BaseJavaMigration {
 
   private void saveUrlAlias(JdbcTemplate jdbcTemplate, UrlAlias urlAlias) throws SQLException {
     String updateQuery =
-        "INSERT INTO url_aliases (uuid,created,last_published,\"primary\",slug,target_identifiable_type,target_language,target_uuid,website_uuid) VALUES(?::uuid,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,?,?,?,?,?,?::uuid,?::uuid);";
+        "INSERT INTO url_aliases (uuid,created,last_published,\"primary\",slug,target_identifiable_type,target_language,target_uuid,website_uuid) VALUES(?::uuid,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,?,?,?,?,?::uuid,?::uuid);";
     try {
       jdbcTemplate.update(
           updateQuery,
