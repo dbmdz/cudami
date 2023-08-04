@@ -36,7 +36,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
 - Add Lobid-Clients for missing Lobid objects
 - Add persistence support for new field `Headword.labelNormalized`
 - Add sorting to Buckets and Bucket objects handling in `HeadwordRepositoryImpl` 
-
+- Add action links to object's view and edit under topic
+    
 ### Changed
 
 - WEMI parts: Manifestations, Works
@@ -64,6 +65,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
 by `"und"`
 - `getByValue` method in `PredicateRepositoryImpl`
 - Comment not supported sorting throwing warning every time in `EntityToEntityRelationRepositoryImpl`
+- Fix saveUrlAlias (one question mark placeholder in sql more than given params)
+- Fix sql migrations 14.10.00, 14.04.00, 9.02.02
+- Fix data language handling in admin webapp
+- Fix visibility of long text in collection view
+- Fix website label rendering
 
 ### Removed
 
