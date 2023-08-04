@@ -75,18 +75,18 @@
               </div>
             </div>
 
-            <th:block th:if="${collection.text?.containsKey(#locale.forLanguageTag(dataLanguage))}">
-              <div class="row mb-1">
-                <div class="col-md-3 multilanguage"><label th:text="#{lbl.text}">Long text</label></div>
-                <div class="col-md-9">
+            <div class="row mb-1">
+              <div class="col-md-3 multilanguage"><label th:text="#{lbl.text}">Long text</label></div>
+              <div class="col-md-9">
+                <th:block th:if="${collection.text?.containsKey(#locale.forLanguageTag(dataLanguage))}">
                   <div class="card">
                     <div class="card-body">
                       <th:block th:insert="fragments/text::renderLocalizedStructuredContent(${collection.text}, ${dataLanguage})"></th:block>
                     </div>
                   </div>
-                </div>
+                </th:block>
               </div>
-            </th:block>
+            </div>
 
             <div class="row">
               <div class="col-md-3">
