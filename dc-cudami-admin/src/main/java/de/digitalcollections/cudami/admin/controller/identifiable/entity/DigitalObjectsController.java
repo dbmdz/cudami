@@ -55,7 +55,7 @@ public class DigitalObjectsController
     model.addAttribute("digitalObject", digitalObject);
 
     List<Locale> existingLanguages = getExistingLanguagesFromIdentifiable(digitalObject);
-    String dataLanguage = getDataLanguage(targetDataLanguage, languageService);
+    String dataLanguage = getDataLanguage(targetDataLanguage, existingLanguages, languageService);
     model
         .addAttribute("existingLanguages", existingLanguages)
         .addAttribute("dataLanguage", dataLanguage);
@@ -64,27 +64,34 @@ public class DigitalObjectsController
 
     List<Locale> existingCollectionsLanguages =
         ((CudamiDigitalObjectsClient) service).getLanguagesOfCollections(uuid);
+    String dataLanguageCollections =
+        getDataLanguage(targetDataLanguage, existingCollectionsLanguages, languageService);
     model
         .addAttribute(
             "existingCollectionsLanguages",
             languageService.sortLanguages(displayLocale, existingCollectionsLanguages))
-        .addAttribute("dataLanguageCollections", getDataLanguage(null, languageService));
+        .addAttribute("dataLanguageCollections", dataLanguageCollections);
 
     List<Locale> existingProjectsLanguages =
         ((CudamiDigitalObjectsClient) service).getLanguagesOfProjects(uuid);
+    String dataLanguageProjects =
+        getDataLanguage(targetDataLanguage, existingProjectsLanguages, languageService);
     model
         .addAttribute(
             "existingProjectsLanguages",
             languageService.sortLanguages(displayLocale, existingProjectsLanguages))
-        .addAttribute("dataLanguageProjects", getDataLanguage(null, languageService));
+        .addAttribute("dataLanguageProjects", dataLanguageProjects);
 
     List<Locale> existingContainedDigitalObjectsLanguages =
         ((CudamiDigitalObjectsClient) service).getLanguagesOfContainedDigitalObjects(uuid);
+    String dataLanguageDigitalObjects =
+        getDataLanguage(
+            targetDataLanguage, existingContainedDigitalObjectsLanguages, languageService);
     model
         .addAttribute(
             "existingDigitalObjectsLanguages",
             languageService.sortLanguages(displayLocale, existingContainedDigitalObjectsLanguages))
-        .addAttribute("dataLanguageDigitalObjects", getDataLanguage(null, languageService));
+        .addAttribute("dataLanguageDigitalObjects", dataLanguageDigitalObjects);
 
     return "digitalobjects/view";
   }

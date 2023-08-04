@@ -88,7 +88,7 @@ public class CorporateBodiesController
     model.addAttribute("corporateBody", corporateBody);
 
     List<Locale> existingLanguages = getExistingLanguagesFromIdentifiable(corporateBody);
-    String dataLanguage = getDataLanguage(targetDataLanguage, languageService);
+    String dataLanguage = getDataLanguage(targetDataLanguage, existingLanguages, languageService);
     model
         .addAttribute("existingLanguages", existingLanguages)
         .addAttribute("dataLanguage", dataLanguage);

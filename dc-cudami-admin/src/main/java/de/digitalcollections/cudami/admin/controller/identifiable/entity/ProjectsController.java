@@ -86,7 +86,7 @@ public class ProjectsController extends AbstractEntitiesController<Project, Cuda
     model.addAttribute("project", project);
 
     List<Locale> existingLanguages = getExistingLanguagesFromIdentifiable(project);
-    String dataLanguage = getDataLanguage(targetDataLanguage, languageService);
+    String dataLanguage = getDataLanguage(targetDataLanguage, existingLanguages, languageService);
     model
         .addAttribute("existingLanguages", existingLanguages)
         .addAttribute("dataLanguage", dataLanguage);

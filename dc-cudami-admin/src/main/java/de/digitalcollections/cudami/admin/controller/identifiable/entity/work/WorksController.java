@@ -55,15 +55,21 @@ public class WorksController extends AbstractEntitiesController<Work, CudamiWork
     model.addAttribute("work", work);
 
     List<Locale> existingLanguages = getExistingLanguagesFromIdentifiable(work);
+    String dataLanguage = getDataLanguage(targetDataLanguage, existingLanguages, languageService);
+    model
+        .addAttribute("existingLanguages", existingLanguages)
+        .addAttribute("dataLanguage", dataLanguage);
+
     Locale displayLocale = LocaleContextHolder.getLocale();
+
     List<Locale> existingManifestationsLanguages =
         languageService.sortLanguages(
             displayLocale, ((CudamiWorksClient) service).getLanguagesOfManifestations(uuid));
-    String dataLanguage = getDataLanguage(targetDataLanguage, languageService);
+    String dataLanguageManifestations =
+        getDataLanguage(targetDataLanguage, existingManifestationsLanguages, languageService);
     model
-        .addAttribute("existingLanguages", existingLanguages)
         .addAttribute("existingManifestationsLanguages", existingManifestationsLanguages)
-        .addAttribute("dataLanguage", dataLanguage);
+        .addAttribute("dataLanguageManifestations", dataLanguageManifestations);
 
     return "works/view";
   }

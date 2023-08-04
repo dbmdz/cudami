@@ -86,7 +86,7 @@ public class ArticlesController extends AbstractEntitiesController<Article, Cuda
     model.addAttribute("article", article);
 
     List<Locale> existingLanguages = getExistingLanguagesFromIdentifiable(article);
-    String dataLanguage = getDataLanguage(targetDataLanguage, languageService);
+    String dataLanguage = getDataLanguage(targetDataLanguage, existingLanguages, languageService);
     model
         .addAttribute("existingLanguages", existingLanguages)
         .addAttribute("dataLanguage", dataLanguage);

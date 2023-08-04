@@ -232,7 +232,7 @@ public class GivennamesController
     model.addAttribute("givenName", givenName);
 
     List<Locale> existingLanguages = getExistingLanguagesFromIdentifiable(givenName);
-    String dataLanguage = getDataLanguage(targetDataLanguage, languageService);
+    String dataLanguage = getDataLanguage(targetDataLanguage, existingLanguages, languageService);
     model
         .addAttribute("existingLanguages", existingLanguages)
         .addAttribute("dataLanguage", dataLanguage);

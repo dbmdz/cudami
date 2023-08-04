@@ -59,7 +59,7 @@ public class GeoLocationsController
     model.addAttribute("geoLocation", geoLocation);
 
     List<Locale> existingLanguages = getExistingLanguagesFromIdentifiable(geoLocation);
-    String dataLanguage = getDataLanguage(targetDataLanguage, languageService);
+    String dataLanguage = getDataLanguage(targetDataLanguage, existingLanguages, languageService);
     model
         .addAttribute("existingLanguages", existingLanguages)
         .addAttribute("dataLanguage", dataLanguage);

@@ -90,7 +90,7 @@ public class FileResourcesMetadataController
     model.addAttribute("fileresource", resource);
 
     List<Locale> existingLanguages = getExistingLanguagesFromIdentifiable(resource);
-    String dataLanguage = getDataLanguage(targetDataLanguage, languageService);
+    String dataLanguage = getDataLanguage(targetDataLanguage, existingLanguages, languageService);
     model
         .addAttribute("existingLanguages", existingLanguages)
         .addAttribute("dataLanguage", dataLanguage);

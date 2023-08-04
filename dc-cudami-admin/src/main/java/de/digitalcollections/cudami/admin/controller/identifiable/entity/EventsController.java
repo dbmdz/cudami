@@ -82,7 +82,7 @@ public class EventsController extends AbstractEntitiesController<Event, CudamiEv
     model.addAttribute("event", event);
 
     List<Locale> existingLanguages = getExistingLanguagesFromIdentifiable(event);
-    String dataLanguage = getDataLanguage(targetDataLanguage, languageService);
+    String dataLanguage = getDataLanguage(targetDataLanguage, existingLanguages, languageService);
     model
         .addAttribute("existingLanguages", existingLanguages)
         .addAttribute("dataLanguage", dataLanguage);

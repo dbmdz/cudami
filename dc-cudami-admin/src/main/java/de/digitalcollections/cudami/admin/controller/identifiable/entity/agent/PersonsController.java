@@ -87,7 +87,7 @@ public class PersonsController extends AbstractEntitiesController<Person, Cudami
     model.addAttribute("person", person);
 
     List<Locale> existingLanguages = getExistingLanguagesFromIdentifiable(person);
-    String dataLanguage = getDataLanguage(targetDataLanguage, languageService);
+    String dataLanguage = getDataLanguage(targetDataLanguage, existingLanguages, languageService);
     model
         .addAttribute("existingLanguages", existingLanguages)
         .addAttribute("dataLanguage", dataLanguage);

@@ -87,7 +87,7 @@ public class HeadwordEntriesController
     model.addAttribute("headwordEntry", headwordEntry);
 
     List<Locale> existingLanguages = getExistingLanguagesFromIdentifiable(headwordEntry);
-    String dataLanguage = getDataLanguage(targetDataLanguage, languageService);
+    String dataLanguage = getDataLanguage(targetDataLanguage, existingLanguages, languageService);
     model
         .addAttribute("existingLanguages", existingLanguages)
         .addAttribute("dataLanguage", dataLanguage);
