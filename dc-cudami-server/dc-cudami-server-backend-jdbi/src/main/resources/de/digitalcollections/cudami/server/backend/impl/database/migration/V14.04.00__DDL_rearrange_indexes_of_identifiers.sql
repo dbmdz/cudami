@@ -4,7 +4,7 @@
  */
 DROP INDEX IF EXISTS idx_identifiers_uniq;
 ALTER TABLE identifiers
-  DROP CONSTRAINT unique_namespace_identifier,
+  DROP CONSTRAINT IF EXISTS unique_namespace_identifier,
   ADD CONSTRAINT unique_namespace_identifier_identifiable UNIQUE (identifiable, namespace, identifier),
   ADD CONSTRAINT unique_namespace_identifier UNIQUE (namespace, identifier) INCLUDE (identifiable);
 
