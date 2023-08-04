@@ -1,6 +1,7 @@
 package de.digitalcollections.cudami.admin.controller.identifiable;
 
 import de.digitalcollections.cudami.admin.business.i18n.LanguageService;
+import de.digitalcollections.cudami.admin.controller.ParameterHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
 import de.digitalcollections.cudami.client.identifiable.CudamiIdentifiablesClient;
 import de.digitalcollections.cudami.client.identifiable.entity.CudamiHeadwordEntriesClient;
@@ -161,5 +162,25 @@ public class IdentifiableController
       throw new ResourceNotFoundException("get entity by identifier with " + namespace + ":" + id);
     }
     return doForward(identifiable, model);
+  }
+
+  @GetMapping("/identifiables/{uuid:" + ParameterHelper.UUID_PATTERN + "}/view")
+  public String view(@PathVariable UUID uuid, Model model)
+      throws TechnicalException, ResourceNotFoundException {
+    Identifiable identifiable = service.getByUuid(uuid);
+    if (identifiable == null) {
+      throw new ResourceNotFoundException();
+    }
+    return doForward(identifiable, model);
+  }
+
+  @GetMapping("/identifiables/{uuid:" + ParameterHelper.UUID_PATTERN + "}/edit")
+  public String edit(@PathVariable UUID uuid, Model model)
+      throws TechnicalException, ResourceNotFoundException {
+    Identifiable identifiable = service.getByUuid(uuid);
+    if (identifiable == null) {
+      throw new ResourceNotFoundException();
+    }
+    return doForward(identifiable, model) + "/edit";
   }
 }
