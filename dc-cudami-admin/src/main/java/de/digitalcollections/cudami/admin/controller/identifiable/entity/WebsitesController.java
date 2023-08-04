@@ -229,16 +229,18 @@ public class WebsitesController extends AbstractEntitiesController<Website, Cuda
     }
 
     List<Locale> existingLanguages = getExistingLanguagesFromIdentifiable(website);
-    String dataLanguage = getDataLanguage(targetDataLanguage, languageService);
+    String dataLanguage = getDataLanguage(targetDataLanguage, existingLanguages, languageService);
     model
         .addAttribute("existingLanguages", existingLanguages)
         .addAttribute("dataLanguage", dataLanguage);
 
     List<Locale> existingWebpageLanguages =
         getExistingLanguagesFromIdentifiables(website.getRootPages());
+    String dataLanguageWebpages =
+        getDataLanguage(targetDataLanguage, existingWebpageLanguages, languageService);
     model
         .addAttribute("existingWebpageLanguages", existingWebpageLanguages)
-        .addAttribute("dataLanguageWebpages", getDataLanguage(null, languageService));
+        .addAttribute("dataLanguageWebpages", dataLanguageWebpages);
 
     model.addAttribute("website", website);
     return "websites/view";
