@@ -26,7 +26,7 @@ public class ItemsController extends AbstractEntitiesController<Item, CudamiItem
   private final CudamiManifestationsClient manifestationsService;
 
   public ItemsController(CudamiClient client, LanguageService languageService) {
-    super(client.forItems(), languageService);
+    super(client.forItems(), client, languageService);
     this.manifestationsService = client.forManifestations();
   }
 

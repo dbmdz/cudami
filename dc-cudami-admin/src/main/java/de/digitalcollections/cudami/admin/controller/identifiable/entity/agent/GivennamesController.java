@@ -47,7 +47,7 @@ public class GivennamesController
       LanguageService languageService,
       MessageSource messageSource,
       LabelNotBlankValidator labelNotBlankValidator) {
-    super(client.forGivenNames(), languageService);
+    super(client.forGivenNames(), client, languageService);
     this.labelNotBlankValidator = labelNotBlankValidator;
     this.messageSource = messageSource;
   }

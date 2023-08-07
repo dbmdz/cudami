@@ -27,7 +27,7 @@ public class ArticlesController extends AbstractEntitiesController<Article, Cuda
   private static final Logger LOGGER = LoggerFactory.getLogger(ArticlesController.class);
 
   public ArticlesController(CudamiClient client, LanguageService languageService) {
-    super(client.forArticles(), languageService);
+    super(client.forArticles(), client, languageService);
   }
 
   @GetMapping("/articles/new")

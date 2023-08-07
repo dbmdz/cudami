@@ -32,7 +32,7 @@ public class CorporateBodiesAPIController
   private static final Logger LOGGER = LoggerFactory.getLogger(CorporateBodiesAPIController.class);
 
   public CorporateBodiesAPIController(CudamiClient client, LanguageService languageService) {
-    super(client.forCorporateBodies(), languageService);
+    super(client.forCorporateBodies(), client, languageService);
   }
 
   @GetMapping("/api/corporatebodies/new")

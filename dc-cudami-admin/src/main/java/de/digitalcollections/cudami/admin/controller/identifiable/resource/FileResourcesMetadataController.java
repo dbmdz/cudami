@@ -30,7 +30,7 @@ public class FileResourcesMetadataController
       LoggerFactory.getLogger(FileResourcesMetadataController.class);
 
   public FileResourcesMetadataController(CudamiClient client, LanguageService languageService) {
-    super(client.forFileResourcesMetadata(), languageService);
+    super(client.forFileResourcesMetadata(), client, languageService);
   }
 
   @GetMapping(value = "/fileresources/new")

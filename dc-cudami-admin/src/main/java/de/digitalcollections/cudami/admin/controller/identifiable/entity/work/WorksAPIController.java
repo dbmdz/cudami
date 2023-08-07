@@ -25,7 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class WorksAPIController extends AbstractEntitiesController<Work, CudamiWorksClient> {
 
   public WorksAPIController(CudamiClient client, LanguageService languageService) {
-    super(client.forWorks(), languageService);
+    super(client.forWorks(), client, languageService);
   }
 
   @SuppressFBWarnings

@@ -47,7 +47,7 @@ public class FamilynamesController
       LanguageService languageService,
       MessageSource messageSource,
       LabelNotBlankValidator labelNotBlankValidator) {
-    super(client.forFamilyNames(), languageService);
+    super(client.forFamilyNames(), client, languageService);
     this.labelNotBlankValidator = labelNotBlankValidator;
     this.messageSource = messageSource;
   }

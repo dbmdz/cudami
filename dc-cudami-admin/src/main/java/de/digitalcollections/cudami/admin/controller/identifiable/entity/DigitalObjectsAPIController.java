@@ -36,7 +36,7 @@ public class DigitalObjectsAPIController
   private static final Logger LOGGER = LoggerFactory.getLogger(DigitalObjectsAPIController.class);
 
   public DigitalObjectsAPIController(CudamiClient client, LanguageService languageService) {
-    super(client.forDigitalObjects(), languageService);
+    super(client.forDigitalObjects(), client, languageService);
   }
 
   /*

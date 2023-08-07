@@ -49,7 +49,7 @@ public class SubjectsController
       LanguageService languageService,
       MessageSource messageSource,
       LabelNotBlankValidator labelNotBlankValidator) {
-    super(client.forSubjects(), languageService);
+    super(client.forSubjects(), client, languageService);
     this.cudamiConfigClient = client.forConfig();
     this.labelNotBlankValidator = labelNotBlankValidator;
     this.messageSource = messageSource;

@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.*;
 public class ItemsAPIController extends AbstractEntitiesController<Item, CudamiItemsClient> {
 
   public ItemsAPIController(LanguageService languageService, CudamiClient client) {
-    super(client.forItems(), languageService);
+    super(client.forItems(), client, languageService);
   }
 
   @SuppressFBWarnings

@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 public class EventsController extends AbstractEntitiesController<Event, CudamiEventsClient> {
 
   public EventsController(CudamiClient client, LanguageService languageService) {
-    super(client.forEvents(), languageService);
+    super(client.forEvents(), client, languageService);
   }
 
   @GetMapping("/events/new")

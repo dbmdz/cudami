@@ -31,7 +31,7 @@ public class HeadwordEntriesAPIController
   private static final Logger LOGGER = LoggerFactory.getLogger(HeadwordEntriesAPIController.class);
 
   public HeadwordEntriesAPIController(CudamiClient client, LanguageService languageService) {
-    super(client.forHeadwordEntries(), languageService);
+    super(client.forHeadwordEntries(), client, languageService);
   }
 
   @GetMapping("/api/headwordentries/new")

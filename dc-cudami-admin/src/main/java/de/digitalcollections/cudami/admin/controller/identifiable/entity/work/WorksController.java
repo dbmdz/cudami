@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 public class WorksController extends AbstractEntitiesController<Work, CudamiWorksClient> {
 
   public WorksController(CudamiClient client, LanguageService languageService) {
-    super(client.forWorks(), languageService);
+    super(client.forWorks(), client, languageService);
   }
 
   @GetMapping("/works")

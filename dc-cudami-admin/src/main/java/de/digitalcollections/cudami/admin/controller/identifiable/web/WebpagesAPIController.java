@@ -33,7 +33,7 @@ public class WebpagesAPIController
   private static final Logger LOGGER = LoggerFactory.getLogger(WebpagesAPIController.class);
 
   public WebpagesAPIController(CudamiClient client, LanguageService languageService) {
-    super(client.forWebpages(), languageService);
+    super(client.forWebpages(), client, languageService);
   }
 
   @GetMapping("/api/webpages/new")

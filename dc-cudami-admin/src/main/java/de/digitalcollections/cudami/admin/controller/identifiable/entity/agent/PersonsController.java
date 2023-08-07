@@ -28,7 +28,7 @@ public class PersonsController extends AbstractEntitiesController<Person, Cudami
   private static final Logger LOGGER = LoggerFactory.getLogger(PersonsController.class);
 
   public PersonsController(CudamiClient client, LanguageService languageService) {
-    super(client.forPersons(), languageService);
+    super(client.forPersons(), client, languageService);
   }
 
   @GetMapping("/persons/new")

@@ -37,7 +37,7 @@ public class ProjectsAPIController
   private static final Logger LOGGER = LoggerFactory.getLogger(ProjectsAPIController.class);
 
   public ProjectsAPIController(CudamiClient client, LanguageService languageService) {
-    super(client.forProjects(), languageService);
+    super(client.forProjects(), client, languageService);
   }
 
   @PostMapping("/api/projects/{uuid:" + ParameterHelper.UUID_PATTERN + "}/digitalobjects")

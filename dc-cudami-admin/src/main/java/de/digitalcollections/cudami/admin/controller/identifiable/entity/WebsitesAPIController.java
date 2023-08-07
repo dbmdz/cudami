@@ -35,7 +35,7 @@ public class WebsitesAPIController
   private static final Logger LOGGER = LoggerFactory.getLogger(WebsitesAPIController.class);
 
   public WebsitesAPIController(CudamiClient client, LanguageService languageService) {
-    super(client.forWebsites(), languageService);
+    super(client.forWebsites(), client, languageService);
   }
 
   @GetMapping("/api/websites/new")

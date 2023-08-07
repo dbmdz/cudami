@@ -31,7 +31,7 @@ public class CollectionsController
   private static final Logger LOGGER = LoggerFactory.getLogger(CollectionsController.class);
 
   public CollectionsController(CudamiClient client, LanguageService languageService) {
-    super(client.forCollections(), languageService);
+    super(client.forCollections(), client, languageService);
   }
 
   @GetMapping("/collections/new")

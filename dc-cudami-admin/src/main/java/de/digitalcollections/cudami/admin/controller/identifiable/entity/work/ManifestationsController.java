@@ -25,7 +25,7 @@ public class ManifestationsController
     extends AbstractEntitiesController<Manifestation, CudamiManifestationsClient> {
 
   public ManifestationsController(CudamiClient client, LanguageService languageService) {
-    super(client.forManifestations(), languageService);
+    super(client.forManifestations(), client, languageService);
   }
 
   @GetMapping("/manifestations")

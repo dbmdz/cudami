@@ -29,7 +29,7 @@ public class ManifestationsAPIController
     extends AbstractEntitiesController<Manifestation, CudamiManifestationsClient> {
 
   public ManifestationsAPIController(CudamiClient client, LanguageService languageService) {
-    super(client.forManifestations(), languageService);
+    super(client.forManifestations(), client, languageService);
   }
 
   @SuppressFBWarnings

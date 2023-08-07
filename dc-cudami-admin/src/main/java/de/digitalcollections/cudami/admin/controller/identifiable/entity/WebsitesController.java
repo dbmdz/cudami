@@ -44,7 +44,7 @@ public class WebsitesController extends AbstractEntitiesController<Website, Cuda
       LanguageService languageService,
       MessageSource messageSource,
       LabelNotBlankValidator labelNotBlankValidator) {
-    super(client.forWebsites(), languageService);
+    super(client.forWebsites(), client, languageService);
     this.labelNotBlankValidator = labelNotBlankValidator;
     this.messageSource = messageSource;
   }

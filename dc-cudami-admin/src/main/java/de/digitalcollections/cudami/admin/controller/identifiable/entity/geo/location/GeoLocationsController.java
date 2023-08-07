@@ -28,7 +28,7 @@ public class GeoLocationsController
   private static final Logger LOGGER = LoggerFactory.getLogger(GeoLocationsController.class);
 
   public GeoLocationsController(CudamiClient client, LanguageService languageService) {
-    super(client.forGeoLocations(), languageService);
+    super(client.forGeoLocations(), client, languageService);
   }
 
   @GetMapping("/geolocations")

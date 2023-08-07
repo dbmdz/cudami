@@ -32,7 +32,7 @@ public class FamilynamesAPIController
   private static final Logger LOGGER = LoggerFactory.getLogger(FamilynamesAPIController.class);
 
   public FamilynamesAPIController(CudamiClient client, LanguageService languageService) {
-    super(client.forFamilyNames(), languageService);
+    super(client.forFamilyNames(), client, languageService);
   }
 
   @GetMapping("/api/familynames/new")

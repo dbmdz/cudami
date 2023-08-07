@@ -24,7 +24,7 @@ public class DigitalObjectsController
     extends AbstractEntitiesController<DigitalObject, CudamiDigitalObjectsClient> {
 
   public DigitalObjectsController(CudamiClient client, LanguageService languageService) {
-    super(client.forDigitalObjects(), languageService);
+    super(client.forDigitalObjects(), client, languageService);
   }
 
   @GetMapping("/digitalobjects")
