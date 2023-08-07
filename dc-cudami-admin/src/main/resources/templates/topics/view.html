@@ -301,7 +301,7 @@
             const baseUrl = [[@{'/entities'}]] + '/' + row.uuid;
             +]*/
            return [
-             renderViewAction(baseUrl + "/view"),
+             renderViewAction(baseUrl),
              renderEditAction(baseUrl)
            ].join(' ');
         }
