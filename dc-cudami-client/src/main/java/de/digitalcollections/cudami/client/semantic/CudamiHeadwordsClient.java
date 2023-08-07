@@ -11,6 +11,7 @@ import de.digitalcollections.model.list.buckets.BucketsRequest;
 import de.digitalcollections.model.list.buckets.BucketsResponse;
 import de.digitalcollections.model.semantic.Headword;
 import java.net.http.HttpClient;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -22,17 +23,22 @@ public class CudamiHeadwordsClient extends CudamiRestClient<Headword> {
 
   public BucketObjectsResponse<Headword> findBucketObjects(
       BucketObjectsRequest<Headword> bucketObjectsRequest) throws TechnicalException {
+    BucketObjectsResponse<Headword> result;
     String url = String.format("%s/bucketobjects", baseEndpoint);
     Bucket<Headword> bucket = bucketObjectsRequest.getBucket();
-    Headword startObject = bucket.getStartObject();
-    Headword endObject = bucket.getEndObject();
-    url = url + "?startId=" + startObject.getUuid();
-    url = url + "&endId=" + endObject.getUuid();
+    if (bucket != null && bucket.getStartObject() != null && bucket.getEndObject() != null) {
+      Headword startObject = bucket.getStartObject();
+      Headword endObject = bucket.getEndObject();
+      url = url + "?startId=" + startObject.getUuid();
+      url = url + "&endId=" + endObject.getUuid();
 
-    url = url + "&" + getFindParamsAsString(bucketObjectsRequest);
+      url = url + "&" + getFindParamsAsString(bucketObjectsRequest);
 
-    BucketObjectsResponse<Headword> result =
-        (BucketObjectsResponse<Headword>) doGetRequestForObject(url, BucketObjectsResponse.class);
+      result =
+          (BucketObjectsResponse<Headword>) doGetRequestForObject(url, BucketObjectsResponse.class);
+    } else {
+      result = new BucketObjectsResponse<>(bucketObjectsRequest, new ArrayList<>());
+    }
     return result;
   }
 
