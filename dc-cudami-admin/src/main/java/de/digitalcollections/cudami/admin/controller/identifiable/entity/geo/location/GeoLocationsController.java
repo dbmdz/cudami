@@ -28,7 +28,7 @@ public class GeoLocationsController
   private static final Logger LOGGER = LoggerFactory.getLogger(GeoLocationsController.class);
 
   public GeoLocationsController(CudamiClient client, LanguageService languageService) {
-    super(client.forGeoLocations(), languageService);
+    super(client.forGeoLocations(), client, languageService);
   }
 
   @GetMapping("/geolocations")
@@ -59,7 +59,7 @@ public class GeoLocationsController
     model.addAttribute("geoLocation", geoLocation);
 
     List<Locale> existingLanguages = getExistingLanguagesFromIdentifiable(geoLocation);
-    String dataLanguage = getDataLanguage(targetDataLanguage, languageService);
+    String dataLanguage = getDataLanguage(targetDataLanguage, existingLanguages, languageService);
     model
         .addAttribute("existingLanguages", existingLanguages)
         .addAttribute("dataLanguage", dataLanguage);

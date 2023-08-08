@@ -40,7 +40,7 @@ public class CollectionsAPIController
   private static final Logger LOGGER = LoggerFactory.getLogger(CollectionsAPIController.class);
 
   public CollectionsAPIController(CudamiClient client, LanguageService languageService) {
-    super(client.forCollections(), languageService);
+    super(client.forCollections(), client, languageService);
   }
 
   @PostMapping("/api/collections/{uuid:" + ParameterHelper.UUID_PATTERN + "}/digitalobjects")

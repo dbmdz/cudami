@@ -36,7 +36,7 @@ public class ImageFileResourcesAPIController
       LoggerFactory.getLogger(ImageFileResourcesAPIController.class);
 
   public ImageFileResourcesAPIController(CudamiClient client, LanguageService languageService) {
-    super(client.forImageFileResources(), languageService);
+    super(client.forImageFileResources(), client, languageService);
   }
 
   @GetMapping("/api/imagefileresources/new")

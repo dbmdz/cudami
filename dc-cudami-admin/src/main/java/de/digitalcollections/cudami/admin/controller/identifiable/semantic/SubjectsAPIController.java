@@ -2,9 +2,10 @@ package de.digitalcollections.cudami.admin.controller.identifiable.semantic;
 
 import de.digitalcollections.cudami.admin.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.admin.business.i18n.LanguageService;
-import de.digitalcollections.cudami.admin.controller.AbstractUniqueObjectController;
+import de.digitalcollections.cudami.admin.controller.identifiable.AbstractIdentifiablesController;
 import de.digitalcollections.cudami.admin.model.bootstraptable.BTResponse;
 import de.digitalcollections.cudami.client.CudamiClient;
+import de.digitalcollections.cudami.client.identifiable.entity.semantic.CudamiSubjectsClient;
 import de.digitalcollections.model.exception.TechnicalException;
 import de.digitalcollections.model.identifiable.semantic.Subject;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -17,12 +18,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 /** Controller for all public "Subjects" endpoints (API). */
 @RestController
-public class SubjectsAPIController extends AbstractUniqueObjectController<Subject> {
+public class SubjectsAPIController
+    extends AbstractIdentifiablesController<Subject, CudamiSubjectsClient> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(SubjectsAPIController.class);
 
   public SubjectsAPIController(CudamiClient client, LanguageService languageService) {
-    super(client.forSubjects(), languageService);
+    super(client.forSubjects(), client, languageService);
   }
 
   @SuppressFBWarnings

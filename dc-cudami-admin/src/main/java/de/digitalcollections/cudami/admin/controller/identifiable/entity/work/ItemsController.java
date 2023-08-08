@@ -26,7 +26,7 @@ public class ItemsController extends AbstractEntitiesController<Item, CudamiItem
   private final CudamiManifestationsClient manifestationsService;
 
   public ItemsController(CudamiClient client, LanguageService languageService) {
-    super(client.forItems(), languageService);
+    super(client.forItems(), client, languageService);
     this.manifestationsService = client.forManifestations();
   }
 
@@ -63,18 +63,21 @@ public class ItemsController extends AbstractEntitiesController<Item, CudamiItem
     model.addAttribute("item", item);
 
     List<Locale> existingLanguages = getExistingLanguagesFromIdentifiable(item);
-    String dataLanguage = getDataLanguage(targetDataLanguage, languageService);
+    String dataLanguage = getDataLanguage(targetDataLanguage, existingLanguages, languageService);
     model
         .addAttribute("existingLanguages", existingLanguages)
         .addAttribute("dataLanguage", dataLanguage);
 
     Locale displayLocale = LocaleContextHolder.getLocale();
+
     List<Locale> existingDigitalObjectsLanguages =
         languageService.sortLanguages(
             displayLocale, ((CudamiItemsClient) service).getLanguagesOfDigitalObjects(uuid));
+    String dataLanguageDigitalObjects =
+        getDataLanguage(targetDataLanguage, existingDigitalObjectsLanguages, languageService);
     model
         .addAttribute("existingDigitalObjectsLanguages", existingDigitalObjectsLanguages)
-        .addAttribute("dataLanguageDigitalObjects", getDataLanguage(null, languageService));
+        .addAttribute("dataLanguageDigitalObjects", dataLanguageDigitalObjects);
 
     return "items/view";
   }

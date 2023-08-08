@@ -31,7 +31,7 @@ public class PersonsAPIController extends AbstractEntitiesController<Person, Cud
   private static final Logger LOGGER = LoggerFactory.getLogger(PersonsAPIController.class);
 
   public PersonsAPIController(CudamiClient client, LanguageService languageService) {
-    super(client.forPersons(), languageService);
+    super(client.forPersons(), client, languageService);
   }
 
   @GetMapping("/api/persons/new")

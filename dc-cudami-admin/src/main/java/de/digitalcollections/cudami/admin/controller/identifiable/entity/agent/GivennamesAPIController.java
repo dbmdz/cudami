@@ -32,7 +32,7 @@ public class GivennamesAPIController
   private static final Logger LOGGER = LoggerFactory.getLogger(GivennamesAPIController.class);
 
   public GivennamesAPIController(CudamiClient client, LanguageService languageService) {
-    super(client.forGivenNames(), languageService);
+    super(client.forGivenNames(), client, languageService);
   }
 
   @GetMapping("/api/givennames/new")

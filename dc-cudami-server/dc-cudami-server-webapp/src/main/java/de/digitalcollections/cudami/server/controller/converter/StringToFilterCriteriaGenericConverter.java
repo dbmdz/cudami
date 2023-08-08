@@ -139,7 +139,7 @@ public class StringToFilterCriteriaGenericConverter implements GenericConverter 
     String expression = null;
     boolean isNativeExpression = false;
     String operationAcronym = null;
-    String operationValue = "";
+    StringBuilder operationValue = new StringBuilder();
     if (newStyle) {
       expression = filterParts[0];
       if (expression.startsWith("[") && expression.endsWith("]")) {
@@ -151,9 +151,9 @@ public class StringToFilterCriteriaGenericConverter implements GenericConverter 
       for (int i = 2; i < filterParts.length; i++) {
         if (i > 2) {
           // add separator again (was part of value and no filter separator)
-          operationValue += ":";
+          operationValue.append(":");
         }
-        operationValue += filterParts[i];
+        operationValue.append(filterParts[i]);
       }
     } else {
       // old style without expression part
@@ -162,7 +162,7 @@ public class StringToFilterCriteriaGenericConverter implements GenericConverter 
               ':'); // index of the first occurrence of ":" (operation value may contain
       // ":", too...
       operationAcronym = filterSource.substring(0, separatorPosition);
-      operationValue = filterSource.substring(separatorPosition + 1);
+      operationValue.append(filterSource.substring(separatorPosition + 1));
     }
 
     // Convert the operation acronym to enum
@@ -176,7 +176,7 @@ public class StringToFilterCriteriaGenericConverter implements GenericConverter 
         expression,
         isNativeExpression,
         filterOperation,
-        operationValue,
+        operationValue.toString(),
         conversionService);
   }
 

@@ -34,7 +34,7 @@ public class WebpagesController
   private final CudamiWebsitesClient websiteService;
 
   public WebpagesController(CudamiClient client, LanguageService languageService) {
-    super(client.forWebpages(), languageService);
+    super(client.forWebpages(), client, languageService);
     this.websiteService = client.forWebsites();
   }
 

@@ -31,7 +31,7 @@ public class CollectionsController
   private static final Logger LOGGER = LoggerFactory.getLogger(CollectionsController.class);
 
   public CollectionsController(CudamiClient client, LanguageService languageService) {
-    super(client.forCollections(), languageService);
+    super(client.forCollections(), client, languageService);
   }
 
   @GetMapping("/collections/new")
@@ -98,17 +98,19 @@ public class CollectionsController
     }
     model.addAttribute("collection", collection);
 
-    List<Locale> existingLanguages = getExistingLanguagesFromIdentifiables(List.of(collection));
-    String dataLanguage = getDataLanguage(targetDataLanguage, languageService);
+    List<Locale> existingLanguages = getExistingLanguagesFromIdentifiable(collection);
+    String dataLanguage = getDataLanguage(targetDataLanguage, existingLanguages, languageService);
     model
         .addAttribute("existingLanguages", existingLanguages)
         .addAttribute("dataLanguage", dataLanguage);
 
     List<Locale> existingSubcollectionsLanguages =
         getExistingLanguagesFromIdentifiables(collection.getChildren());
+    String dataLanguageSubcollections =
+        getDataLanguage(targetDataLanguage, existingSubcollectionsLanguages, languageService);
     model
         .addAttribute("existingSubcollectionsLanguages", existingSubcollectionsLanguages)
-        .addAttribute("dataLanguageSubcollections", getDataLanguage(null, languageService));
+        .addAttribute("dataLanguageSubcollections", dataLanguageSubcollections);
 
     List<Collection> parents = ((CudamiCollectionsClient) service).getParents(uuid);
     model.addAttribute("parents", parents);

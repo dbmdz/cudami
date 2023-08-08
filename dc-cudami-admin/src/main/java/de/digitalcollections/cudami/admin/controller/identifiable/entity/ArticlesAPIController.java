@@ -30,7 +30,7 @@ public class ArticlesAPIController
   private static final Logger LOGGER = LoggerFactory.getLogger(ArticlesAPIController.class);
 
   public ArticlesAPIController(CudamiClient client, LanguageService languageService) {
-    super(client.forArticles(), languageService);
+    super(client.forArticles(), client, languageService);
   }
 
   @GetMapping("/api/articles/new")

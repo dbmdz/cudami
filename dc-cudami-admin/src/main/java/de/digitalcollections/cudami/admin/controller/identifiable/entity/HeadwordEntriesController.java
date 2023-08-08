@@ -28,7 +28,7 @@ public class HeadwordEntriesController
   private static final Logger LOGGER = LoggerFactory.getLogger(HeadwordEntriesController.class);
 
   public HeadwordEntriesController(CudamiClient client, LanguageService languageService) {
-    super(client.forHeadwordEntries(), languageService);
+    super(client.forHeadwordEntries(), client, languageService);
   }
 
   @GetMapping("/headwordentries/new")
@@ -87,7 +87,7 @@ public class HeadwordEntriesController
     model.addAttribute("headwordEntry", headwordEntry);
 
     List<Locale> existingLanguages = getExistingLanguagesFromIdentifiable(headwordEntry);
-    String dataLanguage = getDataLanguage(targetDataLanguage, languageService);
+    String dataLanguage = getDataLanguage(targetDataLanguage, existingLanguages, languageService);
     model
         .addAttribute("existingLanguages", existingLanguages)
         .addAttribute("dataLanguage", dataLanguage);

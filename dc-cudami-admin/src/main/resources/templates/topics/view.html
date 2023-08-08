@@ -297,7 +297,13 @@
         }
 
         function formatActionsEntities(value, row) {
-          return '';
+        	/*[+
+            const baseUrl = [[@{'/entities'}]] + '/' + row.uuid;
+            +]*/
+           return [
+             renderViewAction(baseUrl),
+             renderEditAction(baseUrl)
+           ].join(' ');
         }
 
         function formatActionsFileresources(value, row) {

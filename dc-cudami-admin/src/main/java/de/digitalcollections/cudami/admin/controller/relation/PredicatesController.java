@@ -247,7 +247,7 @@ public class PredicatesController extends AbstractUniqueObjectController<Predica
         predicate.getLabel() != null
             ? languageService.getExistingLanguagesForLocales(predicate.getLabel().getLocales())
             : List.of();
-    String dataLanguage = getDataLanguage(targetDataLanguage, languageService);
+    String dataLanguage = getDataLanguage(targetDataLanguage, existingLanguages, languageService);
 
     model
         .addAttribute("predicate", predicate)

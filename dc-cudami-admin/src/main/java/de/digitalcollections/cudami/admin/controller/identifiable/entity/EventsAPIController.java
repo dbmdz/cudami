@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class EventsAPIController extends AbstractEntitiesController<Event, CudamiEventsClient> {
 
   public EventsAPIController(CudamiClient client, LanguageService languageService) {
-    super(client.forEvents(), languageService);
+    super(client.forEvents(), client, languageService);
   }
 
   /*

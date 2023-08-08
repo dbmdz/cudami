@@ -30,7 +30,7 @@ public class TopicsController extends AbstractEntitiesController<Topic, CudamiTo
   private static final Logger LOGGER = LoggerFactory.getLogger(TopicsController.class);
 
   public TopicsController(CudamiClient client, LanguageService languageService) {
-    super(client.forTopics(), languageService);
+    super(client.forTopics(), client, languageService);
   }
 
   @GetMapping("/topics/new")
@@ -98,33 +98,39 @@ public class TopicsController extends AbstractEntitiesController<Topic, CudamiTo
     model.addAttribute("topic", topic);
 
     List<Locale> existingLanguages = getExistingLanguagesFromIdentifiable(topic);
-    String dataLanguage = getDataLanguage(targetDataLanguage, languageService);
+    String dataLanguage = getDataLanguage(targetDataLanguage, existingLanguages, languageService);
     model
         .addAttribute("existingLanguages", existingLanguages)
         .addAttribute("dataLanguage", dataLanguage);
 
     List<Locale> existingSubtopicsLanguages =
         getExistingLanguagesFromIdentifiables(topic.getChildren());
+    String dataLanguageSubtopics =
+        getDataLanguage(targetDataLanguage, existingSubtopicsLanguages, languageService);
     model
         .addAttribute("existingSubtopicsLanguages", existingSubtopicsLanguages)
-        .addAttribute("dataLanguageSubtopics", getDataLanguage(null, languageService));
+        .addAttribute("dataLanguageSubtopics", dataLanguageSubtopics);
 
     final Locale displayLocale = LocaleContextHolder.getLocale();
     List<Locale> existingEntitiesLanguages =
         ((CudamiTopicsClient) service).getLanguagesOfEntities(uuid);
+    String dataLanguageEntities =
+        getDataLanguage(targetDataLanguage, existingEntitiesLanguages, languageService);
     model
         .addAttribute(
             "existingEntitiesLanguages",
             languageService.sortLanguages(displayLocale, existingEntitiesLanguages))
-        .addAttribute("dataLanguageEntities", getDataLanguage(null, languageService));
+        .addAttribute("dataLanguageEntities", dataLanguageEntities);
 
     List<Locale> existingFileResourcesLanguages =
         ((CudamiTopicsClient) service).getLanguagesOfFileResources(uuid);
+    String dataLanguageFileResources =
+        getDataLanguage(targetDataLanguage, existingFileResourcesLanguages, languageService);
     model
         .addAttribute(
             "existingFileResourcesLanguages",
             languageService.sortLanguages(displayLocale, existingFileResourcesLanguages))
-        .addAttribute("dataLanguageFileResources", getDataLanguage(null, languageService));
+        .addAttribute("dataLanguageFileResources", dataLanguageFileResources);
 
     BreadcrumbNavigation breadcrumbNavigation =
         ((CudamiTopicsClient) service).getBreadcrumbNavigation(uuid);

@@ -25,7 +25,7 @@ public class ManifestationsController
     extends AbstractEntitiesController<Manifestation, CudamiManifestationsClient> {
 
   public ManifestationsController(CudamiClient client, LanguageService languageService) {
-    super(client.forManifestations(), languageService);
+    super(client.forManifestations(), client, languageService);
   }
 
   @GetMapping("/manifestations")
@@ -56,7 +56,7 @@ public class ManifestationsController
     model.addAttribute("manifestation", manifestation);
 
     List<Locale> existingLanguages = getExistingLanguagesFromIdentifiable(manifestation);
-    String dataLanguage = getDataLanguage(targetDataLanguage, languageService);
+    String dataLanguage = getDataLanguage(targetDataLanguage, existingLanguages, languageService);
     model
         .addAttribute("existingLanguages", existingLanguages)
         .addAttribute("dataLanguage", dataLanguage);
@@ -65,9 +65,11 @@ public class ManifestationsController
     List<Locale> existingItemsLanguages =
         languageService.sortLanguages(
             displayLocale, ((CudamiManifestationsClient) service).getLanguagesOfItems(uuid));
+    String dataLanguageItems =
+        getDataLanguage(targetDataLanguage, existingItemsLanguages, languageService);
     model
         .addAttribute("existingItemsLanguages", existingItemsLanguages)
-        .addAttribute("dataLanguageItems", getDataLanguage(null, languageService));
+        .addAttribute("dataLanguageItems", dataLanguageItems);
 
     return "manifestations/view";
   }

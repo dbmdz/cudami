@@ -33,7 +33,7 @@ public class TopicsAPIController extends AbstractEntitiesController<Topic, Cudam
   private static final Logger LOGGER = LoggerFactory.getLogger(TopicsAPIController.class);
 
   public TopicsAPIController(CudamiClient client, LanguageService languageService) {
-    super(client.forTopics(), languageService);
+    super(client.forTopics(), client, languageService);
   }
 
   @GetMapping("/api/topics/new")

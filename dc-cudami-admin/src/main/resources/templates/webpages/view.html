@@ -32,7 +32,7 @@
                   <li class="breadcrumb-item"><a th:href="@{/}">Home</a></li>
                   <li class="breadcrumb-item"><a th:href="@{/websites}" th:text="#{menu.websites}">Websites</a></li>
                   <li class="breadcrumb-item"><a th:href="@{|/websites/${website.uuid}|}">
-                    <th:block th:insert="cudami/fragments/localizedtext::renderLocalizedText(*{label}, ${locale})">Website x</th:block>
+                    <th:block th:insert="cudami/fragments/localizedtext::renderLocalizedText(${website.label}, ${locale})">Website x</th:block>
                     </a></li>
                   <th:block th:if="${not #lists.isEmpty(breadcrumbs)}">
                     <th:block th:each="breadcrumb : ${breadcrumbs}">

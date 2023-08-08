@@ -29,7 +29,7 @@ public class CorporateBodiesController
   private static final Logger LOGGER = LoggerFactory.getLogger(CorporateBodiesController.class);
 
   public CorporateBodiesController(CudamiClient client, LanguageService languageService) {
-    super(client.forCorporateBodies(), languageService);
+    super(client.forCorporateBodies(), client, languageService);
   }
 
   @GetMapping("/corporatebodies/new")
@@ -88,7 +88,7 @@ public class CorporateBodiesController
     model.addAttribute("corporateBody", corporateBody);
 
     List<Locale> existingLanguages = getExistingLanguagesFromIdentifiable(corporateBody);
-    String dataLanguage = getDataLanguage(targetDataLanguage, languageService);
+    String dataLanguage = getDataLanguage(targetDataLanguage, existingLanguages, languageService);
     model
         .addAttribute("existingLanguages", existingLanguages)
         .addAttribute("dataLanguage", dataLanguage);
