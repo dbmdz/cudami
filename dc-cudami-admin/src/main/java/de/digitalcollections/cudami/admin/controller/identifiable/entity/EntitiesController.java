@@ -17,9 +17,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 public class EntitiesController
     extends AbstractEntitiesController<Entity, CudamiEntitiesClient<Entity>> {
 
-  protected EntitiesController(
-      CudamiEntitiesClient service, CudamiClient cudamiClient, LanguageService languageService) {
-    super(service, cudamiClient, languageService);
+  public EntitiesController(CudamiClient cudamiClient, LanguageService languageService) {
+    super(cudamiClient.forEntities(), cudamiClient, languageService);
   }
 
   @GetMapping("/entities/{uuid:" + ParameterHelper.UUID_PATTERN + "}")
