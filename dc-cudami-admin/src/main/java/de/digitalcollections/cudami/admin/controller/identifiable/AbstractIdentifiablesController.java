@@ -175,8 +175,7 @@ public class AbstractIdentifiablesController<
       case WORK:
         return "forward:/works/" + uuid;
       default:
-        throw new TechnicalException(
-            "Unhandled object type " + identifiable.getIdentifiableObjectType());
+        throw new TechnicalException("Unhandled object type " + identifiableObjectType);
     }
   }
 }
