@@ -30,7 +30,7 @@
     "@babel/runtime": "^7.20.1",
     "@types/pubsub-js": "^1.8.3",
     "classnames": "^2.3.2",
-    "filesize": "^10.0.5",
+    "filesize": "^10.0.11",
     "i18next": "^21.10.0",
     "lodash-es": "^4.17.21",
     "object.fromentries": "^2.0.6",
