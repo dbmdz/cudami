@@ -49,7 +49,7 @@ public class PersonServiceImpl extends AgentServiceImpl<Person> implements Perso
             .add(
                 FilterCriterion.builder()
                     .withExpression("placeOfBirth")
-                    .isEquals(geoLocation.getUuid().toString())
+                    .isEquals(geoLocation.getUuid())
                     .build())
             .build();
     pageRequest.setFiltering(filtering);
@@ -68,7 +68,7 @@ public class PersonServiceImpl extends AgentServiceImpl<Person> implements Perso
             .add(
                 FilterCriterion.builder()
                     .withExpression("placeOfDeath")
-                    .isEquals(geoLocation.getUuid().toString())
+                    .isEquals(geoLocation.getUuid())
                     .build())
             .build();
     pageRequest.setFiltering(filtering);
