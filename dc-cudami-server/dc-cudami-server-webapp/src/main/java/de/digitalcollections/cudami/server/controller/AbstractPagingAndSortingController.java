@@ -5,6 +5,7 @@ import de.digitalcollections.model.list.filtering.FilterCriteria;
 import de.digitalcollections.model.list.filtering.FilterCriterion;
 import de.digitalcollections.model.list.filtering.FilterLogicalOperator;
 import de.digitalcollections.model.list.filtering.FilterOperation;
+import de.digitalcollections.model.list.filtering.FilterOperation.OperandCount;
 import de.digitalcollections.model.list.filtering.Filtering;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.sorting.Order;
@@ -51,7 +52,12 @@ public abstract class AbstractPagingAndSortingController {
     if (fc.isNativeExpression()) return fc;
     String expression = fc.getExpression();
     FilterOperation filterOperation = fc.getOperation();
-    String operationValue = (String) fc.getValue();
+    String operationValue;
+    if (OperandCount.MULTIVALUE == filterOperation.getOperandCount()) {
+      operationValue = String.join(",", fc.getValues());
+    } else {
+      operationValue = (String) fc.getValue();
+    }
     try {
       String basicExpression = expression;
       Class<?> fieldClass;
@@ -113,7 +119,8 @@ public abstract class AbstractPagingAndSortingController {
       if (resultingFiltering == null) resultingFiltering = new Filtering();
 
       // TODO: add datalanguage to be able to validate that multilanguage fields in
-      // filtercriteria have already "_language" (it is ".lang", right?) as suffix assigned...
+      // filtercriteria have already "_language" (it is ".lang", right?) as suffix
+      // assigned...
       List<FilterCriterion> typedCriterions =
           filterCriterions.parallelStream()
               .map(fc -> makeTypedFilterCriterion(fc, targetClass))
