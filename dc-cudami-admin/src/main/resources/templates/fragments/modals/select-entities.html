@@ -203,18 +203,23 @@
           // render just the columns and add wrapping outside method
           let html = '<div class="col-md-1">';
           if (object.previewImage) {
+        	  let imageUrl = `${object.previewImage.uri}`;
+        	  if (object.previewImage.httpBaseUrl) {
+        		  imageUrl = `${object.previewImage.httpBaseUrl}/full/50,/0/default.jpg`;
+        	  }
             html = html + `<figure class="mb-0 mx-auto" style="max-width: 50px;">
-                        <img class="img-fluid mw-100" src="${object.previewImage.httpBaseUrl}/full/50,/0/default.jpg">
+                        <img class="img-fluid mw-100" src="${imageUrl}">
                         </figure>`;
           } else {
             html = html + '<img class="img-fluid mw-100" src="/images/no-image.png">';
           }
           html = html + '</div>';
+          let label = Object.values(object.label)[0];
           if (currentValue) {
             // highlight current value in string
-            html = html + `<div class="col">${object.label.de.replace(new RegExp(currentValue, "gi"), (str) => `<span class="alert-warning">${str}</span>`)}</div>`;
+            html = html + `<div class="col">${label.replace(new RegExp(currentValue, "gi"), (str) => `<span class="alert-warning">${str}</span>`)}</div>`;
           } else {
-            html = html + `<div class="col">${object.label.de}</div>`;
+            html = html + `<div class="col">${label}</div>`;
           }
           if (withDeleteButton) {
             html = html + `<div class="text-right col-md-1"><a href="#" onclick="removeEntity('${object.uuid}'); refreshEntitiesDialog();" class="remove"><i class="fa fa-trash"></i></a></div>`;
