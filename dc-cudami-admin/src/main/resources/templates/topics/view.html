@@ -106,6 +106,14 @@
             <div class="row">
               <div class="col-md-3"><label th:text="#{lbl.entities}">Entities</label></div>
               <div class="col-md-9">
+                <div id="alert-entities" class="mt-2 alert alert-success alert-dismissible fade show d-none" role="alert">
+                  <span>Alert message.</span>
+
+                  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                </div>
+                
                 <div id="toolbar-entities">
                   <!-- TODO it always contains "und" undefined language? -->
                   <th:block th:if="${not #lists.isEmpty(existingEntitiesLanguages)}">
@@ -117,7 +125,7 @@
                        data-toggle="table"
                        th:data-url="@{/api/topics/__${topic.uuid}__/entities}"
                        th:data-locale="${#locale}"
-
+                       data-buttons="buttonsEntities"
                        data-cookie="true"
                        data-cookie-id-table="table-entities"
                        data-id-field="uuid"
@@ -153,6 +161,14 @@
             <div class="row">
               <div class="col-md-3"><label th:text="#{lbl.fileresources}">Files</label></div>
               <div class="col-md-9">
+                <div id="alert-fileresources" class="mt-2 alert alert-success alert-dismissible fade show d-none" role="alert">
+                  <span>Alert message.</span>
+
+                  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                </div>
+                
                 <div id="toolbar-fileresources">
                   <!-- TODO it always contains "und" undefined language? -->
                   <th:block th:if="${not #lists.isEmpty(existingFileresourcesLanguages)}">
@@ -164,7 +180,7 @@
                        data-toggle="table"
                        th:data-url="@{/api/topics/__${topic.uuid}__/fileresources}"
                        th:data-locale="${#locale}"
-
+                       data-buttons="buttonsFileResources"
                        data-cookie="true"
                        data-cookie-id-table="table-fileresources"
                        data-id-field="uuid"
@@ -202,6 +218,10 @@
     </th:block>
 
     <section layout:fragment="beforeBodyEnds">
+      <div th:replace="~{fragments/modals/confirm-yes-no :: confirm-yes-no-dialog-html}"></div>
+      <div th:replace="~{fragments/modals/select-entities :: render}"></div>
+      <div th:replace="~{fragments/modals/select-fileresources :: render}"></div>
+
       <script type="text/javascript">
         $(addDataLanguageChangeHandler());
 
@@ -275,6 +295,150 @@
           }
         });
 
+        function addEntities() {
+          /*[+
+           const errorMessage = [[#{error.technical_error}]];
+           // TODO i18n: which language? from page dropdown...
+           const parentLabel = [[${topic.label['de']}]];
+           const addApiUrl = [[@{/api/topics/__${topic.uuid}__/entities}]];
+           const successMessage = `[(#{msg.add_entities.success})]`;
+           +]*/
+
+          $('#selectEntitiesDialog').modal('hide');
+          let entities = getSelectedEntities();
+
+          // add entities to parent topic
+          fetch(addApiUrl,
+            {
+              method: "POST", headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify(entities)
+            })
+            .then(handleFetchErrors)
+            .then(function (response) {
+              $('#table-entities').bootstrapTable('refresh');
+              showMessage('alert-success', '#alert-entities', successMessage);
+            })
+            .catch(function (error) {
+              showMessage('alert-danger', '#alert-entities', errorMessage);
+            });
+        }
+        function addEntitiesDialog() {
+          /*[+
+           const modalTitle = [[#{modal.title.add_entities}]];
+           // TODO i18n: which language? from page dropdown...
+           const parentLabel = [[${topic.label['de']}]];
+           const modalMessage = `[(#{modal.msg.add_entities})]`;
+           const modalBtnText = `[(#{btn.add})]`;
+           const parentUuid = [[${topic.uuid}]];
+           const searchApiUrl = [[@{/api/entities/search}]];
+           +]*/
+
+          const modalDialog = $('#selectEntitiesDialog');
+          $(modalDialog).data('searchApiUrl', searchApiUrl);
+          $(modalDialog).data('mode', 'multi');
+          $(modalDialog).data('showType', 'true');
+          $(modalDialog).find('.modal-title').text(modalTitle);
+          $(modalDialog).find('.modal-message').html(modalMessage);
+          var btnOk = $(modalDialog).find('.modal-footer .btn-primary');
+          $(btnOk).attr('onclick', "addEntities();");
+          $(btnOk).html(modalBtnText);
+          $(modalDialog).modal('show');
+        }
+        
+        function addFileResources() {
+          /*[+
+           const errorMessage = [[#{error.technical_error}]];
+           // TODO i18n: which language? from page dropdown...
+           const parentLabel = [[${topic.label['de']}]];
+           const addApiUrl = [[@{/api/topics/__${topic.uuid}__/fileresources}]];
+           const successMessage = `[(#{msg.add_fileresources.success})]`;
+           +]*/
+
+          $('#selectFileResourcesDialog').modal('hide');
+          let fileResources = getSelectedFileResources();
+
+          // add FileResources to parent topic
+          fetch(addApiUrl,
+            {
+              method: "POST", headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify(fileResources)
+            })
+            .then(handleFetchErrors)
+            .then(function (response) {
+              $('#table-fileresources').bootstrapTable('refresh');
+              showMessage('alert-success', '#alert-fileresources', successMessage);
+            })
+            .catch(function (error) {
+              showMessage('alert-danger', '#alert-fileresources', errorMessage);
+            });
+        }
+        function addFileResourcesDialog() {
+          /*[+
+           const modalTitle = [[#{modal.title.add_fileresources}]];
+           // TODO i18n: which language? from page dropdown...
+           const parentLabel = [[${topic.label['de']}]];
+           const modalMessage = `[(#{modal.msg.add_fileresources})]`;
+           const modalBtnText = `[(#{btn.add})]`;
+           const parentUuid = [[${topic.uuid}]];
+           const searchApiUrl = [[@{/api/fileresources/search}]];
+           +]*/
+
+          const modalDialog = $('#selectFileResourcesDialog');
+          $(modalDialog).data('searchApiUrl', searchApiUrl);
+          $(modalDialog).data('mode', 'multi');
+          $(modalDialog).data('showType', 'true');
+          $(modalDialog).find('.modal-title').text(modalTitle);
+          $(modalDialog).find('.modal-message').html(modalMessage);
+          var btnOk = $(modalDialog).find('.modal-footer .btn-primary');
+          $(btnOk).attr('onclick', "addFileResources();");
+          $(btnOk).html(modalBtnText);
+          $(modalDialog).modal('show');
+        }
+        
+        function buttonsEntities() {
+          /*[+
+           const textAdd = [[#{btn.add}]];
+           const tooltipAdd = [[#{tooltip.add_new_table_entry}]];
+           +]*/
+          return {
+            btnAdd: {
+              text: textAdd,
+              icon: 'fa-plus',
+              event: function () {
+                addEntitiesDialog();
+              },
+              attributes: {
+                title: tooltipAdd
+              }
+            }
+          };
+        }
+        
+        function buttonsFileResources() {
+          /*[+
+           const textAdd = [[#{btn.add}]];
+           const tooltipAdd = [[#{tooltip.add_new_table_entry}]];
+           +]*/
+          return {
+            btnAdd: {
+              text: textAdd,
+              icon: 'fa-plus',
+              event: function () {
+                addFileResourcesDialog();
+              },
+              attributes: {
+                title: tooltipAdd
+              }
+            }
+          };
+        }
+        
         function buttonsSubtopics() {
           /*[+
            const baseUrl = [[@{'/topics'}]];
@@ -302,7 +466,7 @@
             +]*/
            return [
              renderViewAction(baseUrl),
-             renderEditAction(baseUrl)
+             renderRemoveEntityAction(row)
            ].join(' ');
         }
 
@@ -311,7 +475,8 @@
            const baseUrl = [[@{'/fileresources'}]] + '/' + row.uuid;
            +]*/
           return [
-            renderViewAction(baseUrl)
+            renderViewAction(baseUrl),
+            renderRemoveFileResourceAction(row)
           ].join(' ');
         }
 
@@ -344,6 +509,90 @@
            +]*/
           const dataLanguage = $("#subtopics-languages").val();
           return renderLabel(baseUrl, value, dataLanguage);
+        }
+        
+        function removeEntity(uuid) {
+          /*[+
+           const apiUrl = [[@{'/api/topics/__${topic.uuid}__/entities/'}]] + uuid;
+           const errorMessage = [[#{error.technical_error}]];
+           const alertSuccessMessage = [[#{alert.success.entity_removed_from_topic}]];
+           +]*/
+
+          $('#confirmYesNoDialog').modal('hide');
+
+          fetch(apiUrl, {method: "DELETE"})
+            .then(handleFetchErrors)
+            .then(function (response) {
+              showMessage('alert-success', '#alert-entities', alertSuccessMessage);
+              $('#alert-entities').removeClass("d-none");
+              $('#table-entities').bootstrapTable('refresh');
+            })
+            .catch(function (error) {
+              alert(errorMessage);
+            });
+        }
+        function removeEntityDialog(uuid) {
+          const row = $('#table-entities').bootstrapTable('getRowByUniqueId', uuid);
+          const label = row.label[Object.keys(row.label)[0]];
+          /*[+
+           const modalTitle = [[#{modal.title.warning}]];
+           const modalMessage = `[(#{modal.msg.confirm_remove_entity_from_topic})]`;
+           +]*/
+
+          const modalDialog = $('#confirmYesNoDialog');
+          $(modalDialog).find('.modal-title').text(modalTitle);
+          $(modalDialog).find('.modal-body').html(modalMessage);
+          $(modalDialog).find('.modal-footer #confirm').attr('href', "javascript:removeEntity('" + uuid + "');");
+          $(modalDialog).modal('show');
+        }
+        
+        function removeFileResource(uuid) {
+          /*[+
+           const apiUrl = [[@{'/api/topics/__${topic.uuid}__/fileresources/'}]] + uuid;
+           const errorMessage = [[#{error.technical_error}]];
+           const alertSuccessMessage = [[#{alert.success.fileresource_removed_from_topic}]];
+           +]*/
+
+          $('#confirmYesNoDialog').modal('hide');
+
+          fetch(apiUrl, {method: "DELETE"})
+            .then(handleFetchErrors)
+            .then(function (response) {
+              showMessage('alert-success', '#alert-fileresources', alertSuccessMessage);
+              $('#alert-fileresources').removeClass("d-none");
+              $('#table-fileresources').bootstrapTable('refresh');
+            })
+            .catch(function (error) {
+              alert(errorMessage);
+            });
+        }
+        function removeFileResourceDialog(uuid) {
+          const row = $('#table-fileresources').bootstrapTable('getRowByUniqueId', uuid);
+          const label = row.label[Object.keys(row.label)[0]];
+          /*[+
+           const modalTitle = [[#{modal.title.warning}]];
+           const modalMessage = `[(#{modal.msg.confirm_remove_fileresource_from_topic})]`;
+           +]*/
+
+          const modalDialog = $('#confirmYesNoDialog');
+          $(modalDialog).find('.modal-title').text(modalTitle);
+          $(modalDialog).find('.modal-body').html(modalMessage);
+          $(modalDialog).find('.modal-footer #confirm').attr('href', "javascript:removeFileResource('" + uuid + "');");
+          $(modalDialog).modal('show');
+        }
+        
+        function renderRemoveEntityAction(row) {
+          /*[+
+           const tooltip = [[#{tooltip.remove_from_topic}]];
+           +]*/
+          return "<a title=\"" + tooltip + "\" href=\"javascript:removeEntityDialog('" + row.uuid + "');\"><i class='fa fa-unlink'></i></a>";
+        }
+        
+        function renderRemoveFileResourceAction(row) {
+          /*[+
+           const tooltip = [[#{tooltip.remove_from_topic}]];
+           +]*/
+          return "<a title=\"" + tooltip + "\" href=\"javascript:removeFileResourceDialog('" + row.uuid + "');\"><i class='fa fa-unlink'></i></a>";
         }
       /*]]>*/
       </script>

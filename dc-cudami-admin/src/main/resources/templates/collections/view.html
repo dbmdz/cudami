@@ -240,8 +240,8 @@
     </th:block>
 
     <section layout:fragment="beforeBodyEnds">
-      <div th:replace="fragments/modals/confirm-yes-no :: confirm-yes-no-dialog-html"></div>
-      <div th:replace="fragments/modals/select-entities :: render"></div>
+      <div th:replace="~{fragments/modals/confirm-yes-no :: confirm-yes-no-dialog-html}"></div>
+      <div th:replace="~{fragments/modals/select-entities :: render}"></div>
 
       <script type="text/javascript">
         $(addDataLanguageChangeHandler());

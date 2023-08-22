@@ -20,6 +20,46 @@ public class CudamiTopicsClient extends CudamiEntitiesClient<Topic> {
     super(http, serverUrl, Topic.class, mapper, API_VERSION_PREFIX + "/topics");
   }
 
+  public boolean addEntities(UUID topicUuid, List<Entity> entities) throws TechnicalException {
+    try {
+      doPostRequestForString(String.format(baseEndpoint + "/%s/entities", topicUuid), entities);
+    } catch (ResourceNotFoundException e) {
+      return false;
+    }
+    return true;
+  }
+
+  public boolean addEntity(UUID topicUuid, UUID entityUuid) throws TechnicalException {
+    try {
+      doPostRequestForString(
+          String.format(baseEndpoint + "/%s/entities/%s", topicUuid, entityUuid));
+    } catch (ResourceNotFoundException e) {
+      return false;
+    }
+    return true;
+  }
+
+  public boolean addFileResource(UUID topicUuid, UUID fileResourceUuid) throws TechnicalException {
+    try {
+      doPostRequestForString(
+          String.format(baseEndpoint + "/%s/fileresources/%s", topicUuid, fileResourceUuid));
+    } catch (ResourceNotFoundException e) {
+      return false;
+    }
+    return true;
+  }
+
+  public boolean addFileResources(UUID topicUuid, List<FileResource> fileResources)
+      throws TechnicalException {
+    try {
+      doPostRequestForString(
+          String.format(baseEndpoint + "/%s/fileresources", topicUuid), fileResources);
+    } catch (ResourceNotFoundException e) {
+      return false;
+    }
+    return true;
+  }
+
   public PageResponse<Topic> findChildren(UUID uuid, PageRequest pageRequest)
       throws TechnicalException {
     return doGetRequestForPagedObjectList(
@@ -98,6 +138,27 @@ public class CudamiTopicsClient extends CudamiEntitiesClient<Topic> {
     return true;
   }
 
+  public boolean removeEntity(UUID topicUuid, UUID entityUuid) throws TechnicalException {
+    try {
+      doDeleteRequestForString(
+          String.format(baseEndpoint + "/%s/entities/%s", topicUuid, entityUuid));
+    } catch (ResourceNotFoundException e) {
+      return false;
+    }
+    return true;
+  }
+
+  public boolean removeFileResource(UUID topicUuid, UUID fileResourceUuid)
+      throws TechnicalException {
+    try {
+      doDeleteRequestForString(
+          String.format(baseEndpoint + "/%s/fileresources/%s", topicUuid, fileResourceUuid));
+    } catch (ResourceNotFoundException e) {
+      return false;
+    }
+    return true;
+  }
+
   public Topic saveWithParentTopic(Topic subtopic, UUID parentTopicUuid) throws TechnicalException {
     try {
       return doPostRequestForObject(
@@ -107,18 +168,26 @@ public class CudamiTopicsClient extends CudamiEntitiesClient<Topic> {
     }
   }
 
-  public List<Entity> setEntities(UUID uuid, List entities) throws TechnicalException {
-    // FIXME: should be PUT
-    return doPostRequestForObjectList(
-        String.format("%s/%s/entities", baseEndpoint, uuid), entities, Entity.class);
+  public boolean setEntities(UUID topicUuid, List<Entity> entities) throws TechnicalException {
+    try {
+      doPutRequestForObject(
+          String.format("%s/%s/entities", baseEndpoint, topicUuid), entities, String.class);
+    } catch (ResourceNotFoundException e) {
+      return false;
+    }
+    return true;
   }
 
-  public List<FileResource> setFileResources(UUID uuid, List fileResources)
+  public boolean setFileResources(UUID topicUuid, List<FileResource> fileResources)
       throws TechnicalException {
-    // FIXME: should be PUT
-    return doPostRequestForObjectList(
-        String.format("%s/%s/fileresources", baseEndpoint, uuid),
-        fileResources,
-        FileResource.class);
+    try {
+      doPutRequestForObject(
+          String.format("%s/%s/fileresources", baseEndpoint, topicUuid),
+          fileResources,
+          String.class);
+    } catch (ResourceNotFoundException e) {
+      return false;
+    }
+    return true;
   }
 }

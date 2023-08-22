@@ -64,6 +64,43 @@ public class TopicServiceImpl extends EntityServiceImpl<Topic> implements TopicS
   }
 
   @Override
+  public boolean addEntities(Topic topic, List<Entity> entities) throws ServiceException {
+    try {
+      return ((TopicRepository) repository).addEntities(topic, entities);
+    } catch (RepositoryException e) {
+      throw new ServiceException("Backend failure", e);
+    }
+  }
+
+  @Override
+  public boolean addEntity(Topic topic, Entity entity) throws ServiceException {
+    try {
+      return ((TopicRepository) repository).addEntity(topic, entity);
+    } catch (RepositoryException e) {
+      throw new ServiceException("Backend failure", e);
+    }
+  }
+
+  @Override
+  public boolean addFileResource(Topic topic, FileResource fileResource) throws ServiceException {
+    try {
+      return ((TopicRepository) repository).addFileResource(topic, fileResource);
+    } catch (RepositoryException e) {
+      throw new ServiceException("Backend failure", e);
+    }
+  }
+
+  @Override
+  public boolean addFileResources(Topic topic, List<FileResource> fileResources)
+      throws ServiceException {
+    try {
+      return ((TopicRepository) repository).addFileResources(topic, fileResources);
+    } catch (RepositoryException e) {
+      throw new ServiceException("Backend failure", e);
+    }
+  }
+
+  @Override
   public PageResponse<Topic> findChildren(Topic topic, PageRequest pageRequest)
       throws ServiceException {
     PageResponse<Topic> pageResponse;
@@ -211,6 +248,25 @@ public class TopicServiceImpl extends EntityServiceImpl<Topic> implements TopicS
   }
 
   @Override
+  public boolean removeEntity(Topic topic, Entity entity) throws ServiceException {
+    try {
+      return ((TopicRepository) repository).removeEntity(topic, entity);
+    } catch (RepositoryException e) {
+      throw new ServiceException("Backend failure", e);
+    }
+  }
+
+  @Override
+  public boolean removeFileResource(Topic topic, FileResource fileResource)
+      throws ServiceException {
+    try {
+      return ((TopicRepository) repository).removeFileResource(topic, fileResource);
+    } catch (RepositoryException e) {
+      throw new ServiceException("Backend failure", e);
+    }
+  }
+
+  @Override
   public Topic saveWithParent(Topic child, Topic parent) throws ServiceException {
     try {
       Topic topic = ((TopicRepository) repository).saveWithParent(child, parent);
@@ -222,7 +278,7 @@ public class TopicServiceImpl extends EntityServiceImpl<Topic> implements TopicS
   }
 
   @Override
-  public List<Entity> setEntities(Topic topic, List<Entity> entities) throws ServiceException {
+  public boolean setEntities(Topic topic, List<Entity> entities) throws ServiceException {
     try {
       return ((TopicRepository) repository).setEntities(topic, entities);
     } catch (RepositoryException e) {
@@ -231,7 +287,7 @@ public class TopicServiceImpl extends EntityServiceImpl<Topic> implements TopicS
   }
 
   @Override
-  public List<FileResource> setFileResources(Topic topic, List<FileResource> fileResources)
+  public boolean setFileResources(Topic topic, List<FileResource> fileResources)
       throws ServiceException {
     try {
       return ((TopicRepository) repository).setFileResources(topic, fileResources);

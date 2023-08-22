@@ -91,6 +91,62 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
   }
 
   @Override
+  public boolean addEntities(UUID topicUuid, List<Entity> entities) throws RepositoryException {
+    if (topicUuid != null && entities != null) {
+      Integer nextSortIndex =
+          retrieveNextSortIndexForParentChildren(dbi, "topic_entities", "topic_uuid", topicUuid);
+
+      // save relation to topic
+      dbi.useHandle(
+          handle -> {
+            PreparedBatch preparedBatch =
+                handle.prepareBatch(
+                    "INSERT INTO topic_entities(topic_uuid, entity_uuid, sortIndex) VALUES (:uuid, :entityUuid, :sortIndex) ON CONFLICT (topic_uuid, entity_uuid) DO NOTHING");
+            entities.forEach(
+                entity -> {
+                  preparedBatch
+                      .bind("uuid", topicUuid)
+                      .bind("entityUuid", entity.getUuid())
+                      .bind("sortIndex", nextSortIndex + getIndex(entities, entity))
+                      .add();
+                });
+            preparedBatch.execute();
+          });
+      return true;
+    }
+    return false;
+  }
+
+  @Override
+  public boolean addFileResources(UUID topicUuid, List<FileResource> fileResources)
+      throws RepositoryException {
+    if (topicUuid != null && fileResources != null) {
+      Integer nextSortIndex =
+          retrieveNextSortIndexForParentChildren(
+              dbi, "topic_fileresources", "topic_uuid", topicUuid);
+
+      // save relation to topic
+      dbi.useHandle(
+          handle -> {
+            PreparedBatch preparedBatch =
+                handle.prepareBatch(
+                    "INSERT INTO topic_fileresources(topic_uuid, fileresource_uuid, sortIndex) VALUES (:uuid, :fileresourceUuid, :sortIndex) ON CONFLICT (topic_uuid, fileresource_uuid) DO NOTHING");
+            fileResources.forEach(
+                fileResource -> {
+                  preparedBatch
+                      .bind("uuid", topicUuid)
+                      .bind("fileresourceUuid", fileResource.getUuid())
+                      .bind("sortIndex", nextSortIndex + getIndex(fileResources, fileResource))
+                      .add();
+                });
+            preparedBatch.execute();
+          });
+      return true;
+    }
+    return false;
+  }
+
+  @Override
   public Topic create() throws RepositoryException {
     return new Topic();
   }
@@ -503,6 +559,43 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
   }
 
   @Override
+  public boolean removeEntity(UUID topicUuid, UUID entityUuid) throws RepositoryException {
+    if (topicUuid != null && entityUuid != null) {
+      // delete relation to topic
+      final String sql =
+          "DELETE FROM topic_entities WHERE topic_uuid=:topicUuid AND entity_uuid=:entityUuid";
+
+      dbi.withHandle(
+          h ->
+              h.createUpdate(sql)
+                  .bind("topicUuid", topicUuid)
+                  .bind("entityUuid", entityUuid)
+                  .execute());
+      return true;
+    }
+    return false;
+  }
+
+  @Override
+  public boolean removeFileResource(UUID topicUuid, UUID fileResourceUuid)
+      throws RepositoryException {
+    if (topicUuid != null && fileResourceUuid != null) {
+      // delete relation to topic
+      final String sql =
+          "DELETE FROM topic_fileresources WHERE topic_uuid=:topicUuid AND fileresource_uuid=:fileResourceUuid";
+
+      dbi.withHandle(
+          h ->
+              h.createUpdate(sql)
+                  .bind("topicUuid", topicUuid)
+                  .bind("fileResourceUuid", fileResourceUuid)
+                  .execute());
+      return true;
+    }
+    return false;
+  }
+
+  @Override
   public Topic saveWithParent(UUID childUuid, UUID parentUuid) throws RepositoryException {
     Integer nextSortIndex =
         retrieveNextSortIndexForParentChildren(
@@ -522,8 +615,7 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
   }
 
   @Override
-  public List<Entity> setEntities(UUID topicUuid, List<Entity> entities)
-      throws RepositoryException {
+  public boolean setEntities(UUID topicUuid, List<Entity> entities) throws RepositoryException {
     // as we store the whole list new: delete old entries
     dbi.withHandle(
         h ->
@@ -531,32 +623,31 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
                 .bind("uuid", topicUuid)
                 .execute());
 
-    if (entities != null && entities.size() > 0) {
-      // we assume that the entities are already saved...
-      dbi.useHandle(
-          handle -> {
-            PreparedBatch preparedBatch =
-                handle.prepareBatch(
-                    "INSERT INTO topic_entities(topic_uuid, entity_uuid, sortIndex) VALUES(:uuid, :entityUuid, :sortIndex)");
-            for (Entity entity : entities) {
-              preparedBatch
-                  .bind("uuid", topicUuid)
-                  .bind("entityUuid", entity.getUuid())
-                  .bind("sortIndex", getIndex(entities, entity))
-                  .add();
-            }
-            preparedBatch.execute();
-          });
-      int size = entities.size();
-      PageRequest pageRequest = PageRequest.builder().pageNumber(0).pageSize(size - 1).build();
-      PageResponse<Entity> pageResponse = findEntities(topicUuid, pageRequest);
-      return pageResponse.getContent();
+    if (entities != null) {
+      if (entities.size() > 0) {
+        // we assume that the entities are already saved...
+        dbi.useHandle(
+            handle -> {
+              PreparedBatch preparedBatch =
+                  handle.prepareBatch(
+                      "INSERT INTO topic_entities(topic_uuid, entity_uuid, sortIndex) VALUES(:uuid, :entityUuid, :sortIndex)");
+              for (Entity entity : entities) {
+                preparedBatch
+                    .bind("uuid", topicUuid)
+                    .bind("entityUuid", entity.getUuid())
+                    .bind("sortIndex", getIndex(entities, entity))
+                    .add();
+              }
+              preparedBatch.execute();
+            });
+      }
+      return true;
     }
-    return null;
+    return false;
   }
 
   @Override
-  public List<FileResource> setFileResources(UUID topicUuid, List<FileResource> fileResources)
+  public boolean setFileResources(UUID topicUuid, List<FileResource> fileResources)
       throws RepositoryException {
     // as we store the whole list new: delete old entries
     dbi.withHandle(
@@ -566,23 +657,26 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
                 .execute());
 
     if (fileResources != null) {
-      // we assume that the fileresources are already saved...
-      dbi.useHandle(
-          handle -> {
-            PreparedBatch preparedBatch =
-                handle.prepareBatch(
-                    "INSERT INTO topic_fileresources(topic_uuid, fileresource_uuid, sortIndex) VALUES(:uuid, :fileResourceUuid, :sortIndex)");
-            for (FileResource fileResource : fileResources) {
-              preparedBatch
-                  .bind("uuid", topicUuid)
-                  .bind("fileResourceUuid", fileResource.getUuid())
-                  .bind("sortIndex", getIndex(fileResources, fileResource))
-                  .add();
-            }
-            preparedBatch.execute();
-          });
+      if (fileResources.size() > 0) {
+        // we assume that the fileresources are already saved...
+        dbi.useHandle(
+            handle -> {
+              PreparedBatch preparedBatch =
+                  handle.prepareBatch(
+                      "INSERT INTO topic_fileresources(topic_uuid, fileresource_uuid, sortIndex) VALUES(:uuid, :fileResourceUuid, :sortIndex)");
+              for (FileResource fileResource : fileResources) {
+                preparedBatch
+                    .bind("uuid", topicUuid)
+                    .bind("fileResourceUuid", fileResource.getUuid())
+                    .bind("sortIndex", getIndex(fileResources, fileResource))
+                    .add();
+              }
+              preparedBatch.execute();
+            });
+      }
+      return true;
     }
-    return getFileResources(topicUuid);
+    return false;
   }
 
   @Override
