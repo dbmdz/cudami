@@ -8,7 +8,7 @@
 
   <body>
     <th:block th:fragment="render">
-      <div class="modal fade" id="selectEntitiesDialog" data-searchApiUrl="#" data-mode="single" data-showType="false">
+      <div class="modal fade" id="selectFileResourcesDialog" data-searchApiUrl="#" data-mode="single" data-showType="false">
         <div class="modal-dialog modal-lg">
           <div class="modal-content">
             <div class="modal-header">
@@ -22,18 +22,17 @@
               <form>
                 <div class="row">
                   <div class="input-group col-sm-12">
-                    <select class="form-select" id="selectEntitiesDialog-inputType">
+                    <select class="form-select" id="selectFileResourcesDialog-inputType">
                       <option value="label" selected th:text="#{lbl.label}">Label</option>
-                      <option value="refId" th:text="#{lbl.ref_id}">Reference ID</option>
                       <option value="identifier" th:text="#{lbl.identifier}">Identifier</option>
                       <option value="uuid" th:text="#{lbl.uuid}">UUID</option>
                     </select>
                     <div class="form-control auto-search-wrapper p-0 border-0">
-                      <input id="selectEntitiesDialog-userInput" type="text" autocomplete="off" aria-label="User input" name="userInput" class="w-100" style="height: inherit;">
+                      <input id="selectFileResourcesDialog-userInput" type="text" autocomplete="off" aria-label="User input" name="userInput" class="w-100" style="height: inherit;">
                     </div>
                   </div>
                 </div>
-                <input type="hidden" name="selectedEntities" />
+                <input type="hidden" name="selectedFileResources" />
               </form>
 
               <div class="list-group mt-2" style="display: none;"></div>
@@ -51,32 +50,32 @@
         /*<![CDATA[*/
 
         /*[+
-         const msgNoResultsFoundEntities = [[#{msg.no_results_found}]];
+         const msgNoResultsFoundFileResources = [[#{msg.no_results_found}]];
         +]*/
 
         // empty input field every time the type select changes
-        $('#selectEntitiesDialog-inputType').change(function () {$('#selectEntitiesDialog-userInput').val("");});
-        $('#selectEntitiesDialog').on('show.bs.modal', function () {
-          resetEntitiesDialog();
+        $('#selectFileResourcesDialog-inputType').change(function () {$('#selectFileResourcesDialog-userInput').val("");});
+        $('#selectFileResourcesDialog').on('show.bs.modal', function () {
+          resetFileResourcesDialog();
         });
-        let resultCountEntities = 0;
-        const maxRecordsEntities = 25; // == pageSize
-        let totalElementsEntities = 0;
+        let resultCountFileResources = 0;
+        const maxRecordsFileResources = 25; // == pageSize
+        let totalElementsFileResources = 0;
         
-        new Autocomplete('selectEntitiesDialog-userInput', {
+        new Autocomplete('selectFileResourcesDialog-userInput', {
           insertToInput: true,
           cache: false,
           classGroup: "group-by",
-          noResults: ({element, currentValue, template}) => template(`<li>${msgNoResultsFoundEntities}: "${currentValue}"</li>`),
+          noResults: ({element, currentValue, template}) => template(`<li>${msgNoResultsFoundFileResources}: "${currentValue}"</li>`),
           onSearch: ({currentValue}) => {
             // clear count always when new searching
-            resultCountEntities = 0;
-            totalElementsEntities = 0;
+            resultCountFileResources = 0;
+            totalElementsFileResources = 0;
 
-            let apiUrl = $('#selectEntitiesDialog').data('searchApiUrl');
+            let apiUrl = $('#selectFileResourcesDialog').data('searchApiUrl');
             apiUrl = apiUrl + `?pageNumber=0&pageSize=25&searchTerm=${encodeURI(currentValue)}`;
             apiUrl = apiUrl + '&sortBy=label_de';
-            apiUrl = apiUrl + '&searchField=' + $("#selectEntitiesDialog-inputType").val();
+            apiUrl = apiUrl + '&searchField=' + $("#selectFileResourcesDialog-inputType").val();
             return new Promise((resolve) => {
               fetch(apiUrl)
                 .then((response) => response.json())
@@ -85,9 +84,9 @@
                   const result = data.content;
                   resolve(result);
 
-                  // save counts for paging message (if totalElementsEntities > maxRecordsEntities)
-                  totalElementsEntities = data.totalElements;
-                  resultCountEntities = result.length;
+                  // save counts for paging message (if totalElementsFileResources > maxRecordsFileResources)
+                  totalElementsFileResources = data.totalElements;
+                  resultCountFileResources = result.length;
                 })
                 .catch((error) => {
                   // just show user "no result"
@@ -101,14 +100,14 @@
               : matches
                 .map((object, index) => {
                   let moreResultsMessage = "";
-                  if (index === 0 && totalElementsEntities > maxRecordsEntities) {
+                  if (index === 0 && totalElementsFileResources > maxRecordsFileResources) {
                     /*[+
                       const msgPagingMoreResultsFound = `[(#{msg.paging.more_results_found})]`;
                     +]*/
                     moreResultsMessage = `<li class="${classGroup} alert-warning"><span><small>${msgPagingMoreResultsFound}</small></span></li>`;
                   }
 
-                  let objectHtml = renderEntity(object, currentValue);
+                  let objectHtml = renderFileResource(object, currentValue);
                   let html = '<li><div class="row">' + objectHtml + '</div></li>';
 
                   return `${moreResultsMessage} ${html}`;
@@ -116,64 +115,64 @@
                 .join("");
           },
           onSubmit: ({currentValue, index, element, object, results}) => {
-            let selectedEntities = addEntity(object, currentValue);
-            refreshEntitiesDialog();
+            let selectedFileResources = addFileResource(object, currentValue);
+            refreshFileResourcesDialog();
           },
         });
 
-        function addEntity(object, currentValue) {
-          let modalDialog = $('#selectEntitiesDialog');
+        function addFileResource(object, currentValue) {
+          let modalDialog = $('#selectFileResourcesDialog');
 
-          // add selected entity to data
-          let selectedEntities = getSelectedEntities();
-          if (isSelected(object)) {
+          // add selected FileResource to data
+          let selectedFileResources = getSelectedFileResources();
+          if (isFileResourceSelected(object)) {
             // do not add again
             return;
           }
-          selectedEntities.push(object);
-          setSelectedEntities(selectedEntities);
+          selectedFileResources.push(object);
+          setSelectedFileResources(selectedFileResources);
 
           // TODO make obsolete, use array:
           $(modalDialog).find('input[name="selectedUuid"]').val(object.uuid);
 
-          return selectedEntities;
+          return selectedFileResources;
         }
 
-        function getSelectedEntities() {
-          let selectedEntities = $('#selectEntitiesDialog input[name="selectedEntities"]').val();
-          if (!selectedEntities) {
-            selectedEntities = [];
+        function getSelectedFileResources() {
+          let selectedFileResources = $('#selectFileResourcesDialog input[name="selectedFileResources"]').val();
+          if (!selectedFileResources) {
+            selectedFileResources = [];
           } else {
-            selectedEntities = JSON.parse(decodeURIComponent(selectedEntities));
+            selectedFileResources = JSON.parse(decodeURIComponent(selectedFileResources));
           }
-          return selectedEntities;
+          return selectedFileResources;
         }
 
-        function isSelected(entity) {
-          let selectedEntities = getSelectedEntities();
-          const found = selectedEntities.find(object => object.uuid == entity.uuid);
+        function isFileResourceSelected(fileResource) {
+          let selectedFileResources = getSelectedFileResources();
+          const found = selectedFileResources.find(object => object.uuid == fileResource.uuid);
           if (found) {
             return true;
           }
           return false;
         }
 
-        function setSelectedEntities(selectedEntities) {
-          $('#selectEntitiesDialog input[name="selectedEntities"]').val(encodeURIComponent(JSON.stringify(selectedEntities)));
+        function setSelectedFileResources(selectedFileResources) {
+          $('#selectFileResourcesDialog input[name="selectedFileResources"]').val(encodeURIComponent(JSON.stringify(selectedFileResources)));
         }
 
-        function refreshEntitiesDialog() {
+        function refreshFileResourcesDialog() {
           // refreshes list and ok-button state
-          let modalDialog = $('#selectEntitiesDialog');
+          let modalDialog = $('#selectFileResourcesDialog');
           let mode = $(modalDialog).data('mode');
 
-          let selectedEntities = getSelectedEntities();
-          if (selectedEntities.length > 0) {
+          let selectedFileResources = getSelectedFileResources();
+          if (selectedFileResources.length > 0) {
             let htmlItems = '';
-            if (selectedEntities) {
-              getSelectedEntities().forEach(function (object, index) {
-                let entityHtml = '<div class="list-group-item d-flex align-items-start">' + renderEntity(object, null, true) + '</div>';
-                htmlItems = htmlItems + entityHtml;
+            if (selectedFileResources) {
+              getSelectedFileResources().forEach(function (object, index) {
+                let fileResourceHtml = '<div class="list-group-item d-flex align-items-start">' + renderFileResource(object, null, true) + '</div>';
+                htmlItems = htmlItems + fileResourceHtml;
               });
             }
             let htmlList = $(modalDialog).find('div.list-group').html(htmlItems);
@@ -191,15 +190,15 @@
           }
         }
 
-        function removeEntity(uuid) {
-          let selectedEntities = getSelectedEntities();
-          selectedEntities.forEach(function (object, index) {
-            selectedEntities = selectedEntities.filter(object => object.uuid !== uuid);
+        function removeFileResource(uuid) {
+          let selectedFileResources = getSelectedFileResources();
+          selectedFileResources.forEach(function (object, index) {
+            selectedFileResources = selectedFileResources.filter(object => object.uuid !== uuid);
           });
-          setSelectedEntities(selectedEntities);
+          setSelectedFileResources(selectedFileResources);
         }
 
-        function renderEntity(object, currentValue, withDeleteButton) {
+        function renderFileResource(object, currentValue, withDeleteButton) {
           // render just the columns and add wrapping outside method
           let html = '<div class="col-md-1">';
           
@@ -226,7 +225,7 @@
           } else {
             html = html + `${label}`;
           }
-          let showType = $('#selectEntitiesDialog').data('showType');
+          let showType = $('#selectFileResourcesDialog').data('showType');
           if (showType) {
         	  html = html + `<span class="ml-2 badge badge-light">${object.identifiableObjectType}</span>`;
           }
@@ -234,15 +233,15 @@
           
           // delete button
           if (withDeleteButton) {
-            html = html + `<div class="text-right col-md-1"><a href="#" onclick="removeEntity('${object.uuid}'); refreshEntitiesDialog();" class="remove"><i class="fa fa-trash"></i></a></div>`;
+            html = html + `<div class="text-right col-md-1"><a href="#" onclick="removeFileResource('${object.uuid}'); refreshFileResourcesDialog();" class="remove"><i class="fa fa-trash"></i></a></div>`;
           }
           return `${html}`;
         }
         
-        function resetEntitiesDialog() {
-          $('#selectEntitiesDialog-userInput').val("");
-          setSelectedEntities([]);
-          refreshEntitiesDialog();
+        function resetFileResourcesDialog() {
+          $('#selectFileResourcesDialog-userInput').val("");
+          setSelectedFileResources([]);
+          refreshFileResourcesDialog();
         }
         /*]]>*/
       </script>
