@@ -1,5 +1,9 @@
-nav.webpage-toc > ul {
+nav.webpage-toc ul {
   list-style: none;
+}
+
+nav.webpage-toc > ul ul {
+  padding-left: 10px;
 }
 
 nav.webpage-toc li {
