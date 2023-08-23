@@ -57,6 +57,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
 - Thymeleaf Date and TimeValue rendering fragment (date.html) and messages properties moved from cudami admin webapp to cudami client for easy reuse in frontend clients
 - Separate `PageRequest` param handling from `ListRequest` param handling in `BaseRestClient`
 - Reuse logic from `BaseRestClient` in `CudamiHeadwordsClient`
+- Set keepalive time to 5 minutes
 
 ### Fixed
 
@@ -70,6 +71,7 @@ by `"und"`
 - Fix data language handling in admin webapp
 - Fix visibility of long text in collection view
 - Fix website label rendering
+- Fix CSS for an identifiable's ToC
 
 ### Removed
 
