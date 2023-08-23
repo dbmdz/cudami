@@ -6,7 +6,7 @@
   <parent>
     <groupId>de.digitalcollections.cudami</groupId>
     <artifactId>dc-cudami-server</artifactId>
-    <version>7.0.0-RC3</version>
+    <version>7.0.1-SNAPSHOT</version>
   </parent>
 
   <name>DigitalCollections: cudami Repository Server (Business)</name>
