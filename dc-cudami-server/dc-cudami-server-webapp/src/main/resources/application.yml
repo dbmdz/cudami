@@ -60,6 +60,7 @@ spring:
     hikari:
       maximum-pool-size: 25
       connection-init-sql: "set random_page_cost = 2;"
+      keepalive-time: 300000
   flyway:
     baseline-on-migrate: true
     enabled: true

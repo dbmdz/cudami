@@ -27,7 +27,7 @@
     <dependency>
       <groupId>de.digitalcollections.commons</groupId>
       <artifactId>dc-commons-jdbi</artifactId>
-      <version>7.0.0</version>
+      <version>7.0.1</version>
     </dependency>
     <dependency>
       <groupId>de.digitalcollections.commons</groupId>
@@ -63,7 +63,7 @@
     <dependency>
       <groupId>org.flywaydb</groupId>
       <artifactId>flyway-core</artifactId>
-      <version>9.21.1</version>
+      <version>9.21.2</version>
     </dependency>
     <dependency>
       <groupId>org.jdbi</groupId>
@@ -135,19 +135,19 @@
     <dependency>
       <groupId>org.testcontainers</groupId>
       <artifactId>junit-jupiter</artifactId>
-      <version>1.18.3</version>
+      <version>1.19.0</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.testcontainers</groupId>
       <artifactId>testcontainers</artifactId>
-      <version>1.18.3</version>
+      <version>1.19.0</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.testcontainers</groupId>
       <artifactId>postgresql</artifactId>
-      <version>1.18.3</version>
+      <version>1.19.0</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
