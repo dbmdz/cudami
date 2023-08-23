@@ -23,6 +23,7 @@ import org.springframework.context.annotation.FilterType;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Primary;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
+import org.springframework.format.FormatterRegistry;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
@@ -133,8 +134,8 @@ public class SpringConfigWeb implements WebMvcConfigurer {
     return messageSource;
   }
 
-  @Bean
-  public StringToOrderConverter stringToOrderConverter() {
-    return new StringToOrderConverter();
+  @Override
+  public void addFormatters(FormatterRegistry registry) {
+    registry.addConverter(new StringToOrderConverter());
   }
 }
