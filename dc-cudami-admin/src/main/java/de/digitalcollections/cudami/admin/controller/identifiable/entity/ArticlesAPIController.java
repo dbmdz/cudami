@@ -7,12 +7,15 @@ import de.digitalcollections.cudami.client.CudamiClient;
 import de.digitalcollections.cudami.client.identifiable.entity.CudamiArticlesClient;
 import de.digitalcollections.model.exception.TechnicalException;
 import de.digitalcollections.model.identifiable.entity.Article;
+import de.digitalcollections.model.identifiable.entity.agent.Agent;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.List;
 import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -31,6 +34,16 @@ public class ArticlesAPIController
 
   public ArticlesAPIController(CudamiClient client, LanguageService languageService) {
     super(client.forArticles(), client, languageService);
+  }
+
+  @PostMapping("/api/articles/{uuid:" + ParameterHelper.UUID_PATTERN + "}/creators")
+  public ResponseEntity addCreators(@PathVariable UUID uuid, @RequestBody List<Agent> agents)
+      throws TechnicalException {
+    boolean successful = ((CudamiArticlesClient) service).addCreators(uuid, agents);
+    if (successful) {
+      return new ResponseEntity<>(successful, HttpStatus.OK);
+    }
+    return new ResponseEntity<>(successful, HttpStatus.NOT_FOUND);
   }
 
   @GetMapping("/api/articles/new")
@@ -58,6 +71,20 @@ public class ArticlesAPIController
   @ResponseBody
   public Article getByUuid(@PathVariable UUID uuid) throws TechnicalException {
     return service.getByUuid(uuid);
+  }
+
+  /*
+   * Used in templates/articles/view.html
+   */
+  @DeleteMapping("/api/articles/{articleUuid}/creators/{agentUuid}")
+  @ResponseBody
+  public ResponseEntity removeCreator(@PathVariable UUID articleUuid, @PathVariable UUID agentUuid)
+      throws TechnicalException {
+    boolean successful = ((CudamiArticlesClient) service).removeCreator(articleUuid, agentUuid);
+    if (successful) {
+      return new ResponseEntity<>(successful, HttpStatus.OK);
+    }
+    return new ResponseEntity<>(successful, HttpStatus.NOT_FOUND);
   }
 
   @PostMapping("/api/articles")

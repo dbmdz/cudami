@@ -8,5 +8,9 @@ import java.util.List;
 /** Service for Article. */
 public interface ArticleService extends EntityService<Article> {
 
+  boolean addCreators(Article article, List<Agent> agents) throws ServiceException;
+
   List<Agent> getCreators(Article article) throws ServiceException;
+
+  boolean removeCreator(Article article, Agent agent) throws ServiceException;
 }
