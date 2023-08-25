@@ -42,6 +42,16 @@
 
             <hr />
 
+            <div class="row">
+              <div class="col-md-3"><label th:text="#{lbl.article.creators}">Author(s)</label></div>
+              <div class="col-md-9">
+                <div th:each="creator,iterStat: ${article.creators}">
+                  <th:block th:insert="~{fragments/entity::renderAgent(${creator})}"></th:block>
+                  <span th:text="${!iterStat.last ? ',&nbsp;' : ''}">,</span>
+                </div>
+              </div>
+            </div>
+
             <div class="row mb-1">
               <div class="col-md-3 multilanguage"><label th:text="#{lbl.text}">Long text</label></div>
               <div class="col-md-9">
