@@ -6,6 +6,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
 
 ## [Unreleased]
 
+### Fixed
+
+- Fix missing handling of multivalue filter conversion
+- Fix wrong filter type by search for geolocation birth / death
+
 ## [7.0.0](https://github.com/dbmdz/cudami/releases/tag/7.0.0) - 2023-08-28
 
 ### Added

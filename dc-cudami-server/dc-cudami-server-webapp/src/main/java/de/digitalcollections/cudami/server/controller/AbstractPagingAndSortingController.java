@@ -51,7 +51,18 @@ public abstract class AbstractPagingAndSortingController {
     if (fc.isNativeExpression()) return fc;
     String expression = fc.getExpression();
     FilterOperation filterOperation = fc.getOperation();
-    String operationValue = (String) fc.getValue();
+    String operationValue =
+        switch (filterOperation.getOperandCount()) {
+          case SINGLEVALUE -> fc.getValue() instanceof String svalue
+              ? svalue
+              : fc.getValue().toString();
+          case MULTIVALUE -> String.join(",", fc.getValues());
+          case MIN_MAX_VALUES -> String.join(
+              ",",
+              fc.getMinValue() instanceof String smin ? smin : fc.getMinValue().toString(),
+              fc.getMaxValue() instanceof String smax ? smax : fc.getMaxValue().toString());
+          case NO_VALUE -> null;
+        };
     try {
       String basicExpression = expression;
       Class<?> fieldClass;
@@ -113,7 +124,8 @@ public abstract class AbstractPagingAndSortingController {
       if (resultingFiltering == null) resultingFiltering = new Filtering();
 
       // TODO: add datalanguage to be able to validate that multilanguage fields in
-      // filtercriteria have already "_language" (it is ".lang", right?) as suffix assigned...
+      // filtercriteria have already "_language" (it is ".lang", right?) as suffix
+      // assigned...
       List<FilterCriterion> typedCriterions =
           filterCriterions.parallelStream()
               .map(fc -> makeTypedFilterCriterion(fc, targetClass))
