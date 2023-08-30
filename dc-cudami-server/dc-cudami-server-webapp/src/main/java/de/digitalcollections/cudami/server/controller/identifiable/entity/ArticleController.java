@@ -7,6 +7,7 @@ import de.digitalcollections.cudami.server.business.api.service.identifiable.ent
 import de.digitalcollections.cudami.server.controller.ParameterHelper;
 import de.digitalcollections.cudami.server.controller.identifiable.AbstractIdentifiableController;
 import de.digitalcollections.model.identifiable.entity.Article;
+import de.digitalcollections.model.identifiable.entity.agent.Agent;
 import de.digitalcollections.model.list.filtering.FilterCriterion;
 import de.digitalcollections.model.list.filtering.Filtering;
 import de.digitalcollections.model.list.paging.PageResponse;
@@ -17,9 +18,11 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -36,6 +39,25 @@ public class ArticleController extends AbstractIdentifiableController<Article> {
 
   public ArticleController(ArticleService articleService) {
     this.service = articleService;
+  }
+
+  @Operation(summary = "Add existing agents as creators to an existing article")
+  @PostMapping(
+      value = {"/v6/articles/{uuid:" + ParameterHelper.UUID_PATTERN + "}/creators"},
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity addCreators(
+      @Parameter(example = "", description = "UUID of the article") @PathVariable("uuid")
+          UUID articleUuid,
+      @Parameter(example = "", description = "List of the creators to add") @RequestBody
+          List<Agent> creators)
+      throws ServiceException {
+    Article article = new Article();
+    article.setUuid(articleUuid);
+
+    boolean successful = service.addCreators(article, creators);
+    return successful
+        ? new ResponseEntity<>(HttpStatus.NO_CONTENT)
+        : new ResponseEntity<>(HttpStatus.NOT_FOUND);
   }
 
   @Operation(summary = "Get count of articles")
@@ -111,6 +133,28 @@ public class ArticleController extends AbstractIdentifiableController<Article> {
   @Override
   protected IdentifiableService<Article> getService() {
     return service;
+  }
+
+  @Operation(summary = "Remove an existing creator from an existing article")
+  @DeleteMapping(
+      value = {"/v6/articles/{uuid:" + ParameterHelper.UUID_PATTERN + "}/creators/{agentUuid}"},
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity removeCreator(
+      @Parameter(example = "", description = "UUID of the article") @PathVariable("uuid")
+          UUID articleUuid,
+      @Parameter(example = "", description = "UUID of the creator/agent") @PathVariable("agentUuid")
+          UUID agentUuid)
+      throws ServiceException {
+    Article article = new Article();
+    article.setUuid(articleUuid);
+
+    Agent agent = new Agent();
+    agent.setUuid(agentUuid);
+
+    boolean successful = service.removeCreator(article, agent);
+    return successful
+        ? new ResponseEntity<>(HttpStatus.NO_CONTENT)
+        : new ResponseEntity<>(HttpStatus.NOT_FOUND);
   }
 
   @Operation(summary = "Save a newly created article")

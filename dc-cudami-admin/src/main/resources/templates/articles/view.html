@@ -26,6 +26,14 @@
           </div>
 
           <div id="content-body" class="rows-striped">
+            <div id="alert-global" class="mt-2 alert alert-success alert-dismissible fade show d-none" role="alert">
+              <span>Alert message.</span>
+
+              <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+                
             <!-- TODO it always contains "und" undefined language? -->
             <th:block th:if="${not #lists.isEmpty(existingLanguages)}">
               <div class="language-selection">
@@ -41,6 +49,19 @@
             <th:block th:insert="fragments/entity::renderFields(${article})"></th:block>
 
             <hr />
+
+            <div class="row pb-2">
+              <div class="col-md-3"><label th:text="#{lbl.article.creators}">Author(s)</label></div>
+              <div class="col-md-9">
+                <th:block th:each="creator,iterStat: ${article.creators}">
+                  <th:block th:insert="~{fragments/entity::renderAgent(${creator})}"></th:block>
+                  &nbsp;<a th:title="#{tooltip.remove_creator_from_article}" th:href="|javascript:removeCreatorDialog('__${creator.uuid}__', '__${creator.label.getText()}__');|"><i class='fa fa-unlink'></i></a>
+                  <span th:text="${!iterStat.last ? ',&nbsp;' : ''}">,</span>
+                </th:block>
+                
+                <button type="button" class="btn btn-success btn-sm ml-4" th:title="#{tooltip.add_creators_to_article}" onclick="javascript:resetEntitiesDialog();addCreatorsDialog();"><i class='fa fa-plus'></i></button>
+              </div>
+            </div>
 
             <div class="row mb-1">
               <div class="col-md-3 multilanguage"><label th:text="#{lbl.text}">Long text</label></div>
@@ -61,8 +82,100 @@
     </th:block>
 
     <section layout:fragment="beforeBodyEnds">
+      <div th:replace="~{fragments/modals/confirm-yes-no :: confirm-yes-no-dialog-html}"></div>
+      <div th:replace="~{fragments/modals/select-entities :: render}"></div>
+      
       <script type="text/javascript">
         $(addDataLanguageChangeHandler());
+      </script>
+      
+      <script type="text/javascript" th:inline="javascript">
+        /*<![CDATA[*/
+        function addCreators() {
+          /*[+
+           const errorMessage = [[#{error.technical_error}]];
+           // TODO i18n: which language? from page dropdown...
+           const parentLabel = [[${article.label.getText()}]];
+           const addApiUrl = [[@{/api/articles/__${article.uuid}__/creators}]];
+           const successMessage = `[(#{msg.add_creators.success})]`;
+           +]*/
+
+          $('#selectEntitiesDialog').modal('hide');
+          let entities = getSelectedEntities();
+
+          // add agents to article as creators
+          fetch(addApiUrl,
+            {
+              method: "POST", headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify(entities)
+            })
+            .then(handleFetchErrors)
+            .then(function (response) {
+              showMessage('alert-success', '#alert-global', successMessage);
+              window.location.reload();
+            })
+            .catch(function (error) {
+              showMessage('alert-danger', '#alert-global', errorMessage);
+            });
+        }
+        function addCreatorsDialog() {
+          /*[+
+           const modalTitle = [[#{modal.title.add_creators}]];
+           // TODO i18n: which language? from page dropdown...
+           const parentLabel = [[${article.label.getText()}]];
+           const modalMessage = `[(#{modal.msg.add_creators})]`;
+           const modalBtnText = `[(#{btn.add})]`;
+           const parentUuid = [[${article.uuid}]];
+           const searchApiUrl = [[@{/api/agents/search}]];
+           +]*/
+
+          const modalDialog = $('#selectEntitiesDialog');
+          $(modalDialog).data('searchApiUrl', searchApiUrl);
+          $(modalDialog).data('mode', 'multi');
+          $(modalDialog).data('showType', 'true');
+          $(modalDialog).find('.modal-title').text(modalTitle);
+          $(modalDialog).find('.modal-message').html(modalMessage);
+          var btnOk = $(modalDialog).find('.modal-footer .btn-primary');
+          $(btnOk).attr('onclick', "addCreators();");
+          $(btnOk).html(modalBtnText);
+          $(modalDialog).modal('show');
+        }
+        
+        function removeCreator(uuid) {
+          /*[+
+           const apiUrl = [[@{'/api/articles/__${article.uuid}__/creators/'}]] + uuid;
+           const errorMessage = [[#{error.technical_error}]];
+           const alertSuccessMessage = [[#{alert.success.creator_removed_from_article}]];
+           +]*/
+
+          $('#confirmYesNoDialog').modal('hide');
+
+          fetch(apiUrl, {method: "DELETE"})
+            .then(handleFetchErrors)
+            .then(function (response) {
+              showMessage('alert-success', '#alert-global', alertSuccessMessage);
+              window.location.reload();
+            })
+            .catch(function (error) {
+              showMessage('alert-danger', '#alert-global', errorMessage);
+            });
+        }
+        function removeCreatorDialog(uuid, label) {
+            /*[+
+             const modalTitle = [[#{modal.title.warning}]];
+             const modalMessage = `[(#{modal.msg.confirm_remove_creator_from_article})]`;
+             +]*/
+  
+            const modalDialog = $('#confirmYesNoDialog');
+            $(modalDialog).find('.modal-title').text(modalTitle);
+            $(modalDialog).find('.modal-body').html(modalMessage);
+            $(modalDialog).find('.modal-footer #confirm').attr('href', "javascript:removeCreator('" + uuid + "');");
+            $(modalDialog).modal('show');
+          }
+        /*]]>*/
       </script>
     </section>
   </body>

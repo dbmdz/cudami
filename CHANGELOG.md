@@ -6,10 +6,18 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
 
 ## [Unreleased]
 
+### Added
+
+- Add topic add/remove entities/fileresources
+- Add article add/remove creators
+
+### Changed
+
 ### Fixed
 
 - Fix missing handling of multivalue filter conversion
 - Fix wrong filter type by search for geolocation birth / death
+- Fix collection add digitalobjects
 
 ## [7.0.0](https://github.com/dbmdz/cudami/releases/tag/7.0.0) - 2023-08-28
 
@@ -44,7 +52,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
 - Add persistence support for new field `Headword.labelNormalized`
 - Add sorting to Buckets and Bucket objects handling in `HeadwordRepositoryImpl` 
 - Add action links to object's view and edit under topic
-    
+
 ### Changed
 
 - WEMI parts: Manifestations, Works

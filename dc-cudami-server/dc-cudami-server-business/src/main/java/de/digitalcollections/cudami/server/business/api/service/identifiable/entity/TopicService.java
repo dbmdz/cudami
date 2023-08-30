@@ -13,6 +13,14 @@ import java.util.Locale;
 /** Service for Topic. */
 public interface TopicService extends NodeService<Topic>, EntityService<Topic> {
 
+  boolean addEntities(Topic topic, List<Entity> entities) throws ServiceException;
+
+  boolean addEntity(Topic topic, Entity entity) throws ServiceException;
+
+  boolean addFileResource(Topic topic, FileResource fileResource) throws ServiceException;
+
+  boolean addFileResources(Topic topic, List<FileResource> fileResources) throws ServiceException;
+
   PageResponse<Entity> findEntities(Topic topic, PageRequest pageRequest) throws ServiceException;
 
   PageResponse<FileResource> findFileResources(Topic topic, PageRequest pageRequest)
@@ -30,8 +38,11 @@ public interface TopicService extends NodeService<Topic>, EntityService<Topic> {
   // TODO: move to fileresourceservice?
   List<Topic> getTopicsOfFileResource(FileResource fileResource) throws ServiceException;
 
-  List<Entity> setEntities(Topic topic, List<Entity> entities) throws ServiceException;
+  boolean removeEntity(Topic topic, Entity entity) throws ServiceException;
 
-  List<FileResource> setFileResources(Topic topic, List<FileResource> fileResources)
-      throws ServiceException;
+  boolean removeFileResource(Topic topic, FileResource fileResource) throws ServiceException;
+
+  boolean setEntities(Topic topic, List<Entity> entities) throws ServiceException;
+
+  boolean setFileResources(Topic topic, List<FileResource> fileResources) throws ServiceException;
 }

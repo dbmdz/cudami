@@ -16,6 +16,7 @@ import de.digitalcollections.cudami.client.identifiable.entity.CudamiHeadwordEnt
 import de.digitalcollections.cudami.client.identifiable.entity.CudamiProjectsClient;
 import de.digitalcollections.cudami.client.identifiable.entity.CudamiTopicsClient;
 import de.digitalcollections.cudami.client.identifiable.entity.CudamiWebsitesClient;
+import de.digitalcollections.cudami.client.identifiable.entity.agent.CudamiAgentsClient;
 import de.digitalcollections.cudami.client.identifiable.entity.agent.CudamiCorporateBodiesClient;
 import de.digitalcollections.cudami.client.identifiable.entity.agent.CudamiPersonsClient;
 import de.digitalcollections.cudami.client.identifiable.entity.geo.location.CudamiGeoLocationsClient;
@@ -44,6 +45,7 @@ import java.time.Duration;
 
 public class CudamiClient {
 
+  private final CudamiAgentsClient cudamiAgentsClient;
   private final CudamiArticlesClient cudamiArticlesClient;
   private final CudamiCollectionsClient cudamiCollectionsClient;
   private final CudamiConfigClient cudamiConfigClient;
@@ -95,6 +97,7 @@ public class CudamiClient {
 
   public CudamiClient(HttpClient http, String cudamiServerUrl, ObjectMapper mapper) {
     this.http = http;
+    this.cudamiAgentsClient = new CudamiAgentsClient(http, cudamiServerUrl, mapper);
     this.cudamiArticlesClient = new CudamiArticlesClient(http, cudamiServerUrl, mapper);
     this.cudamiCollectionsClient = new CudamiCollectionsClient(http, cudamiServerUrl, mapper);
     this.cudamiConfigClient = new CudamiConfigClient(http, cudamiServerUrl, mapper);
@@ -141,6 +144,10 @@ public class CudamiClient {
     this.cudamiWebpagesClient = new CudamiWebpagesClient(http, cudamiServerUrl, mapper);
     this.cudamiWebsitesClient = new CudamiWebsitesClient(http, cudamiServerUrl, mapper);
     this.cudamiWorksClient = new CudamiWorksClient(http, cudamiServerUrl, mapper);
+  }
+
+  public CudamiAgentsClient forAgents() {
+    return cudamiAgentsClient;
   }
 
   public CudamiArticlesClient forArticles() {

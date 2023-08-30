@@ -8,6 +8,7 @@ import de.digitalcollections.cudami.admin.model.bootstraptable.BTResponse;
 import de.digitalcollections.cudami.client.CudamiClient;
 import de.digitalcollections.cudami.client.identifiable.resource.CudamiFileResourcesMetadataClient;
 import de.digitalcollections.model.exception.TechnicalException;
+import de.digitalcollections.model.identifiable.entity.Entity;
 import de.digitalcollections.model.identifiable.resource.FileResource;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
@@ -18,6 +19,7 @@ import java.util.List;
 import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.actuate.endpoint.InvalidEndpointRequestException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -67,6 +69,32 @@ public class FileResourcesMetadataAPIController
         "label",
         searchTerm,
         dataLanguage);
+  }
+
+  /*
+   * Used in templates/topics/view.html as param for
+   * templates/fragments/modals/select-fileresources.html
+   */
+  @GetMapping("/api/fileresources/search")
+  @ResponseBody
+  public PageResponse<FileResource> find(
+      @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
+      @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
+      @RequestParam(name = "searchField", required = false) String searchField,
+      @RequestParam(name = "searchTerm", required = false) String searchTerm,
+      @RequestParam(name = "sortBy", required = false) List<Order> sortBy)
+      throws TechnicalException {
+    // TODO ?: add datalanguage as request param to allow search / autocompletion in
+    // selected data language
+    String dataLanguage = null;
+    PageRequest pageRequest =
+        createPageRequest(
+            Entity.class, pageNumber, pageSize, sortBy, searchField, searchTerm, dataLanguage);
+    PageResponse<FileResource> pageResponse = search(searchField, searchTerm, pageRequest);
+    if (pageResponse == null) {
+      throw new InvalidEndpointRequestException("invalid request param", searchField);
+    }
+    return pageResponse;
   }
 
   @GetMapping("/api/fileresources/type/{type}")

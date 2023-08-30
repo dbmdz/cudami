@@ -57,6 +57,34 @@ public class ArticleRepositoryImpl extends EntityRepositoryImpl<Article>
   }
 
   @Override
+  public boolean addCreators(UUID articleUuid, List<Agent> agents) throws RepositoryException {
+    if (articleUuid == null || agents == null) {
+      return false;
+    }
+    Integer nextSortIndex =
+        retrieveNextSortIndexForParentChildren(
+            dbi, "article_creators", "article_uuid", articleUuid);
+
+    // save relation to article
+    dbi.useHandle(
+        handle -> {
+          PreparedBatch preparedBatch =
+              handle.prepareBatch(
+                  "INSERT INTO article_creators(article_uuid, agent_uuid, sortIndex) VALUES (:uuid, :agentUuid, :sortIndex) ON CONFLICT (article_uuid, agent_uuid) DO NOTHING");
+          agents.forEach(
+              agent -> {
+                preparedBatch
+                    .bind("uuid", articleUuid)
+                    .bind("agentUuid", agent.getUuid())
+                    .bind("sortIndex", nextSortIndex + getIndex(agents, agent))
+                    .add();
+              });
+          preparedBatch.execute();
+        });
+    return true;
+  }
+
+  @Override
   public Article create() throws RepositoryException {
     return new Article();
   }
@@ -187,6 +215,24 @@ public class ArticleRepositoryImpl extends EntityRepositoryImpl<Article>
   public String getSqlUpdateFieldValues() {
     return super.getSqlUpdateFieldValues()
         + ", date_published=:datePublished, text=:text::JSONB, timevalue_published=:timeValuePublished::JSONB";
+  }
+
+  @Override
+  public boolean removeCreator(UUID articleUuid, UUID agentUuid) throws RepositoryException {
+    if (articleUuid != null && agentUuid != null) {
+      // delete relation to article
+      final String sql =
+          "DELETE FROM article_creators WHERE article_uuid=:articleUuid AND agent_uuid=:agentUuid";
+
+      dbi.withHandle(
+          h ->
+              h.createUpdate(sql)
+                  .bind("articleUuid", articleUuid)
+                  .bind("agentUuid", agentUuid)
+                  .execute());
+      return true;
+    }
+    return false;
   }
 
   @Override

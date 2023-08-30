@@ -7,12 +7,48 @@ import de.digitalcollections.model.identifiable.entity.Topic;
 import de.digitalcollections.model.identifiable.resource.FileResource;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
 
 /** Repository for Topic persistence handling. */
 public interface TopicRepository extends NodeRepository<Topic>, EntityRepository<Topic> {
+
+  default boolean addEntities(Topic topic, List<Entity> entities) throws RepositoryException {
+    if (topic == null || entities == null) {
+      throw new IllegalArgumentException("add failed: given objects must not be null");
+    }
+    return addEntities(topic.getUuid(), entities);
+  }
+
+  boolean addEntities(UUID topicUuid, List<Entity> entities) throws RepositoryException;
+
+  default boolean addEntity(Topic topic, Entity entity) throws RepositoryException {
+    if (topic == null || entity == null) {
+      throw new IllegalArgumentException("add failed: given objects must not be null");
+    }
+    return addEntities(topic.getUuid(), Arrays.asList(entity));
+  }
+
+  default boolean addFileResource(Topic topic, FileResource fileResource)
+      throws RepositoryException {
+    if (topic == null || fileResource == null) {
+      throw new IllegalArgumentException("add failed: given objects must not be null");
+    }
+    return addFileResources(topic.getUuid(), Arrays.asList(fileResource));
+  }
+
+  default boolean addFileResources(Topic topic, List<FileResource> fileResources)
+      throws RepositoryException {
+    if (topic == null || fileResources == null) {
+      throw new IllegalArgumentException("add failed: given objects must not be null");
+    }
+    return addFileResources(topic.getUuid(), fileResources);
+  }
+
+  boolean addFileResources(UUID topicUuid, List<FileResource> fileResources)
+      throws RepositoryException;
 
   default PageResponse<Entity> findEntities(Topic topic, PageRequest pageRequest)
       throws RepositoryException {
@@ -107,16 +143,35 @@ public interface TopicRepository extends NodeRepository<Topic>, EntityRepository
   // FIXME: replace with pagerequest method
   List<Topic> getTopicsOfFileResource(UUID fileResourceUuid) throws RepositoryException;
 
-  default List<Entity> setEntities(Topic topic, List<Entity> entities) throws RepositoryException {
+  default boolean removeEntity(Topic topic, Entity entity) throws RepositoryException {
+    if (topic == null || entity == null) {
+      throw new IllegalArgumentException("remove failed: given objects must not be null");
+    }
+    return removeEntity(topic.getUuid(), entity.getUuid());
+  }
+
+  boolean removeEntity(UUID topicUuid, UUID entityUuid) throws RepositoryException;
+
+  default boolean removeFileResource(Topic topic, FileResource fileResource)
+      throws RepositoryException {
+    if (topic == null || fileResource == null) {
+      throw new IllegalArgumentException("remove failed: given objects must not be null");
+    }
+    return removeFileResource(topic.getUuid(), fileResource.getUuid());
+  }
+
+  boolean removeFileResource(UUID topicUuid, UUID fileResourceUuid) throws RepositoryException;
+
+  default boolean setEntities(Topic topic, List<Entity> entities) throws RepositoryException {
     if (topic == null) {
       throw new IllegalArgumentException("set failed: given object must not be null");
     }
     return setEntities(topic.getUuid(), entities);
   }
 
-  List<Entity> setEntities(UUID topicUuid, List<Entity> entities) throws RepositoryException;
+  boolean setEntities(UUID topicUuid, List<Entity> entities) throws RepositoryException;
 
-  default List<FileResource> setFileResources(Topic topic, List<FileResource> fileResources)
+  default boolean setFileResources(Topic topic, List<FileResource> fileResources)
       throws RepositoryException {
     if (topic == null) {
       throw new IllegalArgumentException("set failed: given object must not be null");
@@ -124,6 +179,6 @@ public interface TopicRepository extends NodeRepository<Topic>, EntityRepository
     return setFileResources(topic.getUuid(), fileResources);
   }
 
-  List<FileResource> setFileResources(UUID topicUuid, List<FileResource> fileResources)
+  boolean setFileResources(UUID topicUuid, List<FileResource> fileResources)
       throws RepositoryException;
 }

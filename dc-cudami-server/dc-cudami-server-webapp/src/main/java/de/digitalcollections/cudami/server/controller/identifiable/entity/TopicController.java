@@ -70,6 +70,91 @@ public class TopicController extends AbstractEntityController<Topic> {
         : new ResponseEntity<>(HttpStatus.NOT_FOUND);
   }
 
+  @Operation(summary = "Add an existing entity to an existing topic")
+  @PostMapping(
+      value = {"/v6/topics/{uuid:" + ParameterHelper.UUID_PATTERN + "}/entities/{entityUuid}"},
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity addEntity(
+      @Parameter(example = "", description = "UUID of the topic") @PathVariable("uuid")
+          UUID topicUuid,
+      @Parameter(example = "", description = "UUID of the entity") @PathVariable("entityUuid")
+          UUID entityUuid)
+      throws ServiceException {
+    Topic topic = new Topic();
+    topic.setUuid(topicUuid);
+
+    Entity entity = new Entity();
+    entity.setUuid(entityUuid);
+
+    boolean successful = service.addEntity(topic, entity);
+    return successful
+        ? new ResponseEntity<>(HttpStatus.NO_CONTENT)
+        : new ResponseEntity<>(HttpStatus.NOT_FOUND);
+  }
+
+  @Operation(summary = "Add existing entities to an existing topic")
+  @PostMapping(
+      value = {"/v6/topics/{uuid:" + ParameterHelper.UUID_PATTERN + "}/entities"},
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity addEntities(
+      @Parameter(example = "", description = "UUID of the topic") @PathVariable("uuid")
+          UUID topicUuid,
+      @Parameter(example = "", description = "List of the entities") @RequestBody
+          List<Entity> entities)
+      throws ServiceException {
+    Topic topic = new Topic();
+    topic.setUuid(topicUuid);
+
+    boolean successful = service.addEntities(topic, entities);
+    return successful
+        ? new ResponseEntity<>(HttpStatus.NO_CONTENT)
+        : new ResponseEntity<>(HttpStatus.NOT_FOUND);
+  }
+
+  @Operation(summary = "Add an existing filersource to an existing topic")
+  @PostMapping(
+      value = {
+        "/v6/topics/{uuid:" + ParameterHelper.UUID_PATTERN + "}/fileresources/{fileResourceUuid}"
+      },
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity addFileResource(
+      @Parameter(example = "", description = "UUID of the topic") @PathVariable("uuid")
+          UUID topicUuid,
+      @Parameter(example = "", description = "UUID of the fileResource")
+          @PathVariable("fileResourceUuid")
+          UUID fileResourceUuid)
+      throws ServiceException {
+    Topic topic = new Topic();
+    topic.setUuid(topicUuid);
+
+    FileResource fileResource = new FileResource();
+    fileResource.setUuid(fileResourceUuid);
+
+    boolean successful = service.addFileResource(topic, fileResource);
+    return successful
+        ? new ResponseEntity<>(HttpStatus.NO_CONTENT)
+        : new ResponseEntity<>(HttpStatus.NOT_FOUND);
+  }
+
+  @Operation(summary = "Add existing fileresources to an existing topic")
+  @PostMapping(
+      value = {"/v6/topics/{uuid:" + ParameterHelper.UUID_PATTERN + "}/fileresources"},
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity addFileResources(
+      @Parameter(example = "", description = "UUID of the topic") @PathVariable("uuid")
+          UUID topicUuid,
+      @Parameter(example = "", description = "List of the fileResources") @RequestBody
+          List<FileResource> fileResources)
+      throws ServiceException {
+    Topic topic = new Topic();
+    topic.setUuid(topicUuid);
+
+    boolean successful = service.addFileResources(topic, fileResources);
+    return successful
+        ? new ResponseEntity<>(HttpStatus.NO_CONTENT)
+        : new ResponseEntity<>(HttpStatus.NOT_FOUND);
+  }
+
   @Operation(summary = "Get count of topics")
   @GetMapping(
       value = {"/v6/topics/count", "/v5/topics/count", "/v2/topics/count", "/latest/topics/count"},
@@ -379,6 +464,53 @@ public class TopicController extends AbstractEntityController<Topic> {
         : new ResponseEntity<>(HttpStatus.NOT_FOUND);
   }
 
+  @Operation(summary = "Remove an existing entity from an existing topic")
+  @DeleteMapping(
+      value = {"/v6/topics/{uuid:" + ParameterHelper.UUID_PATTERN + "}/entities/{entityUuid}"},
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity removeEntity(
+      @Parameter(example = "", description = "UUID of the topic") @PathVariable("uuid")
+          UUID topicUuid,
+      @Parameter(example = "", description = "UUID of the entity") @PathVariable("entityUuid")
+          UUID entityUuid)
+      throws ServiceException {
+    Topic topic = new Topic();
+    topic.setUuid(topicUuid);
+
+    Entity entity = new Entity();
+    entity.setUuid(entityUuid);
+
+    boolean successful = service.removeEntity(topic, entity);
+    return successful
+        ? new ResponseEntity<>(HttpStatus.NO_CONTENT)
+        : new ResponseEntity<>(HttpStatus.NOT_FOUND);
+  }
+
+  @Operation(summary = "Remove an existing fileResource from an existing topic")
+  @DeleteMapping(
+      value = {
+        "/v6/topics/{uuid:" + ParameterHelper.UUID_PATTERN + "}/fileresources/{fileResourceUuid}"
+      },
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity removeFileResource(
+      @Parameter(example = "", description = "UUID of the topic") @PathVariable("uuid")
+          UUID topicUuid,
+      @Parameter(example = "", description = "UUID of the fileResource")
+          @PathVariable("fileResourceUuid")
+          UUID fileResourceUuid)
+      throws ServiceException {
+    Topic topic = new Topic();
+    topic.setUuid(topicUuid);
+
+    FileResource fileResource = new FileResource();
+    fileResource.setUuid(fileResourceUuid);
+
+    boolean successful = service.removeFileResource(topic, fileResource);
+    return successful
+        ? new ResponseEntity<>(HttpStatus.NO_CONTENT)
+        : new ResponseEntity<>(HttpStatus.NOT_FOUND);
+  }
+
   @Operation(summary = "Save a newly created topic")
   @PostMapping(
       value = {"/v6/topics", "/v5/topics", "/v2/topics", "/latest/topics"},
@@ -408,7 +540,7 @@ public class TopicController extends AbstractEntityController<Topic> {
   }
 
   @Operation(summary = "Save entities of topic")
-  @PostMapping(
+  @PutMapping(
       value = {
         "/v6/topics/{uuid:" + ParameterHelper.UUID_PATTERN + "}/entities",
         "/v5/topics/{uuid:" + ParameterHelper.UUID_PATTERN + "}/entities",
@@ -416,13 +548,16 @@ public class TopicController extends AbstractEntityController<Topic> {
         "/latest/topics/{uuid:" + ParameterHelper.UUID_PATTERN + "}/entities"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public List<Entity> setEntities(@PathVariable UUID uuid, @RequestBody List<Entity> entities)
+  public ResponseEntity setEntities(@PathVariable UUID uuid, @RequestBody List<Entity> entities)
       throws ServiceException {
-    return service.setEntities(buildExampleWithUuid(uuid), entities);
+    boolean successful = service.setEntities(buildExampleWithUuid(uuid), entities);
+    return successful
+        ? new ResponseEntity<>(HttpStatus.NO_CONTENT)
+        : new ResponseEntity<>(HttpStatus.NOT_FOUND);
   }
 
   @Operation(summary = "Save fileresources of topic")
-  @PostMapping(
+  @PutMapping(
       value = {
         "/v6/topics/{uuid:" + ParameterHelper.UUID_PATTERN + "}/fileresources",
         "/v5/topics/{uuid:" + ParameterHelper.UUID_PATTERN + "}/fileresources",
@@ -430,10 +565,13 @@ public class TopicController extends AbstractEntityController<Topic> {
         "/latest/topics/{uuid:" + ParameterHelper.UUID_PATTERN + "}/fileresources"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public List<FileResource> setFileresources(
+  public ResponseEntity setFileresources(
       @PathVariable UUID uuid, @RequestBody List<FileResource> fileResources)
       throws ServiceException {
-    return service.setFileResources(buildExampleWithUuid(uuid), fileResources);
+    boolean successful = service.setFileResources(buildExampleWithUuid(uuid), fileResources);
+    return successful
+        ? new ResponseEntity<>(HttpStatus.NO_CONTENT)
+        : new ResponseEntity<>(HttpStatus.NOT_FOUND);
   }
 
   @Operation(summary = "Update a topic")

@@ -42,6 +42,15 @@ public class ArticleServiceImpl extends EntityServiceImpl<Article> implements Ar
   }
 
   @Override
+  public boolean addCreators(Article article, List<Agent> agents) throws ServiceException {
+    try {
+      return ((ArticleRepository) repository).addCreators(article, agents);
+    } catch (RepositoryException e) {
+      throw new ServiceException("Backend failure", e);
+    }
+  }
+
+  @Override
   public Article getByExampleAndLocale(Article example, Locale locale) throws ServiceException {
     Article article = super.getByExampleAndLocale(example, locale);
     if (article == null) {
@@ -59,6 +68,15 @@ public class ArticleServiceImpl extends EntityServiceImpl<Article> implements Ar
   public List<Agent> getCreators(Article article) throws ServiceException {
     try {
       return ((ArticleRepository) repository).getCreators(article);
+    } catch (RepositoryException e) {
+      throw new ServiceException("Backend failure", e);
+    }
+  }
+
+  @Override
+  public boolean removeCreator(Article article, Agent agent) throws ServiceException {
+    try {
+      return ((ArticleRepository) repository).removeCreator(article, agent);
     } catch (RepositoryException e) {
       throw new ServiceException("Backend failure", e);
     }

@@ -195,7 +195,8 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
     StringBuilder innerQuery =
         new StringBuilder("SELECT " + crossTableAlias + ".sortindex AS idx, * " + commonSql);
     // TODO: review this, as it may be also possible by using
-    // digitalObjectRepositoryImpl.addPagingAndSorting.... ? (see ItemRepositoryImpl)
+    // digitalObjectRepositoryImpl.addPagingAndSorting.... ? (see
+    // ItemRepositoryImpl)
     String orderBy =
         digitalObjectRepositoryImpl.addCrossTablePagingAndSorting(
             pageRequest, innerQuery, crossTableAlias);
@@ -567,21 +568,23 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
                 .execute());
 
     if (digitalObjects != null) {
-      // save relation to collection
-      dbi.useHandle(
-          handle -> {
-            PreparedBatch preparedBatch =
-                handle.prepareBatch(
-                    "INSERT INTO collection_digitalobjects(collection_uuid, digitalobject_uuid, sortIndex) VALUES (:uuid, :digitalObjectUuid, :sortIndex)");
-            for (DigitalObject digitalObject : digitalObjects) {
-              preparedBatch
-                  .bind("uuid", collectionUuid)
-                  .bind("digitalObjectUuid", digitalObject.getUuid())
-                  .bind("sortIndex", getIndex(digitalObjects, digitalObject))
-                  .add();
-            }
-            preparedBatch.execute();
-          });
+      if (digitalObjects.size() > 0) {
+        // save relation to collection
+        dbi.useHandle(
+            handle -> {
+              PreparedBatch preparedBatch =
+                  handle.prepareBatch(
+                      "INSERT INTO collection_digitalobjects(collection_uuid, digitalobject_uuid, sortIndex) VALUES (:uuid, :digitalObjectUuid, :sortIndex)");
+              for (DigitalObject digitalObject : digitalObjects) {
+                preparedBatch
+                    .bind("uuid", collectionUuid)
+                    .bind("digitalObjectUuid", digitalObject.getUuid())
+                    .bind("sortIndex", getIndex(digitalObjects, digitalObject))
+                    .add();
+              }
+              preparedBatch.execute();
+            });
+      }
       return true;
     }
     return false;
