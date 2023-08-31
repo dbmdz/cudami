@@ -1,7 +1,10 @@
 package de.digitalcollections.cudami.server.business.api.service.identifiable.entity.agent;
 
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
+import de.digitalcollections.model.identifiable.entity.Collection;
 import de.digitalcollections.model.identifiable.entity.agent.CorporateBody;
+import de.digitalcollections.model.list.filtering.Filtering;
+import java.util.List;
 
 public interface CorporateBodyService extends AgentService<CorporateBody> {
 
@@ -13,4 +16,7 @@ public interface CorporateBodyService extends AgentService<CorporateBody> {
    * @throws ServiceException
    */
   CorporateBody fetchAndSaveByGndId(String gndId) throws ServiceException;
+
+  List<CorporateBody> findCollectionRelatedCorporateBodies(
+      Collection collection, Filtering filtering) throws ServiceException;
 }

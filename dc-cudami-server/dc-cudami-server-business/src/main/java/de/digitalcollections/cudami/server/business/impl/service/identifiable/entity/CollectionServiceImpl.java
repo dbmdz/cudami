@@ -15,7 +15,6 @@ import de.digitalcollections.cudami.server.business.api.service.identifiable.ent
 import de.digitalcollections.cudami.server.config.HookProperties;
 import de.digitalcollections.model.identifiable.Identifier;
 import de.digitalcollections.model.identifiable.entity.Collection;
-import de.digitalcollections.model.identifiable.entity.agent.CorporateBody;
 import de.digitalcollections.model.identifiable.entity.digitalobject.DigitalObject;
 import de.digitalcollections.model.list.filtering.Filtering;
 import de.digitalcollections.model.list.paging.PageRequest;
@@ -164,16 +163,6 @@ public class CollectionServiceImpl extends EntityServiceImpl<Collection>
       Collection collection, PageRequest pageRequest) throws ServiceException {
     try {
       return ((CollectionRepository) repository).findDigitalObjects(collection, pageRequest);
-    } catch (RepositoryException e) {
-      throw new ServiceException("Backend failure", e);
-    }
-  }
-
-  @Override
-  public List<CorporateBody> findRelatedCorporateBodies(Collection collection, Filtering filtering)
-      throws ServiceException {
-    try {
-      return ((CollectionRepository) repository).findRelatedCorporateBodies(collection, filtering);
     } catch (RepositoryException e) {
       throw new ServiceException("Backend failure", e);
     }

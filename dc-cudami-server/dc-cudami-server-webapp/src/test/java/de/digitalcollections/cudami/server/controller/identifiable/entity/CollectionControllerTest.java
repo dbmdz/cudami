@@ -8,6 +8,7 @@ import static org.mockito.Mockito.when;
 
 import de.digitalcollections.cudami.server.business.api.service.LocaleService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.CollectionService;
+import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.agent.CorporateBodyService;
 import de.digitalcollections.cudami.server.controller.BaseControllerTest;
 import de.digitalcollections.model.file.MimeType;
 import de.digitalcollections.model.identifiable.Identifier;
@@ -31,6 +32,7 @@ class CollectionControllerTest extends BaseControllerTest {
 
   @MockBean private CollectionService collectionService;
   @MockBean private LocaleService localeService;
+  @MockBean private CorporateBodyService corporateBodyService;
 
   @DisplayName("shall return related corporate bodies for a given predicate")
   @ParameterizedTest
@@ -65,7 +67,8 @@ class CollectionControllerTest extends BaseControllerTest {
                 .homepageUrl("https://www.whateveryouwanttotest.de/")
                 .build());
 
-    when(collectionService.findRelatedCorporateBodies(any(Collection.class), any(Filtering.class)))
+    when(corporateBodyService.findCollectionRelatedCorporateBodies(
+            any(Collection.class), any(Filtering.class)))
         .thenReturn(expected);
 
     testJson(

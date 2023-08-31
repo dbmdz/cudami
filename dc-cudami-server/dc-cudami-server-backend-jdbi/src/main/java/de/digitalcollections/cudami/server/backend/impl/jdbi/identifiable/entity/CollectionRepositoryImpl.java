@@ -8,7 +8,6 @@ import de.digitalcollections.cudami.server.backend.api.repository.identifiable.e
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.agent.CorporateBodyRepositoryImpl;
 import de.digitalcollections.model.identifiable.Identifier;
 import de.digitalcollections.model.identifiable.entity.Collection;
-import de.digitalcollections.model.identifiable.entity.agent.CorporateBody;
 import de.digitalcollections.model.identifiable.entity.digitalobject.DigitalObject;
 import de.digitalcollections.model.list.filtering.FilterCriterion;
 import de.digitalcollections.model.list.filtering.Filtering;
@@ -211,55 +210,6 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
     long total = retrieveCount(countQuery, argumentMappings);
 
     return new PageResponse<>(result, pageRequest, total);
-  }
-
-  @Override
-  public List<CorporateBody> findRelatedCorporateBodies(UUID uuid, Filtering filtering)
-      throws RepositoryException {
-    final String cbTableAlias = corporateBodyRepositoryImpl.getTableAlias();
-    final String cbTableName = corporateBodyRepositoryImpl.getTableName();
-
-    // We do a double join with "rel_entity_entities" because we have two different
-    // predicates:
-    // - one is fix ("is_part_of"): defines the relation between collection and
-    // project
-    // - the other one is given as part of the parameter "filtering" for defining
-    // relation
-    // between corporatebody and project
-    StringBuilder innerQuery =
-        new StringBuilder(
-            "SELECT * FROM "
-                + cbTableName
-                + " AS "
-                + cbTableAlias
-                + " LEFT JOIN rel_entity_entities AS r ON "
-                + cbTableAlias
-                + ".uuid = r.object_uuid"
-                + " LEFT JOIN rel_entity_entities AS rel ON r.subject_uuid = rel.subject_uuid"
-                + " WHERE rel.object_uuid = :uuid"
-                + " AND rel.predicate = 'is_part_of'");
-    FilterCriterion predicate = filtering.getFilterCriterionFor("predicate");
-    if (predicate != null) {
-      String predicateFilter = String.format(" AND r.predicate = '%s'", predicate.getValue());
-      innerQuery.append(predicateFilter);
-    }
-
-    Map<String, Object> argumentMappings = new HashMap<>();
-    argumentMappings.put("uuid", uuid);
-    List<CorporateBody> result =
-        corporateBodyRepositoryImpl.retrieveList(
-            corporateBodyRepositoryImpl.getSqlSelectReducedFields(),
-            innerQuery,
-            argumentMappings,
-            null);
-
-    return result;
-  }
-
-  @Override
-  public PageResponse<CorporateBody> findRelatedCorporateBodies(
-      UUID uuid, PageRequest pageRequest) {
-    throw new UnsupportedOperationException(); // TODO: not yet implemented
   }
 
   @Override

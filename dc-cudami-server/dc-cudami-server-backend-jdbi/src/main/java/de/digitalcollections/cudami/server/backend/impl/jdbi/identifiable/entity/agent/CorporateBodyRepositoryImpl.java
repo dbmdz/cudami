@@ -6,6 +6,14 @@ import de.digitalcollections.cudami.server.backend.api.repository.identifiable.I
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.alias.UrlAliasRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.agent.CorporateBodyRepository;
 import de.digitalcollections.model.identifiable.entity.agent.CorporateBody;
+import de.digitalcollections.model.list.filtering.FilterCriterion;
+import de.digitalcollections.model.list.filtering.Filtering;
+import de.digitalcollections.model.list.paging.PageRequest;
+import de.digitalcollections.model.list.paging.PageResponse;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 import org.jdbi.v3.core.Jdbi;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -89,5 +97,46 @@ public class CorporateBodyRepositoryImpl extends AgentRepositoryImpl<CorporateBo
   @Override
   public String getSqlUpdateFieldValues() {
     return super.getSqlUpdateFieldValues() + ", homepage_url=:homepageUrl, text=:text::JSONB";
+  }
+
+  @Override
+  public List<CorporateBody> findCollectionRelatedCorporateBodies(
+      UUID collectionUuid, Filtering filtering) throws RepositoryException {
+    // We do a double join with "rel_entity_entities" because we have two different
+    // predicates:
+    // - one is fix ("is_part_of"): defines the relation between collection and
+    // project
+    // - the other one is given as part of the parameter "filtering" for defining
+    // relation
+    // between corporatebody and project
+    StringBuilder innerQuery =
+        new StringBuilder(
+            """
+              SELECT * FROM {{tableName}} {{tableAlias}}
+              LEFT JOIN rel_entity_entities AS r ON {{tableAlias}}.uuid = r.object_uuid
+              LEFT JOIN rel_entity_entities AS rel ON r.subject_uuid = rel.subject_uuid
+              WHERE rel.object_uuid = :uuid
+                AND rel.predicate = 'is_part_of' """
+                .replace("{{tableName}}", tableName)
+                .replace("{{tableAlias}}", tableAlias));
+    FilterCriterion predicate =
+        filtering != null ? filtering.getFilterCriterionFor("predicate") : null;
+    if (predicate != null) {
+      String predicateFilter = String.format(" AND r.predicate = '%s'", predicate.getValue());
+      innerQuery.append(predicateFilter);
+    }
+
+    Map<String, Object> argumentMappings = new HashMap<>();
+    argumentMappings.put("uuid", collectionUuid);
+    List<CorporateBody> result =
+        retrieveList(getSqlSelectReducedFields(), innerQuery, argumentMappings, null);
+
+    return result;
+  }
+
+  @Override
+  public PageResponse<CorporateBody> findCollectionRelatedCorporateBodies(
+      UUID collectionUuid, PageRequest pageRequest) {
+    throw new UnsupportedOperationException(); // TODO: not yet implemented
   }
 }

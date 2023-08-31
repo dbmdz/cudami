@@ -4,9 +4,7 @@ import de.digitalcollections.cudami.server.business.api.service.content.ManagedC
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.NodeService;
 import de.digitalcollections.model.identifiable.entity.Collection;
-import de.digitalcollections.model.identifiable.entity.agent.CorporateBody;
 import de.digitalcollections.model.identifiable.entity.digitalobject.DigitalObject;
-import de.digitalcollections.model.list.filtering.Filtering;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import java.util.List;
@@ -27,9 +25,6 @@ public interface CollectionService
       throws ServiceException;
 
   PageResponse<DigitalObject> findDigitalObjects(Collection collection, PageRequest pageRequest)
-      throws ServiceException;
-
-  List<CorporateBody> findRelatedCorporateBodies(Collection collection, Filtering filtering)
       throws ServiceException;
 
   Collection getByExampleAndActive(Collection collection) throws ServiceException;
