@@ -1,0 +1,7 @@
+spring:
+  datasource:
+    url: jdbc:tc:postgresql:12.1:///test_database
+    username: test
+    password: test
+  flyway:
+    locations: 'classpath:/de/digitalcollections/cudami/server/backend/impl/database/migration'
