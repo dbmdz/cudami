@@ -12,7 +12,10 @@ import de.digitalcollections.cudami.server.business.api.service.identifiable.ali
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.agent.CorporateBodyService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.resource.ImageFileResourceService;
 import de.digitalcollections.cudami.server.config.HookProperties;
+import de.digitalcollections.model.identifiable.entity.Collection;
 import de.digitalcollections.model.identifiable.entity.agent.CorporateBody;
+import de.digitalcollections.model.list.filtering.Filtering;
+import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -71,5 +74,16 @@ public class CorporateBodyServiceImpl extends AgentServiceImpl<CorporateBody>
       throw new ServiceException("Cannot save CorporateBody: " + corporateBody.toString(), e);
     }
     return corporateBody;
+  }
+
+  @Override
+  public List<CorporateBody> findCollectionRelatedCorporateBodies(
+      Collection collection, Filtering filtering) throws ServiceException {
+    try {
+      return ((CorporateBodyRepository) repository)
+          .findCollectionRelatedCorporateBodies(collection, filtering);
+    } catch (RepositoryException e) {
+      throw new ServiceException("Backend failure", e);
+    }
   }
 }

@@ -6,11 +6,13 @@ import de.digitalcollections.cudami.server.business.api.service.exceptions.Servi
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.CollectionService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.EntityService;
+import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.agent.CorporateBodyService;
 import de.digitalcollections.cudami.server.controller.AbstractEntityController;
 import de.digitalcollections.cudami.server.controller.ParameterHelper;
 import de.digitalcollections.model.identifiable.entity.Collection;
 import de.digitalcollections.model.identifiable.entity.agent.CorporateBody;
 import de.digitalcollections.model.identifiable.entity.digitalobject.DigitalObject;
+import de.digitalcollections.model.list.filtering.FilterCriteria;
 import de.digitalcollections.model.list.filtering.FilterCriterion;
 import de.digitalcollections.model.list.filtering.FilterLogicalOperator;
 import de.digitalcollections.model.list.filtering.Filtering;
@@ -44,10 +46,15 @@ public class CollectionController extends AbstractEntityController<Collection> {
 
   private final LocaleService localeService;
   private final CollectionService service;
+  private final CorporateBodyService corporateBodyService;
 
-  public CollectionController(CollectionService collectionService, LocaleService localeService) {
+  public CollectionController(
+      CollectionService collectionService,
+      LocaleService localeService,
+      CorporateBodyService corporateBodyService) {
     this.service = collectionService;
     this.localeService = localeService;
+    this.corporateBodyService = corporateBodyService;
   }
 
   @Operation(summary = "Add an existing digital object to an existing collection")
@@ -260,13 +267,24 @@ public class CollectionController extends AbstractEntityController<Collection> {
       @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria,
       @RequestParam(name = "filtering", required = false) Filtering filtering)
       throws ServiceException {
+    FilterCriteria predicateFca =
+        filtering != null ? filtering.getFilterCriteriaListFor("predicate") : null;
+    FilterCriterion<String> predicateFromFiltering =
+        predicateFca != null ? predicateFca.getFilterCriterionFor("predicate") : null;
+    if (predicateFromFiltering != null) predicateFca.remove(predicateFromFiltering);
+
     Filtering resultingFiltering = mergeFilters(CorporateBody.class, filtering, filterCriteria);
-    if (predicateFilter != null) {
+
+    if (predicateFromFiltering != null) {
+      if (resultingFiltering == null) resultingFiltering = new Filtering();
+      resultingFiltering.add(FilterLogicalOperator.AND, List.of(predicateFromFiltering));
+    } else if (predicateFilter != null) {
       if (resultingFiltering == null) resultingFiltering = new Filtering();
       predicateFilter.setExpression("predicate");
       resultingFiltering.add(FilterLogicalOperator.AND, List.of(predicateFilter));
     }
-    return service.findRelatedCorporateBodies(buildExampleWithUuid(uuid), resultingFiltering);
+    return corporateBodyService.findCollectionRelatedCorporateBodies(
+        buildExampleWithUuid(uuid), resultingFiltering);
   }
 
   @Operation(

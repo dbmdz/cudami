@@ -3,9 +3,7 @@ package de.digitalcollections.cudami.server.backend.api.repository.identifiable.
 import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.NodeRepository;
 import de.digitalcollections.model.identifiable.entity.Collection;
-import de.digitalcollections.model.identifiable.entity.agent.CorporateBody;
 import de.digitalcollections.model.identifiable.entity.digitalobject.DigitalObject;
-import de.digitalcollections.model.list.filtering.Filtering;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import java.util.Arrays;
@@ -44,21 +42,6 @@ public interface CollectionRepository
   }
 
   PageResponse<DigitalObject> findDigitalObjects(UUID collectionUuid, PageRequest pageRequest)
-      throws RepositoryException;
-
-  default List<CorporateBody> findRelatedCorporateBodies(Collection collection, Filtering filtering)
-      throws RepositoryException {
-    if (collection == null) {
-      throw new IllegalArgumentException("find failed: given collection must not be null");
-    }
-    return findRelatedCorporateBodies(collection.getUuid(), filtering);
-  }
-
-  // FIXME: remove it, just use PageRequest
-  List<CorporateBody> findRelatedCorporateBodies(UUID uuid, Filtering filtering)
-      throws RepositoryException;
-
-  PageResponse<CorporateBody> findRelatedCorporateBodies(UUID uuid, PageRequest pageRequest)
       throws RepositoryException;
 
   default boolean removeDigitalObject(Collection collection, DigitalObject digitalObject)
