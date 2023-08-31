@@ -37,6 +37,7 @@ public class SpringConfigBackendTestDatabase {
 
   private static final DockerImageName DOCKER_IMAGE_NAME = DockerImageName.parse("postgres:12");
   private static Boolean isMigrated = false;
+  private static DriverManagerDataSource DATA_SOURCE;
 
   @Container
   public static PostgreSQLContainer postgreSQLContainer =
@@ -61,12 +62,16 @@ public class SpringConfigBackendTestDatabase {
   @Bean
   @Primary
   public DataSource testDataSource() {
-    DriverManagerDataSource dataSource = new DriverManagerDataSource();
-    dataSource.setDriverClassName(postgreSQLContainer.getDriverClassName());
-    dataSource.setUrl(postgreSQLContainer.getJdbcUrl());
-    dataSource.setUsername("test");
-    dataSource.setPassword("test");
-    return dataSource;
+    if (DATA_SOURCE == null) {
+      DriverManagerDataSource dataSource = new DriverManagerDataSource();
+      dataSource.setDriverClassName(postgreSQLContainer.getDriverClassName());
+      // jdbc:postgresql://localhost:32769/test?loggerLevel=OFF
+      dataSource.setUrl(postgreSQLContainer.getJdbcUrl());
+      dataSource.setUsername("test");
+      dataSource.setPassword("test");
+      SpringConfigBackendTestDatabase.DATA_SOURCE = dataSource;
+    }
+    return SpringConfigBackendTestDatabase.DATA_SOURCE;
   }
 
   @Bean
