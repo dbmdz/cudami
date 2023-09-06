@@ -39,19 +39,12 @@ class TagRepositoryImplTest {
 
   @Autowired CudamiConfig cudamiConfig;
 
-  @Autowired PostgreSQLContainer postgreSQLContainer;
 
   @Autowired Jdbi jdbi;
 
   @BeforeEach
   public void beforeEach() {
     repo = new TagRepositoryImpl(jdbi, cudamiConfig);
-  }
-
-  @Test
-  @DisplayName("is testable")
-  void containerIsUpAndRunning() {
-    assertThat(postgreSQLContainer.isRunning()).isTrue();
   }
 
   @DisplayName("can save and retrieve by uuid")

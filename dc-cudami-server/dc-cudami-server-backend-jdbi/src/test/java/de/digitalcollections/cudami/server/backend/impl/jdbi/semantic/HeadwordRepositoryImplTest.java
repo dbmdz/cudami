@@ -38,19 +38,12 @@ class HeadwordRepositoryImplTest {
 
   @Autowired CudamiConfig cudamiConfig;
 
-  @Autowired PostgreSQLContainer postgreSQLContainer;
 
   @Autowired Jdbi jdbi;
 
   @BeforeEach
   public void beforeEach() {
     repo = new HeadwordRepositoryImpl(jdbi, cudamiConfig);
-  }
-
-  @Test
-  @DisplayName("is testable")
-  void containerIsUpAndRunning() {
-    assertThat(postgreSQLContainer.isRunning()).isTrue();
   }
 
   @Test

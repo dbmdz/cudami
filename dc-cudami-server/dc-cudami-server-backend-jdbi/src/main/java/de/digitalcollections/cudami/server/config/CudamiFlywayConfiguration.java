@@ -9,12 +9,11 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.context.annotation.Primary;
-import org.springframework.context.annotation.Profile;
 
 @Configuration
-@Profile("!TEST")
 public class CudamiFlywayConfiguration extends FlywayConfiguration {
 
+  @Override
   @Primary
   @Bean(name = "flywayInitializer")
   @DependsOn("springUtility")

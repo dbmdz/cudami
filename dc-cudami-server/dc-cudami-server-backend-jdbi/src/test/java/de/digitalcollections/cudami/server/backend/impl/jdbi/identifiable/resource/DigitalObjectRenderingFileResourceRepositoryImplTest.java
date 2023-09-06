@@ -43,7 +43,6 @@ class DigitalObjectRenderingFileResourceRepositoryImplTest {
 
   @Autowired CudamiConfig cudamiConfig;
 
-  @Autowired PostgreSQLContainer postgreSQLContainer;
 
   @Autowired
   private FileResourceMetadataRepositoryImpl<FileResource> renderingFileResourceRepositoryImpl;

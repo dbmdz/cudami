@@ -33,7 +33,6 @@ class IdentifierRepositoryImplTest {
 
   IdentifierRepositoryImpl repo;
 
-  @Autowired PostgreSQLContainer postgreSQLContainer;
   @Autowired Jdbi jdbi;
   @Autowired CudamiConfig cudamiConfig;
   @Autowired WebpageRepository webpageRepository;
@@ -41,13 +40,6 @@ class IdentifierRepositoryImplTest {
   @BeforeEach
   public void beforeEach() {
     repo = new IdentifierRepositoryImpl(jdbi, cudamiConfig);
-    System.out.println(postgreSQLContainer.getJdbcUrl());
-  }
-
-  @Test
-  @DisplayName("is testable")
-  void containerIsUpAndRunning() {
-    assertThat(postgreSQLContainer.isRunning()).isTrue();
   }
 
   @Test

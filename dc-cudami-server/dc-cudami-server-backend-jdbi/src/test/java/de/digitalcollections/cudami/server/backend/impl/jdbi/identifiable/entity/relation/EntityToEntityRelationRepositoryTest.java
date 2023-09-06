@@ -43,7 +43,6 @@ import org.testcontainers.containers.PostgreSQLContainer;
 public class EntityToEntityRelationRepositoryTest {
   EntityToEntityRelationRepositoryImpl repository;
 
-  @Autowired PostgreSQLContainer postgreSQLContainer;
   @Autowired Jdbi jdbi;
   @Autowired CudamiConfig cudamiConfig;
 
@@ -56,12 +55,6 @@ public class EntityToEntityRelationRepositoryTest {
   @BeforeEach
   public void beforeEach() {
     repository = new EntityToEntityRelationRepositoryImpl(jdbi, entityRepository, cudamiConfig);
-  }
-
-  @Test
-  @DisplayName("is testable")
-  void containerIsUpAndRunning() {
-    assertThat(postgreSQLContainer.isRunning()).isTrue();
   }
 
   @Test

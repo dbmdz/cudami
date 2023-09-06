@@ -1,7 +1,9 @@
 spring:
-  datasource:
-    url: jdbc:tc:postgresql:12.1:///test_database
-    username: test
-    password: test
   flyway:
-    locations: 'classpath:/de/digitalcollections/cudami/server/backend/impl/database/migration'
+    baseline-on-migrate: true
+    enabled: true
+    locations: "classpath:/de/digitalcollections/cudami/server/backend/impl/database/migration"
+    out-of-order: true
+    placeholders:
+      iiifBaseUrl: http://localhost:23232/image/v2/
+

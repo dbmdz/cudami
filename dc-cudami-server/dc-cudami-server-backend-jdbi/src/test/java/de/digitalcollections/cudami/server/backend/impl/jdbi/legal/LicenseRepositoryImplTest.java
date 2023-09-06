@@ -36,19 +36,12 @@ import org.testcontainers.containers.PostgreSQLContainer;
 public class LicenseRepositoryImplTest {
 
   @Autowired Jdbi jdbi;
-  @Autowired PostgreSQLContainer postgreSQLContainer;
   @Autowired CudamiConfig cudamiConfig;
   LicenseRepositoryImpl repo;
 
   @BeforeEach
   public void beforeEach() {
     repo = new LicenseRepositoryImpl(jdbi, cudamiConfig);
-  }
-
-  @Test
-  @DisplayName("is testable")
-  void containerIsUpAndRunning() {
-    assertThat(postgreSQLContainer.isRunning()).isTrue();
   }
 
   private License createLicense() {
