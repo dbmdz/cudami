@@ -39,12 +39,6 @@ class EventRepositoryImplTest extends AbstractIdentifiableRepositoryImplTest<Eve
     repo = new EventRepositoryImpl(jdbi, cudamiConfig, identifierRepository, urlAliasRepository);
   }
 
-  //  @Test
-  //  @DisplayName("is testable")
-  //  void containerIsUpAndRunning() {
-  //    assertThat(postgreSQLContainer.isRunning()).isTrue();
-  //  }
-
   @DisplayName("can save and retrieve by uuid")
   @Test
   void saveAndRetrieveByUuid() throws RepositoryException {
