@@ -23,7 +23,6 @@ import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.testcontainers.containers.PostgreSQLContainer;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(
@@ -37,7 +36,6 @@ class HeadwordRepositoryImplTest {
   HeadwordRepositoryImpl repo;
 
   @Autowired CudamiConfig cudamiConfig;
-
 
   @Autowired Jdbi jdbi;
 

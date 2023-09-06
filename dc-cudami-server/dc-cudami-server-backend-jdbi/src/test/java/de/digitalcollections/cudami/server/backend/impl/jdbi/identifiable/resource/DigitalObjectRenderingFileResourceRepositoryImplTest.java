@@ -25,7 +25,6 @@ import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.testcontainers.containers.PostgreSQLContainer;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(
@@ -42,7 +41,6 @@ class DigitalObjectRenderingFileResourceRepositoryImplTest {
   @Autowired private TextFileResourceRepositoryImpl textFileResourceMetadataRepository;
 
   @Autowired CudamiConfig cudamiConfig;
-
 
   @Autowired
   private FileResourceMetadataRepositoryImpl<FileResource> renderingFileResourceRepositoryImpl;

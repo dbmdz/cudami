@@ -39,12 +39,6 @@ class SubjectRepositoryImplTest extends AbstractRepositoryImplTest {
     repo = new SubjectRepositoryImpl(jdbi, cudamiConfig, dbIdentifierMapper);
   }
 
-  //  @Test
-  //  @DisplayName("is testable")
-  //  void containerIsUpAndRunning() {
-  //    assertThat(postgreSQLContainer.isRunning()).isTrue();
-  //  }
-
   @DisplayName("can save and retrieve by uuid")
   @Test
   void saveAndRetrieveByUuid() throws RepositoryException {

@@ -30,18 +30,11 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 @Sql(scripts = "classpath:cleanup_database.sql")
 public class AbstractRepositoryImplTest {
 
-  //  @Autowired protected PostgreSQLContainer postgreSQLContainer;
   @Autowired protected Jdbi jdbi;
   @Autowired protected CudamiConfig cudamiConfig;
   @Autowired protected IiifObjectMapper iiifObjectMapper;
   @Autowired protected BackendIiifServerConfig iiifServerConfig;
   @Autowired private DigitalCollectionsObjectMapper mapper;
-
-  //  @Test
-  //  @DisplayName("is testable")
-  //  void containerIsUpAndRunning() {
-  //    assertThat(postgreSQLContainer.isRunning()).isTrue();
-  //  }
 
   protected <O> O createDeepCopy(O object) {
     try {
