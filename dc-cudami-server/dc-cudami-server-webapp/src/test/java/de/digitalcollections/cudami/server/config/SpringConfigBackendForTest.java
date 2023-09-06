@@ -7,6 +7,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import javax.sql.DataSource;
 import org.mockito.Mockito;
+import org.springframework.boot.autoconfigure.flyway.FlywayMigrationInitializer;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
@@ -21,6 +22,12 @@ public class SpringConfigBackendForTest {
     DataSource dataSource = Mockito.mock(DataSource.class);
     Mockito.when(dataSource.getConnection()).thenReturn(connection);
     return dataSource;
+  }
+
+  @Primary
+  @Bean(name = "flywayInitializer")
+  public FlywayMigrationInitializer flywayInitializer() {
+    return Mockito.mock(FlywayMigrationInitializer.class);
   }
 
   @Bean
