@@ -11,8 +11,7 @@
     <version>7.1.0-SNAPSHOT</version>
   </parent>
 
-  <name>DigitalCollections: cudami Repository Server (Backend IMPL JDBI
-    PostgreSql)</name>
+  <name>DigitalCollections: cudami Repository Server (Backend IMPL JDBI PostgreSql)</name>
   <artifactId>dc-cudami-server-backend-jdbi</artifactId>
   <packaging>jar</packaging>
 
@@ -28,6 +27,7 @@
     <dependency>
       <groupId>com.zaxxer</groupId>
       <artifactId>HikariCP</artifactId>
+      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>de.digitalcollections.commons</groupId>
@@ -179,15 +179,13 @@
     <dependency>
       <groupId>org.testcontainers</groupId>
       <artifactId>postgresql</artifactId>
-      <version>
-        1.19.0</version>
+      <version>1.19.0</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.yaml</groupId>
       <artifactId>snakeyaml</artifactId>
-      <scope>
-        test</scope>
+      <scope>test</scope>
     </dependency>
   </dependencies>
 </project>
