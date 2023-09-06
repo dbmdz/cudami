@@ -36,7 +36,6 @@ public class UserRepositoryImplTest {
 
   UserRepositoryImpl repo;
 
-  @Autowired PostgreSQLContainer postgreSQLContainer;
 
   @Autowired Jdbi jdbi;
 
@@ -45,12 +44,6 @@ public class UserRepositoryImplTest {
   @BeforeEach
   public void beforeEach() {
     repo = new UserRepositoryImpl(jdbi, cudamiConfig);
-  }
-
-  @Test
-  @DisplayName("is testable")
-  void containerIsUpAndRunning() {
-    assertThat(postgreSQLContainer.isRunning()).isTrue();
   }
 
   @Test

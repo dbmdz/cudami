@@ -34,7 +34,6 @@ public class RenderingTemplateRepositoryImplTest {
 
   RenderingTemplateRepositoryImpl repo;
 
-  @Autowired PostgreSQLContainer postgreSQLContainer;
 
   @Autowired Jdbi jdbi;
 

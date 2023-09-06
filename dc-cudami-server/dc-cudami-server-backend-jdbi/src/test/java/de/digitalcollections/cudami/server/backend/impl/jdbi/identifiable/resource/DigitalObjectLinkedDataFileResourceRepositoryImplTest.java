@@ -39,7 +39,6 @@ class DigitalObjectLinkedDataFileResourceRepositoryImplTest {
 
   @Autowired CudamiConfig cudamiConfig;
 
-  @Autowired PostgreSQLContainer postgreSQLContainer;
 
   @Autowired private DigitalObjectRepositoryImpl digitalObjectRepository;
   @Autowired private LinkedDataFileResourceRepositoryImpl linkedDataFileResourceRepositoryImpl;
