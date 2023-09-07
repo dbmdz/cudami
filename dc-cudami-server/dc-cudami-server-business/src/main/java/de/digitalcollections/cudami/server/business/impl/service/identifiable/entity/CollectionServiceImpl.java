@@ -345,8 +345,7 @@ public class CollectionServiceImpl extends EntityServiceImpl<Collection>
   @Override
   public Collection saveWithParent(Collection child, Collection parent) throws ServiceException {
     try {
-      if (child.getUuid() == null)
-        save(child);
+      if (child.getUuid() == null) save(child);
       Collection collection =
           ((NodeRepository<Collection>) repository).saveParentRelation(child, parent);
       setPublicationStatus(collection);

@@ -119,8 +119,7 @@ public class WebpageServiceImpl extends IdentifiableServiceImpl<Webpage, Webpage
       throws ServiceException {
     PageResponse<Webpage> pageResponse;
     try {
-      pageResponse =
-          repository.findRootWebpagesForWebsite(website, pageRequest);
+      pageResponse = repository.findRootWebpagesForWebsite(website, pageRequest);
     } catch (RepositoryException e) {
       throw new ServiceException("Backend failure", e);
     }
@@ -326,8 +325,7 @@ public class WebpageServiceImpl extends IdentifiableServiceImpl<Webpage, Webpage
   @Override
   public Webpage saveWithParent(Webpage child, Webpage parent) throws ServiceException {
     try {
-      if (child.getUuid() == null)
-        save(child);
+      if (child.getUuid() == null) save(child);
       Webpage webpage = ((NodeRepository<Webpage>) repository).saveParentRelation(child, parent);
       setPublicationStatus(webpage);
       return webpage;
