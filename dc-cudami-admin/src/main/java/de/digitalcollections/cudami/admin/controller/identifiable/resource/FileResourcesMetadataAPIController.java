@@ -11,6 +11,7 @@ import de.digitalcollections.model.exception.TechnicalException;
 import de.digitalcollections.model.identifiable.entity.Entity;
 import de.digitalcollections.model.identifiable.resource.FileResource;
 import de.digitalcollections.model.list.filtering.FilterCriterion;
+import de.digitalcollections.model.list.filtering.FilterLogicalOperator;
 import de.digitalcollections.model.list.filtering.Filtering;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
@@ -105,7 +106,18 @@ public class FileResourcesMetadataAPIController
     if (searchTerm != null) {
       Filtering filtering =
           Filtering.builder()
-              .add(FilterCriterion.builder().contains(searchTerm).withExpression("label").build())
+              .filterCriterion(
+                  FilterLogicalOperator.OR,
+                  FilterCriterion.builder().contains(searchTerm).withExpression("label").build())
+              .filterCriterion(
+                  FilterLogicalOperator.OR,
+                  FilterCriterion.builder()
+                      .contains(searchTerm)
+                      .withExpression("description")
+                      .build())
+              .filterCriterion(
+                  FilterLogicalOperator.OR,
+                  FilterCriterion.builder().contains(searchTerm).withExpression("filename").build())
               .build();
       pageRequest.setFiltering(filtering);
     }
