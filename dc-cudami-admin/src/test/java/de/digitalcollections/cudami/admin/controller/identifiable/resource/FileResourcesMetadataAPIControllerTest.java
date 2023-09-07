@@ -8,10 +8,10 @@ import de.digitalcollections.cudami.client.CudamiClient;
 import de.digitalcollections.cudami.client.identifiable.resource.CudamiFileResourcesMetadataClient;
 import de.digitalcollections.model.exception.TechnicalException;
 import de.digitalcollections.model.list.filtering.FilterCriterion;
+import de.digitalcollections.model.list.filtering.FilterLogicalOperator;
 import de.digitalcollections.model.list.filtering.FilterOperation;
 import de.digitalcollections.model.list.filtering.Filtering;
 import de.digitalcollections.model.list.paging.PageRequest;
-import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -42,8 +42,18 @@ class FileResourcesMetadataAPIControllerTest {
     PageRequest expectedPageRequest = new PageRequest();
     expectedPageRequest.setPageSize(11);
     expectedPageRequest.setPageNumber(0);
-    FilterCriterion filterCriterion = new FilterCriterion("label", FilterOperation.CONTAINS, "foo");
-    Filtering filtering = new Filtering(List.of(filterCriterion));
+    FilterCriterion filterCriterionLabel =
+        new FilterCriterion("label", FilterOperation.CONTAINS, "foo");
+    FilterCriterion filterCriterionDescription =
+        new FilterCriterion("description", FilterOperation.CONTAINS, "foo");
+    FilterCriterion filterCriterionFilename =
+        new FilterCriterion("filename", FilterOperation.CONTAINS, "foo");
+    Filtering filtering =
+        Filtering.builder()
+            .filterCriterion(FilterLogicalOperator.OR, filterCriterionLabel)
+            .filterCriterion(FilterLogicalOperator.OR, filterCriterionDescription)
+            .filterCriterion(FilterLogicalOperator.OR, filterCriterionFilename)
+            .build();
     expectedPageRequest.setFiltering(filtering);
 
     controller.findByType("image", 0, 11, "foo", null);
