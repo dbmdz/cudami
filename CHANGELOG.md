@@ -18,6 +18,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
 - Fix missing handling of multivalue filter conversion
 - Fix wrong filter type by search for geolocation birth / death
 - Fix collection add digitalobjects
+- Fixed retrieval of existing images by name in admin GUI
 
 ## [7.0.0](https://github.com/dbmdz/cudami/releases/tag/7.0.0) - 2023-08-28
 

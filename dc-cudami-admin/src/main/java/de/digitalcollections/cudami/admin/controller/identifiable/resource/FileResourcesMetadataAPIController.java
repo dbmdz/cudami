@@ -105,7 +105,7 @@ public class FileResourcesMetadataAPIController
     if (searchTerm != null) {
       Filtering filtering =
           Filtering.builder()
-              .add(FilterCriterion.builder().isEquals(searchTerm).withExpression("label").build())
+              .add(FilterCriterion.builder().contains(searchTerm).withExpression("label").build())
               .build();
       pageRequest.setFiltering(filtering);
     }
