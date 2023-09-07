@@ -269,7 +269,9 @@ public class TopicServiceImpl extends EntityServiceImpl<Topic> implements TopicS
   @Override
   public Topic saveWithParent(Topic child, Topic parent) throws ServiceException {
     try {
-      Topic topic = ((TopicRepository) repository).saveWithParent(child, parent);
+      if (child.getUuid() == null)
+        save(child);
+      Topic topic = ((TopicRepository) repository).saveParentRelation(child, parent);
       return topic;
     } catch (Exception e) {
       LOGGER.error("Cannot save topic " + child + ": ", e);

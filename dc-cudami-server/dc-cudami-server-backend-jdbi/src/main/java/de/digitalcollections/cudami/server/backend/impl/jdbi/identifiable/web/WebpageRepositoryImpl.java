@@ -416,7 +416,7 @@ public class WebpageRepositoryImpl extends IdentifiableRepositoryImpl<Webpage>
   }
 
   @Override
-  public Webpage saveWithParent(UUID childWebpageUuid, UUID parentWebpageUuid)
+  public Webpage saveParentRelation(UUID childWebpageUuid, UUID parentWebpageUuid)
       throws RepositoryException {
     Integer nextSortIndex =
         retrieveNextSortIndexForParentChildren(

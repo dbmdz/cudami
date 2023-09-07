@@ -103,14 +103,14 @@ public interface NodeRepository<N extends Identifiable> extends IdentifiableRepo
 
   boolean removeChild(UUID parentUuid, UUID childUuid) throws RepositoryException;
 
-  default N saveWithParent(N child, N parent) throws RepositoryException {
-    if (parent == null) {
-      throw new IllegalArgumentException("parent and child must not be null");
+  default N saveParentRelation(N child, N parent) throws RepositoryException {
+    if (parent == null || child == null) {
+      throw new IllegalArgumentException("Parent and child must not be null");
     }
-    if (child.getUuid() == null) {
-      save(child);
+    if (parent.getUuid() == null || child.getUuid() == null) {
+      throw new IllegalArgumentException("Parent and Child must have been saved already");
     }
-    return saveWithParent(child.getUuid(), parent.getUuid());
+    return saveParentRelation(child.getUuid(), parent.getUuid());
   }
 
   /**
@@ -119,7 +119,7 @@ public interface NodeRepository<N extends Identifiable> extends IdentifiableRepo
    * @return saved child node
    * @throws RepositoryException if saving fails
    */
-  N saveWithParent(UUID childUuid, UUID parentUuid) throws RepositoryException;
+  N saveParentRelation(UUID childUuid, UUID parentUuid) throws RepositoryException;
 
   default boolean updateChildrenOrder(N parent, List<N> children) throws RepositoryException {
     if (parent == null || children == null) {

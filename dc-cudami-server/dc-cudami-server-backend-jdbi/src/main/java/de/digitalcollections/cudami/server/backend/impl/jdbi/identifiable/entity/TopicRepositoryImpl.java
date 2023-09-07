@@ -596,7 +596,7 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
   }
 
   @Override
-  public Topic saveWithParent(UUID childUuid, UUID parentUuid) throws RepositoryException {
+  public Topic saveParentRelation(UUID childUuid, UUID parentUuid) throws RepositoryException {
     Integer nextSortIndex =
         retrieveNextSortIndexForParentChildren(
             dbi, "topic_topics", "parent_topic_uuid", parentUuid);
