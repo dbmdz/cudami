@@ -326,7 +326,7 @@ public class WebpageServiceImpl extends IdentifiableServiceImpl<Webpage, Webpage
   public Webpage saveWithParent(Webpage child, Webpage parent) throws ServiceException {
     try {
       if (child.getUuid() == null) save(child);
-      Webpage webpage = ((NodeRepository<Webpage>) repository).saveParentRelation(child, parent);
+      Webpage webpage = repository.saveParentRelation(child, parent);
       setPublicationStatus(webpage);
       return webpage;
     } catch (Exception e) {
