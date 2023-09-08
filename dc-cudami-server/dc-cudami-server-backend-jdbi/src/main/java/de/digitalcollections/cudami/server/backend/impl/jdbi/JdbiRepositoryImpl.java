@@ -686,7 +686,7 @@ public abstract class JdbiRepositoryImpl<U extends UniqueObject>
         dbi.withHandle(
             (Handle h) ->
                 h.createQuery(
-                        "SELECT MAX(sortIndex) + 1 FROM "
+                        "SELECT COALESCE(MAX(sortIndex), -1) + 1 FROM "
                             + tableName
                             + " WHERE "
                             + columNameParentUuid
@@ -695,9 +695,6 @@ public abstract class JdbiRepositoryImpl<U extends UniqueObject>
                     .mapTo(Integer.class)
                     .findOne()
                     .orElse(null));
-    if (sortIndex == null) {
-      return 0;
-    }
     return sortIndex;
   }
 

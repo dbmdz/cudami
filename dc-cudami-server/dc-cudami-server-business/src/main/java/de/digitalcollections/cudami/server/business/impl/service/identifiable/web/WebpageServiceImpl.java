@@ -119,8 +119,7 @@ public class WebpageServiceImpl extends IdentifiableServiceImpl<Webpage, Webpage
       throws ServiceException {
     PageResponse<Webpage> pageResponse;
     try {
-      pageResponse =
-          ((WebpageRepository) repository).findRootWebpagesForWebsite(website, pageRequest);
+      pageResponse = repository.findRootWebpagesForWebsite(website, pageRequest);
     } catch (RepositoryException e) {
       throw new ServiceException("Backend failure", e);
     }
@@ -179,7 +178,7 @@ public class WebpageServiceImpl extends IdentifiableServiceImpl<Webpage, Webpage
     Filtering filtering = ManagedContentService.filteringForActive();
     Webpage webpage;
     try {
-      webpage = ((WebpageRepository) repository).getByExampleAndFiltering(example, filtering);
+      webpage = repository.getByExampleAndFiltering(example, filtering);
     } catch (RepositoryException e) {
       throw new ServiceException("Backend failure", e);
     }
@@ -298,7 +297,7 @@ public class WebpageServiceImpl extends IdentifiableServiceImpl<Webpage, Webpage
     }
     // root webpage under a website
     try {
-      return ((WebpageRepository) repository).getWebsite(rootWebpage);
+      return repository.getWebsite(rootWebpage);
     } catch (RepositoryException e) {
       throw new ServiceException("Backend failure", e);
     }
@@ -326,7 +325,8 @@ public class WebpageServiceImpl extends IdentifiableServiceImpl<Webpage, Webpage
   @Override
   public Webpage saveWithParent(Webpage child, Webpage parent) throws ServiceException {
     try {
-      Webpage webpage = ((NodeRepository<Webpage>) repository).saveWithParent(child, parent);
+      if (child.getUuid() == null) save(child);
+      Webpage webpage = repository.saveParentRelation(child, parent);
       setPublicationStatus(webpage);
       return webpage;
     } catch (Exception e) {
@@ -343,7 +343,7 @@ public class WebpageServiceImpl extends IdentifiableServiceImpl<Webpage, Webpage
         save(webpage);
       }
       try {
-        webpage = ((WebpageRepository) repository).saveWithParentWebsite(webpage, parentWebsite);
+        webpage = repository.saveWithParentWebsite(webpage, parentWebsite);
       } catch (RepositoryException e) {
         throw new ServiceException("Backend failure", e);
       }

@@ -490,7 +490,7 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
   }
 
   @Override
-  public Collection saveWithParent(UUID childUuid, UUID parentUuid) throws RepositoryException {
+  public Collection saveParentRelation(UUID childUuid, UUID parentUuid) throws RepositoryException {
     Integer nextSortIndex =
         retrieveNextSortIndexForParentChildren(
             dbi, "collection_collections", "parent_collection_uuid", parentUuid);
