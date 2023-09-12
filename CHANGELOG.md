@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
 
 ## [Unreleased]
 
+## [7.1.0](https://github.com/dbmdz/cudami/releases/tag/7.1.0) - 2023-09-12
+
 ### Added
 
 - Add topic add/remove entities/fileresources
@@ -13,12 +15,18 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
 
 ### Changed
 
+- SQL: replace `count` by `exists` in trigger functions that check the existence of foreign tables' PKs
+- Upgrade dc-model(-jackson) to 12.2.0
+- Upgrade dc-commons-jdbi to 7.0.2
+- Upgrade dc-commons-springmvc to 7.0.2
+
 ### Fixed
 
 - Fix missing handling of multivalue filter conversion
 - Fix wrong filter type by search for geolocation birth / death
 - Fix collection add digitalobjects
 - Fixed retrieval of existing images by name in admin GUI
+- Saving of UrlAliases of subcollections, subwebpages and subtopics
 
 ## [7.0.0](https://github.com/dbmdz/cudami/releases/tag/7.0.0) - 2023-08-28
 
