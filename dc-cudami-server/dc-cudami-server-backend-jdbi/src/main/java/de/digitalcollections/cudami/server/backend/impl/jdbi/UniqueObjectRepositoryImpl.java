@@ -186,16 +186,22 @@ public abstract class UniqueObjectRepositoryImpl<U extends UniqueObject>
       } else if (bindings != null && basicReduceRowsBiConsumer == null) {
         return (List<U>)
             dbi.withHandle(
-                (Handle handle) -> handle.createQuery(sql).mapToBean(uniqueObjectImplClass).list());
+                (Handle handle) ->
+                    handle
+                        .createQuery(sql)
+                        .bindMap(bindings)
+                        .mapToBean(uniqueObjectImplClass)
+                        .list());
+      } else {
+        // bindings != null && basicReduceRowsBiConsumer != null
+        return dbi.withHandle(
+            (Handle handle) ->
+                handle
+                    .createQuery(sql)
+                    .bindMap(bindings)
+                    .reduceRows(basicReduceRowsBiConsumer)
+                    .collect(Collectors.toList()));
       }
-      // bindings != null && basicReduceRowsBiConsumer != null
-      return dbi.withHandle(
-          (Handle handle) ->
-              handle
-                  .createQuery(sql)
-                  .bindMap(bindings)
-                  .reduceRows(basicReduceRowsBiConsumer)
-                  .collect(Collectors.toList()));
     } catch (StatementException e) {
       String detailMessage = e.getCause() != null ? e.getCause().getMessage() : e.getMessage();
       throw new RepositoryException(
