@@ -6,7 +6,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
 
 ## [Unreleased]
 
-## [7.1.0](https://github.com/dbmdz/cudami/releases/tag/7.1.0) - 2023-09-12
+## [7.1.0](https://github.com/dbmdz/cudami/releases/tag/7.1.0) - 2023-09-15
 
 ### Added
 
@@ -16,9 +16,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
 ### Changed
 
 - SQL: replace `count` by `exists` in trigger functions that check the existence of foreign tables' PKs
-- Upgrade dc-model(-jackson) to 12.2.0
-- Upgrade dc-commons-jdbi to 7.0.2
-- Upgrade dc-commons-springmvc to 7.0.2
+- Upgrade dc-model(-jackson) to 12.2.1
+- Upgrade dc-commons-jdbi to 7.0.3
+- Upgrade dc-commons-springmvc to 7.0.3
 
 ### Fixed
 

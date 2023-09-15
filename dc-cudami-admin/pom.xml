@@ -6,7 +6,7 @@
   <parent>
     <groupId>de.digitalcollections.cudami</groupId>
     <artifactId>dc-cudami</artifactId>
-    <version>7.1.0-RC2</version>
+    <version>7.1.0-RC3</version>
   </parent>
 
   <name>DigitalCollections: cudami Management Webapp</name>
@@ -46,7 +46,7 @@
     <dependency>
       <groupId>de.digitalcollections.commons</groupId>
       <artifactId>dc-commons-springmvc</artifactId>
-      <version>7.0.2</version>
+      <version>7.0.3</version>
     </dependency>
     <dependency>
       <groupId>de.digitalcollections.cudami</groupId>
