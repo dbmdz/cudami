@@ -1,7 +1,5 @@
 package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable;
 
-import static de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.resource.FileResourceMetadataRepositoryImpl.SQL_PREVIEW_IMAGE_FIELDS_PI;
-
 import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifiableRepository;
@@ -33,21 +31,6 @@ import de.digitalcollections.model.list.sorting.Order;
 import de.digitalcollections.model.list.sorting.Sorting;
 import de.digitalcollections.model.semantic.Tag;
 import de.digitalcollections.model.text.LocalizedText;
-import java.net.URI;
-import java.net.URL;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
-import java.util.function.BiFunction;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 import org.jdbi.v3.core.Handle;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.core.generic.GenericType;
@@ -59,6 +42,15 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.StringUtils;
+
+import java.net.URI;
+import java.net.URL;
+import java.util.*;
+import java.util.function.BiFunction;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
+import static de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.resource.FileResourceMetadataRepositoryImpl.SQL_PREVIEW_IMAGE_FIELDS_PI;
 
 @Repository
 public class IdentifiableRepositoryImpl<I extends Identifiable>
@@ -207,7 +199,7 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
   }
 
   private boolean deleteIdentifiers(UUID identifiableUuid) throws RepositoryException {
-    I identifiable = getByUuid(identifiableUuid);
+    I identifiable = getByUuids(List.of(identifiableUuid)).stream().findFirst().orElse(null);
     if (identifiable == null || identifiable.getIdentifiers() == null) {
       return false;
     }
@@ -366,7 +358,7 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
 
     if (identifiableUuid == null) return null;
 
-    return getByUuid(identifiableUuid);
+    return getByUuids(List.of(identifiableUuid)).stream().findFirst().orElse(null);
   }
 
   @Override
@@ -572,10 +564,10 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
 
   @Override
   /**
-   * Override super.retrieveOne because of always joining identifiers, preview image, url aliases,
-   * tags and subjects for {@Identifiable}.
+   * Override super.retrieveMultiple because of always joining identifiers, preview image, url
+   * aliases, tags and subjects for {@Identifiable}.
    */
-  public I retrieveOne(
+  public List<I> retrieveMultiple(
       String fieldsSql,
       Filtering filtering,
       String sqlAdditionalJoins,
@@ -659,7 +651,7 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
     addFiltering(filtering, sql, argumentMappings);
 
     Map<String, Object> bindMap = Map.copyOf(argumentMappings);
-    I result =
+    List<I> result =
         dbi.withHandle(
                 h ->
                     h.createQuery(sql.toString())
@@ -669,8 +661,7 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
                               fullReduceRowsBiConsumer(map, rowView);
                               additionalReduceRowsBiConsumer(map, rowView);
                             }))
-            .findFirst()
-            .orElse(null);
+            .collect(Collectors.toList());
     return result;
   }
 
@@ -885,7 +876,8 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
     bindings.put("tags_uuids", extractUuids(identifiable.getTags()));
     bindings.put("subjects_uuids", extractUuids(identifiable.getSubjects()));
 
-    I identifiableFromRepo = getByUuid(identifiable.getUuid());
+    I identifiableFromRepo =
+        getByUuids(List.of(identifiable.getUuid())).stream().findFirst().orElse(null);
 
     super.update(identifiable, bindings, sqlModifier);
     // do not update/left out from statement (not changed since insert):

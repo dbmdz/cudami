@@ -31,6 +31,7 @@ import de.digitalcollections.model.text.contentblock.Paragraph;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -105,7 +106,7 @@ class IdentifiableRepositoryImplTest
   }
 
   @Test
-  @DisplayName("retrieve one identifiable")
+  @DisplayName("can retrieve a single identifiable by its uuid")
   void testGetByUuid() throws RepositoryException {
     Identifiable identifiable = new Identifiable();
     identifiable.setUuid(UUID.randomUUID());
@@ -118,6 +119,83 @@ class IdentifiableRepositoryImplTest
 
     Identifiable actual = (Identifiable) repo.getByUuid(identifiable.getUuid());
     assertThat(actual.equals(identifiable));
+  }
+
+  @Test
+  @DisplayName("can retrieve a multiple identifiables by their uuids")
+  void testGetByUuids() {
+    Map<UUID, Identifiable> persistedIdentifiables =
+        IntStream.range(0, 10)
+            .mapToObj(
+                i -> {
+                  Identifiable identifiable = new Identifiable();
+                  identifiable.setUuid(UUID.randomUUID());
+                  identifiable.setCreated(LocalDateTime.now());
+                  identifiable.setType(IdentifiableType.RESOURCE);
+                  identifiable.setLabel("test");
+                  identifiable.setLastModified(LocalDateTime.now());
+
+                  try {
+                    repo.save(identifiable);
+                  } catch (RepositoryException e) {
+                    throw new RuntimeException(e);
+                  }
+
+                  return identifiable;
+                })
+            .collect(Collectors.toMap(Identifiable::getUuid, i -> i));
+
+    Map<UUID, Identifiable> actualIdentifiables =
+        persistedIdentifiables.keySet().stream()
+            .map(
+                u -> {
+                  try {
+                    return (Identifiable) repo.getByUuid(u);
+                  } catch (RepositoryException e) {
+                    throw new RuntimeException(e);
+                  }
+                })
+            .collect(Collectors.toMap(Identifiable::getUuid, i -> i));
+
+    assertThat(actualIdentifiables).isEqualTo(persistedIdentifiables);
+  }
+
+  @Test
+  @DisplayName("can return a subset of identifiables, queried by their uuid")
+  void getByUuidWithPartialResult() throws RepositoryException {
+    Identifiable identifiable = new Identifiable();
+    identifiable.setUuid(UUID.randomUUID());
+    identifiable.setCreated(LocalDateTime.now());
+    identifiable.setType(IdentifiableType.RESOURCE);
+    identifiable.setLabel("test");
+    identifiable.setLastModified(LocalDateTime.now());
+    repo.save(identifiable);
+
+    List<Identifiable> actual =
+        repo.getByUuids(
+            List.of(
+                UUID.randomUUID(),
+                identifiable.getUuid(),
+                UUID.randomUUID(),
+                identifiable.getUuid()));
+
+    // We don't get duplicates here!
+    assertThat(actual).containsExactlyInAnyOrder(identifiable);
+  }
+
+  @Test
+  @DisplayName(
+      "can return an empty list of identifiables, when non of them was found by querying by uuid")
+  void getEmptyListOfIdentifiablesByGetByUuids() throws RepositoryException {
+    List<Identifiable> actual = repo.getByUuids(List.of(UUID.randomUUID(), UUID.randomUUID()));
+    assertThat(actual).isEmpty();
+  }
+
+  @Test
+  @DisplayName("returns null when a single getByUUID finds no matches")
+  void getNullIdentifiablesByUuid() throws RepositoryException {
+    Identifiable actual = (Identifiable) repo.getByUuid(UUID.randomUUID());
+    assertThat(actual).isNull();
   }
 
   @Test

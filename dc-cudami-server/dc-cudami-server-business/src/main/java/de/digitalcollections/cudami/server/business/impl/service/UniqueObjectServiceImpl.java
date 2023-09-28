@@ -100,18 +100,19 @@ public abstract class UniqueObjectServiceImpl<
   }
 
   @Override
-  public U getByExample(U uniqueObject) throws ServiceException {
+  public List<U> getByExamples(List<U> uniqueObjects) throws ServiceException {
     try {
-      return repository.getByExample(uniqueObject);
+      return repository.getByExamples(uniqueObjects);
     } catch (RepositoryException e) {
       throw new ServiceException("Backend failure", e);
     }
   }
 
   @Override
-  public U getByExampleAndFiltering(U uniqueObject, Filtering filtering) throws ServiceException {
+  public List<U> getByExamplesAndFiltering(List<U> uniqueObjects, Filtering filtering)
+      throws ServiceException {
     try {
-      return repository.getByExampleAndFiltering(uniqueObject, filtering);
+      return repository.getByExamplesAndFiltering(uniqueObjects, filtering);
     } catch (RepositoryException e) {
       throw new ServiceException("Backend failure", e);
     }

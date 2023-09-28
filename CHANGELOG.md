@@ -8,6 +8,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
 
 ### Added
 
+<<<<<<< HEAD
 - Hierarchically filled `DigitalObject` (by UUID or identifier); the `lastModified` date of the `DigitalObject`
   is set to the newest of its WMI objects, the WMI objects lose their date therefor
 - Identifiers of objects enclosed in `Work`, `Manifestation` & `Item`
@@ -37,6 +38,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
 ### Added
 
 - Added functionality to add a `data-label` attribute to table cells
+=======
+- Ability to retrieve multiple UniqueObjects by UUIDs within a single request
+>>>>>>> aa3beb0a2 (Base implementation for retrieving multiple UniqueObjects by uuids)
 
 ## [7.1.0](https://github.com/dbmdz/cudami/releases/tag/7.1.0) - 2023-10-10
 

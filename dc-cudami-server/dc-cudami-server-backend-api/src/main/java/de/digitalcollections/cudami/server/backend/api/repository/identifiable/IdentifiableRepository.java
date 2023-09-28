@@ -10,7 +10,9 @@ import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 public interface IdentifiableRepository<I extends Identifiable> extends UniqueObjectRepository<I> {
 
@@ -60,11 +62,15 @@ public interface IdentifiableRepository<I extends Identifiable> extends UniqueOb
   PageResponse<FileResource> findRelatedFileResources(
       UUID identifiableUuid, PageRequest pageRequest) throws RepositoryException;
 
-  default I getByIdentifiable(I identifiable) throws RepositoryException {
-    if (identifiable == null) {
-      throw new IllegalArgumentException("get failed: given identifiable must not be null");
+  default List<I> getByIdentifiables(List<I> identifiables) throws RepositoryException {
+    if (identifiables == null) {
+      throw new IllegalArgumentException("get failed: given identifiables must not be null");
     }
-    return getByUuid(identifiable.getUuid());
+    return getByUuids(
+        identifiables.stream()
+            .map(Identifiable::getUuid)
+            .filter(Objects::nonNull)
+            .collect(Collectors.toList()));
   }
 
   default I getByIdentifier(Identifier identifier) throws RepositoryException {

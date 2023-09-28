@@ -15,8 +15,11 @@ import de.digitalcollections.model.list.sorting.Direction;
 import de.digitalcollections.model.list.sorting.NullHandling;
 import de.digitalcollections.model.list.sorting.Order;
 import de.digitalcollections.model.list.sorting.Sorting;
+import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -119,5 +122,28 @@ public abstract class BaseCudamiRestClientTest<
     client.update(uuid, toUpdate);
 
     verifyHttpRequestByMethodRelativeUrlAndRequestBody("put", "/" + uuid, toUpdate);
+  }
+
+  @DisplayName("can retrieve less than 30 uuids by GET")
+  @Test
+  public void getByUuidsGET() throws TechnicalException, IOException, InterruptedException {
+    UUID uuid1 = UUID.randomUUID();
+    UUID uuid2 = UUID.randomUUID();
+
+    client.getByUuids(List.of(uuid1, uuid2));
+
+    verifyHttpRequestByMethodAndRelativeURL("get", "/list/" + uuid1 + "," + uuid2);
+  }
+
+  @DisplayName("can retrieve more than 30 uuids by POST")
+  @Test
+  public void getByUuidsPOST() throws TechnicalException, IOException, InterruptedException {
+    List<UUID> uuids =
+        IntStream.of(0, 50).mapToObj(i -> UUID.randomUUID()).collect(Collectors.toList());
+
+    client.getByUuids(uuids);
+
+    String requestBody = new DigitalCollectionsObjectMapper().writeValueAsString(uuids);
+    verifyHttpRequestByMethodRelativeUrlAndRequestBody("post", "/list", requestBody);
   }
 }

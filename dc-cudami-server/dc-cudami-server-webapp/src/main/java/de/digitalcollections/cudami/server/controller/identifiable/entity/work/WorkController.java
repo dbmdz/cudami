@@ -23,16 +23,17 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import java.net.URI;
-import java.util.List;
-import java.util.Locale;
-import java.util.UUID;
-import javax.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.http.HttpServletRequest;
+import java.net.URI;
+import java.util.List;
+import java.util.Locale;
+import java.util.UUID;
 
 @RestController
 @Tag(name = "Work controller")
@@ -186,6 +187,17 @@ public class WorkController extends AbstractEntityController<Work> {
     } else {
       return super.getByUuidAndLocale(uuid, pLocale);
     }
+  }
+
+  @Override
+  @Operation(summary = "Get a list of works by their UUIDs")
+  @GetMapping(
+      value = {
+          "/v6/works/list/{uuids}", // no REGEX possible here!
+      },
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  public PageResponse<Work> getByUuids(@PathVariable UUID[] uuids) throws ServiceException {
+    return super.getByUuids(uuids);
   }
 
   @Operation(summary = "Get creators of a work")
