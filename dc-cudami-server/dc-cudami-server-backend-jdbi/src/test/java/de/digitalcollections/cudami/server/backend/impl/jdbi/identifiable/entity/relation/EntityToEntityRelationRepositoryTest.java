@@ -59,8 +59,13 @@ public class EntityToEntityRelationRepositoryTest {
   @Test
   @DisplayName("should save an EntityRelation")
   void saveEntityRelation()
-      throws InstantiationException, IllegalAccessException, IllegalArgumentException,
-          InvocationTargetException, NoSuchMethodException, SecurityException, RepositoryException {
+      throws InstantiationException,
+          IllegalAccessException,
+          IllegalArgumentException,
+          InvocationTargetException,
+          NoSuchMethodException,
+          SecurityException,
+          RepositoryException {
     Predicate predicate = new Predicate();
     predicate.setValue("is_test");
     EntityRelation expectedRelation =
@@ -94,8 +99,13 @@ public class EntityToEntityRelationRepositoryTest {
   @Test
   @DisplayName("should save two EntityRelations and retrieve in same order")
   void saveEntityRelations()
-      throws InstantiationException, IllegalAccessException, IllegalArgumentException,
-          InvocationTargetException, NoSuchMethodException, SecurityException, RepositoryException {
+      throws InstantiationException,
+          IllegalAccessException,
+          IllegalArgumentException,
+          InvocationTargetException,
+          NoSuchMethodException,
+          SecurityException,
+          RepositoryException {
     Predicate predicate = new Predicate();
     predicate.setValue("is_test");
     EntityRelation expectedRelation =
@@ -137,8 +147,13 @@ public class EntityToEntityRelationRepositoryTest {
   @Test
   @DisplayName("should update the relation if already exists")
   void updateRelations()
-      throws InstantiationException, IllegalAccessException, IllegalArgumentException,
-          InvocationTargetException, NoSuchMethodException, SecurityException, RepositoryException {
+      throws InstantiationException,
+          IllegalAccessException,
+          IllegalArgumentException,
+          InvocationTargetException,
+          NoSuchMethodException,
+          SecurityException,
+          RepositoryException {
     Predicate predicate = new Predicate();
     predicate.setValue("is_test");
     EntityRelation expectedRelation =

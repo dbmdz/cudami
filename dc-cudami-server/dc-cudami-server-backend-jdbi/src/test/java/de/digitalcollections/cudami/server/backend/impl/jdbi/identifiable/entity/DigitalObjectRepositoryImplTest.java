@@ -287,8 +287,13 @@ class DigitalObjectRepositoryImplTest
   @Test
   @DisplayName("can filter by the parent uuid")
   void filterByParentUuid()
-      throws InstantiationException, IllegalAccessException, IllegalArgumentException,
-          InvocationTargetException, NoSuchMethodException, SecurityException, RepositoryException {
+      throws InstantiationException,
+          IllegalAccessException,
+          IllegalArgumentException,
+          InvocationTargetException,
+          NoSuchMethodException,
+          SecurityException,
+          RepositoryException {
     // Insert the parent DigitalObject
     DigitalObject parent =
         TestModelFixture.createDigitalObject(Map.of(Locale.GERMAN, "Parent"), Map.of());

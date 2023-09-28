@@ -59,6 +59,7 @@ public interface NodeRepository<N extends Identifiable> extends IdentifiableRepo
     }
     return getBreadcrumbNavigation(node.getUuid());
   }
+
   /**
    * @param nodeUuid the uuid of the current node
    * @return the breadcrumb navigation

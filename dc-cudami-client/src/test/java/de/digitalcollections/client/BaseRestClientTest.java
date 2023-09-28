@@ -52,8 +52,12 @@ public abstract class BaseRestClientTest<T extends Object, C extends BaseRestCli
 
   @BeforeEach
   public void beforeEach()
-      throws IOException, InterruptedException, NoSuchMethodException, InvocationTargetException,
-          InstantiationException, IllegalAccessException {
+      throws IOException,
+          InterruptedException,
+          NoSuchMethodException,
+          InvocationTargetException,
+          InstantiationException,
+          IllegalAccessException {
     httpClient = mock(HttpClient.class);
     httpResponse = mock(HttpResponse.class);
     httpRequestCaptor = ArgumentCaptor.forClass(HttpRequest.class);

@@ -99,7 +99,8 @@ public class PredicateController extends AbstractUniqueObjectController<Predicat
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Predicate saveWithValidation(
       @Valid @RequestBody Predicate predicate, BindingResult bindingResult)
-      throws ServiceException, ValidationException,
+      throws ServiceException,
+          ValidationException,
           de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException {
     if (bindingResult.hasErrors()) {
       ValidationException validationException = new ValidationException("validation error");
