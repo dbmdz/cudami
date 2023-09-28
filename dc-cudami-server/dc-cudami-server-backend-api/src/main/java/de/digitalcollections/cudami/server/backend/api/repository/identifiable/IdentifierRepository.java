@@ -5,8 +5,10 @@ import de.digitalcollections.cudami.server.backend.api.repository.exceptions.Rep
 import de.digitalcollections.model.identifiable.Identifiable;
 import de.digitalcollections.model.identifiable.Identifier;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 public interface IdentifierRepository extends UniqueObjectRepository<Identifier> {
 
@@ -29,11 +31,16 @@ public interface IdentifierRepository extends UniqueObjectRepository<Identifier>
 
   List<Identifier> findByIdentifiable(UUID identifiableUuid) throws RepositoryException;
 
-  default Identifier getByIdentifier(Identifier identifier) throws RepositoryException {
-    if (identifier == null) {
-      throw new IllegalArgumentException("get failed: given object must not be null");
+  default List<Identifier> getByIdentifiers(List<Identifier> identifiers)
+      throws RepositoryException {
+    if (identifiers == null) {
+      throw new IllegalArgumentException("get failed: given objects must not be null");
     }
-    return getByUuid(identifier.getUuid());
+    return getByUuids(
+        identifiers.stream()
+            .map(Identifier::getUuid)
+            .filter(Objects::nonNull)
+            .collect(Collectors.toList()));
   }
 
   @Override

@@ -20,15 +20,16 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import java.util.List;
-import java.util.Locale;
-import java.util.UUID;
-import javax.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.http.HttpServletRequest;
+import java.util.List;
+import java.util.Locale;
+import java.util.UUID;
 
 @RestController
 @Tag(name = "Manifestation controller")
@@ -174,6 +175,17 @@ public class ManifestationController extends AbstractEntityController<Manifestat
     } else {
       return super.getByUuidAndLocale(uuid, pLocale);
     }
+  }
+
+  @Override
+  @Operation(summary = "Get a list of manifestations by their UUIDs")
+  @GetMapping(
+      value = {
+          "/v6/manifestations/list/{uuids}", // no REGEX possible here!
+      },
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  public PageResponse<Manifestation> getByUuids(@PathVariable UUID[] uuids) throws ServiceException {
+    return super.getByUuids(uuids);
   }
 
   @Operation(summary = "Get languages of all manifestations")

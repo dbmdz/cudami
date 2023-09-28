@@ -1,10 +1,7 @@
 package de.digitalcollections.cudami.server.controller;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -40,6 +37,19 @@ public abstract class BaseControllerTest {
     PageRequest pageRequest = PageRequest.builder().pageSize(25).pageNumber(0).build();
     pageResponse.setRequest(pageRequest);
     return pageResponse;
+  }
+
+  protected UUID extractNthUuidFromPath(String path, int n) {
+    Pattern uuidPattern =
+        Pattern.compile("(\\b[0-9a-f]{8}\\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\\b[0-9a-f]{12})");
+    Matcher matcher = uuidPattern.matcher(path);
+    if (matcher.find()) {
+      for (int i = 0; i < n; i++) {
+        matcher.find();
+      }
+      return UUID.fromString(matcher.group(0));
+    }
+    return null;
   }
 
   protected UUID extractFirstUuidFromPath(String path) {

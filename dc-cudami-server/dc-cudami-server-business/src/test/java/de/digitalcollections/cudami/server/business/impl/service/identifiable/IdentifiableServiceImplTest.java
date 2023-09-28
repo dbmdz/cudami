@@ -4,12 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
@@ -31,12 +26,7 @@ import de.digitalcollections.model.identifiable.entity.manifestation.Manifestati
 import de.digitalcollections.model.identifiable.resource.FileResource;
 import de.digitalcollections.model.text.LocalizedText;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -706,5 +696,37 @@ class IdentifiableServiceImplTest extends AbstractUniqueObjectServiceImplTest {
     assertThat(secondStoredPrimaryUrlAlias.isPrimary()).isFalse();
     verify(urlAliasService).update(eq(firstStoredPrimaryUrlAlias));
     verify(urlAliasService).update(eq(secondStoredPrimaryUrlAlias));
+  }
+
+  @DisplayName("returns null when a single queried returns no result")
+  @Test
+  public void returnNullForNonexistingGetByExample() throws RepositoryException, ServiceException {
+    Identifiable example = Identifiable.builder().uuid(UUID.randomUUID()).build();
+    when(repo.getByExample(eq(example))).thenReturn(null);
+
+    assertThat(service.getByExample(example)).isNull();
+  }
+
+  @DisplayName("can return a single Identifiable by example")
+  @Test
+  public void returnIdentifiableOnGetByExample() throws RepositoryException, ServiceException {
+    Identifiable example = Identifiable.builder().uuid(UUID.randomUUID()).build();
+    when(repo.getByExamples(eq(List.of(example)))).thenReturn(List.of(example));
+
+    assertThat(service.getByExample(example)).isEqualTo(example);
+  }
+
+  @DisplayName("can return a partial result of multiple Identifiables by example")
+  @Test
+  public void returnMultipleIdentifiablesByExample() throws RepositoryException, ServiceException {
+    Identifiable example1 = Identifiable.builder().uuid(UUID.randomUUID()).build();
+    Identifiable example2 = Identifiable.builder().uuid(UUID.randomUUID()).build();
+    Identifiable example3 = Identifiable.builder().uuid(UUID.randomUUID()).build();
+
+    when(repo.getByExamples(eq(List.of(example1, example2, example3))))
+        .thenReturn(List.of(example1, example2));
+
+    assertThat(service.getByExamples(List.of(example1, example2, example3)))
+        .containsExactlyInAnyOrder(example1, example2);
   }
 }

@@ -2,10 +2,7 @@ package de.digitalcollections.cudami.server.controller.identifiable;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifiableService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.alias.UrlAliasService;
@@ -19,9 +16,13 @@ import de.digitalcollections.model.identifiable.alias.UrlAlias;
 import de.digitalcollections.model.identifiable.entity.Collection;
 import de.digitalcollections.model.identifiable.entity.Website;
 import de.digitalcollections.model.identifiable.entity.digitalobject.DigitalObject;
+import de.digitalcollections.model.jackson.DigitalCollectionsObjectMapper;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
+import java.util.List;
+import java.util.UUID;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -35,6 +36,64 @@ public class IdentifiableControllerTest extends BaseControllerTest {
   private IdentifiableService identifiableService;
 
   @MockBean private UrlAliasService urlAliasService;
+
+  @DisplayName("can return a single identifiable")
+  @ParameterizedTest
+  @ValueSource(strings = {"/v6/identifiables/12345678-1234-1234-1234-123456789012"})
+  public void getIdentifiableByUuid(String path) throws Exception {
+    Identifiable example = Identifiable.class.getDeclaredConstructor().newInstance();
+    example.setUuid(extractFirstUuidFromPath(path));
+
+    Identifiable identifiable = Identifiable.builder().uuid(example.getUuid()).build();
+
+    when(identifiableService.getByExamples(eq(List.of(example)))).thenReturn(List.of(identifiable));
+    testJson(path, "/v6/identifiables/12345678-1234-1234-1234-123456789012.json");
+  }
+
+  @DisplayName("can return multiple identifiables with a GET request")
+  @ParameterizedTest
+  @ValueSource(
+      strings = {
+        "/v6/identifiables/list/12345678-1234-1234-1234-123456789012,22345678-1234-1234-1234-123456789012"
+      })
+  public void getMultipleIdentifiablesByUuid(String path) throws Exception {
+    Identifiable example1 = Identifiable.class.getDeclaredConstructor().newInstance();
+    example1.setUuid(extractNthUuidFromPath(path, 0));
+
+    Identifiable example2 = Identifiable.class.getDeclaredConstructor().newInstance();
+    example2.setUuid(extractNthUuidFromPath(path, 1));
+
+    Identifiable identifiable1 = Identifiable.builder().uuid(example1.getUuid()).build();
+    Identifiable identifiable2 = Identifiable.builder().uuid(example2.getUuid()).build();
+
+    when(identifiableService.getByExamples(eq(List.of(example1, example2))))
+        .thenReturn(List.of(identifiable1, identifiable2));
+    testJson(path, "/v6/identifiables/list.json");
+  }
+
+  @DisplayName("can return multiple identifiables with a POST request")
+  @Test
+  public void getByManyUuids() throws Exception {
+    List<UUID> uuidList =
+        List.of(
+            UUID.fromString("12345678-1234-1234-1234-123456789012"),
+            UUID.fromString("22345678-1234-1234-1234-123456789012"));
+    String jsonBody = new DigitalCollectionsObjectMapper().writeValueAsString(uuidList);
+
+    Identifiable example1 = Identifiable.class.getDeclaredConstructor().newInstance();
+    example1.setUuid(UUID.fromString("12345678-1234-1234-1234-123456789012"));
+
+    Identifiable example2 = Identifiable.class.getDeclaredConstructor().newInstance();
+    example2.setUuid(UUID.fromString("22345678-1234-1234-1234-123456789012"));
+
+    Identifiable identifiable1 = Identifiable.builder().uuid(example1.getUuid()).build();
+    Identifiable identifiable2 = Identifiable.builder().uuid(example2.getUuid()).build();
+
+    when(identifiableService.getByExamples(eq(List.of(example1, example2))))
+        .thenReturn(List.of(identifiable1, identifiable2));
+
+    testPostJson("/v6/identifiables/list", jsonBody, "/v6/identifiables/list.json");
+  }
 
   @DisplayName("can return an empty LocalizedUrlAlias")
   @ParameterizedTest

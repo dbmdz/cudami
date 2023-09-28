@@ -7,17 +7,6 @@ import de.digitalcollections.model.list.filtering.FilterCriterion;
 import de.digitalcollections.model.list.filtering.Filtering;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-import java.util.function.BiFunction;
-import java.util.stream.Collectors;
 import org.jdbi.v3.core.Handle;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.core.JdbiException;
@@ -27,6 +16,11 @@ import org.jdbi.v3.core.statement.StatementException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
+
+import java.time.LocalDateTime;
+import java.util.*;
+import java.util.function.BiFunction;
+import java.util.stream.Collectors;
 
 public abstract class UniqueObjectRepositoryImpl<U extends UniqueObject>
     extends JdbiRepositoryImpl<U> implements UniqueObjectRepository<U> {
@@ -221,13 +215,14 @@ public abstract class UniqueObjectRepositoryImpl<U extends UniqueObject>
   }
 
   @Override
-  public U getByUuidAndFiltering(UUID uuid, Filtering filtering) throws RepositoryException {
+  public List<U> getByUuidsAndFiltering(List<UUID> uuids, Filtering filtering)
+      throws RepositoryException {
     if (filtering == null) {
       filtering = new Filtering();
     }
-    filtering.add(FilterCriterion.builder().withExpression("uuid").isEquals(uuid).build());
+    filtering.add(FilterCriterion.builder().withExpression("uuid").in(uuids).build());
 
-    U result = retrieveOne(getSqlSelectAllFields(), filtering, null);
+    List<U> result = retrieveMultiple(getSqlSelectAllFields(), filtering, null);
     return result;
   }
 
@@ -414,22 +409,22 @@ public abstract class UniqueObjectRepositoryImpl<U extends UniqueObject>
     return retrieveList(fieldsSql, null, innerQuery, argumentMappings, orderBy);
   }
 
-  protected U retrieveOne(String fieldsSql, Filtering filtering, String sqlAdditionalJoins)
-      throws RepositoryException {
+  protected List<U> retrieveMultiple(
+      String fieldsSql, Filtering filtering, String sqlAdditionalJoins) throws RepositoryException {
     Map<String, Object> argumentMappings = new HashMap<>(0);
-    return retrieveOne(fieldsSql, filtering, sqlAdditionalJoins, argumentMappings);
+    return retrieveMultiple(fieldsSql, filtering, sqlAdditionalJoins, argumentMappings);
   }
 
-  protected U retrieveOne(
+  protected List<U> retrieveMultiple(
       String fieldsSql,
       Filtering filtering,
       String sqlAdditionalJoins,
       Map<String, Object> argumentMappings)
       throws RepositoryException {
-    return retrieveOne(fieldsSql, filtering, sqlAdditionalJoins, argumentMappings, null);
+    return retrieveMultiple(fieldsSql, filtering, sqlAdditionalJoins, argumentMappings, null);
   }
 
-  protected U retrieveOne(
+  protected List<U> retrieveMultiple(
       String fieldsSql,
       Filtering filtering,
       String sqlAdditionalJoins,
@@ -461,7 +456,7 @@ public abstract class UniqueObjectRepositoryImpl<U extends UniqueObject>
 
     Map<String, Object> bindMap = Map.copyOf(argumentMappings);
     try {
-      U result =
+      List<U> result =
           dbi.withHandle(
                   h ->
                       h.createQuery(sql.toString())
@@ -471,8 +466,7 @@ public abstract class UniqueObjectRepositoryImpl<U extends UniqueObject>
                                 fullReduceRowsBiConsumer(map, rowView);
                                 additionalReduceRowsBiConsumer(map, rowView);
                               }))
-              .findFirst()
-              .orElse(null);
+              .collect(Collectors.toList());
       return result;
     } catch (StatementException e) {
       String detailMessage = e.getCause() != null ? e.getCause().getMessage() : e.getMessage();
@@ -481,6 +475,24 @@ public abstract class UniqueObjectRepositoryImpl<U extends UniqueObject>
     } catch (JdbiException e) {
       throw new RepositoryException(e);
     }
+  }
+
+  protected U retrieveOne(String fieldsSql, Filtering filtering, String sqlAdditionalJoins)
+      throws RepositoryException {
+    Map<String, Object> argumentMappings = new HashMap<>(0);
+    return retrieveOne(fieldsSql, filtering, sqlAdditionalJoins, argumentMappings, null);
+  }
+
+  protected U retrieveOne(
+      String fieldsSql,
+      Filtering filtering,
+      String sqlAdditionalJoins,
+      Map<String, Object> argumentMappings,
+      String innerSelect)
+      throws RepositoryException {
+    List<U> resultElements =
+        retrieveMultiple(fieldsSql, filtering, sqlAdditionalJoins, argumentMappings, innerSelect);
+    return resultElements.stream().findFirst().orElse(null);
   }
 
   @Override

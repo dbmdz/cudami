@@ -30,23 +30,36 @@ public interface UniqueObjectService<U extends UniqueObject> {
   Set<U> getAll() throws ServiceException;
 
   /**
-   * Retrieve one {@code UniqueObject} by given properties in example instance.
+   * Retrieve one {@code UniqueObject}s by given properties in example instance.
    *
    * @param uniqueObject example instance containing unique property
-   * @return the found {@code UniqueObject} or {@code null}
+   * @return the found {@code UniqueObject} or null
    * @throws ServiceException in case of problems
    */
-  U getByExample(U uniqueObject) throws ServiceException;
+  default U getByExample(U uniqueObject) throws ServiceException {
+    List<U> uniqueObjects = getByExamples(List.of(uniqueObject));
+    return (uniqueObjects.isEmpty() ? null : uniqueObjects.stream().findFirst().orElse(null));
+  }
 
   /**
-   * Retrieve one {@code UniqueObject} by given properties in example instance and given filtering.
+   * Retrieve {@code UniqueObject}s by given properties in example instances.
    *
-   * @param uniqueObject example instance containing unique property
-   * @param filtering filtering params
-   * @return the found {@code UniqueObject} or {@code null}
+   * @param uniqueObjects example instances containing unique property
+   * @return List of found {@code UniqueObject}s
    * @throws ServiceException in case of problems
    */
-  U getByExampleAndFiltering(U uniqueObject, Filtering filtering) throws ServiceException;
+  List<U> getByExamples(List<U> uniqueObjects) throws ServiceException;
+
+  /**
+   * Retrieve {@code UniqueObject}s by given properties in example instances and given filtering.
+   *
+   * @param uniqueObjects example instances containing unique property
+   * @param filtering filtering params
+   * @return List of found {@code UniqueObject}s
+   * @throws ServiceException in case of problems
+   */
+  List<U> getByExamplesAndFiltering(List<U> uniqueObjects, Filtering filtering)
+      throws ServiceException;
 
   List<U> getRandom(int count) throws ServiceException;
 

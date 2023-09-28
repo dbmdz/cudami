@@ -12,10 +12,7 @@ import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.list.sorting.Order;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.ParameterizedType;
-import java.util.List;
-import java.util.Locale;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -91,8 +88,23 @@ public abstract class AbstractUniqueObjectController<U extends UniqueObject>
   }
 
   protected ResponseEntity<U> getByUuid(UUID uuid) throws ServiceException {
-    U result = getService().getByExample(buildExampleWithUuid(uuid));
-    return new ResponseEntity<>(result, result != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
+    List<U> result =
+        getService().getByExamples(buildExamplesWithUuids(List.of(uuid).toArray(new UUID[0])));
+    if (result.isEmpty()) {
+      return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+    }
+
+    return new ResponseEntity<>(result.stream().findFirst().orElse(null), HttpStatus.OK);
+  }
+
+  protected PageResponse<U> getByUuids(UUID[] uuids) throws ServiceException {
+    List<U> result = getService().getByExamples(buildExamplesWithUuids(uuids));
+    return PageResponse.builder()
+        .withContent(result)
+        .forPageSize(Integer.MAX_VALUE)
+        .forRequestPage(0)
+        .withTotalElements(result.size())
+        .build();
   }
 
   protected ResponseEntity<U> getByUuidAndLocale(UUID uuid, Locale locale) throws ServiceException {
@@ -124,6 +136,25 @@ public abstract class AbstractUniqueObjectController<U extends UniqueObject>
         | InvocationTargetException e) {
       throw new ServiceException(
           "Cannot construct example " + objectType + " for uuid=" + uuid + ": " + e, e);
+    }
+  }
+
+  protected List<U> buildExamplesWithUuids(UUID[] uuids) throws ServiceException {
+    try {
+      List<U> exampleList = new ArrayList<>();
+      for (UUID uuid : uuids) {
+        exampleList.add(buildExampleWithUuid(uuid));
+      }
+      return exampleList;
+    } catch (ServiceException e) {
+      throw new ServiceException(
+          "Cannot construct example list of "
+              + objectType
+              + " for uuids="
+              + Arrays.toString(uuids)
+              + ": "
+              + e,
+          e);
     }
   }
 }

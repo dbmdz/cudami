@@ -22,10 +22,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @Tag(name = "Identifiable controller")
@@ -39,6 +36,26 @@ public class IdentifiableController extends AbstractIdentifiableController<Ident
       UrlAliasService urlAliasService) {
     this.service = identifiableService;
     this.urlAliasService = urlAliasService;
+  }
+
+  @Override
+  @Operation(summary = "Get a list of identifiables by UUID")
+  @GetMapping(
+      value = {
+        "/v6/identifiables/list/{uuids}", // no REGEX possible here!
+      },
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  public PageResponse<Identifiable> getByUuids(@PathVariable UUID[] uuids) throws ServiceException {
+    return super.getByUuids(uuids);
+  }
+
+  @Operation(summary = "Get a list of identifiables by UUID")
+  @PostMapping(
+      value = {"/v6/identifiables/list"},
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  public PageResponse<Identifiable> getByManyUuids(@RequestBody UUID[] uuids)
+      throws ServiceException {
+    return super.getByUuids(uuids);
   }
 
   @Override
@@ -109,7 +126,7 @@ public class IdentifiableController extends AbstractIdentifiableController<Ident
       throws CudamiControllerException {
 
     try {
-      if (service.getByExample(Identifiable.builder().uuid(uuid).build()) == null) {
+      if (service.getByExamples(List.of(Identifiable.builder().uuid(uuid).build())).isEmpty()) {
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
       }
     } catch (Exception e) {
