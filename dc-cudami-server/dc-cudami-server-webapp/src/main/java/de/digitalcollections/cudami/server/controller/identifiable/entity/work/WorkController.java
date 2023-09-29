@@ -190,10 +190,10 @@ public class WorkController extends AbstractEntityController<Work> {
   }
 
   @Override
-  @Operation(summary = "Get a list of works by their UUIDs")
+  @Operation(summary = "Get a list of works by UUID")
   @GetMapping(
       value = {
-          "/v6/works/list/{uuids}", // no REGEX possible here!
+        "/v6/works/list/{uuids}", // no REGEX possible here!
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public PageResponse<Work> getByUuids(@PathVariable UUID[] uuids) throws ServiceException {

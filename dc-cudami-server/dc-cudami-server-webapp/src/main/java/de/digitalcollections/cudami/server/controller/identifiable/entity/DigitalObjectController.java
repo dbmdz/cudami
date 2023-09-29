@@ -179,6 +179,15 @@ public class DigitalObjectController extends AbstractEntityController<DigitalObj
     return super.getByUuids(uuids);
   }
 
+  @Operation(summary = "Get a list of digital objects by UUID")
+  @PostMapping(
+      value = {"/v6/digitalobjects/list"},
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  public PageResponse<DigitalObject> getByManyUuids(@RequestBody UUID[] uuids)
+      throws ServiceException {
+    return super.getByUuids(uuids);
+  }
+
   @Operation(
       summary =
           "Get all (active) collections of a digital object as (paged, sorted, filtered) list")
