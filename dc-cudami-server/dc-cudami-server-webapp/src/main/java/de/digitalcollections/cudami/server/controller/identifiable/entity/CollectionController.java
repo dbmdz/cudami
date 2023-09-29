@@ -31,14 +31,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @Tag(name = "Collection controller")
@@ -448,6 +441,26 @@ public class CollectionController extends AbstractEntityController<Collection> {
     }
     return new ResponseEntity<>(
         collection, collection != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
+  }
+
+  @Override
+  @Operation(summary = "Get a list of collections by UUID")
+  @GetMapping(
+      value = {
+        "/v6/collections/list/{uuids}", // no REGEX possible here!
+      },
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  public PageResponse<Collection> getByUuids(@PathVariable UUID[] uuids) throws ServiceException {
+    return super.getByUuids(uuids);
+  }
+
+  @Operation(summary = "Get a list of collections by UUID")
+  @PostMapping(
+      value = {"/v6/collections/list"},
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  public PageResponse<Collection> getByManyUuids(@RequestBody UUID[] uuids)
+      throws ServiceException {
+    return super.getByUuids(uuids);
   }
 
   @Operation(summary = "Get the first created parent of a collection")
