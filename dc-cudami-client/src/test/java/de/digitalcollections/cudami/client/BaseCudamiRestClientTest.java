@@ -139,11 +139,10 @@ public abstract class BaseCudamiRestClientTest<
   @Test
   public void getByUuidsPOST() throws TechnicalException, IOException, InterruptedException {
     List<UUID> uuids =
-        IntStream.of(0, 50).mapToObj(i -> UUID.randomUUID()).collect(Collectors.toList());
+        IntStream.range(0, 50).mapToObj(i -> UUID.randomUUID()).collect(Collectors.toList());
 
     client.getByUuids(uuids);
 
-    String requestBody = new DigitalCollectionsObjectMapper().writeValueAsString(uuids);
-    verifyHttpRequestByMethodRelativeUrlAndRequestBody("post", "/list", requestBody);
+    verifyHttpRequestByMethodRelativeUrlAndRequestBody("post", "/list", uuids);
   }
 }
