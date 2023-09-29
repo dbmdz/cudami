@@ -178,13 +178,23 @@ public class ManifestationController extends AbstractEntityController<Manifestat
   }
 
   @Override
-  @Operation(summary = "Get a list of manifestations by their UUIDs")
+  @Operation(summary = "Get a list of manifestations by UUID")
   @GetMapping(
       value = {
-          "/v6/manifestations/list/{uuids}", // no REGEX possible here!
+        "/v6/manifestations/list/{uuids}", // no REGEX possible here!
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public PageResponse<Manifestation> getByUuids(@PathVariable UUID[] uuids) throws ServiceException {
+  public PageResponse<Manifestation> getByUuids(@PathVariable UUID[] uuids)
+      throws ServiceException {
+    return super.getByUuids(uuids);
+  }
+
+  @Operation(summary = "Get a list of manifestations by UUID")
+  @PostMapping(
+      value = {"/v6/manifestations/list"},
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  public PageResponse<Manifestation> getByManyUuids(@RequestBody UUID[] uuids)
+      throws ServiceException {
     return super.getByUuids(uuids);
   }
 
