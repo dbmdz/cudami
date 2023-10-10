@@ -3,9 +3,7 @@ package de.digitalcollections.cudami.server.business.impl.service.identifiable.e
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.EventRepository;
@@ -19,6 +17,7 @@ import de.digitalcollections.cudami.server.config.HookProperties;
 import de.digitalcollections.model.identifiable.Identifier;
 import de.digitalcollections.model.identifiable.entity.Event;
 import de.digitalcollections.model.text.LocalizedText;
+import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 import java.util.UUID;
@@ -76,7 +75,7 @@ class EventServiceImplTest extends AbstractServiceImplTest {
         .when(eventRepository)
         .save(eq(savedEvent));
 
-    when(eventRepository.getByExample(eq(savedEvent))).thenReturn(savedEvent);
+    when(eventRepository.getByExamples(eq(List.of(savedEvent)))).thenReturn(List.of(savedEvent));
 
     eventService.save(savedEvent);
 

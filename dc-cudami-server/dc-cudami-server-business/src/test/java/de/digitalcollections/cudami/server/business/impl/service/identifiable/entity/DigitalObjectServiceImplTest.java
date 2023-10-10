@@ -134,6 +134,41 @@ class DigitalObjectServiceImplTest extends AbstractServiceImplTest {
   }
 
   @Test
+  @DisplayName("fills LinkedDataResources for a retrieved DigitalObject by uuid")
+  void fillLinkedDataResourcesForGetByUuidAndLocale() throws ServiceException, RepositoryException {
+    UUID uuid = UUID.randomUUID();
+
+    DigitalObject persistedDigitalObject =
+        DigitalObject.builder()
+            .uuid(uuid)
+            .label(Locale.GERMAN, "deutschsprachiges Label")
+            .label(Locale.ENGLISH, "english label")
+            .description(Locale.GERMAN, "Beschreibung")
+            .description(Locale.ENGLISH, "description")
+            .build();
+
+    when(repo.getByExamples(eq(List.of(persistedDigitalObject))))
+        .thenReturn(List.of(persistedDigitalObject));
+
+    LinkedDataFileResource persistedLinkedDataFileResource =
+        LinkedDataFileResource.builder()
+            .label(Locale.GERMAN, "Linked Data")
+            .context("https://foo.bar/blubb.xml")
+            .objectType("XML")
+            .filename("blubb.xml") // required!!
+            .mimeType(MimeType.MIME_APPLICATION_XML)
+            .build();
+    when(digitalObjectLinkedDataFileResourceService.getLinkedDataFileResources(
+            eq(persistedDigitalObject)))
+        .thenReturn(List.of(persistedLinkedDataFileResource));
+
+    DigitalObject actual = service.getByExampleAndLocale(persistedDigitalObject, Locale.ROOT);
+
+    assertThat(actual).isNotNull();
+    assertThat(actual.getLinkedDataResources()).containsExactly(persistedLinkedDataFileResource);
+  }
+
+  @Test
   @DisplayName("can save RenderingResources for a DigitalObject")
   void saveRenderingResources() throws ValidationException, ServiceException {
     FileResource renderingResource = new TextFileResource();
@@ -171,7 +206,8 @@ class DigitalObjectServiceImplTest extends AbstractServiceImplTest {
             .description(Locale.GERMAN, "Beschreibung")
             .description(Locale.ENGLISH, "description")
             .build();
-    when(repo.getByExample(eq(persistedDigitalObject))).thenReturn(persistedDigitalObject);
+    when(repo.getByExamples(eq(List.of(persistedDigitalObject))))
+        .thenReturn(List.of(persistedDigitalObject));
 
     FileResource persistedRenderingResource = new TextFileResource();
     persistedRenderingResource.setLabel(new LocalizedText(Locale.GERMAN, "Linked Data"));
@@ -307,12 +343,12 @@ class DigitalObjectServiceImplTest extends AbstractServiceImplTest {
             .linkedDataResources(List.of(LinkedDataFileResource.builder().build()))
             .refId(42)
             .build();
-    when(repo.getByExample(any(DigitalObject.class))).thenReturn(persistedDigitalObject);
+    when(repo.getByExamples(any(List.class))).thenReturn(List.of(persistedDigitalObject));
     when(repo.delete(any(DigitalObject.class))).thenReturn(true);
 
     assertThat(service.delete(persistedDigitalObject)).isTrue();
 
-    verify(repo, times(1)).getByExample(eq(persistedDigitalObject));
+    verify(repo, times(1)).getByExamples(eq(List.of(persistedDigitalObject)));
     verify(repo, times(1)).deleteFileResources(eq(persistedDigitalObject));
     verify(repo, times(1)).delete(eq(persistedDigitalObject));
     verify(digitalObjectLinkedDataFileResourceService, times(1))
@@ -370,14 +406,15 @@ class DigitalObjectServiceImplTest extends AbstractServiceImplTest {
   @Test
   @DisplayName("returns true when the digital object was successfully connected with the item")
   public void addExistingAndNotConntectedDigitalObjectToItem()
-      throws ConflictException, ServiceException, ValidationException {
+      throws ConflictException, ServiceException, ValidationException, RepositoryException {
     Item item = Item.builder().uuid(UUID.randomUUID()).build();
     DigitalObject digitalObject =
         DigitalObject.builder()
             .uuid(UUID.randomUUID())
             .label(LocalizedText.builder().text(Locale.ITALY, "Viva Italia!").build())
             .build();
-    when(service.getByExamples(eq(List.of(digitalObject)))).thenReturn(List.of(digitalObject));
+    when(repo.getByExamples(eq(List.of(digitalObject)))).thenReturn(List.of(digitalObject));
+    when(repo.getByExample(eq(digitalObject))).thenReturn(digitalObject);
 
     assertThat(service.setItem(digitalObject, item)).isTrue();
   }
