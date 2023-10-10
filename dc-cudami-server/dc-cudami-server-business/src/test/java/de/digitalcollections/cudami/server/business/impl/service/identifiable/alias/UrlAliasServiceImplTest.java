@@ -5,11 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import de.digitalcollections.commons.web.SlugGenerator;
 import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
@@ -108,7 +104,7 @@ class UrlAliasServiceImplTest extends AbstractUniqueObjectServiceImplTest {
     urlAlias.setPrimary(true);
     LocalDateTime publicationDate = LocalDateTime.now();
     urlAlias.setLastPublished(publicationDate);
-    when(repo.getByExample(any(UrlAlias.class))).thenReturn(urlAlias);
+    when(repo.getByExamples(any(List.class))).thenReturn(List.of(urlAlias));
 
     service.checkPublication(urlAlias);
 
@@ -124,7 +120,7 @@ class UrlAliasServiceImplTest extends AbstractUniqueObjectServiceImplTest {
     urlAlias.setPrimary(true);
     LocalDateTime publicationDate = LocalDateTime.now();
     urlAlias.setLastPublished(publicationDate);
-    when(repo.getByExample(any(UrlAlias.class))).thenReturn(urlAlias);
+    when(repo.getByExamples(any(List.class))).thenReturn(List.of(urlAlias));
 
     UrlAlias changedUrlAlias = createDeepCopy(urlAlias);
     changedUrlAlias.setPrimary(false);
@@ -146,7 +142,7 @@ class UrlAliasServiceImplTest extends AbstractUniqueObjectServiceImplTest {
     urlAlias.setPrimary(false);
     LocalDateTime publicationDate = LocalDateTime.now().minusDays(1);
     urlAlias.setLastPublished(publicationDate);
-    when(repo.getByExample(any(UrlAlias.class))).thenReturn(urlAlias);
+    when(repo.getByExamples(any(List.class))).thenReturn(List.of(urlAlias));
 
     UrlAlias changedUrlAlias = createDeepCopy(urlAlias);
     changedUrlAlias.setPrimary(true);
@@ -180,7 +176,7 @@ class UrlAliasServiceImplTest extends AbstractUniqueObjectServiceImplTest {
     urlAlias.setPrimary(true);
     LocalDateTime publicationDate = LocalDateTime.now();
     urlAlias.setLastPublished(publicationDate);
-    when(repo.getByExample(any(UrlAlias.class))).thenReturn(urlAlias);
+    when(repo.getByExamples(any(List.class))).thenReturn(List.of(urlAlias));
 
     UrlAlias changedUrlAlias = createDeepCopy(urlAlias);
     changedUrlAlias.setSlug("foo");
@@ -430,13 +426,13 @@ class UrlAliasServiceImplTest extends AbstractUniqueObjectServiceImplTest {
   @DisplayName("raises a ServiceException when the repository throws an exception")
   @Test
   public void raiseException() throws RepositoryException {
-    when(repo.getByExample(any(UrlAlias.class))).thenThrow(new RepositoryException("foo"));
+    when(repo.getByExamples(any(List.class))).thenThrow(new RepositoryException("foo"));
 
     UrlAlias urlAlias = createUrlAlias();
     assertThrows(
         ServiceException.class,
         () -> {
-          service.getByExample(urlAlias);
+          service.getByExamples(List.of(urlAlias));
         });
   }
 
@@ -490,14 +486,15 @@ class UrlAliasServiceImplTest extends AbstractUniqueObjectServiceImplTest {
   @Test
   public void raiseExceptionWhenRetrievingLocalizedUrlAliasesLeadsToAnException()
       throws RepositoryException {
-    doThrow(RepositoryException.class).when(repo).getByExample(any(UrlAlias.class));
-
     UrlAlias urlAlias = createUrlAlias();
+
+    List<UrlAlias> arg = List.of(urlAlias);
+    doThrow(RepositoryException.class).when(repo).getByExamples(eq(arg));
 
     assertThrows(
         ServiceException.class,
         () -> {
-          service.getByExample(urlAlias);
+          service.getByExamples(arg);
         });
   }
 
@@ -546,7 +543,7 @@ class UrlAliasServiceImplTest extends AbstractUniqueObjectServiceImplTest {
   @DisplayName("raises a ServiceException when updating leads to an exception in the repository")
   @Test
   public void raiseExceptionWhenUpdateLeadsToAnException() throws RepositoryException {
-    doThrow(RepositoryException.class).when(repo).getByExample(any(UrlAlias.class));
+    doThrow(RepositoryException.class).when(repo).getByExamples(any(List.class));
 
     assertThrows(
         ServiceException.class,
@@ -603,7 +600,7 @@ class UrlAliasServiceImplTest extends AbstractUniqueObjectServiceImplTest {
     UrlAlias expected =
         createUrlAlias("hützligrütz", false, "de", false, UUID.randomUUID(), UUID.randomUUID());
 
-    when(repo.getByExample(any(UrlAlias.class))).thenReturn(expected);
+    when(repo.getByExamples(any(List.class))).thenReturn(List.of(expected));
 
     assertThat(service.getByExample(createUrlAlias())).isEqualTo(expected);
   }
@@ -619,9 +616,9 @@ class UrlAliasServiceImplTest extends AbstractUniqueObjectServiceImplTest {
   @DisplayName("returns null, an UrlAlias with uuid=null should be retrieved")
   @Test
   public void readNull() throws ServiceException, RepositoryException {
-    when(repo.getByExample(eq(null))).thenReturn(null);
+    when(repo.getByExamples(eq(null))).thenReturn(null);
 
-    assertThat(service.getByExample(null)).isNull();
+    assertThat(service.getByExamples(null)).isNull();
   }
 
   @DisplayName("throws an exception when validating a LocalizedUrlAlias with no primary UrlAlias")
@@ -829,7 +826,7 @@ class UrlAliasServiceImplTest extends AbstractUniqueObjectServiceImplTest {
   public void updateUrlAlias() throws RepositoryException, ServiceException {
     UrlAlias expected =
         createUrlAlias("hützligrütz", true, "de", false, UUID.randomUUID(), UUID.randomUUID());
-    when(repo.getByExample(any(UrlAlias.class))).thenReturn(expected);
+    when(repo.getByExamples(any(List.class))).thenReturn(List.of(expected));
 
     UrlAlias expectedForUpdate = createDeepCopy(expected);
 
