@@ -116,6 +116,48 @@ class IdentifiableForm extends Component {
     })
   }
 
+  /*
+   * Adds an attribute 'data-label' to all table cells of table rows except the first one (header row)
+   * if a text is found in the corresponding cell in the first row
+   */
+  addDataLabelToTable = (table) => {
+    let headerLabels = []
+    return {
+      ...table,
+      content: table.content.map((row, idx) => {
+        if (idx === 0) {
+          headerLabels = row.content.map((cell) => {
+            const paragraphs = cell.content.filter(
+              (e) => e.type === 'paragraph',
+            )
+            if (paragraphs[0]?.content) {
+              const texts = paragraphs[0].content.filter(
+                (e) => e.type === 'text',
+              )
+              if (texts) {
+                return texts[0].text
+              }
+            }
+            return null
+          })
+          return row
+        }
+        return {
+          ...row,
+          content: row.content.map((cell, idx) => {
+            if (!headerLabels[idx]) {
+              return cell
+            }
+            return {
+              ...cell,
+              attrs: {...cell.attrs, 'data-label': headerLabels[idx]},
+            }
+          }),
+        }
+      }),
+    }
+  }
+
   addLanguage = (selectedLanguage) => {
     const {
       availableLanguages,
@@ -181,6 +223,28 @@ class IdentifiableForm extends Component {
       return
     }
     return Object.fromEntries(cleanedAliases)
+  }
+
+  /*
+   * Modifies the content blocks dynamically if needed
+   */
+  enrichContent = (localizedContent) => {
+    return Object.fromEntries(
+      Object.entries(localizedContent).map(([language, doc]) => [
+        language,
+        {
+          ...doc,
+          content: doc.content.map((block) => {
+            switch (block.type) {
+              case 'table':
+                return this.addDataLabelToTable(block)
+              default:
+                return block
+            }
+          }),
+        },
+      ]),
+    )
   }
 
   getFormComponent = () => {
@@ -389,6 +453,7 @@ class IdentifiableForm extends Component {
       )
     }
     if (identifiable.text) {
+      identifiable.text = this.enrichContent(identifiable.text)
       identifiable.text = this.cleanContent(identifiable.text)
     }
     const {error = false, uuid} = await (identifiable.uuid
