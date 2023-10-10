@@ -6,7 +6,11 @@
   <parent>
     <groupId>de.digitalcollections.cudami</groupId>
     <artifactId>dc-cudami-server</artifactId>
+<<<<<<< HEAD
     <version>8.0.0-SNAPSHOT</version>
+=======
+    <version>7.2.0-SNAPSHOT</version>
+>>>>>>> 8dcc93615 (Rebase fix)
   </parent>
 
   <name>DigitalCollections: cudami Repository Server (Webapp)</name>
