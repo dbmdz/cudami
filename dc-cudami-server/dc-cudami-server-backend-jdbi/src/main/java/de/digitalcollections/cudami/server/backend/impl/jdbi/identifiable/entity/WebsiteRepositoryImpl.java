@@ -12,11 +12,7 @@ import de.digitalcollections.model.identifiable.web.Webpage;
 import de.digitalcollections.model.list.filtering.Filtering;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.core.statement.PreparedBatch;
 import org.slf4j.Logger;
@@ -78,6 +74,20 @@ public class WebsiteRepositoryImpl extends EntityRepositoryImpl<Website>
       website.setRootPages(getRootWebpages(website.getUuid()));
     }
     return website;
+  }
+
+  @Override
+  public List<Website> getByUuidsAndFiltering(List<UUID> uuids, Filtering filtering)
+      throws RepositoryException {
+    List<Website> websites = super.getByUuidsAndFiltering(uuids, filtering);
+
+    if (websites != null && !websites.isEmpty()) {
+      for (Website website : websites) {
+        website.setRootPages(getRootWebpages(website.getUuid()));
+      }
+    }
+
+    return websites;
   }
 
   @Override

@@ -1,14 +1,5 @@
 package de.digitalcollections.cudami.server.business.impl.service.identifiable.entity;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
 import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.DigitalObjectRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.resource.DigitalObjectLinkedDataFileResourceRepository;
@@ -29,6 +20,7 @@ import de.digitalcollections.cudami.server.business.api.service.identifiable.res
 import de.digitalcollections.cudami.server.business.impl.service.AbstractServiceImplTest;
 import de.digitalcollections.cudami.server.config.HookProperties;
 import de.digitalcollections.model.file.MimeType;
+import de.digitalcollections.model.identifiable.Identifier;
 import de.digitalcollections.model.identifiable.entity.digitalobject.DigitalObject;
 import de.digitalcollections.model.identifiable.entity.item.Item;
 import de.digitalcollections.model.identifiable.resource.FileResource;
@@ -36,13 +28,20 @@ import de.digitalcollections.model.identifiable.resource.FileResourceType;
 import de.digitalcollections.model.identifiable.resource.LinkedDataFileResource;
 import de.digitalcollections.model.identifiable.resource.TextFileResource;
 import de.digitalcollections.model.text.LocalizedText;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+
 import java.net.URI;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.*;
 
 @DisplayName("The DigitalObjectService")
 class DigitalObjectServiceImplTest extends AbstractServiceImplTest {
@@ -161,6 +160,136 @@ class DigitalObjectServiceImplTest extends AbstractServiceImplTest {
   }
 
   @Test
+  @DisplayName("fills RenderingResources for a retrieved DigitalObject by uuid and locale")
+  void fillRenderingResourcesForGetByUuidAndLocale() throws ServiceException, RepositoryException {
+    UUID uuid = UUID.randomUUID();
+    DigitalObject persistedDigitalObject =
+        DigitalObject.builder()
+            .uuid(uuid)
+            .label(Locale.GERMAN, "deutschsprachiges Label")
+            .label(Locale.ENGLISH, "english label")
+            .description(Locale.GERMAN, "Beschreibung")
+            .description(Locale.ENGLISH, "description")
+            .build();
+    when(repo.getByExample(eq(persistedDigitalObject))).thenReturn(persistedDigitalObject);
+
+    FileResource persistedRenderingResource = new TextFileResource();
+    persistedRenderingResource.setLabel(new LocalizedText(Locale.GERMAN, "Linked Data"));
+    persistedRenderingResource.setMimeType(MimeType.fromTypename("text/html"));
+    persistedRenderingResource.setUri(URI.create("https://bla.bla/foo.html"));
+    persistedRenderingResource.setUuid(UUID.randomUUID());
+    persistedRenderingResource.setFilename("foo.html");
+    persistedRenderingResource.setLabel(new LocalizedText(Locale.GERMAN, "Beschreibung"));
+    when(digitalObjectRenderingFileResourceService.getRenderingFileResources(
+            eq(persistedDigitalObject)))
+        .thenReturn(List.of(persistedRenderingResource));
+
+    DigitalObject actual = service.getByExampleAndLocale(persistedDigitalObject, Locale.ROOT);
+
+    assertThat(actual).isNotNull();
+    assertThat(actual.getRenderingResources()).containsExactly(persistedRenderingResource);
+  }
+
+  @Test
+  @DisplayName(
+      "fills RenderingResources for a retrieved DigitalObject by identifier (id and namespace)")
+  void fillRenderingResourceForGetByIdentfier() throws ServiceException, RepositoryException {
+    UUID uuid = UUID.randomUUID();
+    DigitalObject persistedDigitalObject =
+        DigitalObject.builder()
+            .uuid(uuid)
+            .label(Locale.GERMAN, "deutschsprachiges Label")
+            .label(Locale.ENGLISH, "english label")
+            .description(Locale.GERMAN, "Beschreibung")
+            .description(Locale.ENGLISH, "description")
+            .build();
+    when(repo.getByIdentifier(any(Identifier.class))).thenReturn(persistedDigitalObject);
+
+    FileResource persistedRenderingResource = new TextFileResource();
+    persistedRenderingResource.setLabel(new LocalizedText(Locale.GERMAN, "Linked Data"));
+    persistedRenderingResource.setMimeType(MimeType.fromTypename("text/html"));
+    persistedRenderingResource.setUri(URI.create("https://bla.bla/foo.html"));
+    persistedRenderingResource.setUuid(UUID.randomUUID());
+    persistedRenderingResource.setFilename("foo.html");
+    persistedRenderingResource.setLabel(new LocalizedText(Locale.GERMAN, "Beschreibung"));
+    when(digitalObjectRenderingFileResourceService.getRenderingFileResources(
+            eq(persistedDigitalObject)))
+        .thenReturn(List.of(persistedRenderingResource));
+
+    DigitalObject actual =
+        service.getByIdentifier(Identifier.builder().namespace("foo").id("bar").build());
+    assertThat(actual).isNotNull();
+    assertThat(actual.getRenderingResources()).containsExactly(persistedRenderingResource);
+
+    actual = service.getByIdentifier(Identifier.builder().namespace("foo").id("bar").build());
+    assertThat(actual).isNotNull();
+    assertThat(actual.getRenderingResources()).containsExactly(persistedRenderingResource);
+  }
+
+  @Test
+  @DisplayName("fills RenderingResources for a retrieved DigitalObject by uuid")
+  void fillRenderingResourceForGetByUUID() throws ServiceException, RepositoryException {
+    UUID uuid = UUID.randomUUID();
+    DigitalObject persistedDigitalObject =
+        DigitalObject.builder()
+            .uuid(uuid)
+            .label(Locale.GERMAN, "deutschsprachiges Label")
+            .label(Locale.ENGLISH, "english label")
+            .description(Locale.GERMAN, "Beschreibung")
+            .description(Locale.ENGLISH, "description")
+            .build();
+    when(repo.getByExamples(any(List.class))).thenReturn(List.of(persistedDigitalObject));
+
+    FileResource persistedRenderingResource = new TextFileResource();
+    persistedRenderingResource.setLabel(new LocalizedText(Locale.GERMAN, "Linked Data"));
+    persistedRenderingResource.setMimeType(MimeType.fromTypename("text/html"));
+    persistedRenderingResource.setUri(URI.create("https://bla.bla/foo.html"));
+    persistedRenderingResource.setUuid(UUID.randomUUID());
+    persistedRenderingResource.setFilename("foo.html");
+    persistedRenderingResource.setLabel(new LocalizedText(Locale.GERMAN, "Beschreibung"));
+    when(digitalObjectRenderingFileResourceService.getRenderingFileResources(
+            eq(persistedDigitalObject)))
+        .thenReturn(List.of(persistedRenderingResource));
+
+    DigitalObject actual = service.getByExample(persistedDigitalObject);
+
+    assertThat(actual).isNotNull();
+    assertThat(actual.getRenderingResources()).containsExactly(persistedRenderingResource);
+  }
+
+  @Test
+  @DisplayName("fills RenderingResources for a retrieved DigitalObject by refId")
+  void fillRenderingResourceForGetByRefId() throws ServiceException, RepositoryException {
+    UUID uuid = UUID.randomUUID();
+    DigitalObject persistedDigitalObject =
+        DigitalObject.builder()
+            .uuid(uuid)
+            .label(Locale.GERMAN, "deutschsprachiges Label")
+            .label(Locale.ENGLISH, "english label")
+            .description(Locale.GERMAN, "Beschreibung")
+            .description(Locale.ENGLISH, "description")
+            .refId(42)
+            .build();
+    when(repo.getByRefId(any(Long.class))).thenReturn(persistedDigitalObject);
+
+    FileResource persistedRenderingResource = new TextFileResource();
+    persistedRenderingResource.setLabel(new LocalizedText(Locale.GERMAN, "Linked Data"));
+    persistedRenderingResource.setMimeType(MimeType.fromTypename("text/html"));
+    persistedRenderingResource.setUri(URI.create("https://bla.bla/foo.html"));
+    persistedRenderingResource.setUuid(UUID.randomUUID());
+    persistedRenderingResource.setFilename("foo.html");
+    persistedRenderingResource.setLabel(new LocalizedText(Locale.GERMAN, "Beschreibung"));
+    when(digitalObjectRenderingFileResourceService.getRenderingFileResources(
+            eq(persistedDigitalObject)))
+        .thenReturn(List.of(persistedRenderingResource));
+
+    DigitalObject actual = service.getByRefId(42);
+
+    assertThat(actual).isNotNull();
+    assertThat(actual.getRenderingResources()).containsExactly(persistedRenderingResource);
+  }
+
+  @Test
   @DisplayName(
       "deletes RenderingResources and LinkedDataFileResources of a DigitalObject, when the DigitalObject is delete")
   void deleteRenderingAndLinkedDataFileResources()
@@ -203,7 +332,7 @@ class DigitalObjectServiceImplTest extends AbstractServiceImplTest {
   public void addNonexistingDigitalObjectToItem()
       throws ConflictException, ServiceException, ValidationException {
     DigitalObject digitalObject = createDigitalObject();
-    when(service.getByExample(eq(digitalObject))).thenReturn(null);
+    when(service.getByExamples(eq(List.of(digitalObject)))).thenReturn(List.of());
 
     assertThat(service.setItem(digitalObject, Item.builder().build())).isFalse();
   }
@@ -216,7 +345,7 @@ class DigitalObjectServiceImplTest extends AbstractServiceImplTest {
     DigitalObject digitalObject =
         DigitalObject.builder().uuid(UUID.randomUUID()).item(item).build();
 
-    when(service.getByExample(eq(digitalObject))).thenReturn(digitalObject);
+    when(service.getByExamples(eq(List.of(digitalObject)))).thenReturn(List.of(digitalObject));
 
     assertThat(service.setItem(digitalObject, item)).isTrue();
   }
@@ -230,7 +359,7 @@ class DigitalObjectServiceImplTest extends AbstractServiceImplTest {
     DigitalObject digitalObject =
         DigitalObject.builder().uuid(UUID.randomUUID()).item(otherItem).build();
 
-    when(service.getByExample(eq(digitalObject))).thenReturn(digitalObject);
+    when(service.getByExamples(eq(List.of(digitalObject)))).thenReturn(List.of(digitalObject));
     assertThrows(
         ConflictException.class,
         () -> {
@@ -248,7 +377,7 @@ class DigitalObjectServiceImplTest extends AbstractServiceImplTest {
             .uuid(UUID.randomUUID())
             .label(LocalizedText.builder().text(Locale.ITALY, "Viva Italia!").build())
             .build();
-    when(service.getByExample(eq(digitalObject))).thenReturn(digitalObject);
+    when(service.getByExamples(eq(List.of(digitalObject)))).thenReturn(List.of(digitalObject));
 
     assertThat(service.setItem(digitalObject, item)).isTrue();
   }

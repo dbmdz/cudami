@@ -11,11 +11,7 @@ import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.geo.location.GeoLocationRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.geo.location.HumanSettlementRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.work.ItemRepositoryImpl;
-import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.resource.DigitalObjectLinkedDataFileResourceRepositoryImpl;
-import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.resource.DigitalObjectRenderingFileResourceRepositoryImpl;
-import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.resource.FileResourceMetadataRepositoryImpl;
-import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.resource.ImageFileResourceRepositoryImpl;
-import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.resource.LinkedDataFileResourceRepositoryImpl;
+import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.resource.*;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.legal.LicenseRepositoryImpl;
 import de.digitalcollections.cudami.server.config.BackendIiifServerConfig;
 import de.digitalcollections.iiif.model.ImageContent;
@@ -46,21 +42,6 @@ import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.text.LocalizedStructuredContent;
 import de.digitalcollections.model.text.LocalizedText;
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URL;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
-import java.util.UUID;
-import java.util.Vector;
-import java.util.function.BiConsumer;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.core.generic.GenericType;
 import org.jdbi.v3.core.result.RowView;
@@ -70,6 +51,14 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Repository;
+
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URL;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.*;
+import java.util.function.BiConsumer;
 
 @Repository
 public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObject>
@@ -492,6 +481,16 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
     long total = retrieveCount(countQuery, argumentMappings);
 
     return new PageResponse<>(result, pageRequest, total);
+  }
+
+  @Override
+  public List<DigitalObject> getByUuidsAndFiltering(List<UUID> uuids, Filtering filtering)
+      throws RepositoryException {
+    List<DigitalObject> digitalObjects = super.getByUuidsAndFiltering(uuids, filtering);
+    for (DigitalObject digitalObject : digitalObjects) {
+      fillAttributes(digitalObject);
+    }
+    return digitalObjects;
   }
 
   @Override
