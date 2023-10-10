@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
 
 ## [Unreleased]
 
+### Added
+
+- Added functionality to add a `data-label` attribute to table cells
+
 ## [7.1.0](https://github.com/dbmdz/cudami/releases/tag/7.1.0) - 2023-10-10
 
 ### Added
