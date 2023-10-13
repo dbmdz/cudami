@@ -184,6 +184,7 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
     super.fullReduceRowsBiConsumer(map, rowView);
     I identifiable = map.get(rowView.getColumn(mappingPrefix + "_uuid", UUID.class));
 
+    setPreviewImageIdentifier(rowView, identifiable);
     setTagsFromRowView(rowView, identifiable);
     setSubjectsFromRowView(rowView, identifiable);
   }
@@ -585,67 +586,79 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
       throws RepositoryException {
     StringBuilder sql =
         new StringBuilder(
-            "SELECT"
-                + fieldsSql
-                + ","
-                + IdentifierRepositoryImpl.sqlSelectAllFields(
-                    IdentifierRepositoryImpl.TABLE_ALIAS, IdentifierRepositoryImpl.MAPPING_PREFIX)
-                + ","
-                + ImageFileResourceRepositoryImpl.SQL_PREVIEW_IMAGE_FIELDS_PI
-                + ", "
-                + UrlAliasRepositoryImpl.sqlSelectReducedFields(
-                    UrlAliasRepositoryImpl.TABLE_ALIAS, UrlAliasRepositoryImpl.MAPPING_PREFIX)
-                + ", "
-                + TagRepositoryImpl.sqlSelectReducedFields(
-                    TagRepositoryImpl.TABLE_ALIAS, TagRepositoryImpl.MAPPING_PREFIX)
-                + ", "
-                + SubjectRepositoryImpl.sqlSelectReducedFields(
-                    SubjectRepositoryImpl.TABLE_ALIAS, SubjectRepositoryImpl.MAPPING_PREFIX)
-                + " FROM "
-                + (StringUtils.hasText(innerSelect) ? innerSelect : tableName)
-                + " AS "
-                + tableAlias
-                + (StringUtils.hasText(sqlAdditionalJoins)
-                    ? " %s".formatted(sqlAdditionalJoins)
-                    : "")
-                + (StringUtils.hasText(getSqlSelectAllFieldsJoins())
-                    ? " %s".formatted(getSqlSelectAllFieldsJoins())
-                    : "")
-                + (StringUtils.hasText(getSqlSelectReducedFieldsJoins())
-                    ? " %s".formatted(getSqlSelectReducedFieldsJoins())
-                    : "")
-                + " LEFT JOIN "
-                + IdentifierRepositoryImpl.TABLE_NAME
-                + " AS "
-                + IdentifierRepositoryImpl.TABLE_ALIAS
-                + " ON "
-                + tableAlias
-                + ".uuid = "
-                + IdentifierRepositoryImpl.TABLE_ALIAS
-                + ".identifiable"
-                + " LEFT JOIN "
-                + ImageFileResourceRepositoryImpl.TABLE_NAME
-                + " AS file ON "
-                + tableAlias
-                + ".previewfileresource = file.uuid"
-                + " LEFT JOIN "
-                + UrlAliasRepositoryImpl.TABLE_NAME
-                + " AS "
-                + UrlAliasRepositoryImpl.TABLE_ALIAS
-                + " ON "
-                + tableAlias
-                + ".uuid = "
-                + UrlAliasRepositoryImpl.TABLE_ALIAS
-                + ".target_uuid"
-                + urlAliasRepository.getSqlSelectReducedFieldsJoins()
-                + " LEFT JOIN %1$s %2$s ON %2$s.uuid = ANY(%3$s.tags_uuids)"
-                    .formatted(
-                        TagRepositoryImpl.TABLE_NAME, TagRepositoryImpl.TABLE_ALIAS, tableAlias)
-                + " LEFT JOIN %1$s %2$s ON %2$s.uuid = ANY(%3$s.subjects_uuids)"
-                    .formatted(
-                        SubjectRepositoryImpl.TABLE_NAME,
-                        SubjectRepositoryImpl.TABLE_ALIAS,
-                        tableAlias));
+            ("""
+            SELECT {{fieldsSql}}, {{identifierFields}},
+              {{imageFileFields}}, {{imageFileIdentifierFields}},
+              {{urlAliasFields}}, {{tagFields}}, {{subjectFields}}
+            FROM {{mainTable}} {{mainAlias}}
+            """
+                    // extra joins
+                    + (StringUtils.hasText(sqlAdditionalJoins)
+                        ? "%s\n".formatted(sqlAdditionalJoins)
+                        : "")
+                    + (StringUtils.hasText(getSqlSelectAllFieldsJoins())
+                        ? "%s\n".formatted(getSqlSelectAllFieldsJoins())
+                        : "")
+                    + (StringUtils.hasText(getSqlSelectReducedFieldsJoins())
+                        ? "%s\n".formatted(getSqlSelectReducedFieldsJoins())
+                        : "")
+                    // regular identifiable joins
+                    + """
+            LEFT JOIN {{identifierTable}} AS {{identifierAlias}}
+              ON  {{mainAlias}}.uuid = {{identifierAlias}}.identifiable
+            LEFT JOIN (
+              {{imageFileTable}} AS file LEFT JOIN {{identifierTable}} file_id
+              ON file_id.identifiable = file.uuid
+            ) ON {{mainAlias}}.previewfileresource = file.uuid
+            LEFT JOIN {{urlAliasTable}} AS {{urlAliasAlias}}
+              ON  {{mainAlias}}.uuid = {{urlAliasAlias}}.target_uuid
+            {{urlAliasExtraJoins}}
+            LEFT JOIN {{tagTable}} {{tagAlias}}
+              ON {{tagAlias}}.uuid = ANY({{mainAlias}}.tags_uuids)
+            LEFT JOIN {{subjectTable}} {{subjectAlias}}
+              ON {{subjectAlias}}.uuid = ANY({{mainAlias}}.subjects_uuids)
+            """)
+                // fields
+                .replace("{{fieldsSql}}", fieldsSql)
+                .replace(
+                    "{{identifierFields}}",
+                    IdentifierRepositoryImpl.sqlSelectAllFields(
+                        IdentifierRepositoryImpl.TABLE_ALIAS,
+                        IdentifierRepositoryImpl.MAPPING_PREFIX))
+                .replace(
+                    "{{imageFileFields}}",
+                    ImageFileResourceRepositoryImpl.SQL_PREVIEW_IMAGE_FIELDS_PI)
+                .replace(
+                    "{{imageFileIdentifierFields}}",
+                    IdentifierRepositoryImpl.sqlSelectAllFields("file_id", "file_id"))
+                .replace(
+                    "{{urlAliasFields}}",
+                    UrlAliasRepositoryImpl.sqlSelectReducedFields(
+                        UrlAliasRepositoryImpl.TABLE_ALIAS, UrlAliasRepositoryImpl.MAPPING_PREFIX))
+                .replace(
+                    "{{tagFields}}",
+                    TagRepositoryImpl.sqlSelectReducedFields(
+                        TagRepositoryImpl.TABLE_ALIAS, TagRepositoryImpl.MAPPING_PREFIX))
+                .replace(
+                    "{{subjectFields}}",
+                    SubjectRepositoryImpl.sqlSelectReducedFields(
+                        SubjectRepositoryImpl.TABLE_ALIAS, SubjectRepositoryImpl.MAPPING_PREFIX))
+                // main table or inner select
+                .replace(
+                    "{{mainTable}}", StringUtils.hasText(innerSelect) ? innerSelect : tableName)
+                .replace("{{mainAlias}}", tableAlias)
+                // joined tables
+                .replace("{{identifierTable}}", IdentifierRepositoryImpl.TABLE_NAME)
+                .replace("{{identifierAlias}}", IdentifierRepositoryImpl.TABLE_ALIAS)
+                .replace("{{imageFileTable}}", ImageFileResourceRepositoryImpl.TABLE_NAME)
+                .replace("{{urlAliasTable}}", UrlAliasRepositoryImpl.TABLE_NAME)
+                .replace("{{urlAliasAlias}}", UrlAliasRepositoryImpl.TABLE_ALIAS)
+                .replace(
+                    "{{urlAliasExtraJoins}}", urlAliasRepository.getSqlSelectReducedFieldsJoins())
+                .replace("{{tagTable}}", TagRepositoryImpl.TABLE_NAME)
+                .replace("{{tagAlias}}", TagRepositoryImpl.TABLE_ALIAS)
+                .replace("{{subjectTable}}", SubjectRepositoryImpl.TABLE_NAME)
+                .replace("{{subjectAlias}}", SubjectRepositoryImpl.TABLE_ALIAS));
 
     if (argumentMappings == null) {
       argumentMappings = new HashMap<>(0);
@@ -757,6 +770,20 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
       previewImage.setUri(rowView.getColumn("pi_uri", URI.class));
       identifiable.setPreviewImage(previewImage);
     }
+  }
+
+  private void setPreviewImageIdentifier(RowView rowView, I identifiable) {
+    UUID identifierUuid = rowView.getColumn("file_id_uuid", UUID.class);
+    if (identifierUuid == null) return;
+    Identifier id =
+        Identifier.builder()
+            .uuid(identifierUuid)
+            .created(rowView.getColumn("file_id_created", LocalDateTime.class))
+            .lastModified(rowView.getColumn("file_id_last_modified", LocalDateTime.class))
+            .namespace(rowView.getColumn("file_id_namespace", String.class))
+            .id(rowView.getColumn("file_id_identifier", String.class))
+            .build();
+    identifiable.getPreviewImage().addIdentifier(id);
   }
 
   @Override
