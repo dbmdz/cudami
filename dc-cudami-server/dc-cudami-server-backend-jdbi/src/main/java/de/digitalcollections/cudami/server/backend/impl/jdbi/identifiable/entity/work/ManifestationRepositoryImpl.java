@@ -20,7 +20,13 @@ import de.digitalcollections.model.identifiable.entity.agent.CorporateBody;
 import de.digitalcollections.model.identifiable.entity.agent.Family;
 import de.digitalcollections.model.identifiable.entity.agent.Person;
 import de.digitalcollections.model.identifiable.entity.geo.location.HumanSettlement;
-import de.digitalcollections.model.identifiable.entity.manifestation.*;
+import de.digitalcollections.model.identifiable.entity.manifestation.DistributionInfo;
+import de.digitalcollections.model.identifiable.entity.manifestation.ExpressionType;
+import de.digitalcollections.model.identifiable.entity.manifestation.Manifestation;
+import de.digitalcollections.model.identifiable.entity.manifestation.ProductionInfo;
+import de.digitalcollections.model.identifiable.entity.manifestation.PublicationInfo;
+import de.digitalcollections.model.identifiable.entity.manifestation.Publisher;
+import de.digitalcollections.model.identifiable.entity.manifestation.PublishingInfo;
 import de.digitalcollections.model.identifiable.entity.relation.EntityRelation;
 import de.digitalcollections.model.identifiable.entity.work.Work;
 import de.digitalcollections.model.list.filtering.Filtering;
@@ -33,8 +39,15 @@ import de.digitalcollections.model.time.LocalDateRange;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.lang.reflect.InvocationTargetException;
 import java.time.LocalDateTime;
-import java.util.*;
-import java.util.function.BiConsumer;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.Vector;
 import java.util.stream.Stream;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.core.JdbiException;
@@ -138,41 +151,42 @@ public class ManifestationRepositoryImpl extends EntityRepositoryImpl<Manifestat
   }
 
   @Override
-  protected BiConsumer<Map<UUID, Manifestation>, RowView> createAdditionalReduceRowsBiConsumer() {
-    return (map, rowView) -> {
-      Manifestation manifestation =
-          map.get(rowView.getColumn(MAPPING_PREFIX + "_uuid", UUID.class));
-      // This object should exist already. If not, the mistake is somewhere in
-      // IdentifiableRepo.
+  protected void fullReduceRowsBiConsumer(Map<UUID, Manifestation> map, RowView rowView) {
+    super.fullReduceRowsBiConsumer(map, rowView);
+    Manifestation manifestation = map.get(rowView.getColumn(MAPPING_PREFIX + "_uuid", UUID.class));
+    // This object should exist already. If not, the mistake is somewhere in
+    // IdentifiableRepo.
 
-      // publishers
-      Agent publAgent = null;
-      if (rowView.getColumn(AgentRepositoryImpl.MAPPING_PREFIX + "_uuid", UUID.class) != null) {
-        Agent ag = rowView.getRow(Agent.class);
-        publAgent =
-            switch (ag.getIdentifiableObjectType()) {
-              case CORPORATE_BODY -> DerivedAgentBuildHelper.build(ag, CorporateBody.class);
-              case PERSON -> DerivedAgentBuildHelper.build(ag, Person.class);
-              case FAMILY -> DerivedAgentBuildHelper.build(ag, Family.class);
-              default -> ag;
-            };
-      }
-      HumanSettlement publPlace =
-          rowView.getColumn(HumanSettlementRepositoryImpl.MAPPING_PREFIX + "_uuid", UUID.class)
-                  != null
-              ? rowView.getRow(HumanSettlement.class)
-              : null;
-      if (manifestation.getDistributionInfo() != null)
-        fillPublishers(manifestation.getDistributionInfo().getPublishers(), publAgent, publPlace);
-      if (manifestation.getProductionInfo() != null)
-        fillPublishers(manifestation.getProductionInfo().getPublishers(), publAgent, publPlace);
-      if (manifestation.getPublicationInfo() != null)
-        fillPublishers(manifestation.getPublicationInfo().getPublishers(), publAgent, publPlace);
-    };
+    // publishers
+    Agent publAgent = null;
+    if (rowView.getColumn(AgentRepositoryImpl.MAPPING_PREFIX + "_uuid", UUID.class) != null) {
+      Agent ag = rowView.getRow(Agent.class);
+      publAgent =
+          switch (ag.getIdentifiableObjectType()) {
+            case CORPORATE_BODY -> DerivedAgentBuildHelper.build(ag, CorporateBody.class);
+            case PERSON -> DerivedAgentBuildHelper.build(ag, Person.class);
+            case FAMILY -> DerivedAgentBuildHelper.build(ag, Family.class);
+            default -> ag;
+          };
+    }
+    HumanSettlement publPlace =
+        rowView.getColumn(HumanSettlementRepositoryImpl.MAPPING_PREFIX + "_uuid", UUID.class)
+                != null
+            ? rowView.getRow(HumanSettlement.class)
+            : null;
+    if (manifestation.getDistributionInfo() != null)
+      fillPublishers(manifestation.getDistributionInfo().getPublishers(), publAgent, publPlace);
+    if (manifestation.getProductionInfo() != null)
+      fillPublishers(manifestation.getProductionInfo().getPublishers(), publAgent, publPlace);
+    if (manifestation.getPublicationInfo() != null)
+      fillPublishers(manifestation.getPublicationInfo().getPublishers(), publAgent, publPlace);
   }
 
   @Override
-  protected void extendReducedIdentifiable(Manifestation manifestation, RowView rowView) {
+  protected void basicReduceRowsBiConsumer(Map<UUID, Manifestation> map, RowView rowView) {
+    super.basicReduceRowsBiConsumer(map, rowView);
+    Manifestation manifestation = map.get(rowView.getColumn(mappingPrefix + "_uuid", UUID.class));
+
     // parents
     UUID parentUuid = rowView.getColumn("parent_uuid", UUID.class);
     if (parentUuid != null) {

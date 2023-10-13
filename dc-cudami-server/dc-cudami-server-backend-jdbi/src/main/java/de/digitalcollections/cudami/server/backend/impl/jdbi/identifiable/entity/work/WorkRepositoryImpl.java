@@ -100,7 +100,10 @@ public class WorkRepositoryImpl extends EntityRepositoryImpl<Work> implements Wo
   }
 
   @Override
-  protected void extendReducedIdentifiable(Work work, RowView rowView) {
+  protected void basicReduceRowsBiConsumer(Map<UUID, Work> map, RowView rowView) {
+    super.basicReduceRowsBiConsumer(map, rowView);
+    Work work = map.get(rowView.getColumn(mappingPrefix + "_uuid", UUID.class));
+
     // parents
     UUID parentUuid = rowView.getColumn("parent_uuid", UUID.class);
     if (parentUuid != null) {

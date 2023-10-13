@@ -35,6 +35,7 @@ import de.digitalcollections.model.semantic.Tag;
 import de.digitalcollections.model.text.LocalizedText;
 import java.net.URI;
 import java.net.URL;
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -45,7 +46,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
-import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -170,50 +170,22 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
   }
 
   @Override
-  protected BiConsumer<Map<UUID, I>, RowView> createAdditionalReduceRowsBiConsumer() {
-    if (additionalReduceRowsBiConsumer == null) {
-      return super.createAdditionalReduceRowsBiConsumer();
-    }
-    return additionalReduceRowsBiConsumer;
+  protected void basicReduceRowsBiConsumer(Map<UUID, I> map, RowView rowView) {
+    super.basicReduceRowsBiConsumer(map, rowView);
+    I identifiable = map.get(rowView.getColumn(mappingPrefix + "_uuid", UUID.class));
+
+    setPreviewImageFromRowView(rowView, identifiable);
+    setIdentifiersFromRowView(rowView, identifiable);
+    setLocalizedUrlAliasesFromRowView(rowView, identifiable);
   }
 
   @Override
-  protected BiConsumer<Map<UUID, I>, RowView> createBasicReduceRowsBiConsumer() {
-    return (map, rowView) -> {
-      I identifiable =
-          map.computeIfAbsent(
-              rowView.getColumn(mappingPrefix + "_uuid", UUID.class),
-              fn -> {
-                return (I) rowView.getRow(uniqueObjectImplClass);
-              });
+  protected void fullReduceRowsBiConsumer(Map<UUID, I> map, RowView rowView) {
+    super.fullReduceRowsBiConsumer(map, rowView);
+    I identifiable = map.get(rowView.getColumn(mappingPrefix + "_uuid", UUID.class));
 
-      setPreviewImageFromRowView(rowView, identifiable);
-      setIdentifiersFromRowView(rowView, identifiable);
-      setLocalizedUrlAliasesFromRowView(rowView, identifiable);
-
-      extendReducedIdentifiable(identifiable, rowView);
-    };
-  }
-
-  @Override
-  protected BiConsumer<Map<UUID, I>, RowView> createFullReduceRowsBiConcumer() {
-    return (map, rowView) -> {
-      I identifiable =
-          map.computeIfAbsent(
-              rowView.getColumn(mappingPrefix + "_uuid", UUID.class),
-              fn -> {
-                return (I) rowView.getRow(uniqueObjectImplClass);
-              });
-
-      setPreviewImageFromRowView(rowView, identifiable);
-      setIdentifiersFromRowView(rowView, identifiable);
-      setLocalizedUrlAliasesFromRowView(rowView, identifiable);
-
-      setTagsFromRowView(rowView, identifiable);
-      setSubjectsFromRowView(rowView, identifiable);
-
-      extendReducedIdentifiable(identifiable, rowView);
-    };
+    setTagsFromRowView(rowView, identifiable);
+    setSubjectsFromRowView(rowView, identifiable);
   }
 
   @Override
@@ -240,16 +212,6 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
     }
     identifierRepository.delete(identifiable.getIdentifiers());
     return true;
-  }
-
-  /**
-   * Extend the reduced Identifiable by the contents of the provided RowView
-   *
-   * @param identifiable the reduced Identifiable
-   * @param rowView the rowView
-   */
-  protected void extendReducedIdentifiable(I identifiable, RowView rowView) {
-    // do nothing by default
   }
 
   @Override
@@ -593,7 +555,7 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
               return handle
                   .createQuery(sql)
                   .bindMap(argumentMappings)
-                  .reduceRows(basicReduceRowsBiConsumer)
+                  .reduceRows(this::basicReduceRowsBiConsumer)
                   .collect(Collectors.toList());
             });
     return result;
@@ -698,8 +660,8 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
                         .bindMap(bindMap)
                         .reduceRows(
                             (Map<UUID, I> map, RowView rowView) -> {
-                              fullReduceRowsBiConsumer.accept(map, rowView);
-                              additionalReduceRowsBiConsumer.accept(map, rowView);
+                              fullReduceRowsBiConsumer(map, rowView);
+                              additionalReduceRowsBiConsumer(map, rowView);
                             }))
             .findFirst()
             .orElse(null);
@@ -782,12 +744,13 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
       // file.uuid pi_uuid, file.filename pi_filename, file.mimetype pi_mimeType,
       // file.uri pi_uri, file.http_base_url pi_httpBaseUrl
 
-      // TODO workaround as long at is not possible to register two RowMappers for one
-      // type
-      // but for different prefixes (unitl now the first takes precedence),
+      // TODO workaround as long as it is not possible to register two RowMappers for one
+      // type but for different prefixes (until now the first takes precedence),
       // see discussion https://groups.google.com/g/jdbi/c/UhVygrtoH0U
+      if (identifiable.getPreviewImage() != null) return;
       ImageFileResource previewImage = new ImageFileResource();
       previewImage.setUuid(rowView.getColumn("pi_uuid", UUID.class));
+      previewImage.setLabel(rowView.getColumn("pi_label", LocalizedText.class));
       previewImage.setFilename(rowView.getColumn("pi_filename", String.class));
       previewImage.setHttpBaseUrl(rowView.getColumn("pi_httpBaseUrl", URL.class));
       previewImage.setMimeType(rowView.getColumn("pi_mimeType", MimeType.class));

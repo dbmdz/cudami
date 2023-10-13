@@ -20,7 +20,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.core.result.RowView;
@@ -72,55 +71,53 @@ public class PersonRepositoryImpl extends AgentRepositoryImpl<Person> implements
   }
 
   @Override
-  protected BiConsumer<Map<UUID, Person>, RowView> createAdditionalReduceRowsBiConsumer() {
-    return (map, rowView) -> {
-      // entity should be already in map, as we here just add additional data
-      Person person = map.get(rowView.getColumn(mappingPrefix + "_uuid", UUID.class));
+  protected void fullReduceRowsBiConsumer(Map<UUID, Person> map, RowView rowView) {
+    super.fullReduceRowsBiConsumer(map, rowView);
+    // entity should be already in map, as we here just add additional data
+    Person person = map.get(rowView.getColumn(mappingPrefix + "_uuid", UUID.class));
 
-      if (rowView.getColumn("glbirth_uuid", UUID.class) != null) {
-        UUID glBirthUuid = rowView.getColumn("glbirth_uuid", UUID.class);
-        Long glRefId = rowView.getColumn("glbirth_refid", Long.class);
-        LocalizedText label = rowView.getColumn("glbirth_label", LocalizedText.class);
-        GeoLocationType geoLocationType =
-            rowView.getColumn("glbirth_geoLocationType", GeoLocationType.class);
-        final GeoLocation placeOfBirth = new GeoLocation();
-        placeOfBirth.setUuid(glBirthUuid);
-        placeOfBirth.setRefId(glRefId);
-        placeOfBirth.setLabel(label);
-        placeOfBirth.setGeoLocationType(geoLocationType);
-        person.setPlaceOfBirth(placeOfBirth);
-      }
+    if (rowView.getColumn("glbirth_uuid", UUID.class) != null) {
+      UUID glBirthUuid = rowView.getColumn("glbirth_uuid", UUID.class);
+      Long glRefId = rowView.getColumn("glbirth_refid", Long.class);
+      LocalizedText label = rowView.getColumn("glbirth_label", LocalizedText.class);
+      GeoLocationType geoLocationType =
+          rowView.getColumn("glbirth_geoLocationType", GeoLocationType.class);
+      final GeoLocation placeOfBirth = new GeoLocation();
+      placeOfBirth.setUuid(glBirthUuid);
+      placeOfBirth.setRefId(glRefId);
+      placeOfBirth.setLabel(label);
+      placeOfBirth.setGeoLocationType(geoLocationType);
+      person.setPlaceOfBirth(placeOfBirth);
+    }
 
-      if (rowView.getColumn("gldeath_uuid", UUID.class) != null) {
-        UUID glDeathUuid = rowView.getColumn("gldeath_uuid", UUID.class);
-        Long glRefId = rowView.getColumn("gldeath_refid", Long.class);
-        LocalizedText label = rowView.getColumn("gldeath_label", LocalizedText.class);
-        GeoLocationType geoLocationType =
-            rowView.getColumn("gldeath_geoLocationType", GeoLocationType.class);
-        final GeoLocation placeOfDeath = new GeoLocation();
-        placeOfDeath.setUuid(glDeathUuid);
-        placeOfDeath.setRefId(glRefId);
-        placeOfDeath.setLabel(label);
-        placeOfDeath.setGeoLocationType(geoLocationType);
-        person.setPlaceOfDeath(placeOfDeath);
-      }
+    if (rowView.getColumn("gldeath_uuid", UUID.class) != null) {
+      UUID glDeathUuid = rowView.getColumn("gldeath_uuid", UUID.class);
+      Long glRefId = rowView.getColumn("gldeath_refid", Long.class);
+      LocalizedText label = rowView.getColumn("gldeath_label", LocalizedText.class);
+      GeoLocationType geoLocationType =
+          rowView.getColumn("gldeath_geoLocationType", GeoLocationType.class);
+      final GeoLocation placeOfDeath = new GeoLocation();
+      placeOfDeath.setUuid(glDeathUuid);
+      placeOfDeath.setRefId(glRefId);
+      placeOfDeath.setLabel(label);
+      placeOfDeath.setGeoLocationType(geoLocationType);
+      person.setPlaceOfDeath(placeOfDeath);
+    }
 
-      try {
-        if (rowView.getColumn(FamilyNameRepositoryImpl.MAPPING_PREFIX + "_uuid", UUID.class)
-            != null) {
-          person.getFamilyNames().add(rowView.getRow(FamilyName.class));
-        }
-        if (rowView.getColumn(GivenNameRepositoryImpl.MAPPING_PREFIX + "_uuid", UUID.class)
-            != null) {
-          person.getGivenNames().add(rowView.getRow(GivenName.class));
-        }
-      } catch (Exception e) {
-        // TODO to avoid this, some boolean params has to be given to function, if
-        // fields should
-        // exist.
-        LOGGER.debug("No family name or given name in rowview. Skipping.");
+    try {
+      if (rowView.getColumn(FamilyNameRepositoryImpl.MAPPING_PREFIX + "_uuid", UUID.class)
+          != null) {
+        person.getFamilyNames().add(rowView.getRow(FamilyName.class));
       }
-    };
+      if (rowView.getColumn(GivenNameRepositoryImpl.MAPPING_PREFIX + "_uuid", UUID.class) != null) {
+        person.getGivenNames().add(rowView.getRow(GivenName.class));
+      }
+    } catch (Exception e) {
+      // TODO to avoid this, some boolean params has to be given to function, if
+      // fields should
+      // exist.
+      LOGGER.debug("No family name or given name in rowview. Skipping.");
+    }
   }
 
   @Override

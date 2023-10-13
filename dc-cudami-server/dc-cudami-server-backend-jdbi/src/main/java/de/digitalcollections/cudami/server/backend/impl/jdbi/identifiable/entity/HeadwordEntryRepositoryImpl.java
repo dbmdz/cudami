@@ -20,7 +20,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.core.result.RowView;
@@ -66,23 +65,21 @@ public class HeadwordEntryRepositoryImpl extends EntityRepositoryImpl<HeadwordEn
   }
 
   @Override
-  protected BiConsumer<Map<UUID, HeadwordEntry>, RowView> createAdditionalReduceRowsBiConsumer() {
-    return (map, rowView) -> {
-      // entity should be already in map, as we here just add additional data
-      HeadwordEntry headwordEntry =
-          map.get(rowView.getColumn(MAPPING_PREFIX + "_uuid", UUID.class));
+  protected void fullReduceRowsBiConsumer(Map<UUID, HeadwordEntry> map, RowView rowView) {
+    super.fullReduceRowsBiConsumer(map, rowView);
+    // entity should be already in map, as we here just add additional data
+    HeadwordEntry headwordEntry = map.get(rowView.getColumn(MAPPING_PREFIX + "_uuid", UUID.class));
 
-      if (rowView.getColumn(HeadwordRepositoryImpl.MAPPING_PREFIX + "_uuid", UUID.class) != null) {
-        UUID headwordUuid =
-            rowView.getColumn(HeadwordRepositoryImpl.MAPPING_PREFIX + "_uuid", UUID.class);
-        String label =
-            rowView.getColumn(HeadwordRepositoryImpl.MAPPING_PREFIX + "_label", String.class);
-        final Headword headword = new Headword();
-        headword.setUuid(headwordUuid);
-        headword.setLabel(label);
-        headwordEntry.setHeadword(headword);
-      }
-    };
+    if (rowView.getColumn(HeadwordRepositoryImpl.MAPPING_PREFIX + "_uuid", UUID.class) != null) {
+      UUID headwordUuid =
+          rowView.getColumn(HeadwordRepositoryImpl.MAPPING_PREFIX + "_uuid", UUID.class);
+      String label =
+          rowView.getColumn(HeadwordRepositoryImpl.MAPPING_PREFIX + "_label", String.class);
+      final Headword headword = new Headword();
+      headword.setUuid(headwordUuid);
+      headword.setLabel(label);
+      headwordEntry.setHeadword(headword);
+    }
   }
 
   @Override

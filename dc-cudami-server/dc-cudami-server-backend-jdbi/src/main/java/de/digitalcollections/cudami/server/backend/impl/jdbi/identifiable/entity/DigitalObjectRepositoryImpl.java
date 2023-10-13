@@ -5,9 +5,11 @@ import de.digitalcollections.cudami.server.backend.api.repository.exceptions.Rep
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.alias.UrlAliasRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.DigitalObjectRepository;
+import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.agent.AgentRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.agent.CorporateBodyRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.agent.PersonRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.geo.location.GeoLocationRepositoryImpl;
+import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.geo.location.HumanSettlementRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.work.ItemRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.resource.FileResourceMetadataRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.resource.ImageFileResourceRepositoryImpl;
@@ -19,13 +21,17 @@ import de.digitalcollections.iiif.model.jackson.IiifObjectMapper;
 import de.digitalcollections.iiif.model.sharedcanvas.Canvas;
 import de.digitalcollections.iiif.model.sharedcanvas.Manifest;
 import de.digitalcollections.model.file.MimeType;
+import de.digitalcollections.model.identifiable.IdentifiableObjectType;
 import de.digitalcollections.model.identifiable.Identifier;
 import de.digitalcollections.model.identifiable.entity.Collection;
 import de.digitalcollections.model.identifiable.entity.Project;
 import de.digitalcollections.model.identifiable.entity.agent.Agent;
+import de.digitalcollections.model.identifiable.entity.agent.CorporateBody;
+import de.digitalcollections.model.identifiable.entity.agent.Person;
 import de.digitalcollections.model.identifiable.entity.digitalobject.CreationInfo;
 import de.digitalcollections.model.identifiable.entity.digitalobject.DigitalObject;
 import de.digitalcollections.model.identifiable.entity.geo.location.GeoLocation;
+import de.digitalcollections.model.identifiable.entity.geo.location.HumanSettlement;
 import de.digitalcollections.model.identifiable.entity.item.Item;
 import de.digitalcollections.model.identifiable.resource.FileResource;
 import de.digitalcollections.model.identifiable.resource.ImageFileResource;
@@ -33,19 +39,21 @@ import de.digitalcollections.model.legal.License;
 import de.digitalcollections.model.list.filtering.Filtering;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
+import de.digitalcollections.model.text.LocalizedStructuredContent;
 import de.digitalcollections.model.text.LocalizedText;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
-import java.util.function.BiConsumer;
 import org.jdbi.v3.core.Jdbi;
+import org.jdbi.v3.core.generic.GenericType;
 import org.jdbi.v3.core.result.RowView;
 import org.jdbi.v3.core.statement.PreparedBatch;
 import org.slf4j.Logger;
@@ -156,16 +164,15 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
   }
 
   @Override
-  protected BiConsumer<Map<UUID, DigitalObject>, RowView> createAdditionalReduceRowsBiConsumer() {
-    return (map, rowView) -> {
-      DigitalObject digitalObject =
-          map.get(rowView.getColumn(MAPPING_PREFIX + "_uuid", UUID.class));
+  protected void fullReduceRowsBiConsumer(Map<UUID, DigitalObject> map, RowView rowView) {
+    super.fullReduceRowsBiConsumer(map, rowView);
+    DigitalObject digitalObject = map.get(rowView.getColumn(MAPPING_PREFIX + "_uuid", UUID.class));
 
-      // Try to fill license subresource with uuid, url and label
-      License license = rowView.getRow(License.class);
-      if (license.getUuid() != null) {
-        digitalObject.setLicense(license);
-      }
+    // Try to fill license subresource with uuid, url and label
+    License license = rowView.getRow(License.class);
+    if (license.getUuid() != null) {
+      digitalObject.setLicense(license);
+    }
 
       // Try to fill UUID of geolocation of creator
       UUID creationCreatorUuid =
@@ -192,12 +199,11 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
         digitalObject.setCreationInfo(creationInfo);
       }
 
-      Integer numberOfBinaryResources =
-          rowView.getColumn(MAPPING_PREFIX + "_number_binaryresources", Integer.class);
-      if (numberOfBinaryResources != null) {
-        digitalObject.setNumberOfBinaryResources(numberOfBinaryResources);
-      }
-    };
+    Integer numberOfBinaryResources =
+        rowView.getColumn(MAPPING_PREFIX + "_number_binaryresources", Integer.class);
+    if (numberOfBinaryResources != null) {
+      digitalObject.setNumberOfBinaryResources(numberOfBinaryResources);
+    }
   }
 
   @Override
@@ -211,8 +217,9 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
   }
 
   @Override
-  protected void extendReducedIdentifiable(DigitalObject identifiable, RowView rowView) {
-    super.extendReducedIdentifiable(identifiable, rowView);
+  protected void basicReduceRowsBiConsumer(Map<UUID, DigitalObject> map, RowView rowView) {
+    super.basicReduceRowsBiConsumer(map, rowView);
+    DigitalObject identifiable = map.get(rowView.getColumn(mappingPrefix + "_uuid", UUID.class));
 
     // Fill the parent (empty, only with uuid), if present.
     UUID parentUuid = rowView.getColumn(MAPPING_PREFIX + "_parent_uuid", UUID.class);

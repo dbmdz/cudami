@@ -25,7 +25,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
-import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.core.JdbiException;
@@ -105,55 +104,44 @@ public class UrlAliasRepositoryImpl extends UniqueObjectRepositoryImpl<UrlAlias>
   }
 
   @Override
-  protected BiConsumer<Map<UUID, UrlAlias>, RowView> createBasicReduceRowsBiConsumer() {
-    return (map, rowView) -> {
-      UrlAlias urlAlias =
-          map.computeIfAbsent(
-              rowView.getColumn(mappingPrefix + "_uuid", UUID.class),
-              fn -> {
-                return (UrlAlias) rowView.getRow(uniqueObjectImplClass);
-              });
+  protected void basicReduceRowsBiConsumer(Map<UUID, UrlAlias> map, RowView rowView) {
+    super.basicReduceRowsBiConsumer(map, rowView);
+    UrlAlias urlAlias = map.get(rowView.getColumn(mappingPrefix + "_uuid", UUID.class));
 
-      /*
-       * + tableAlias +
-       * ".target_identifiable_objecttype uaidf_identifiableObjectType, " +
-       * tableAlias + ".target_identifiable_type uaidf_identifiableType, " +
-       * tableAlias + ".target_uuid uaidf_uuid, "
-       */
-      if (rowView.getColumn("uaidf_uuid", UUID.class) != null) {
-        UUID targetUuid = rowView.getColumn("uaidf_uuid", UUID.class);
-        IdentifiableType targetIdentifiableType =
-            rowView.getColumn("uaidf_identifiableType", IdentifiableType.class);
-        IdentifiableObjectType targetIdentifiableObjectType =
-            rowView.getColumn("uaidf_identifiableObjectType", IdentifiableObjectType.class);
+    /*
+     * + tableAlias +
+     * ".target_identifiable_objecttype uaidf_identifiableObjectType, " +
+     * tableAlias + ".target_identifiable_type uaidf_identifiableType, " +
+     * tableAlias + ".target_uuid uaidf_uuid, "
+     */
+    if (rowView.getColumn("uaidf_uuid", UUID.class) != null) {
+      UUID targetUuid = rowView.getColumn("uaidf_uuid", UUID.class);
+      IdentifiableType targetIdentifiableType =
+          rowView.getColumn("uaidf_identifiableType", IdentifiableType.class);
+      IdentifiableObjectType targetIdentifiableObjectType =
+          rowView.getColumn("uaidf_identifiableObjectType", IdentifiableObjectType.class);
 
-        Identifiable target = new Identifiable();
-        target.setUuid(targetUuid);
-        target.setType(targetIdentifiableType);
-        target.setIdentifiableObjectType(targetIdentifiableObjectType);
-        urlAlias.setTarget(target);
-      }
+      Identifiable target = new Identifiable();
+      target.setUuid(targetUuid);
+      target.setType(targetIdentifiableType);
+      target.setIdentifiableObjectType(targetIdentifiableObjectType);
+      urlAlias.setTarget(target);
+    }
 
-      /*
-       * + WebsiteRepositoryImpl.TABLE_ALIAS + ".uuid uawebs_uuid, " +
-       * WebsiteRepositoryImpl.TABLE_ALIAS + ".label uawebs_label, " +
-       * WebsiteRepositoryImpl.TABLE_ALIAS + ".url uawebs_url";
-       */
-      if (rowView.getColumn("uawebs_uuid", UUID.class) != null) {
-        UUID websiteUuid = rowView.getColumn("uawebs_uuid", UUID.class);
-        LocalizedText websiteLabel = rowView.getColumn("uawebs_label", LocalizedText.class);
+    /*
+     * + WebsiteRepositoryImpl.TABLE_ALIAS + ".uuid uawebs_uuid, " +
+     * WebsiteRepositoryImpl.TABLE_ALIAS + ".label uawebs_label, " +
+     * WebsiteRepositoryImpl.TABLE_ALIAS + ".url uawebs_url";
+     */
+    if (rowView.getColumn("uawebs_uuid", UUID.class) != null) {
+      UUID websiteUuid = rowView.getColumn("uawebs_uuid", UUID.class);
+      LocalizedText websiteLabel = rowView.getColumn("uawebs_label", LocalizedText.class);
 
-        Website website = new Website();
-        website.setUuid(websiteUuid);
-        website.setLabel(websiteLabel);
-        urlAlias.setWebsite(website);
-      }
-    };
-  }
-
-  @Override
-  protected BiConsumer<Map<UUID, UrlAlias>, RowView> createFullReduceRowsBiConcumer() {
-    return createBasicReduceRowsBiConsumer();
+      Website website = new Website();
+      website.setUuid(websiteUuid);
+      website.setLabel(websiteLabel);
+      urlAlias.setWebsite(website);
+    }
   }
 
   @Override
@@ -237,7 +225,7 @@ public class UrlAliasRepositoryImpl extends UniqueObjectRepositoryImpl<UrlAlias>
               h ->
                   h.createQuery(commonSql.toString())
                       .bindMap(bindings)
-                      .reduceRows(basicReduceRowsBiConsumer)
+                      .reduceRows(this::basicReduceRowsBiConsumer)
                       .toArray(UrlAlias[]::new));
       return new PageResponse<>(List.of(new LocalizedUrlAliases(resultset)), pageRequest, count);
     } catch (StatementException e) {
@@ -354,7 +342,7 @@ public class UrlAliasRepositoryImpl extends UniqueObjectRepositoryImpl<UrlAlias>
               h ->
                   h.createQuery(sql.toString())
                       .bindMap(bindings)
-                      .reduceRows(basicReduceRowsBiConsumer)
+                      .reduceRows(this::basicReduceRowsBiConsumer)
                       .toArray(UrlAlias[]::new));
       return new LocalizedUrlAliases(resultset);
     } catch (StatementException e) {
