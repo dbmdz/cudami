@@ -72,23 +72,15 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
   public static final String TABLE_ALIAS = "d";
   public static final String TABLE_NAME = "digitalobjects";
 
-  @Lazy @Autowired private EntityRepositoryImpl<Agent> agentEntityRepositoryImpl;
-
+  @Lazy @Autowired private AgentRepositoryImpl<Agent> agentRepositoryImpl;
   @Lazy @Autowired private CollectionRepositoryImpl collectionRepositoryImpl;
-
   @Lazy @Autowired private CorporateBodyRepositoryImpl corporateBodyRepositoryImpl;
 
   @Lazy @Autowired
   private FileResourceMetadataRepositoryImpl<FileResource> fileResourceMetadataRepositoryImpl;
 
-  @Lazy @Autowired private EntityRepositoryImpl<GeoLocation> geolocationEntityRepositoryImpl;
-
   @Lazy @Autowired private GeoLocationRepositoryImpl<GeoLocation> geoLocationRepositoryImpl;
-
-  private final IiifObjectMapper iiifObjectMapper;
-
-  private final BackendIiifServerConfig iiifServerConfig;
-
+  @Lazy @Autowired private HumanSettlementRepositoryImpl humanSettlementRepositoryImpl;
   @Lazy @Autowired private ImageFileResourceRepositoryImpl imageFileResourceRepositoryImpl;
 
   @Lazy @Autowired
@@ -96,6 +88,9 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
 
   @Lazy @Autowired private PersonRepositoryImpl personRepositoryImpl;
   @Lazy @Autowired private ProjectRepositoryImpl projectRepositoryImpl;
+
+  private final IiifObjectMapper iiifObjectMapper;
+  private final BackendIiifServerConfig iiifServerConfig;
 
   public DigitalObjectRepositoryImpl(
       Jdbi dbi,
@@ -174,13 +169,20 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
       digitalObject.setLicense(license);
     }
 
-      // Try to fill UUID of geolocation of creator
+    // creator
+    if (digitalObject.getCreationInfo() == null) {
       UUID creationCreatorUuid =
           rowView.getColumn(MAPPING_PREFIX + "_creation_creator_uuid", UUID.class);
+      IdentifiableObjectType creatorType =
+          rowView.getColumn("creator_objecttype", IdentifiableObjectType.class);
       LocalDate creationDate =
           rowView.getColumn(MAPPING_PREFIX + "_creation_date", LocalDate.class);
       UUID creationGeolocationUuid =
-          rowView.getColumn(MAPPING_PREFIX + "_creation_geolocation_uuid", UUID.class);
+          rowView.getColumn(geoLocationRepositoryImpl.getMappingPrefix() + "_uuid", UUID.class);
+      IdentifiableObjectType geoLocationType =
+          rowView.getColumn(
+              geoLocationRepositoryImpl.getMappingPrefix() + "_identifiable_objecttype",
+              IdentifiableObjectType.class);
 
       // If any of creation.creator.uuid, creation.geolocation.uuid or creation.date
       // is set,
@@ -188,21 +190,55 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
       if (creationCreatorUuid != null || creationDate != null || creationGeolocationUuid != null) {
         CreationInfo creationInfo = new CreationInfo();
         if (creationCreatorUuid != null) {
-          creationInfo.setCreator(Agent.builder().uuid(creationCreatorUuid).build());
+          Agent creator =
+              switch (creatorType) {
+                case PERSON -> rowView.getRow(Person.class);
+                case CORPORATE_BODY -> rowView.getRow(CorporateBody.class);
+                default -> Agent.builder().uuid(creationCreatorUuid).build();
+              };
+          creationInfo.setCreator(creator);
         }
         if (creationDate != null) {
           creationInfo.setDate(creationDate);
         }
         if (creationGeolocationUuid != null) {
-          creationInfo.setGeoLocation(GeoLocation.builder().uuid(creationGeolocationUuid).build());
+          GeoLocation creationGeoLocation =
+              switch (geoLocationType) {
+                case HUMAN_SETTLEMENT -> rowView.getRow(HumanSettlement.class);
+                default -> rowView.getRow(GeoLocation.class);
+              };
+          creationInfo.setGeoLocation(creationGeoLocation);
         }
         digitalObject.setCreationInfo(creationInfo);
       }
+    }
 
     Integer numberOfBinaryResources =
         rowView.getColumn(MAPPING_PREFIX + "_number_binaryresources", Integer.class);
     if (numberOfBinaryResources != null) {
       digitalObject.setNumberOfBinaryResources(numberOfBinaryResources);
+    }
+
+    // parent
+    UUID parentUuid = rowView.getColumn("parent_uuid", UUID.class);
+    if (parentUuid != null
+        && (digitalObject.getParent() == null || digitalObject.getParent().getCreated() == null)) {
+      digitalObject.setParent(
+          DigitalObject.builder()
+              .uuid(parentUuid)
+              .label(rowView.getColumn("parent_label", LocalizedText.class))
+              .refId(rowView.getColumn("parent_refId", Integer.class))
+              .notes(
+                  rowView.getColumn(
+                      "parent_notes", new GenericType<List<LocalizedStructuredContent>>() {}))
+              .created(rowView.getColumn("parent_created", LocalDateTime.class))
+              .lastModified(rowView.getColumn("parent_lastModified", LocalDateTime.class))
+              .build());
+      UUID parentsParentUuid = rowView.getColumn("parent_parentUuid", UUID.class);
+      if (parentsParentUuid != null)
+        digitalObject
+            .getParent()
+            .setParent(DigitalObject.builder().uuid(parentsParentUuid).build());
     }
   }
 
@@ -232,66 +268,6 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
     LocalizedText itemLabel = rowView.getColumn("item_label", LocalizedText.class);
     if (itemUuid != null) {
       identifiable.setItem(Item.builder().uuid(itemUuid).label(itemLabel).build());
-    }
-  }
-
-  private void fillAttributes(DigitalObject digitalObject) throws RepositoryException {
-    if (digitalObject == null) {
-      return;
-    }
-
-    // Fill the previewImage
-    UUID previewImageUuid =
-        digitalObject.getPreviewImage() != null ? digitalObject.getPreviewImage().getUuid() : null;
-    if (previewImageUuid != null) {
-      digitalObject.setPreviewImage(imageFileResourceRepositoryImpl.getByUuid(previewImageUuid));
-    }
-
-    // If CreationInfo is set, retrieve the UUIDs of agent and place and fill their
-    // objects
-    CreationInfo creationInfo = digitalObject.getCreationInfo();
-    if (creationInfo != null) {
-      UUID creatorUuid =
-          creationInfo.getCreator() != null ? creationInfo.getCreator().getUuid() : null;
-      if (creatorUuid != null) {
-        // Can be either a CorporateBody or a Person
-        Agent creatorEntity = agentEntityRepositoryImpl.getByUuid(creatorUuid);
-        if (creatorEntity != null) {
-          switch (creatorEntity.getIdentifiableObjectType()) {
-            case CORPORATE_BODY:
-              creationInfo.setCreator(corporateBodyRepositoryImpl.getByUuid(creatorUuid));
-              break;
-            case PERSON:
-              creationInfo.setCreator(personRepositoryImpl.getByUuid(creatorUuid));
-              break;
-            default:
-              creationInfo.setCreator(creatorEntity);
-          }
-        }
-      }
-
-      UUID geolocationUuid =
-          creationInfo.getGeoLocation() != null ? creationInfo.getGeoLocation().getUuid() : null;
-      if (geolocationUuid != null) {
-        // Can be a GeoLocation or a HumanSettlement at the moment
-        GeoLocation geolocationEntity = geolocationEntityRepositoryImpl.getByUuid(geolocationUuid);
-        if (geolocationEntity != null) {
-          switch (geolocationEntity.getIdentifiableObjectType()) {
-              // FIXME: Why no HUMAN_SETTLEMENT here?
-            default:
-              creationInfo.setGeoLocation(geoLocationRepositoryImpl.getByUuid(geolocationUuid));
-          }
-        }
-      }
-
-      UUID parentUuid =
-          digitalObject.getParent() != null ? digitalObject.getParent().getUuid() : null;
-      if (parentUuid != null) {
-        DigitalObject parent = getByUuid(parentUuid);
-        if (parent != null) {
-          digitalObject.setParent(parent);
-        }
-      }
     }
   }
 
@@ -406,33 +382,6 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
     long total = retrieveCount(countQuery, argumentMappings);
 
     return new PageResponse<>(result, pageRequest, total);
-  }
-
-  @Override
-  /**
-   * Returns the fully filled DigitalObject including all of its direct attributes.
-   *
-   * <p>If a belonging item exists for this DigitalObject, the Item is returned with nothing but its
-   * UUID set, and the client is responsible for retrieving the whole item object!
-   */
-  public DigitalObject getByIdentifier(Identifier identifier) throws RepositoryException {
-    DigitalObject digitalObject = super.getByIdentifier(identifier);
-    fillAttributes(digitalObject);
-    return digitalObject;
-  }
-
-  @Override
-  /**
-   * Returns the fully filled DigitalObject including all of its direct attributes.
-   *
-   * <p>If a belonging item exists for this DigitalObject, the Item is returned with nothing but its
-   * UUID set, and the client is responsible for retrieving the whole item object!
-   */
-  public DigitalObject getByUuidAndFiltering(UUID uuid, Filtering filtering)
-      throws RepositoryException {
-    DigitalObject digitalObject = super.getByUuidAndFiltering(uuid, filtering);
-    fillAttributes(digitalObject);
-    return digitalObject;
   }
 
   @Override
@@ -633,60 +582,80 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
   @Override
   public String getSqlSelectAllFields(String tableAlias, String mappingPrefix) {
     return super.getSqlSelectAllFields(tableAlias, mappingPrefix)
-        + ", "
-        + LicenseRepositoryImpl.TABLE_ALIAS
-        + ".uuid "
-        + LicenseRepositoryImpl.MAPPING_PREFIX
-        + "_uuid"
-        + ", "
-        + LicenseRepositoryImpl.TABLE_ALIAS
-        + ".label "
-        + LicenseRepositoryImpl.MAPPING_PREFIX
-        + "_label"
-        + ", "
-        + LicenseRepositoryImpl.TABLE_ALIAS
-        + ".url "
-        + LicenseRepositoryImpl.MAPPING_PREFIX
-        + "_url"
-        + ", "
-        + LicenseRepositoryImpl.TABLE_ALIAS
-        + ".acronym "
-        + LicenseRepositoryImpl.MAPPING_PREFIX
-        + "_acronym"
-        + ", "
-        + tableAlias
-        + ".creation_creator_uuid "
-        + mappingPrefix
-        + "_creation_creator_uuid"
-        + ", "
-        + tableAlias
-        + ".creation_date "
-        + mappingPrefix
-        + "_creation_date"
-        + ", "
-        + tableAlias
-        + ".creation_geolocation_uuid "
-        + mappingPrefix
-        + "_creation_geolocation_uuid"
-        + ", "
-        + tableAlias
-        + ".number_binaryresources "
-        + mappingPrefix
-        + "_number_binaryresources";
+        + """
+        , {{licenseTable}}.uuid {{licenseMapping}}_uuid,
+        {{licenseTable}}.label {{licenseMapping}}_label,
+        {{licenseTable}}.url {{licenseMapping}}_url,
+        {{licenseTable}}.acronym {{licenseMapping}}_acronym,
+        -- creators
+        {{tableAlias}}.creation_creator_uuid {{mappingPrefix}}_creation_creator_uuid,
+        {{agentAlias}}.identifiable_objecttype creator_objecttype,
+        {{personFields}},
+        {{corporationFields}},
+        {{tableAlias}}.creation_date {{mappingPrefix}}_creation_date,
+        {{tableAlias}}.creation_geolocation_uuid {{mappingPrefix}}_creation_geolocation_uuid,
+        {{geolocFields}},
+        {{humanSettleFields}},
+        -- binary resources
+        {{tableAlias}}.number_binaryresources {{mappingPrefix}}_number_binaryresources,
+        -- parent
+        parent.uuid parent_uuid, parent.label parent_label, parent.refid parent_refId,
+        parent.notes parent_notes, parent.created parent_created,
+        parent.last_modified parent_lastModified, parent.parent_uuid parent_parentUuid
+        """
+            .replace("{{tableAlias}}", tableAlias)
+            .replace("{{mappingPrefix}}", mappingPrefix)
+            .replace("{{licenseTable}}", LicenseRepositoryImpl.TABLE_ALIAS)
+            .replace("{{licenseMapping}}", LicenseRepositoryImpl.MAPPING_PREFIX)
+            // creation info: creator
+            .replace("{{agentAlias}}", agentRepositoryImpl.getTableAlias())
+            .replace("{{personFields}}", personRepositoryImpl.getSqlSelectReducedFields())
+            .replace("{{corporationFields}}", corporateBodyRepositoryImpl.getSqlSelectAllFields())
+            // creation info: geo location
+            .replace("{{geolocFields}}", geoLocationRepositoryImpl.getSqlSelectAllFields())
+            .replace(
+                "{{humanSettleFields}}", humanSettlementRepositoryImpl.getSqlSelectAllFields());
   }
 
   @Override
   protected String getSqlSelectAllFieldsJoins() {
     return super.getSqlSelectAllFieldsJoins()
-        + " LEFT JOIN "
-        + LicenseRepositoryImpl.TABLE_NAME
-        + " AS "
-        + LicenseRepositoryImpl.TABLE_ALIAS
-        + " ON "
-        + TABLE_ALIAS
-        + ".license_uuid = "
-        + LicenseRepositoryImpl.TABLE_ALIAS
-        + ".uuid";
+        + """
+        LEFT JOIN {{licenseTable}} {{licenseAlias}}
+          ON {{tableAlias}}.license_uuid = {{licenseAlias}}.uuid
+        -- creation info creator
+        LEFT JOIN {{agentTable}} {{agentAlias}}
+          ON {{tableAlias}}.creation_creator_uuid = {{agentAlias}}.uuid
+        LEFT JOIN {{corporationTable}} {{corporationAlias}}
+          ON {{agentAlias}}.uuid = {{corporationAlias}}.uuid
+        LEFT JOIN {{personTable}} {{personAlias}}
+          ON {{agentAlias}}.uuid = {{personAlias}}.uuid
+        -- creation info geolocation
+        LEFT JOIN {{geolocTable}} {{geolocAlias}}
+          ON {{tableAlias}}.creation_geolocation_uuid = {{geolocAlias}}.uuid
+        LEFT JOIN {{humanSettleTable}} {{humanSettleAlias}}
+          ON {{geolocAlias}}.uuid = {{humanSettleAlias}}.uuid
+        -- parent
+        LEFT JOIN {{tableName}} parent
+          ON {{tableAlias}}.parent_uuid = parent.uuid
+        """
+            .replace("{{tableName}}", tableName)
+            .replace("{{tableAlias}}", tableAlias)
+            // license
+            .replace("{{licenseTable}}", LicenseRepositoryImpl.TABLE_NAME)
+            .replace("{{licenseAlias}}", LicenseRepositoryImpl.TABLE_ALIAS)
+            // creation info: creator
+            .replace("{{agentTable}}", agentRepositoryImpl.getTableName())
+            .replace("{{agentAlias}}", agentRepositoryImpl.getTableAlias())
+            .replace("{{corporationTable}}", corporateBodyRepositoryImpl.getTableName())
+            .replace("{{corporationAlias}}", corporateBodyRepositoryImpl.getTableAlias())
+            .replace("{{personTable}}", personRepositoryImpl.getTableName())
+            .replace("{{personAlias}}", personRepositoryImpl.getTableAlias())
+            // creation info: geo location
+            .replace("{{geolocTable}}", geoLocationRepositoryImpl.getTableName())
+            .replace("{{geolocAlias}}", geoLocationRepositoryImpl.getTableAlias())
+            .replace("{{humanSettleTable}}", HumanSettlementRepositoryImpl.TABLE_NAME)
+            .replace("{{humanSettleAlias}}", HumanSettlementRepositoryImpl.TABLE_ALIAS);
   }
 
   @Override
@@ -724,8 +693,8 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
   }
 
   // --------- repository setters for testing purposes only ----------------------
-  public void setAgentEntityRepository(EntityRepositoryImpl<Agent> agentEntityRepositoryImpl) {
-    this.agentEntityRepositoryImpl = agentEntityRepositoryImpl;
+  public void setAgentEntityRepository(AgentRepositoryImpl<Agent> agentRepositoryImpl) {
+    this.agentRepositoryImpl = agentRepositoryImpl;
   }
 
   public void setCollectionRepository(CollectionRepositoryImpl collectionRepositoryImpl) {
@@ -782,11 +751,6 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
           });
     }
     return getFileResources(digitalObjectUuid);
-  }
-
-  public void setGeolocationEntityRepositoryImpl(
-      EntityRepositoryImpl<GeoLocation> geolocationEntityRepositoryImpl) {
-    this.geolocationEntityRepositoryImpl = geolocationEntityRepositoryImpl;
   }
 
   public void setGeoLocationRepositoryImpl(
