@@ -153,11 +153,11 @@ export async function findRootObjects(
   try {
     const response = await fetch(url)
     const json = await response.json()
-    const {content, pageRequest, totalElements} = json
+    const {content, pageRequest, rows, total, totalElements} = json
     return {
-      content,
-      pageSize: pageRequest.pageSize,
-      totalElements,
+      content: rows ?? content,
+      pageSize: pageRequest?.pageSize,
+      totalElements: total ?? totalElements,
     }
   } catch (err) {
     return {
