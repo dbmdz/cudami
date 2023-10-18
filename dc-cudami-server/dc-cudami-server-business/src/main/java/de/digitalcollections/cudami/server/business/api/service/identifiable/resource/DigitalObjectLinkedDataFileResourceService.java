@@ -28,7 +28,7 @@ public interface DigitalObjectLinkedDataFileResourceService {
    * @return list of persisted LinkedDataFileResources
    * @throws ServiceException
    */
-  List<LinkedDataFileResource> setLinkedDataFileResources(
+  void setLinkedDataFileResources(
       DigitalObject digitalObject, List<LinkedDataFileResource> linkedDataFileResources)
       throws ServiceException;
 }

@@ -407,18 +407,18 @@ public class DigitalObjectServiceImpl extends EntityServiceImpl<DigitalObject>
   }
 
   @Override
-  public List<LinkedDataFileResource> setLinkedDataFileResources(
+  public void setLinkedDataFileResources(
       DigitalObject digitalObject, List<LinkedDataFileResource> linkedDataFileResources)
       throws ServiceException {
-    return digitalObjectLinkedDataFileResourceService.setLinkedDataFileResources(
+    digitalObjectLinkedDataFileResourceService.setLinkedDataFileResources(
         digitalObject, linkedDataFileResources);
   }
 
   @Override
-  public List<FileResource> setRenderingFileResources(
+  public void setRenderingFileResources(
       DigitalObject digitalObject, List<FileResource> renderingFileResources)
       throws ServiceException {
-    return digitalObjectRenderingFileResourceService.setRenderingFileResources(
+    digitalObjectRenderingFileResourceService.setRenderingFileResources(
         digitalObject, renderingFileResources);
   }
 

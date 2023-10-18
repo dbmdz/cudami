@@ -15,7 +15,6 @@ import de.digitalcollections.cudami.server.business.api.service.identifiable.res
 import de.digitalcollections.cudami.server.business.api.service.identifiable.resource.VideoFileResourceService;
 import de.digitalcollections.model.identifiable.entity.digitalobject.DigitalObject;
 import de.digitalcollections.model.identifiable.resource.FileResource;
-import java.util.ArrayList;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -119,7 +118,7 @@ public class DigitalObjectRenderingFileResourceServiceImpl
   }
 
   @Override
-  public List<FileResource> setRenderingFileResources(
+  public void setRenderingFileResources(
       DigitalObject digitalObject, List<FileResource> renderingResources) throws ServiceException {
 
     // Remove the old rendering resources, if present
@@ -162,7 +161,5 @@ public class DigitalObjectRenderingFileResourceServiceImpl
         throw new ServiceException("Backend failure", e);
       }
     }
-
-    return renderingResources;
   }
 }

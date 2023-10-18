@@ -60,11 +60,11 @@ public interface DigitalObjectService extends EntityService<DigitalObject> {
   boolean setItem(DigitalObject digitalObject, Item item)
       throws ConflictException, ValidationException, ServiceException;
 
-  List<LinkedDataFileResource> setLinkedDataFileResources(
+  void setLinkedDataFileResources(
       DigitalObject digitalObject, List<LinkedDataFileResource> linkedDataFileResources)
       throws ServiceException;
 
-  List<FileResource> setRenderingFileResources(
+  void setRenderingFileResources(
       DigitalObject digitalObject, List<FileResource> renderingFileResources)
       throws ServiceException;
 }
