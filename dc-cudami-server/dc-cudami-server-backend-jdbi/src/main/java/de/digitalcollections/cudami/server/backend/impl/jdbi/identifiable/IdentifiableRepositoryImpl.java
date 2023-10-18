@@ -435,18 +435,6 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
   }
 
   /**
-   * SQL-snippet for fields to be returned for complete field request.<br>
-   * If already all fields are returned with reduced fields request: just return reduced field set
-   * here, otherwise add additional fields to reduced set to get all fields.
-   *
-   * @return SQL snippet
-   */
-  @Override
-  public String getSqlSelectAllFields(String tableAlias, String mappingPrefix) {
-    return getSqlSelectReducedFields(tableAlias, mappingPrefix);
-  }
-
-  /**
    * @return SQL for fields of reduced field set of {@code UniqueObject}
    */
   @Override
