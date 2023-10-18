@@ -121,6 +121,13 @@ public class DigitalObjectRenderingFileResourceServiceImpl
   public void setRenderingFileResources(
       DigitalObject digitalObject, List<FileResource> renderingResources) throws ServiceException {
 
+    // Remove the old relations
+    try {
+      digitalObjectRenderingFileResourceRepository.removeByDigitalObject(digitalObject);
+    } catch (RepositoryException e) {
+      throw new ServiceException("Backend failure", e);
+    }
+
     // Remove the old rendering resources, if present
     List<FileResource> existingRenderingResources = getRenderingFileResources(digitalObject);
     for (FileResource existingRenderingResource : existingRenderingResources) {
@@ -132,17 +139,9 @@ public class DigitalObjectRenderingFileResourceServiceImpl
       }
     }
 
-    // Remove the old relations
-    try {
-      digitalObjectRenderingFileResourceRepository.removeByDigitalObject(digitalObject);
-    } catch (RepositoryException e) {
-      throw new ServiceException("Backend failure", e);
-    }
-
     // Persist the new rendering resources
     if (renderingResources != null) {
       // first save rendering resources
-      List<FileResource> savedRenderingResources = new ArrayList<>();
       for (FileResource renderingResource : renderingResources) {
         try {
           fileResourceMetadataService.save(renderingResource);
@@ -150,13 +149,12 @@ public class DigitalObjectRenderingFileResourceServiceImpl
           throw new ServiceException(
               "Cannot save RenderingResource" + renderingResource + ": " + e, e);
         }
-        savedRenderingResources.add(renderingResource);
       }
 
       // Persist the new relations
       try {
         digitalObjectRenderingFileResourceRepository.setRenderingFileResources(
-            digitalObject, savedRenderingResources);
+            digitalObject, renderingResources);
       } catch (RepositoryException e) {
         throw new ServiceException("Backend failure", e);
       }

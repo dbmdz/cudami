@@ -11,6 +11,8 @@ import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.geo.location.GeoLocationRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.geo.location.HumanSettlementRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.work.ItemRepositoryImpl;
+import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.resource.DigitalObjectLinkedDataFileResourceRepositoryImpl;
+import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.resource.DigitalObjectRenderingFileResourceRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.resource.FileResourceMetadataRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.resource.ImageFileResourceRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.resource.LinkedDataFileResourceRepositoryImpl;
@@ -35,6 +37,7 @@ import de.digitalcollections.model.identifiable.entity.geo.location.HumanSettlem
 import de.digitalcollections.model.identifiable.entity.item.Item;
 import de.digitalcollections.model.identifiable.resource.FileResource;
 import de.digitalcollections.model.identifiable.resource.ImageFileResource;
+import de.digitalcollections.model.identifiable.resource.LinkedDataFileResource;
 import de.digitalcollections.model.legal.License;
 import de.digitalcollections.model.list.filtering.Filtering;
 import de.digitalcollections.model.list.paging.PageRequest;
@@ -51,7 +54,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
+import java.util.Vector;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.core.generic.GenericType;
 import org.jdbi.v3.core.result.RowView;
@@ -239,6 +244,38 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
         digitalObject
             .getParent()
             .setParent(DigitalObject.builder().uuid(parentsParentUuid).build());
+    }
+
+    // file resources
+    UUID linkedDataFileResUuid = rowView.getColumn(linkedDataFileResourceRepositoryImpl.getMappingPrefix() + "_uuid", UUID.class);
+    if (linkedDataFileResUuid != null) {
+      if (digitalObject.getLinkedDataResources() == null || digitalObject.getLinkedDataResources().isEmpty()) {
+        int maxIndex = rowView.getColumn("max_dold_sortindex", Integer.class);
+        Vector<LinkedDataFileResource> resources = new Vector<>(++maxIndex);
+        resources.setSize(maxIndex);
+        digitalObject.setLinkedDataResources(resources);
+      }
+      LinkedDataFileResource ldFileResource = rowView.getRow(LinkedDataFileResource.class);
+      if (!digitalObject.getLinkedDataResources().parallelStream().anyMatch(res -> Objects.equals(res, ldFileResource))) {
+        int idx = rowView.getColumn("dold_sortindex", Integer.class);
+        digitalObject.getLinkedDataResources().set(idx, ldFileResource);
+      }
+    }
+
+    // rendering resources
+    UUID renderingResourceUuid = rowView.getColumn(fileResourceMetadataRepositoryImpl.getMappingPrefix() + "_uuid", UUID.class);
+    if (renderingResourceUuid != null) {
+      if (digitalObject.getRenderingResources() == null || digitalObject.getRenderingResources().isEmpty()) {
+        int maxIndex = rowView.getColumn("max_dorr_sortindex", Integer.class);
+        Vector<FileResource> resources = new Vector<>(++maxIndex);
+        resources.setSize(maxIndex);
+        digitalObject.setRenderingResources(resources);
+      }
+      FileResource renderingResource = rowView.getRow(FileResource.class);
+      if (!digitalObject.getRenderingResources().parallelStream().anyMatch(res -> Objects.equals(res, renderingResource))) {
+        int idx = rowView.getColumn("dorr_sortindex", Integer.class);
+        digitalObject.getRenderingResources().set(idx, renderingResource);
+      }
     }
   }
 
@@ -601,7 +638,15 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
         -- parent
         parent.uuid parent_uuid, parent.label parent_label, parent.refid parent_refId,
         parent.notes parent_notes, parent.created parent_created,
-        parent.last_modified parent_lastModified, parent.parent_uuid parent_parentUuid
+        parent.last_modified parent_lastModified, parent.parent_uuid parent_parentUuid,
+        -- linked data file resources
+        {{digitalObjLinkedDataResAlias}}.sortindex dold_sortindex,
+        max({{digitalObjLinkedDataResAlias}}.sortindex) over (partition by {{tableAlias}}.uuid) max_dold_sortindex,
+        {{linkedDataFileResFields}},
+        -- rendering resources
+        {{digitalObjRenderingResAlias}}.sortindex dorr_sortindex,
+        max({{digitalObjRenderingResAlias}}.sortindex) over (partition by {{tableAlias}}.uuid) max_dorr_sortindex,
+        {{renderingResFields}}
         """
             .replace("{{tableAlias}}", tableAlias)
             .replace("{{mappingPrefix}}", mappingPrefix)
@@ -614,7 +659,13 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
             // creation info: geo location
             .replace("{{geolocFields}}", geoLocationRepositoryImpl.getSqlSelectAllFields())
             .replace(
-                "{{humanSettleFields}}", humanSettlementRepositoryImpl.getSqlSelectAllFields());
+                "{{humanSettleFields}}", humanSettlementRepositoryImpl.getSqlSelectAllFields())
+            // linked data
+            .replace("{{digitalObjLinkedDataResAlias}}", DigitalObjectLinkedDataFileResourceRepositoryImpl.TABLE_ALIAS)
+            .replace("{{linkedDataFileResFields}}", linkedDataFileResourceRepositoryImpl.getSqlSelectAllFields())
+            // rendering resources
+            .replace("digitalObjRenderingResAlias", DigitalObjectRenderingFileResourceRepositoryImpl.TABLE_ALIAS)
+            .replace("renderingResFields", fileResourceMetadataRepositoryImpl.getSqlSelectReducedFields());
   }
 
   @Override
@@ -638,6 +689,14 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
         -- parent
         LEFT JOIN {{tableName}} parent
           ON {{tableAlias}}.parent_uuid = parent.uuid
+        LEFT JOIN (
+          {{digitalObjLinkedDataResTable}} {{digitalObjLinkedDataResAlias}} INNER JOIN {{linkedDataFileResTable}} {{linkedDataFileResAlias}}
+          ON {{digitalObjLinkedDataResAlias}}.linkeddata_fileresource_uuid = {{linkedDataFileResAlias}}.uuid
+        ) ON {{digitalObjLinkedDataResAlias}}.digitalobject_uuid = {{tableAlias}}.uuid
+        LEFT JOIN (
+          {{digitalObjRenderingResTable}} {{digitalObjRenderingResAlias}} INNER JOIN {{renderingResourcesTable}} {{renderingResourcesAlias}}
+          ON {{digitalObjRenderingResAlias}}.fileresource_uuid = {{renderingResourcesAlias}}.uuid
+        ) ON {{digitalObjRenderingResAlias}}.digitalobject_uuid = {{tableAlias}}.uuid
         """
             .replace("{{tableName}}", tableName)
             .replace("{{tableAlias}}", tableAlias)
@@ -655,7 +714,17 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
             .replace("{{geolocTable}}", geoLocationRepositoryImpl.getTableName())
             .replace("{{geolocAlias}}", geoLocationRepositoryImpl.getTableAlias())
             .replace("{{humanSettleTable}}", HumanSettlementRepositoryImpl.TABLE_NAME)
-            .replace("{{humanSettleAlias}}", HumanSettlementRepositoryImpl.TABLE_ALIAS);
+            .replace("{{humanSettleAlias}}", HumanSettlementRepositoryImpl.TABLE_ALIAS)
+            // linked data file resources
+            .replace("{{digitalObjLinkedDataResTable}}", DigitalObjectLinkedDataFileResourceRepositoryImpl.TABLE_NAME)
+            .replace("{{digitalObjLinkedDataResAlias}}", DigitalObjectLinkedDataFileResourceRepositoryImpl.TABLE_ALIAS)
+            .replace("{{linkedDataFileResTable}}", linkedDataFileResourceRepositoryImpl.getTableName())
+            .replace("{{linkedDataFileResAlias}}", linkedDataFileResourceRepositoryImpl.getTableAlias())
+            // rendering resources
+            .replace("digitalObjRenderingResTable", DigitalObjectRenderingFileResourceRepositoryImpl.TABLE_NAME)
+            .replace("digitalObjRenderingResAlias", DigitalObjectRenderingFileResourceRepositoryImpl.TABLE_ALIAS)
+            .replace("renderingResourcesTable", fileResourceMetadataRepositoryImpl.getTableName())
+            .replace("renderingResourcesAlias", fileResourceMetadataRepositoryImpl.getTableAlias());
   }
 
   @Override
