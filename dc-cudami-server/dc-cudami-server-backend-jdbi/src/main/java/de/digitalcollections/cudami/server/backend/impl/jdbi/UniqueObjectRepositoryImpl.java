@@ -69,13 +69,11 @@ public abstract class UniqueObjectRepositoryImpl<U extends UniqueObject>
   protected void additionalReduceRowsBiConsumer(Map<UUID, U> map, RowView rowView) {}
 
   /** The basic reduce rows biconsumer for reduced selects (lists, paging) */
+  @SuppressWarnings("unchecked")
   protected void basicReduceRowsBiConsumer(Map<UUID, U> map, RowView rowView) {
-    U uniqueObject =
-        map.computeIfAbsent(
-            rowView.getColumn(mappingPrefix + "_uuid", UUID.class),
-            fn -> {
-              return (U) rowView.getRow(uniqueObjectImplClass);
-            });
+    map.computeIfAbsent(
+        rowView.getColumn(mappingPrefix + "_uuid", UUID.class),
+        uuid -> (U) rowView.getRow(uniqueObjectImplClass));
   }
 
   /**
