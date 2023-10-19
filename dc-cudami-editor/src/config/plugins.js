@@ -6,7 +6,7 @@ import {footnotes} from '@aeaton/prosemirror-footnotes'
 import {dropCursor} from 'prosemirror-dropcursor'
 import {gapCursor} from 'prosemirror-gapcursor'
 import {history} from 'prosemirror-history'
-import {columnResizing, tableEditing} from 'prosemirror-tables'
+import {tableEditing} from 'prosemirror-tables'
 
 import {linkEditing, nodeViews} from './custom/plugins'
 import keys from './keys'
@@ -19,7 +19,6 @@ export default [
   dropCursor(),
   gapCursor(),
   history(),
-  columnResizing(),
   tableEditing(),
   // custom plugins
   linkEditing(),
