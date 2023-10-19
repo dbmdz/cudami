@@ -127,7 +127,7 @@
 
     <th:block th:if="${block.class.simpleName == 'TableCell'}" th:with="attr=${block.attributes}">
       <th:block th:if="${attr}">
-        <td th:attr="colspan=${attr.get('colspan') != null}?${attr.get('colspan')}, rowspan=${attr.get('rowspan') != null}?${attr.get('rowspan')}, data-colwidth=${attr.get('colwidth') != null}?${attr.get('colwidth')}">
+        <td th:attr="colspan=${attr.get('colspan') != null}?${attr.get('colspan')}, rowspan=${attr.get('rowspan') != null}?${attr.get('rowspan')}, data-label=${attr.get('data-label') != null}?${attr.get('data-label')}">
         <th:block th:insert="~{::renderContentBlocks(${block.contentBlocks})}"></th:block>
         </td>
       </th:block>
@@ -140,7 +140,7 @@
 
     <th:block th:if="${block.class.simpleName == 'TableHeader'}" th:with="attr=${block.attributes}">
       <th:block th:if="${attr}">
-        <th th:attr="colspan=${attr.get('colspan') != null}?${attr.get('colspan')}, rowspan=${attr.get('rowspan') != null}?${attr.get('rowspan')}, data-colwidth=${attr.get('colwidth') != null}?${attr.get('colwidth')}"
+        <th th:attr="colspan=${attr.get('colspan') != null}?${attr.get('colspan')}, rowspan=${attr.get('rowspan') != null}?${attr.get('rowspan')}, data-label=${attr.get('data-label') != null}?${attr.get('data-label')}"
             >
         <th:block th:insert="~{::renderContentBlocks(${block.contentBlocks})}"></th:block>
         </th>
