@@ -186,7 +186,7 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
           rowView.getColumn(geoLocationRepositoryImpl.getMappingPrefix() + "_uuid", UUID.class);
       IdentifiableObjectType geoLocationType =
           rowView.getColumn(
-              geoLocationRepositoryImpl.getMappingPrefix() + "_identifiable_objecttype",
+              geoLocationRepositoryImpl.getMappingPrefix() + "_identifiableObjectType",
               IdentifiableObjectType.class);
 
       // If any of creation.creator.uuid, creation.geolocation.uuid or creation.date
@@ -664,8 +664,8 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
             .replace("{{digitalObjLinkedDataResAlias}}", DigitalObjectLinkedDataFileResourceRepositoryImpl.TABLE_ALIAS)
             .replace("{{linkedDataFileResFields}}", linkedDataFileResourceRepositoryImpl.getSqlSelectAllFields())
             // rendering resources
-            .replace("digitalObjRenderingResAlias", DigitalObjectRenderingFileResourceRepositoryImpl.TABLE_ALIAS)
-            .replace("renderingResFields", fileResourceMetadataRepositoryImpl.getSqlSelectReducedFields());
+            .replace("{{digitalObjRenderingResAlias}}", DigitalObjectRenderingFileResourceRepositoryImpl.TABLE_ALIAS)
+            .replace("{{renderingResFields}}", fileResourceMetadataRepositoryImpl.getSqlSelectReducedFields());
   }
 
   @Override
@@ -721,10 +721,10 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
             .replace("{{linkedDataFileResTable}}", linkedDataFileResourceRepositoryImpl.getTableName())
             .replace("{{linkedDataFileResAlias}}", linkedDataFileResourceRepositoryImpl.getTableAlias())
             // rendering resources
-            .replace("digitalObjRenderingResTable", DigitalObjectRenderingFileResourceRepositoryImpl.TABLE_NAME)
-            .replace("digitalObjRenderingResAlias", DigitalObjectRenderingFileResourceRepositoryImpl.TABLE_ALIAS)
-            .replace("renderingResourcesTable", fileResourceMetadataRepositoryImpl.getTableName())
-            .replace("renderingResourcesAlias", fileResourceMetadataRepositoryImpl.getTableAlias());
+            .replace("{{digitalObjRenderingResTable}}", DigitalObjectRenderingFileResourceRepositoryImpl.TABLE_NAME)
+            .replace("{{digitalObjRenderingResAlias}}", DigitalObjectRenderingFileResourceRepositoryImpl.TABLE_ALIAS)
+            .replace("{{renderingResourcesTable}}", fileResourceMetadataRepositoryImpl.getTableName())
+            .replace("{{renderingResourcesAlias}}", fileResourceMetadataRepositoryImpl.getTableAlias());
   }
 
   @Override

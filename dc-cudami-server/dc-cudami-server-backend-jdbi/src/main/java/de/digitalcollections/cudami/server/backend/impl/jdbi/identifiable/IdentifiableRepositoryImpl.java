@@ -767,9 +767,9 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
         Identifier.builder()
             .uuid(identifierUuid)
             .created(rowView.getColumn("file_id_created", LocalDateTime.class))
-            .lastModified(rowView.getColumn("file_id_last_modified", LocalDateTime.class))
+            .lastModified(rowView.getColumn("file_id_lastModified", LocalDateTime.class))
             .namespace(rowView.getColumn("file_id_namespace", String.class))
-            .id(rowView.getColumn("file_id_identifier", String.class))
+            .id(rowView.getColumn("file_id_id", String.class))
             .build();
     identifiable.getPreviewImage().addIdentifier(id);
   }
