@@ -247,32 +247,40 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
     }
 
     // file resources
-    UUID linkedDataFileResUuid = rowView.getColumn(linkedDataFileResourceRepositoryImpl.getMappingPrefix() + "_uuid", UUID.class);
+    UUID linkedDataFileResUuid =
+        rowView.getColumn(
+            linkedDataFileResourceRepositoryImpl.getMappingPrefix() + "_uuid", UUID.class);
     if (linkedDataFileResUuid != null) {
-      if (digitalObject.getLinkedDataResources() == null || digitalObject.getLinkedDataResources().isEmpty()) {
+      if (digitalObject.getLinkedDataResources() == null
+          || digitalObject.getLinkedDataResources().isEmpty()) {
         int maxIndex = rowView.getColumn("max_dold_sortindex", Integer.class);
         Vector<LinkedDataFileResource> resources = new Vector<>(++maxIndex);
         resources.setSize(maxIndex);
         digitalObject.setLinkedDataResources(resources);
       }
       LinkedDataFileResource ldFileResource = rowView.getRow(LinkedDataFileResource.class);
-      if (!digitalObject.getLinkedDataResources().parallelStream().anyMatch(res -> Objects.equals(res, ldFileResource))) {
+      if (!digitalObject.getLinkedDataResources().parallelStream()
+          .anyMatch(res -> Objects.equals(res, ldFileResource))) {
         int idx = rowView.getColumn("dold_sortindex", Integer.class);
         digitalObject.getLinkedDataResources().set(idx, ldFileResource);
       }
     }
 
     // rendering resources
-    UUID renderingResourceUuid = rowView.getColumn(fileResourceMetadataRepositoryImpl.getMappingPrefix() + "_uuid", UUID.class);
+    UUID renderingResourceUuid =
+        rowView.getColumn(
+            fileResourceMetadataRepositoryImpl.getMappingPrefix() + "_uuid", UUID.class);
     if (renderingResourceUuid != null) {
-      if (digitalObject.getRenderingResources() == null || digitalObject.getRenderingResources().isEmpty()) {
+      if (digitalObject.getRenderingResources() == null
+          || digitalObject.getRenderingResources().isEmpty()) {
         int maxIndex = rowView.getColumn("max_dorr_sortindex", Integer.class);
         Vector<FileResource> resources = new Vector<>(++maxIndex);
         resources.setSize(maxIndex);
         digitalObject.setRenderingResources(resources);
       }
       FileResource renderingResource = rowView.getRow(FileResource.class);
-      if (!digitalObject.getRenderingResources().parallelStream().anyMatch(res -> Objects.equals(res, renderingResource))) {
+      if (!digitalObject.getRenderingResources().parallelStream()
+          .anyMatch(res -> Objects.equals(res, renderingResource))) {
         int idx = rowView.getColumn("dorr_sortindex", Integer.class);
         digitalObject.getRenderingResources().set(idx, renderingResource);
       }
@@ -658,14 +666,21 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
             .replace("{{corporationFields}}", corporateBodyRepositoryImpl.getSqlSelectAllFields())
             // creation info: geo location
             .replace("{{geolocFields}}", geoLocationRepositoryImpl.getSqlSelectAllFields())
-            .replace(
-                "{{humanSettleFields}}", humanSettlementRepositoryImpl.getSqlSelectAllFields())
+            .replace("{{humanSettleFields}}", humanSettlementRepositoryImpl.getSqlSelectAllFields())
             // linked data
-            .replace("{{digitalObjLinkedDataResAlias}}", DigitalObjectLinkedDataFileResourceRepositoryImpl.TABLE_ALIAS)
-            .replace("{{linkedDataFileResFields}}", linkedDataFileResourceRepositoryImpl.getSqlSelectAllFields())
+            .replace(
+                "{{digitalObjLinkedDataResAlias}}",
+                DigitalObjectLinkedDataFileResourceRepositoryImpl.TABLE_ALIAS)
+            .replace(
+                "{{linkedDataFileResFields}}",
+                linkedDataFileResourceRepositoryImpl.getSqlSelectAllFields())
             // rendering resources
-            .replace("{{digitalObjRenderingResAlias}}", DigitalObjectRenderingFileResourceRepositoryImpl.TABLE_ALIAS)
-            .replace("{{renderingResFields}}", fileResourceMetadataRepositoryImpl.getSqlSelectReducedFields());
+            .replace(
+                "{{digitalObjRenderingResAlias}}",
+                DigitalObjectRenderingFileResourceRepositoryImpl.TABLE_ALIAS)
+            .replace(
+                "{{renderingResFields}}",
+                fileResourceMetadataRepositoryImpl.getSqlSelectReducedFields());
   }
 
   @Override
@@ -716,15 +731,27 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
             .replace("{{humanSettleTable}}", HumanSettlementRepositoryImpl.TABLE_NAME)
             .replace("{{humanSettleAlias}}", HumanSettlementRepositoryImpl.TABLE_ALIAS)
             // linked data file resources
-            .replace("{{digitalObjLinkedDataResTable}}", DigitalObjectLinkedDataFileResourceRepositoryImpl.TABLE_NAME)
-            .replace("{{digitalObjLinkedDataResAlias}}", DigitalObjectLinkedDataFileResourceRepositoryImpl.TABLE_ALIAS)
-            .replace("{{linkedDataFileResTable}}", linkedDataFileResourceRepositoryImpl.getTableName())
-            .replace("{{linkedDataFileResAlias}}", linkedDataFileResourceRepositoryImpl.getTableAlias())
+            .replace(
+                "{{digitalObjLinkedDataResTable}}",
+                DigitalObjectLinkedDataFileResourceRepositoryImpl.TABLE_NAME)
+            .replace(
+                "{{digitalObjLinkedDataResAlias}}",
+                DigitalObjectLinkedDataFileResourceRepositoryImpl.TABLE_ALIAS)
+            .replace(
+                "{{linkedDataFileResTable}}", linkedDataFileResourceRepositoryImpl.getTableName())
+            .replace(
+                "{{linkedDataFileResAlias}}", linkedDataFileResourceRepositoryImpl.getTableAlias())
             // rendering resources
-            .replace("{{digitalObjRenderingResTable}}", DigitalObjectRenderingFileResourceRepositoryImpl.TABLE_NAME)
-            .replace("{{digitalObjRenderingResAlias}}", DigitalObjectRenderingFileResourceRepositoryImpl.TABLE_ALIAS)
-            .replace("{{renderingResourcesTable}}", fileResourceMetadataRepositoryImpl.getTableName())
-            .replace("{{renderingResourcesAlias}}", fileResourceMetadataRepositoryImpl.getTableAlias());
+            .replace(
+                "{{digitalObjRenderingResTable}}",
+                DigitalObjectRenderingFileResourceRepositoryImpl.TABLE_NAME)
+            .replace(
+                "{{digitalObjRenderingResAlias}}",
+                DigitalObjectRenderingFileResourceRepositoryImpl.TABLE_ALIAS)
+            .replace(
+                "{{renderingResourcesTable}}", fileResourceMetadataRepositoryImpl.getTableName())
+            .replace(
+                "{{renderingResourcesAlias}}", fileResourceMetadataRepositoryImpl.getTableAlias());
   }
 
   @Override

@@ -11,6 +11,6 @@ public interface DigitalObjectRenderingFileResourceService {
 
   List<FileResource> getRenderingFileResources(DigitalObject digitalObject) throws ServiceException;
 
-  void setRenderingFileResources(
-      DigitalObject digitalObject, List<FileResource> renderingResources) throws ServiceException;
+  void setRenderingFileResources(DigitalObject digitalObject, List<FileResource> renderingResources)
+      throws ServiceException;
 }
