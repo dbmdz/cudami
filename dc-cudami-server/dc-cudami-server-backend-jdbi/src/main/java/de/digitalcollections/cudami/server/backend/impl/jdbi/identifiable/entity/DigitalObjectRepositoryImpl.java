@@ -23,9 +23,11 @@ import de.digitalcollections.iiif.model.jackson.IiifObjectMapper;
 import de.digitalcollections.iiif.model.sharedcanvas.Canvas;
 import de.digitalcollections.iiif.model.sharedcanvas.Manifest;
 import de.digitalcollections.model.file.MimeType;
+import de.digitalcollections.model.identifiable.Identifiable;
 import de.digitalcollections.model.identifiable.IdentifiableObjectType;
 import de.digitalcollections.model.identifiable.Identifier;
 import de.digitalcollections.model.identifiable.entity.Collection;
+import de.digitalcollections.model.identifiable.entity.CustomAttributes;
 import de.digitalcollections.model.identifiable.entity.Project;
 import de.digitalcollections.model.identifiable.entity.agent.Agent;
 import de.digitalcollections.model.identifiable.entity.agent.CorporateBody;
@@ -51,12 +53,14 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.Vector;
+import java.util.function.BiConsumer;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.core.generic.GenericType;
 import org.jdbi.v3.core.result.RowView;
@@ -168,6 +172,13 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
     super.fullReduceRowsBiConsumer(map, rowView);
     DigitalObject digitalObject = map.get(rowView.getColumn(MAPPING_PREFIX + "_uuid", UUID.class));
 
+    // a small function that we need several times here but nowhere else
+    BiConsumer<Identifiable, String> setIdentifiers =
+        (identifiable, colName) -> {
+          List<Identifier> ids = rowView.getColumn(colName, new GenericType<List<Identifier>>() {});
+          if (ids != null) identifiable.setIdentifiers(new HashSet<Identifier>(ids));
+        };
+
     // Try to fill license subresource with uuid, url and label
     License license = rowView.getRow(License.class);
     if (license.getUuid() != null) {
@@ -201,6 +212,7 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
                 case CORPORATE_BODY -> rowView.getRow(CorporateBody.class);
                 default -> Agent.builder().uuid(creationCreatorUuid).build();
               };
+          setIdentifiers.accept(creator, "creator_identifiers");
           creationInfo.setCreator(creator);
         }
         if (creationDate != null) {
@@ -212,6 +224,7 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
                 case HUMAN_SETTLEMENT -> rowView.getRow(HumanSettlement.class);
                 default -> rowView.getRow(GeoLocation.class);
               };
+          setIdentifiers.accept(creationGeoLocation, "creation_geolocation_identifiers");
           creationInfo.setGeoLocation(creationGeoLocation);
         }
         digitalObject.setCreationInfo(creationInfo);
@@ -228,22 +241,38 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
     UUID parentUuid = rowView.getColumn("parent_uuid", UUID.class);
     if (parentUuid != null
         && (digitalObject.getParent() == null || digitalObject.getParent().getCreated() == null)) {
-      digitalObject.setParent(
+      DigitalObject parent =
           DigitalObject.builder()
               .uuid(parentUuid)
               .label(rowView.getColumn("parent_label", LocalizedText.class))
+              .description(
+                  rowView.getColumn("parent_description", LocalizedStructuredContent.class))
+              .customAttributes(
+                  rowView.getColumn("parent_customAttributes", CustomAttributes.class))
               .refId(rowView.getColumn("parent_refId", Integer.class))
               .notes(
                   rowView.getColumn(
                       "parent_notes", new GenericType<List<LocalizedStructuredContent>>() {}))
               .created(rowView.getColumn("parent_created", LocalDateTime.class))
               .lastModified(rowView.getColumn("parent_lastModified", LocalDateTime.class))
-              .build());
+              .build();
+      setIdentifiers.accept(parent, "parent_identifiers");
+
       UUID parentsParentUuid = rowView.getColumn("parent_parentUuid", UUID.class);
-      if (parentsParentUuid != null)
-        digitalObject
-            .getParent()
-            .setParent(DigitalObject.builder().uuid(parentsParentUuid).build());
+      if (parentsParentUuid != null) {
+        DigitalObject parentsParent = DigitalObject.builder().uuid(parentsParentUuid).build();
+        setIdentifiers.accept(parentsParent, "parent_parentIdentifiers");
+        parent.setParent(parentsParent);
+      }
+
+      UUID parentItemUuid = rowView.getColumn("parent_itemUuid", UUID.class);
+      if (parentItemUuid != null) {
+        Item parentsItem = Item.builder().uuid(parentItemUuid).build();
+        setIdentifiers.accept(parentsItem, "parent_itemIdentifiers");
+        parent.setItem(parentsItem);
+      }
+
+      digitalObject.setParent(parent);
     }
 
     // file resources
@@ -279,6 +308,7 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
         digitalObject.setRenderingResources(resources);
       }
       FileResource renderingResource = rowView.getRow(FileResource.class);
+      DigitalObjectRenderingFileResourceRepositoryImpl.fillResourceType(renderingResource);
       if (!digitalObject.getRenderingResources().parallelStream()
           .anyMatch(res -> Objects.equals(res, renderingResource))) {
         int idx = rowView.getColumn("dorr_sortindex", Integer.class);
@@ -311,8 +341,16 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
     // set item UUID and label only
     UUID itemUuid = rowView.getColumn(MAPPING_PREFIX + "_item_uuid", UUID.class);
     LocalizedText itemLabel = rowView.getColumn("item_label", LocalizedText.class);
+    List<Identifier> itemIdentifiers =
+        rowView.getColumn("item_identifiers", new GenericType<List<Identifier>>() {});
     if (itemUuid != null) {
-      identifiable.setItem(Item.builder().uuid(itemUuid).label(itemLabel).build());
+      identifiable.setItem(
+          Item.builder()
+              .uuid(itemUuid)
+              .label(itemLabel)
+              .identifiers(
+                  itemIdentifiers != null ? new HashSet<Identifier>(itemIdentifiers) : null)
+              .build());
     }
   }
 
@@ -634,19 +672,23 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
         {{licenseTable}}.acronym {{licenseMapping}}_acronym,
         -- creators
         {{tableAlias}}.creation_creator_uuid {{mappingPrefix}}_creation_creator_uuid,
+        get_identifiers({{tableAlias}}.creation_creator_uuid) creator_identifiers,
         {{agentAlias}}.identifiable_objecttype creator_objecttype,
         {{personFields}},
         {{corporationFields}},
         {{tableAlias}}.creation_date {{mappingPrefix}}_creation_date,
         {{tableAlias}}.creation_geolocation_uuid {{mappingPrefix}}_creation_geolocation_uuid,
+        get_identifiers({{tableAlias}}.creation_geolocation_uuid) creation_geolocation_identifiers,
         {{geolocFields}},
         {{humanSettleFields}},
         -- binary resources
         {{tableAlias}}.number_binaryresources {{mappingPrefix}}_number_binaryresources,
         -- parent
-        parent.uuid parent_uuid, parent.label parent_label, parent.refid parent_refId,
-        parent.notes parent_notes, parent.created parent_created,
-        parent.last_modified parent_lastModified, parent.parent_uuid parent_parentUuid,
+        parent.uuid parent_uuid, get_identifiers(parent.uuid) parent_identifiers, parent.label parent_label,
+        parent.refid parent_refId, parent.notes parent_notes, parent.created parent_created,
+        parent.last_modified parent_lastModified, parent.parent_uuid parent_parentUuid, get_identifiers(parent.parent_uuid) parent_parentIdentifiers,
+        parent.item_uuid parent_itemUuid, get_identifiers(parent.item_uuid) parent_itemIdentifiers,
+        parent.custom_attrs parent_customAttributes, parent.description parent_description,
         -- linked data file resources
         {{digitalObjLinkedDataResAlias}}.sortindex dold_sortindex,
         max({{digitalObjLinkedDataResAlias}}.sortindex) over (partition by {{tableAlias}}.uuid) max_dold_sortindex,
@@ -759,7 +801,7 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
     return super.getSqlSelectReducedFields(tableAlias, mappingPrefix)
         + """
         , %1$s.parent_uuid %2$s_parent_uuid,
-        %1$s.item_uuid %2$s_item_uuid,
+        %1$s.item_uuid %2$s_item_uuid, get_identifiers(%1$s.item_uuid) item_identifiers,
         %3$s.label item_label"""
             .formatted(tableAlias, mappingPrefix, ItemRepositoryImpl.TABLE_ALIAS);
   }
