@@ -53,11 +53,11 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.UUID;
 import java.util.Vector;
 import java.util.function.BiConsumer;
@@ -175,8 +175,8 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
     // a small function that we need several times here but nowhere else
     BiConsumer<Identifiable, String> setIdentifiers =
         (identifiable, colName) -> {
-          List<Identifier> ids = rowView.getColumn(colName, new GenericType<List<Identifier>>() {});
-          if (ids != null) identifiable.setIdentifiers(new HashSet<Identifier>(ids));
+          Set<Identifier> ids = rowView.getColumn(colName, new GenericType<Set<Identifier>>() {});
+          if (ids != null) identifiable.setIdentifiers(ids);
         };
 
     // Try to fill license subresource with uuid, url and label
@@ -341,16 +341,11 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
     // set item UUID and label only
     UUID itemUuid = rowView.getColumn(MAPPING_PREFIX + "_item_uuid", UUID.class);
     LocalizedText itemLabel = rowView.getColumn("item_label", LocalizedText.class);
-    List<Identifier> itemIdentifiers =
-        rowView.getColumn("item_identifiers", new GenericType<List<Identifier>>() {});
+    Set<Identifier> itemIdentifiers =
+        rowView.getColumn("item_identifiers", new GenericType<Set<Identifier>>() {});
     if (itemUuid != null) {
       identifiable.setItem(
-          Item.builder()
-              .uuid(itemUuid)
-              .label(itemLabel)
-              .identifiers(
-                  itemIdentifiers != null ? new HashSet<Identifier>(itemIdentifiers) : null)
-              .build());
+          Item.builder().uuid(itemUuid).label(itemLabel).identifiers(itemIdentifiers).build());
     }
   }
 
@@ -830,24 +825,6 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
     super.save(digitalObject);
   }
 
-  // --------- repository setters for testing purposes only ----------------------
-  public void setAgentEntityRepository(AgentRepositoryImpl<Agent> agentRepositoryImpl) {
-    this.agentRepositoryImpl = agentRepositoryImpl;
-  }
-
-  public void setCollectionRepository(CollectionRepositoryImpl collectionRepositoryImpl) {
-    this.collectionRepositoryImpl = collectionRepositoryImpl;
-  }
-
-  public void setCorporateBodyRepository(CorporateBodyRepositoryImpl corporateBodyRepositoryImpl) {
-    this.corporateBodyRepositoryImpl = corporateBodyRepositoryImpl;
-  }
-
-  public void setFileResourceMetadataRepository(
-      FileResourceMetadataRepositoryImpl<FileResource> fileResourceMetadataRepositoryImpl) {
-    this.fileResourceMetadataRepositoryImpl = fileResourceMetadataRepositoryImpl;
-  }
-
   @Override
   public List<FileResource> setFileResources(
       UUID digitalObjectUuid, List<FileResource> fileResources) throws RepositoryException {
@@ -891,9 +868,31 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
     return getFileResources(digitalObjectUuid);
   }
 
+  // --------- repository setters for testing purposes only ----------------------
+  public void setAgentRepository(AgentRepositoryImpl<Agent> agentRepositoryImpl) {
+    this.agentRepositoryImpl = agentRepositoryImpl;
+  }
+
+  public void setCollectionRepository(CollectionRepositoryImpl collectionRepositoryImpl) {
+    this.collectionRepositoryImpl = collectionRepositoryImpl;
+  }
+
+  public void setCorporateBodyRepository(CorporateBodyRepositoryImpl corporateBodyRepositoryImpl) {
+    this.corporateBodyRepositoryImpl = corporateBodyRepositoryImpl;
+  }
+
+  public void setFileResourceMetadataRepository(
+      FileResourceMetadataRepositoryImpl<FileResource> fileResourceMetadataRepositoryImpl) {
+    this.fileResourceMetadataRepositoryImpl = fileResourceMetadataRepositoryImpl;
+  }
+
   public void setGeoLocationRepositoryImpl(
       GeoLocationRepositoryImpl<GeoLocation> geoLocationRepositoryImpl) {
     this.geoLocationRepositoryImpl = geoLocationRepositoryImpl;
+  }
+
+  public void setHumanSettlementRepository(HumanSettlementRepositoryImpl repositoryImpl) {
+    this.humanSettlementRepositoryImpl = repositoryImpl;
   }
 
   public void setLinkedDataFileResourceRepository(
