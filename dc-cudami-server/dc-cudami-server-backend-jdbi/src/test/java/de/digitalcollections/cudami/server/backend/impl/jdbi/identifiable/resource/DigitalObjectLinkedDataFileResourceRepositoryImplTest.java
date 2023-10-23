@@ -50,7 +50,7 @@ class DigitalObjectLinkedDataFileResourceRepositoryImplTest {
             jdbi, cudamiConfig, linkedDataFileResourceRepositoryImpl);
   }
 
-  @DisplayName("can save LinkedDataFileResources for a DigitalObject")
+  @DisplayName("can save and retrieve LinkedDataFileResources for a DigitalObject")
   @Test
   void setLinkedDataFileResourcesForDigitalObject() throws RepositoryException {
     // Persist the DigitalObject
@@ -73,42 +73,11 @@ class DigitalObjectLinkedDataFileResourceRepositoryImplTest {
             .mimeType(MimeType.MIME_APPLICATION_XML)
             .build();
 
-    List<LinkedDataFileResource> actual =
-        repo.setLinkedDataFileResources(digitalObject.getUuid(), List.of(linkedDataFileResource));
+    repo.setLinkedDataFileResources(digitalObject.getUuid(), List.of(linkedDataFileResource));
+    List<LinkedDataFileResource> actual = repo.getLinkedDataFileResources(digitalObject.getUuid());
 
     assertThat(actual).hasSize(1);
     assertThat(actual.get(0).getUuid()).isNotNull();
-  }
-
-  @DisplayName("can retrieve LinkedDataFileResources for a DigitalObject")
-  @Test
-  void getLinkedDataFileResourcesForDigitalObject() throws RepositoryException {
-    // Persist the DigitalObject
-    DigitalObject digitalObject =
-        DigitalObject.builder()
-            .label(Locale.GERMAN, "deutschsprachiges Label")
-            .label(Locale.ENGLISH, "english label")
-            .description(Locale.GERMAN, "Beschreibung")
-            .description(Locale.ENGLISH, "description")
-            .build();
-    digitalObjectRepository.save(digitalObject);
-
-    // Try to persist the LinkedDataFileResource
-    LinkedDataFileResource linkedDataFileResource =
-        LinkedDataFileResource.builder()
-            .label(Locale.GERMAN, "Linked Data")
-            .context("https://foo.bar/blubb.xml")
-            .objectType("XML")
-            .filename("blubb.xml") // required!!
-            .mimeType(MimeType.MIME_APPLICATION_XML)
-            .build();
-    List<LinkedDataFileResource> persisted =
-        repo.setLinkedDataFileResources(digitalObject.getUuid(), List.of(linkedDataFileResource));
-
-    List<LinkedDataFileResource> actual = repo.getLinkedDataFileResources(digitalObject.getUuid());
-
-    assertThat(actual).isNotEmpty();
-    assertThat(actual).isEqualTo(persisted);
   }
 
   @DisplayName("can delete a list of LinkedDataFileResources by their uuids")
@@ -133,8 +102,9 @@ class DigitalObjectLinkedDataFileResourceRepositoryImplTest {
             .filename("blubb.xml") // required!!
             .mimeType(MimeType.MIME_APPLICATION_XML)
             .build();
+    repo.setLinkedDataFileResources(digitalObject.getUuid(), List.of(linkedDataFileResource));
     List<LinkedDataFileResource> persisted =
-        repo.setLinkedDataFileResources(digitalObject.getUuid(), List.of(linkedDataFileResource));
+        repo.getLinkedDataFileResources(digitalObject.getUuid());
 
     repo.delete(
         persisted.stream().map(LinkedDataFileResource::getUuid).collect(Collectors.toList()));
@@ -173,8 +143,7 @@ class DigitalObjectLinkedDataFileResourceRepositoryImplTest {
             .filename("blubb.xml") // required!!
             .mimeType(MimeType.MIME_APPLICATION_XML)
             .build();
-    List<LinkedDataFileResource> persisted =
-        repo.setLinkedDataFileResources(digitalObject.getUuid(), List.of(linkedDataFileResource));
+    repo.setLinkedDataFileResources(digitalObject.getUuid(), List.of(linkedDataFileResource));
 
     assertThat(repo.countDigitalObjectsForResource(linkedDataFileResource.getUuid())).isEqualTo(1);
   }
@@ -207,8 +176,7 @@ class DigitalObjectLinkedDataFileResourceRepositoryImplTest {
             .filename("blubb.xml") // required!!
             .mimeType(MimeType.MIME_APPLICATION_XML)
             .build();
-    List<LinkedDataFileResource> persisted =
-        repo.setLinkedDataFileResources(digitalObject.getUuid(), List.of(linkedDataFileResource));
+    repo.setLinkedDataFileResources(digitalObject.getUuid(), List.of(linkedDataFileResource));
 
     assertThat(repo.delete(linkedDataFileResource.getUuid())).isEqualTo(1);
   }

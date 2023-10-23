@@ -9,9 +9,11 @@ import de.digitalcollections.cudami.server.backend.api.repository.identifiable.a
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.work.ItemRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.AbstractIdentifiableRepositoryImplTest;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.IdentifierRepositoryImpl;
+import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.agent.AgentRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.agent.CorporateBodyRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.agent.PersonRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.geo.location.GeoLocationRepositoryImpl;
+import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.geo.location.HumanSettlementRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.resource.FileResourceMetadataRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.resource.LinkedDataFileResourceRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.legal.LicenseRepositoryImpl;
@@ -77,16 +79,15 @@ class DigitalObjectRepositoryImplTest
 
   @Autowired private CorporateBodyRepositoryImpl corporateBodyRepositoryImpl;
 
-  @Autowired private EntityRepositoryImpl<Agent> agentEntityRepositoryImpl;
+  @Autowired private AgentRepositoryImpl<Agent> agentRepositoryImpl;
 
   @Autowired
   private FileResourceMetadataRepositoryImpl<FileResource> fileResourceMetadataRepositoryImpl;
 
   @Autowired private TagRepositoryImpl tagRepository;
 
-  @Autowired private EntityRepositoryImpl<GeoLocation> geoLocationEntityRepositoryImpl;
-
   @Autowired private GeoLocationRepositoryImpl<GeoLocation> geoLocationRepositoryImpl;
+  @Autowired private HumanSettlementRepositoryImpl humanSettlementRepositoryImpl;
 
   @Autowired private IdentifierRepositoryImpl identifierRepositoryImpl;
 
@@ -116,12 +117,12 @@ class DigitalObjectRepositoryImplTest
             identifierRepository,
             urlAliasRepository,
             iiifObjectMapper);
-    repo.setAgentEntityRepository(agentEntityRepositoryImpl);
+    repo.setAgentRepository(agentRepositoryImpl);
     repo.setCollectionRepository(collectionRepositoryImpl);
     repo.setCorporateBodyRepository(corporateBodyRepositoryImpl);
     repo.setFileResourceMetadataRepository(fileResourceMetadataRepositoryImpl);
-    repo.setGeolocationEntityRepositoryImpl(geoLocationEntityRepositoryImpl);
     repo.setGeoLocationRepositoryImpl(geoLocationRepositoryImpl);
+    repo.setHumanSettlementRepository(humanSettlementRepositoryImpl);
     repo.setLinkedDataFileResourceRepository(linkedDataFileResourceRepository);
     repo.setPersonRepository(personRepositoryImpl);
   }
@@ -138,6 +139,7 @@ class DigitalObjectRepositoryImplTest
             .uuid(UUID.randomUUID())
             .label(Locale.GERMAN, "Körperschaft")
             .label(Locale.ENGLISH, "Corporate Body")
+            .identifier(Identifier.builder().namespace("CB").id("corporation").build())
             .build();
     CorporateBodyRepositoryImpl corporateBodyRepository =
         new CorporateBodyRepositoryImpl(
@@ -396,7 +398,12 @@ class DigitalObjectRepositoryImplTest
     assertThat(digitalObject.getItem().getUuid()).isEqualTo(item.getUuid());
     DigitalObject retrieved = repo.getByUuid(digitalObject.getUuid());
     assertThat(retrieved.getItem())
-        .isEqualTo(Item.builder().uuid(item.getUuid()).label(item.getLabel()).build());
+        .isEqualTo(
+            Item.builder()
+                .uuid(item.getUuid())
+                .label(item.getLabel())
+                .identifier(Identifier.builder().namespace("mdz-sig").id("Signatur").build())
+                .build());
   }
 
   @Test
