@@ -5,7 +5,6 @@ import de.digitalcollections.cudami.server.backend.api.repository.exceptions.Rep
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.semantic.SubjectRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.UniqueObjectRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.type.DbIdentifierMapper;
-import de.digitalcollections.model.identifiable.Identifier;
 import de.digitalcollections.model.identifiable.semantic.Subject;
 import de.digitalcollections.model.list.filtering.FilterCriterion;
 import de.digitalcollections.model.list.paging.PageRequest;
@@ -36,19 +35,13 @@ public class SubjectRepositoryImpl extends UniqueObjectRepositoryImpl<Subject>
 
   public static String sqlSelectReducedFields(String tableAlias, String mappingPrefix) {
     return UniqueObjectRepositoryImpl.sqlSelectReducedFields(tableAlias, mappingPrefix)
-        + ", "
-        + tableAlias
-        + ".identifiers "
-        + mappingPrefix
-        + "_identifiers, "
-        + tableAlias
-        + ".label "
-        + mappingPrefix
-        + "_label, "
-        + tableAlias
-        + ".type "
-        + mappingPrefix
-        + "_subjectType";
+        + """
+       , dbidentifiers2jsonb({{tableAlias}}.identifiers) {{mappingPrefix}}_identifiers,
+       {{tableAlias}}.label {{mappingPrefix}}_label,
+       {{tableAlias}}.type {{mappingPrefix}}_subjectType
+       """
+            .replace("{{tableAlias}}", tableAlias)
+            .replace("{{mappingPrefix}}", mappingPrefix);
   }
 
   public SubjectRepositoryImpl(
@@ -63,7 +56,6 @@ public class SubjectRepositoryImpl extends UniqueObjectRepositoryImpl<Subject>
 
     dbi.registerRowMapper(BeanMapper.factory(Subject.class, MAPPING_PREFIX));
     this.dbi.registerArrayType(dbIdentifierMapper);
-    this.dbi.registerColumnMapper(Identifier.class, dbIdentifierMapper);
   }
 
   @Override
