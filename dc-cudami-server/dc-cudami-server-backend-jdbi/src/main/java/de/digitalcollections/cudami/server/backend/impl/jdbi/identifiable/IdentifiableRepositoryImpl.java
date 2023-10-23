@@ -35,7 +35,6 @@ import de.digitalcollections.model.semantic.Tag;
 import de.digitalcollections.model.text.LocalizedText;
 import java.net.URI;
 import java.net.URL;
-import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -51,6 +50,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.jdbi.v3.core.Handle;
 import org.jdbi.v3.core.Jdbi;
+import org.jdbi.v3.core.generic.GenericType;
 import org.jdbi.v3.core.mapper.reflect.BeanMapper;
 import org.jdbi.v3.core.result.RowView;
 import org.jdbi.v3.core.statement.PreparedBatch;
@@ -576,7 +576,7 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
         new StringBuilder(
             ("""
             SELECT {{fieldsSql}}, {{identifierFields}},
-              {{imageFileFields}}, {{imageFileIdentifierFields}},
+              {{imageFileFields}}, get_identifiers(file.uuid) pi_identifiers,
               {{urlAliasFields}}, {{tagFields}}, {{subjectFields}}
             FROM {{mainTable}} {{mainAlias}}
             """
@@ -594,10 +594,8 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
                     + """
             LEFT JOIN {{identifierTable}} AS {{identifierAlias}}
               ON  {{mainAlias}}.uuid = {{identifierAlias}}.identifiable
-            LEFT JOIN (
-              {{imageFileTable}} AS file LEFT JOIN {{identifierTable}} file_id
-              ON file_id.identifiable = file.uuid
-            ) ON {{mainAlias}}.previewfileresource = file.uuid
+            LEFT JOIN {{imageFileTable}} AS file
+              ON {{mainAlias}}.previewfileresource = file.uuid
             LEFT JOIN {{urlAliasTable}} AS {{urlAliasAlias}}
               ON  {{mainAlias}}.uuid = {{urlAliasAlias}}.target_uuid
             {{urlAliasExtraJoins}}
@@ -616,9 +614,6 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
                 .replace(
                     "{{imageFileFields}}",
                     ImageFileResourceRepositoryImpl.SQL_PREVIEW_IMAGE_FIELDS_PI)
-                .replace(
-                    "{{imageFileIdentifierFields}}",
-                    IdentifierRepositoryImpl.sqlSelectAllFields("file_id", "file_id"))
                 .replace(
                     "{{urlAliasFields}}",
                     UrlAliasRepositoryImpl.sqlSelectReducedFields(
@@ -761,17 +756,12 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
   }
 
   private void setPreviewImageIdentifier(RowView rowView, I identifiable) {
-    UUID identifierUuid = rowView.getColumn("file_id_uuid", UUID.class);
-    if (identifierUuid == null) return;
-    Identifier id =
-        Identifier.builder()
-            .uuid(identifierUuid)
-            .created(rowView.getColumn("file_id_created", LocalDateTime.class))
-            .lastModified(rowView.getColumn("file_id_lastModified", LocalDateTime.class))
-            .namespace(rowView.getColumn("file_id_namespace", String.class))
-            .id(rowView.getColumn("file_id_id", String.class))
-            .build();
-    identifiable.getPreviewImage().addIdentifier(id);
+    if (identifiable.getPreviewImage() == null) return;
+    Set<Identifier> imageIdentifiers = rowView.getColumn("pi_identifiers", new SetOfIdentifiers());
+    if (identifiable.getPreviewImage().getIdentifiers() != null
+            && !identifiable.getPreviewImage().getIdentifiers().isEmpty()
+        || imageIdentifiers == null) return;
+    identifiable.getPreviewImage().setIdentifiers(imageIdentifiers);
   }
 
   @Override
@@ -929,4 +919,7 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
       throw e;
     }
   }
+
+  // This is not working with an anonymous inner class here
+  private static class SetOfIdentifiers extends GenericType<Set<Identifier>> {}
 }
