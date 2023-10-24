@@ -25,7 +25,6 @@ public interface DigitalObjectLinkedDataFileResourceService {
    *
    * @param digitalObject the DigitalObject
    * @param linkedDataFileResources list of LinkedDataFileResources to be persisted
-   * @return list of persisted LinkedDataFileResources
    * @throws ServiceException
    */
   void setLinkedDataFileResources(

@@ -39,6 +39,7 @@ public interface HeadwordService extends UniqueObjectService<Headword> {
 
   List<Locale> getLanguages() throws ServiceException;
 
+  @Override
   List<Headword> getRandom(int count) throws ServiceException;
 
   List<Entity> getRelatedEntities(Headword headword) throws ServiceException;
@@ -52,6 +53,7 @@ public interface HeadwordService extends UniqueObjectService<Headword> {
    * @param headword headword the entities are related to
    * @param entities the entities that are related to the headword
    * @return the list of the related entities
+   * @throws ServiceException
    */
   List<Entity> setRelatedEntities(Headword headword, List<Entity> entities) throws ServiceException;
 
@@ -62,6 +64,7 @@ public interface HeadwordService extends UniqueObjectService<Headword> {
    * @param headword headword the file resources are related to
    * @param fileResources the file resources that are related to the entity part
    * @return the list of the related file resources
+   * @throws ServiceException
    */
   List<FileResource> setRelatedFileResources(Headword headword, List<FileResource> fileResources)
       throws ServiceException;
