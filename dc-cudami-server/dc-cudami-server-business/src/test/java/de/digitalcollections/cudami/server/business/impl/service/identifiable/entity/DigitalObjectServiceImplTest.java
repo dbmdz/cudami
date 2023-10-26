@@ -22,6 +22,8 @@ import de.digitalcollections.cudami.server.business.api.service.identifiable.ali
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.CollectionService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.ProjectService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.work.ItemService;
+import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.work.ManifestationService;
+import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.work.WorkService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.resource.DigitalObjectLinkedDataFileResourceService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.resource.DigitalObjectRenderingFileResourceService;
 import de.digitalcollections.cudami.server.business.impl.service.AbstractServiceImplTest;
@@ -53,6 +55,8 @@ class DigitalObjectServiceImplTest extends AbstractServiceImplTest {
   protected HookProperties hookProperties;
   private IdentifierService identifierService;
   private ItemService itemService;
+  private ManifestationService manifestationService;
+  private WorkService workService;
   private LocaleService localeService;
   private ProjectService projectService;
   private UrlAliasService urlAliasService;
@@ -73,6 +77,8 @@ class DigitalObjectServiceImplTest extends AbstractServiceImplTest {
     hookProperties = mock(HookProperties.class);
     identifierService = mock(IdentifierService.class);
     itemService = mock(ItemService.class);
+    manifestationService = mock(ManifestationService.class);
+    workService = mock(WorkService.class);
     localeService = mock(LocaleService.class);
     when(localeService.getDefaultLanguage()).thenReturn("de");
     projectService = mock(ProjectService.class);
@@ -89,6 +95,8 @@ class DigitalObjectServiceImplTest extends AbstractServiceImplTest {
             projectService,
             identifierService,
             itemService,
+            manifestationService,
+            workService,
             urlAliasService,
             digitalObjectLinkedDataFileResourceService,
             digitalObjectRenderingFileResourceService,

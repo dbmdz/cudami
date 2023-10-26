@@ -8,7 +8,9 @@ import de.digitalcollections.model.exception.http.client.ResourceNotFoundExcepti
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import java.net.http.HttpClient;
+import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,8 +45,20 @@ public class CudamiRestClient<T extends UniqueObject> extends BaseRestClient<T> 
   }
 
   public T getByUuid(UUID uuid) throws TechnicalException {
+    return getByUuid(uuid, null);
+  }
+
+  public T getByUuid(UUID uuid, Map<String, String> additionalParameters)
+      throws TechnicalException {
     try {
-      return doGetRequestForObject(String.format("%s/%s", baseEndpoint, uuid));
+      String params = "";
+      if (additionalParameters != null && !additionalParameters.isEmpty()) {
+        params =
+            additionalParameters.entrySet().stream()
+                .map(entry -> String.format("%s=%s", entry.getKey(), entry.getValue()))
+                .collect(Collectors.joining("&", "?", ""));
+      }
+      return doGetRequestForObject(String.format("%s/%s%s", baseEndpoint, uuid, params));
     } catch (ResourceNotFoundException e) {
       return null;
     }

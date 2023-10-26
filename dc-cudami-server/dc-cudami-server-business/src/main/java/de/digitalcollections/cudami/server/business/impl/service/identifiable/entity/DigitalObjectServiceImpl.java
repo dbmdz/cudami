@@ -14,14 +14,19 @@ import de.digitalcollections.cudami.server.business.api.service.identifiable.ent
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.DigitalObjectService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.ProjectService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.work.ItemService;
+import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.work.ManifestationService;
+import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.work.WorkService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.resource.DigitalObjectLinkedDataFileResourceService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.resource.DigitalObjectRenderingFileResourceService;
 import de.digitalcollections.cudami.server.config.HookProperties;
+import de.digitalcollections.model.UniqueObject;
 import de.digitalcollections.model.identifiable.Identifier;
 import de.digitalcollections.model.identifiable.entity.Collection;
 import de.digitalcollections.model.identifiable.entity.Project;
 import de.digitalcollections.model.identifiable.entity.digitalobject.DigitalObject;
 import de.digitalcollections.model.identifiable.entity.item.Item;
+import de.digitalcollections.model.identifiable.entity.manifestation.Manifestation;
+import de.digitalcollections.model.identifiable.entity.work.Work;
 import de.digitalcollections.model.identifiable.resource.FileResource;
 import de.digitalcollections.model.identifiable.resource.ImageFileResource;
 import de.digitalcollections.model.identifiable.resource.LinkedDataFileResource;
@@ -31,6 +36,7 @@ import de.digitalcollections.model.list.paging.PageResponse;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.function.BiConsumer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -47,8 +53,11 @@ public class DigitalObjectServiceImpl extends EntityServiceImpl<DigitalObject>
   private final DigitalObjectLinkedDataFileResourceService
       digitalObjectLinkedDataFileResourceService;
   private final DigitalObjectRenderingFileResourceService digitalObjectRenderingFileResourceService;
-  private final ItemService itemService;
   private final ProjectService projectService;
+
+  private final ItemService itemService;
+  private final ManifestationService manifestationService;
+  private final WorkService workService;
 
   public DigitalObjectServiceImpl(
       DigitalObjectRepository repository,
@@ -56,6 +65,8 @@ public class DigitalObjectServiceImpl extends EntityServiceImpl<DigitalObject>
       ProjectService projectService,
       IdentifierService identifierService,
       ItemService itemService,
+      ManifestationService manifestationService,
+      WorkService workService,
       UrlAliasService urlAliasService,
       DigitalObjectLinkedDataFileResourceService digitalObjectLinkedDataFileResourceService,
       DigitalObjectRenderingFileResourceService digitalObjectRenderingFileResourceService,
@@ -71,6 +82,8 @@ public class DigitalObjectServiceImpl extends EntityServiceImpl<DigitalObject>
         cudamiConfig);
     this.collectionService = collectionService;
     this.itemService = itemService;
+    this.manifestationService = manifestationService;
+    this.workService = workService;
     this.projectService = projectService;
     this.digitalObjectRenderingFileResourceService = digitalObjectRenderingFileResourceService;
     this.digitalObjectLinkedDataFileResourceService = digitalObjectLinkedDataFileResourceService;
@@ -189,9 +202,37 @@ public class DigitalObjectServiceImpl extends EntityServiceImpl<DigitalObject>
     }
   }
 
+  private void expandByWemiObjects(DigitalObject digitalObject) throws ServiceException {
+    if (digitalObject == null || digitalObject.getItem() == null) return;
+    // local function to set lastModified of the DigitalObject to the newest of its enclosed WMI
+    // objects
+    BiConsumer<DigitalObject, UniqueObject> setNewestLastModified =
+        (digObj, wmiObject) -> {
+          if (wmiObject.getLastModified().isAfter(digObj.getLastModified()))
+            digObj.setLastModified(wmiObject.getLastModified());
+          wmiObject.setLastModified(null);
+        };
+
+    Item item = itemService.getByExample(digitalObject.getItem());
+    digitalObject.setItem(item);
+    setNewestLastModified.accept(digitalObject, item);
+
+    if (item.getManifestation() == null) return;
+    Manifestation manifestation = manifestationService.getByExample(item.getManifestation());
+    item.setManifestation(manifestation);
+    setNewestLastModified.accept(digitalObject, manifestation);
+
+    if (manifestation.getWork() == null) return;
+    Work work = workService.getByExample(manifestation.getWork());
+    manifestation.setWork(work);
+    setNewestLastModified.accept(digitalObject, work);
+  }
+
   @Override
-  public DigitalObject getByExample(DigitalObject example) throws ServiceException {
+  public DigitalObject getByExample(DigitalObject example, boolean fillWemi)
+      throws ServiceException {
     DigitalObject digitalObject = super.getByExample(example);
+    if (fillWemi) expandByWemiObjects(digitalObject);
     return digitalObject;
   }
 
@@ -203,28 +244,10 @@ public class DigitalObjectServiceImpl extends EntityServiceImpl<DigitalObject>
   }
 
   @Override
-  public DigitalObject getByIdentifier(Identifier identifier) throws ServiceException {
+  public DigitalObject getByIdentifier(Identifier identifier, boolean fillWemi)
+      throws ServiceException {
     DigitalObject digitalObject = super.getByIdentifier(identifier);
-    return digitalObject;
-  }
-
-  @Override
-  public DigitalObject getByIdentifierWithWEMI(Identifier identifier) throws ServiceException {
-    DigitalObject digitalObject = getByIdentifier(identifier);
-    if (digitalObject == null) {
-      return null;
-    }
-    if (digitalObject.getItem() != null) {
-      Item item = itemService.getByExample(digitalObject.getItem());
-
-      // for later:
-      //      if (item.getManifestation() != null) {
-      //        // TODO: fetch manifestation and fill item
-      //      }
-
-      digitalObject.setItem(item);
-    }
-
+    if (fillWemi) expandByWemiObjects(digitalObject);
     return digitalObject;
   }
 

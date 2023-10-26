@@ -72,6 +72,10 @@ public class CudamiDigitalObjectsClient extends CudamiEntitiesClient<DigitalObje
     return getByIdentifier(namespace, id, Map.of("fill-wemi", "true"));
   }
 
+  public DigitalObject getByUuidAndFillWEMI(UUID uuid) throws TechnicalException {
+    return getByUuid(uuid, Map.of("fill-wemi", "true"));
+  }
+
   public List<FileResource> getFileResources(UUID uuid) throws TechnicalException {
     return doGetRequestForObjectList(
         String.format("%s/%s/fileresources", baseEndpoint, uuid), FileResource.class);
