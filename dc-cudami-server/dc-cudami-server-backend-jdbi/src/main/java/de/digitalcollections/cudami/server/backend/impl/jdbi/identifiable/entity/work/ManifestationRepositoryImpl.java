@@ -14,6 +14,7 @@ import de.digitalcollections.cudami.server.backend.impl.jdbi.type.MainSubTypeMap
 import de.digitalcollections.cudami.server.backend.impl.jdbi.type.TitleMapper;
 import de.digitalcollections.model.RelationSpecification;
 import de.digitalcollections.model.identifiable.IdentifiableObjectType;
+import de.digitalcollections.model.identifiable.Identifier;
 import de.digitalcollections.model.identifiable.entity.Entity;
 import de.digitalcollections.model.identifiable.entity.agent.Agent;
 import de.digitalcollections.model.identifiable.entity.agent.CorporateBody;
@@ -46,6 +47,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import java.util.Vector;
 import java.util.stream.Stream;
@@ -214,6 +216,8 @@ public class ManifestationRepositoryImpl extends EntityRepositoryImpl<Manifestat
                 .identifiableObjectType(
                     rowView.getColumn(
                         "parent_identifiableObjectType", IdentifiableObjectType.class))
+                .identifiers(
+                    rowView.getColumn("parent_identifiers", new GenericType<Set<Identifier>>() {}))
                 .build();
         manifestation
             .getParents()
@@ -441,10 +445,19 @@ public class ManifestationRepositoryImpl extends EntityRepositoryImpl<Manifestat
         """
             .formatted(tableAlias, mappingPrefix)
         // publishers
-        + "%s, %s"
-            .formatted(
-                agentRepository.getSqlSelectReducedFields(),
-                humanSettlementRepository.getSqlSelectReducedFields());
+        + """
+        {{agentFields}},
+        {{humanSettlementFields}},
+        get_identifiers({{agentAlias}}.uuid) {{agentMap}}_identifiers,
+        get_identifiers({{humanSettleAlias}}.uuid) {{humanSettleMap}}_identifiers
+        """
+            .replace("{{agentFields}}", agentRepository.getSqlSelectReducedFields())
+            .replace(
+                "{{humanSettlementFields}}", humanSettlementRepository.getSqlSelectReducedFields())
+            .replace("{{agentAlias}}", agentRepository.getTableAlias())
+            .replace("{{agentMap}}", agentRepository.getMappingPrefix())
+            .replace("{{humanSettleAlias}}", humanSettlementRepository.getTableAlias())
+            .replace("{{humanSettleMap}}", humanSettlementRepository.getMappingPrefix());
   }
 
   @Override
@@ -471,7 +484,7 @@ public class ManifestationRepositoryImpl extends EntityRepositoryImpl<Manifestat
             , %1$s.expressiontypes %2$s_expressionTypes, %1$s.language %2$s_language, %1$s.manifestationtype %2$s_manifestationType,
             %1$s.manufacturingtype %2$s_manufacturingType, %1$s.mediatypes %2$s_mediaTypes,
             %1$s.titles %2$s_titles,
-            %3$s.uuid %4$s_uuid, %3$s.label %4$s_label,
+            %3$s.uuid %4$s_uuid, get_identifiers(%3$s.uuid) %4$s_identifiers, %3$s.label %4$s_label,
             """
             .formatted(
                 tableAlias,
@@ -483,17 +496,20 @@ public class ManifestationRepositoryImpl extends EntityRepositoryImpl<Manifestat
             mms.title parent_title, mms.sortKey parent_sortKey,
             parent.uuid parent_uuid, parent.label parent_label, parent.titles parent_titles, parent.manifestationtype parent_manifestationType,
             parent.refid parent_refId, parent.notes parent_notes, parent.created parent_created, parent.last_modified parent_lastModified,
-            parent.identifiable_objecttype parent_identifiableObjectType,
+            parent.identifiable_objecttype parent_identifiableObjectType, get_identifiers(parent.uuid) parent_identifiers,
             """
         // relations
         + """
-            %1$s.predicate %2$s_predicate, %1$s.sortindex %2$s_sortindex,
-            %1$s.additional_predicates %2$s_additionalPredicates,
-            max(%1$s.sortindex) OVER (PARTITION BY %3$s.uuid) relation_max_sortindex, """
-            .formatted(
-                EntityToEntityRelationRepositoryImpl.TABLE_ALIAS,
-                EntityToEntityRelationRepositoryImpl.MAPPING_PREFIX,
-                tableAlias)
+            {{entityRelationAlias}}.predicate {{entityRelationMap}}_predicate, {{entityRelationAlias}}.sortindex {{entityRelationMap}}_sortindex,
+            {{entityRelationAlias}}.additional_predicates {{entityRelationMap}}_additionalPredicates,
+            max({{entityRelationAlias}}.sortindex) OVER (PARTITION BY {{tableAlias}}.uuid) relation_max_sortindex,
+            get_identifiers({{entityAlias}}.uuid) {{entityMapping}}_identifiers,
+            """
+            .replace("{{tableAlias}}", tableAlias)
+            .replace("{{entityRelationAlias}}", EntityToEntityRelationRepositoryImpl.TABLE_ALIAS)
+            .replace("{{entityRelationMap}}", EntityToEntityRelationRepositoryImpl.MAPPING_PREFIX)
+            .replace("{{entityAlias}}", entityRepository.getTableAlias())
+            .replace("{{entityMapping}}", entityRepository.getMappingPrefix())
         + entityRepository.getSqlSelectReducedFields();
   }
 

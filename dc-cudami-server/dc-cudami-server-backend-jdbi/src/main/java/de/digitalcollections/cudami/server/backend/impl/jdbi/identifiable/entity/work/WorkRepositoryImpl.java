@@ -13,6 +13,7 @@ import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity
 import de.digitalcollections.cudami.server.backend.impl.jdbi.type.LocalDateRangeMapper;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.type.TitleMapper;
 import de.digitalcollections.model.identifiable.IdentifiableObjectType;
+import de.digitalcollections.model.identifiable.Identifier;
 import de.digitalcollections.model.identifiable.entity.Entity;
 import de.digitalcollections.model.identifiable.entity.agent.Agent;
 import de.digitalcollections.model.identifiable.entity.relation.EntityRelation;
@@ -126,6 +127,8 @@ public class WorkRepositoryImpl extends EntityRepositoryImpl<Work> implements Wo
                 .identifiableObjectType(
                     rowView.getColumn(
                         "parent_identifiableObjectType", IdentifiableObjectType.class))
+                .identifiers(
+                    rowView.getColumn("parent_identifiers", new GenericType<Set<Identifier>>() {}))
                 .build();
         work.getParents().add(parent);
       }
@@ -346,18 +349,20 @@ public class WorkRepositoryImpl extends EntityRepositoryImpl<Work> implements Wo
         + """
             parent.uuid parent_uuid, parent.label parent_label, parent.titles parent_titles,
             parent.refid parent_refId, parent.notes parent_notes, parent.created parent_created, parent.last_modified parent_lastModified,
-            parent.identifiable_objecttype parent_identifiableObjectType,
+            parent.identifiable_objecttype parent_identifiableObjectType, get_identifiers(parent.uuid) parent_identifiers,
             """
         // relations
         + """
-          %1$s.predicate %2$s_predicate, %1$s.sortindex %2$s_sortindex,
-          %1$s.additional_predicates %2$s_additionalPredicates,
-          max(%1$s.sortindex) OVER (PARTITION BY %3$s.uuid) relation_max_sortindex,
-          """
-            .formatted(
-                EntityToEntityRelationRepositoryImpl.TABLE_ALIAS,
-                EntityToEntityRelationRepositoryImpl.MAPPING_PREFIX,
-                tableAlias)
+            {{entityRelationAlias}}.predicate {{entityRelationMap}}_predicate, {{entityRelationAlias}}.sortindex {{entityRelationMap}}_sortindex,
+            {{entityRelationAlias}}.additional_predicates {{entityRelationMap}}_additionalPredicates,
+            max({{entityRelationAlias}}.sortindex) OVER (PARTITION BY {{tableAlias}}.uuid) relation_max_sortindex,
+            get_identifiers({{entityAlias}}.uuid) {{entityMapping}}_identifiers,
+            """
+            .replace("{{tableAlias}}", tableAlias)
+            .replace("{{entityRelationAlias}}", EntityToEntityRelationRepositoryImpl.TABLE_ALIAS)
+            .replace("{{entityRelationMap}}", EntityToEntityRelationRepositoryImpl.MAPPING_PREFIX)
+            .replace("{{entityAlias}}", entityRepository.getTableAlias())
+            .replace("{{entityMapping}}", entityRepository.getMappingPrefix())
         + entityRepository.getSqlSelectReducedFields();
   }
 
