@@ -237,23 +237,10 @@ public class DigitalObjectServiceImpl extends EntityServiceImpl<DigitalObject>
   }
 
   @Override
-  public DigitalObject getByExampleAndLocale(DigitalObject example, Locale locale)
-      throws ServiceException {
-    DigitalObject digitalObject = super.getByExampleAndLocale(example, locale);
-    return digitalObject;
-  }
-
-  @Override
   public DigitalObject getByIdentifier(Identifier identifier, boolean fillWemi)
       throws ServiceException {
     DigitalObject digitalObject = super.getByIdentifier(identifier);
     if (fillWemi) expandByWemiObjects(digitalObject);
-    return digitalObject;
-  }
-
-  @Override
-  public DigitalObject getByRefId(long refId) throws ServiceException {
-    DigitalObject digitalObject = super.getByRefId(refId);
     return digitalObject;
   }
 
