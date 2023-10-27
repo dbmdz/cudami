@@ -24,14 +24,22 @@ import de.digitalcollections.model.identifiable.entity.agent.Agent;
 import de.digitalcollections.model.identifiable.entity.agent.CorporateBody;
 import de.digitalcollections.model.identifiable.entity.agent.Person;
 import de.digitalcollections.model.identifiable.entity.geo.location.HumanSettlement;
-import de.digitalcollections.model.identifiable.entity.manifestation.*;
+import de.digitalcollections.model.identifiable.entity.manifestation.ExpressionType;
+import de.digitalcollections.model.identifiable.entity.manifestation.Manifestation;
+import de.digitalcollections.model.identifiable.entity.manifestation.ProductionInfo;
+import de.digitalcollections.model.identifiable.entity.manifestation.PublicationInfo;
+import de.digitalcollections.model.identifiable.entity.manifestation.Publisher;
 import de.digitalcollections.model.identifiable.entity.relation.EntityRelation;
 import de.digitalcollections.model.identifiable.entity.work.Work;
 import de.digitalcollections.model.identifiable.semantic.Subject;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.relation.Predicate;
-import de.digitalcollections.model.text.*;
+import de.digitalcollections.model.text.LocalizedStructuredContent;
+import de.digitalcollections.model.text.LocalizedText;
+import de.digitalcollections.model.text.StructuredContent;
+import de.digitalcollections.model.text.Title;
+import de.digitalcollections.model.text.TitleType;
 import de.digitalcollections.model.text.contentblock.Text;
 import de.digitalcollections.model.time.LocalDateRange;
 import java.time.LocalDate;
@@ -40,7 +48,11 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.stream.Stream;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
@@ -86,10 +98,19 @@ class ManifestationRepositoryImplTest
   @DisplayName("1.0. Save a manifestation with parent")
   void testSaveManifestation() throws RepositoryException {
     // agents for relations
-    CorporateBody editor = CorporateBody.builder().label("Editor").addName("Editor").build();
+    CorporateBody editor =
+        CorporateBody.builder()
+            .label("Editor")
+            .addName("Editor")
+            .identifier(Identifier.builder().namespace("namespace").id("editor").build())
+            .build();
     corporateBodyRepository.save(editor);
     CorporateBody someoneElse =
-        CorporateBody.builder().label("Someone else").addName("Someone else").build();
+        CorporateBody.builder()
+            .label("Someone else")
+            .addName("Someone else")
+            .identifier(Identifier.builder().namespace("namespace").id("someoneElse").build())
+            .build();
     corporateBodyRepository.save(someoneElse);
 
     // predicates
@@ -411,6 +432,7 @@ class ManifestationRepositoryImplTest
         CorporateBody.builder()
             .name(new LocalizedText(Locale.ENGLISH, "Publisher"))
             .label(new LocalizedText(Locale.ENGLISH, "Publisher label"))
+            .identifier(Identifier.builder().namespace("publisherAgent").id("publisher").build())
             .build();
     corporateBodyRepository.save(publisherAgent);
     Person productionAgent =
@@ -423,6 +445,7 @@ class ManifestationRepositoryImplTest
         HumanSettlement.builder()
             .name(new LocalizedText(Locale.forLanguageTag("und-Latn"), "München"))
             .label(Locale.forLanguageTag("und-Latn"), "München")
+            .identifier(Identifier.builder().namespace("publicationPlace").id("Munich").build())
             .build();
     humanSettlementRepository.save(publicationPlace1);
     assertThat(publicationPlace1.getRefId()).isGreaterThan(0);
@@ -437,6 +460,7 @@ class ManifestationRepositoryImplTest
     Manifestation manifestation =
         Manifestation.builder()
             .label(Locale.GERMAN, "ein Label")
+            .identifier(Identifier.builder().namespace("manifestation-id").id("test").build())
             .composition("composition")
             .expressionType(ExpressionType.builder().mainType("BOOK").subType("PRINT").build())
             .language(Locale.GERMAN)
