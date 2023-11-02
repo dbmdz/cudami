@@ -8,6 +8,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
 
 ### Added
 
+- Hierarchically filled `DigitalObject` (by UUID or identifier); the `lastModified` date of the `DigitalObject`
+  is set to the newest of its WMI objects, the WMI objects lose their date therefor
+- Identifiers of objects enclosed in `Work`, `Manifestation` & `Item`
 - SQL function to retrieve an identifiable's identifiers
 - SQL function to convert `dbidentifier[]` (composite database type) into json(b)
 
