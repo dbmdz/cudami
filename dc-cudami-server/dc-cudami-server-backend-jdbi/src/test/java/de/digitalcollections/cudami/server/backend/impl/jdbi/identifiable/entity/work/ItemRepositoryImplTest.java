@@ -85,7 +85,11 @@ public class ItemRepositoryImplTest
   @Test
   @DisplayName("can save an item")
   public void saveItem() throws RepositoryException {
-    Item item = Item.builder().label(Locale.GERMAN, "Item").build();
+    Item item =
+        Item.builder()
+            .label(Locale.GERMAN, "Item")
+            .identifier(Identifier.builder().namespace("namespace").id("id").build())
+            .build();
     saveAndAssertTimestampsAndEqualityToSaveable(item);
   }
 
@@ -165,11 +169,13 @@ public class ItemRepositoryImplTest
         CorporateBody.builder()
             .label(Locale.GERMAN, "A Company")
             .identifiableObjectType(IdentifiableObjectType.CORPORATE_BODY)
+            .identifier(Identifier.builder().namespace("namespace").id("company").build())
             .build());
     holders.add(
         CorporateBody.builder()
             .label(Locale.GERMAN, "Some Amazing Company")
             .identifiableObjectType(IdentifiableObjectType.CORPORATE_BODY)
+            .identifier(Identifier.builder().namespace("namespace").id("companü").build())
             .build());
 
     CorporateBody holder0 = (CorporateBody) holders.get(0);

@@ -8,6 +8,7 @@ import de.digitalcollections.cudami.server.backend.api.repository.identifiable.e
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.DigitalObjectRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.EntityRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.agent.AgentRepositoryImpl;
+import de.digitalcollections.model.identifiable.Identifier;
 import de.digitalcollections.model.identifiable.entity.agent.Agent;
 import de.digitalcollections.model.identifiable.entity.agent.CorporateBody;
 import de.digitalcollections.model.identifiable.entity.agent.Family;
@@ -24,8 +25,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import org.jdbi.v3.core.Jdbi;
+import org.jdbi.v3.core.generic.GenericType;
 import org.jdbi.v3.core.result.RowView;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -82,6 +85,8 @@ public class ItemRepositoryImpl extends EntityRepositoryImpl<Item> implements It
       if (item.getPartOfItem().getLabel() != null) return;
       LocalizedText partOfItemLabel = rowView.getColumn("poi_label", LocalizedText.class);
       item.getPartOfItem().setLabel(partOfItemLabel);
+      Set<Identifier> ids = rowView.getColumn("poi_identifiers", new SetOfIdentifiers());
+      if (ids != null) item.getPartOfItem().setIdentifiers(ids);
     }
 
     // same for manifestation
@@ -90,6 +95,9 @@ public class ItemRepositoryImpl extends EntityRepositoryImpl<Item> implements It
       LocalizedText manifestationLabel =
           rowView.getColumn(MAPPING_PREFIX + "_manifestation_label", LocalizedText.class);
       item.getManifestation().setLabel(manifestationLabel);
+      Set<Identifier> ids =
+          rowView.getColumn(MAPPING_PREFIX + "_manifestation_identifiers", new SetOfIdentifiers());
+      if (ids != null) item.getManifestation().setIdentifiers(ids);
     }
   }
 
@@ -281,8 +289,8 @@ public class ItemRepositoryImpl extends EntityRepositoryImpl<Item> implements It
     return getSqlSelectReducedFields(tableAlias, mappingPrefix)
         + """
         , %1$s.exemplifies_manifestation %2$s_exemplifies_manifestation,
-        poi.label poi_label,
-        %3$s.label %2$s_manifestation_label
+        poi.label poi_label, get_identifiers(poi.uuid) poi_identifiers,
+        %3$s.label %2$s_manifestation_label, get_identifiers(%3$s.uuid) %2$s_manifestation_identifiers
         """
             .formatted(tableAlias, mappingPrefix, ManifestationRepositoryImpl.TABLE_ALIAS);
   }
@@ -314,7 +322,10 @@ public class ItemRepositoryImpl extends EntityRepositoryImpl<Item> implements It
         + mappingPrefix
         + "_manifestation_uuid, "
         + agentRepository.getSqlSelectReducedFields(
-            "holdertable", AgentRepositoryImpl.MAPPING_PREFIX);
+            "holdertable", AgentRepositoryImpl.MAPPING_PREFIX)
+        + ", get_identifiers(holdertable.uuid) "
+        + AgentRepositoryImpl.MAPPING_PREFIX
+        + "_identifiers";
   }
 
   @Override
@@ -345,4 +356,6 @@ public class ItemRepositoryImpl extends EntityRepositoryImpl<Item> implements It
     bindings.put("holder_uuids", extractUuids(item.getHolders()));
     super.update(item, bindings);
   }
+
+  private static class SetOfIdentifiers extends GenericType<Set<Identifier>> {}
 }

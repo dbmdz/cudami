@@ -69,7 +69,8 @@ class DigitalObjectControllerTest extends BaseControllerTest {
             .refId(72)
             .build();
 
-    when(digitalObjectService.getByIdentifier(any(Identifier.class))).thenReturn(expected);
+    when(digitalObjectService.getByIdentifier(any(Identifier.class), eq(false)))
+        .thenReturn(expected);
 
     testJson(path);
   }
@@ -145,13 +146,13 @@ class DigitalObjectControllerTest extends BaseControllerTest {
     DigitalObject expected = DigitalObject.builder().build();
 
     when(digitalObjectService.getByIdentifier(
-            eq(Identifier.builder().namespace("foo").id("bar").build())))
+            eq(Identifier.builder().namespace("foo").id("bar").build()), eq(false)))
         .thenReturn(expected);
 
     testHttpGet(path);
 
     verify(digitalObjectService, times(1))
-        .getByIdentifier(eq(Identifier.builder().namespace("foo").id("bar").build()));
+        .getByIdentifier(eq(Identifier.builder().namespace("foo").id("bar").build()), eq(false));
   }
 
   @DisplayName("can retrieve by identifier with base 64 encoded data")
@@ -161,7 +162,7 @@ class DigitalObjectControllerTest extends BaseControllerTest {
     DigitalObject expected = DigitalObject.builder().build();
 
     when(digitalObjectService.getByIdentifier(
-            eq(Identifier.builder().namespace("foo").id("bar/bla").build())))
+            eq(Identifier.builder().namespace("foo").id("bar/bla").build()), eq(false)))
         .thenReturn(expected);
 
     testHttpGet(
@@ -169,7 +170,8 @@ class DigitalObjectControllerTest extends BaseControllerTest {
             + Base64.getEncoder().encodeToString("foo:bar/bla".getBytes(StandardCharsets.UTF_8)));
 
     verify(digitalObjectService, times(1))
-        .getByIdentifier(eq(Identifier.builder().namespace("foo").id("bar/bla").build()));
+        .getByIdentifier(
+            eq(Identifier.builder().namespace("foo").id("bar/bla").build()), eq(false));
   }
 
   @DisplayName("throws a 404 exception, when update of a not yet existing resource is attempted")

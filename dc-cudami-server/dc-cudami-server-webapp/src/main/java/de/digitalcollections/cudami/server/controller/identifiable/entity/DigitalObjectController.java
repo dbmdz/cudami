@@ -141,10 +141,7 @@ public class DigitalObjectController extends AbstractEntityController<DigitalObj
             .id(namespaceAndId.getRight())
             .build();
 
-    DigitalObject digitalObject =
-        fillWemi
-            ? service.getByIdentifierWithWEMI(identifier)
-            : service.getByIdentifier(identifier);
+    DigitalObject digitalObject = service.getByIdentifier(identifier, fillWemi);
     return new ResponseEntity<>(
         digitalObject, digitalObject != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
   }
@@ -159,7 +156,6 @@ public class DigitalObjectController extends AbstractEntityController<DigitalObj
     return super.getByRefId(refId);
   }
 
-  @Override
   @Operation(summary = "Get a digital object by uuid")
   @GetMapping(
       value = {
@@ -169,8 +165,13 @@ public class DigitalObjectController extends AbstractEntityController<DigitalObj
         "/latest/digitalobjects/{uuid:" + ParameterHelper.UUID_PATTERN + "}"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<DigitalObject> getByUuid(@PathVariable UUID uuid) throws ServiceException {
-    return super.getByUuid(uuid);
+  public ResponseEntity<DigitalObject> getByUuid(
+      @PathVariable UUID uuid,
+      @RequestParam(name = "fill-wemi", required = false, defaultValue = "false") boolean fillWemi)
+      throws ServiceException {
+    DigitalObject result = service.getByExample(buildExampleWithUuid(uuid), fillWemi);
+    return new ResponseEntity<DigitalObject>(
+        result, result != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
   }
 
   @Operation(

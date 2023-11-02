@@ -106,7 +106,11 @@ class WorkRepositoryImplTest extends AbstractIdentifiableRepositoryImplTest<Work
   @DisplayName("persists all fields of a saved work")
   @Test
   public void persistAllFieldsOnSave() throws RepositoryException {
-    Work parentWork = Work.builder().label(Locale.GERMAN, "Parent").build();
+    Work parentWork =
+        Work.builder()
+            .label(Locale.GERMAN, "Parent")
+            .identifier(Identifier.builder().namespace("parent").id("work").build())
+            .build();
     repo.save(parentWork);
 
     Work work =
