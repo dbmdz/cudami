@@ -23,7 +23,7 @@ public class FileResourceMetadataRepositoryImpl<F extends FileResource>
 
   public static final String MAPPING_PREFIX = "fr";
   public static final String SQL_PREVIEW_IMAGE_FIELDS_PI =
-      " file.uuid pi_uuid, file.filename pi_filename, file.mimetype pi_mimeType, file.uri pi_uri, file.http_base_url pi_httpBaseUrl";
+      " file.uuid pi_uuid, file.label pi_label, file.filename pi_filename, file.mimetype pi_mimeType, file.uri pi_uri, file.http_base_url pi_httpBaseUrl";
   public static final String TABLE_ALIAS = "f";
   public static final String TABLE_NAME = "fileresources";
 

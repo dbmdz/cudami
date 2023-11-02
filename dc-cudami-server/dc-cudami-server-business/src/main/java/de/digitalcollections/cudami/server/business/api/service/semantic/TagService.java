@@ -4,6 +4,7 @@ import de.digitalcollections.cudami.server.business.api.service.UniqueObjectServ
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.model.semantic.Tag;
 
+/** Service for Tag */
 public interface TagService extends UniqueObjectService<Tag> {
 
   Tag getByValue(String value) throws ServiceException;

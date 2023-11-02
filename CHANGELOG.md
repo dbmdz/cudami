@@ -6,13 +6,21 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
 
 ## [Unreleased]
 
+### Added
+
+- SQL function to retrieve an identifiable's identifiers
+- SQL function to convert `dbidentifier[]` (composite database type) into json(b)
+
 ### Changed
 
 - Replaced `data-colwidth` with `data-label` in table rendering
+- `DigitalObject` is retrieved 90 percent faster by SQL joins instead of single `getByUuid` calls
 
 ### Removed
 
 - Removed plugin for table column resizing
+- **Breaking**: Objects contained in a `DigitalObject` retrieved by UUID/identifier are not
+  completely filled anymore
 
 ### Fixed
 

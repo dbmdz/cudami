@@ -192,7 +192,6 @@ public class DigitalObjectServiceImpl extends EntityServiceImpl<DigitalObject>
   @Override
   public DigitalObject getByExample(DigitalObject example) throws ServiceException {
     DigitalObject digitalObject = super.getByExample(example);
-    fillDigitalObject(digitalObject);
     return digitalObject;
   }
 
@@ -200,14 +199,12 @@ public class DigitalObjectServiceImpl extends EntityServiceImpl<DigitalObject>
   public DigitalObject getByExampleAndLocale(DigitalObject example, Locale locale)
       throws ServiceException {
     DigitalObject digitalObject = super.getByExampleAndLocale(example, locale);
-    fillDigitalObject(digitalObject);
     return digitalObject;
   }
 
   @Override
   public DigitalObject getByIdentifier(Identifier identifier) throws ServiceException {
     DigitalObject digitalObject = super.getByIdentifier(identifier);
-    fillDigitalObject(digitalObject);
     return digitalObject;
   }
 
@@ -234,7 +231,6 @@ public class DigitalObjectServiceImpl extends EntityServiceImpl<DigitalObject>
   @Override
   public DigitalObject getByRefId(long refId) throws ServiceException {
     DigitalObject digitalObject = super.getByRefId(refId);
-    fillDigitalObject(digitalObject);
     return digitalObject;
   }
 
@@ -352,7 +348,6 @@ public class DigitalObjectServiceImpl extends EntityServiceImpl<DigitalObject>
     } catch (ServiceException e) {
       throw new ServiceException("Cannot save DigitalObject: " + e, e);
     }
-    fillDigitalObject(digitalObject);
   }
 
   @Override
@@ -407,18 +402,18 @@ public class DigitalObjectServiceImpl extends EntityServiceImpl<DigitalObject>
   }
 
   @Override
-  public List<LinkedDataFileResource> setLinkedDataFileResources(
+  public void setLinkedDataFileResources(
       DigitalObject digitalObject, List<LinkedDataFileResource> linkedDataFileResources)
       throws ServiceException {
-    return digitalObjectLinkedDataFileResourceService.setLinkedDataFileResources(
+    digitalObjectLinkedDataFileResourceService.setLinkedDataFileResources(
         digitalObject, linkedDataFileResources);
   }
 
   @Override
-  public List<FileResource> setRenderingFileResources(
+  public void setRenderingFileResources(
       DigitalObject digitalObject, List<FileResource> renderingFileResources)
       throws ServiceException {
-    return digitalObjectRenderingFileResourceService.setRenderingFileResources(
+    digitalObjectRenderingFileResourceService.setRenderingFileResources(
         digitalObject, renderingFileResources);
   }
 
@@ -440,6 +435,5 @@ public class DigitalObjectServiceImpl extends EntityServiceImpl<DigitalObject>
     } catch (ServiceException e) {
       throw new ServiceException("Cannot update DigitalObject: " + e, e);
     }
-    fillDigitalObject(digitalObject);
   }
 }

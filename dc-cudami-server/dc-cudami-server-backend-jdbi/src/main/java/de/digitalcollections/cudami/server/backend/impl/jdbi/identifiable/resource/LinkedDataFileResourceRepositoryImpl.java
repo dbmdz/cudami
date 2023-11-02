@@ -16,8 +16,8 @@ public class LinkedDataFileResourceRepositoryImpl
     extends FileResourceMetadataRepositoryImpl<LinkedDataFileResource>
     implements LinkedDataFileResourceRepository {
 
-  public static final String MAPPING_PREFIX = "fr";
-  public static final String TABLE_ALIAS = "f";
+  public static final String MAPPING_PREFIX = "fld";
+  public static final String TABLE_ALIAS = "fld";
   public static final String TABLE_NAME = "fileresources_linkeddata";
 
   public LinkedDataFileResourceRepositoryImpl(

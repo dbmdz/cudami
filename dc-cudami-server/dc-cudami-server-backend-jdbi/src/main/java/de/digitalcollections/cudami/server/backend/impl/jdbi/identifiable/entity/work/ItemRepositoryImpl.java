@@ -19,8 +19,12 @@ import de.digitalcollections.model.list.filtering.Filtering;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.text.LocalizedText;
-import java.util.*;
-import java.util.function.BiConsumer;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.UUID;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.core.result.RowView;
 import org.slf4j.Logger;
@@ -67,32 +71,32 @@ public class ItemRepositoryImpl extends EntityRepositoryImpl<Item> implements It
   }
 
   @Override
-  protected BiConsumer<Map<UUID, Item>, RowView> createAdditionalReduceRowsBiConsumer() {
-    return (map, rowView) -> {
-      // must not be null; otherwise something went wrong earlier
-      Item item = map.get(rowView.getColumn(MAPPING_PREFIX + "_uuid", UUID.class));
-      // the super item is created and filled with its UUID in
-      // extendReducedIdentifiable
-      // if there is none then we will not do anything
-      if (item.getPartOfItem() != null) {
-        if (item.getPartOfItem().getLabel() != null) return;
-        LocalizedText partOfItemLabel = rowView.getColumn("poi_label", LocalizedText.class);
-        item.getPartOfItem().setLabel(partOfItemLabel);
-      }
+  protected void fullReduceRowsBiConsumer(Map<UUID, Item> map, RowView rowView) {
+    super.fullReduceRowsBiConsumer(map, rowView);
+    // must not be null; otherwise something went wrong earlier
+    Item item = map.get(rowView.getColumn(MAPPING_PREFIX + "_uuid", UUID.class));
+    // the super item is created and filled with its UUID in
+    // extendReducedIdentifiable
+    // if there is none then we will not do anything
+    if (item.getPartOfItem() != null) {
+      if (item.getPartOfItem().getLabel() != null) return;
+      LocalizedText partOfItemLabel = rowView.getColumn("poi_label", LocalizedText.class);
+      item.getPartOfItem().setLabel(partOfItemLabel);
+    }
 
-      // same for manifestation
-      if (item.getManifestation() != null) {
-        if (item.getManifestation().getLabel() != null) return;
-        LocalizedText manifestationLabel =
-            rowView.getColumn(MAPPING_PREFIX + "_manifestation_label", LocalizedText.class);
-        item.getManifestation().setLabel(manifestationLabel);
-      }
-    };
+    // same for manifestation
+    if (item.getManifestation() != null) {
+      if (item.getManifestation().getLabel() != null) return;
+      LocalizedText manifestationLabel =
+          rowView.getColumn(MAPPING_PREFIX + "_manifestation_label", LocalizedText.class);
+      item.getManifestation().setLabel(manifestationLabel);
+    }
   }
 
   @Override
-  protected void extendReducedIdentifiable(Item identifiable, RowView rowView) {
-    super.extendReducedIdentifiable(identifiable, rowView);
+  protected void basicReduceRowsBiConsumer(Map<UUID, Item> map, RowView rowView) {
+    super.basicReduceRowsBiConsumer(map, rowView);
+    Item identifiable = map.get(rowView.getColumn(mappingPrefix + "_uuid", UUID.class));
 
     Agent holder = null;
     if (rowView.getColumn(AgentRepositoryImpl.MAPPING_PREFIX + "_uuid", UUID.class) != null) {

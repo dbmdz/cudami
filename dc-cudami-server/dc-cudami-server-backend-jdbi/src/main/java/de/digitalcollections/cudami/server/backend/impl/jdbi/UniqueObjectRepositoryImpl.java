@@ -16,7 +16,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 import org.jdbi.v3.core.Handle;
@@ -42,22 +41,10 @@ public abstract class UniqueObjectRepositoryImpl<U extends UniqueObject>
             .replace("{{prefix}}", mappingPrefix);
   }
 
-  /*
-   * BiFunction for reducing rows (related objects) of joins not already part of
-   * uniqueobject.
-   */
-  protected final BiConsumer<Map<UUID, U>, RowView> additionalReduceRowsBiConsumer;
-  protected final BiConsumer<Map<UUID, U>, RowView> basicReduceRowsBiConsumer;
-
-  protected final BiConsumer<Map<UUID, U>, RowView> fullReduceRowsBiConsumer;
-
   protected final Class<? extends UniqueObject> uniqueObjectImplClass;
 
   protected UniqueObjectRepositoryImpl() {
     super();
-    this.additionalReduceRowsBiConsumer = null;
-    this.basicReduceRowsBiConsumer = null;
-    this.fullReduceRowsBiConsumer = null;
     this.uniqueObjectImplClass = null;
   }
 
@@ -72,54 +59,32 @@ public abstract class UniqueObjectRepositoryImpl<U extends UniqueObject>
 
     this.dbi.registerRowMapper(BeanMapper.factory(uniqueObjectImplClass, mappingPrefix));
     this.uniqueObjectImplClass = uniqueObjectImplClass;
-
-    this.additionalReduceRowsBiConsumer = createAdditionalReduceRowsBiConsumer();
-    this.basicReduceRowsBiConsumer = createBasicReduceRowsBiConsumer();
-    this.fullReduceRowsBiConsumer = createFullReduceRowsBiConcumer();
   }
 
   /**
    * For details select (only used in find one, not lists): if additional objects should be "joined"
-   * into instance, set bi function for doing this.
-   *
-   * @return BiConsumer function
+   * (the parameter {@code sqlAdditionalJoins} in {@link #retrieveOne(String, Filtering, String,
+   * Map)})
    */
-  protected BiConsumer<Map<UUID, U>, RowView> createAdditionalReduceRowsBiConsumer() {
-    return (map, rowView) -> {};
+  protected void additionalReduceRowsBiConsumer(Map<UUID, U> map, RowView rowView) {}
+
+  /** The basic reduce rows biconsumer for reduced selects (lists, paging) */
+  @SuppressWarnings("unchecked")
+  protected void basicReduceRowsBiConsumer(Map<UUID, U> map, RowView rowView) {
+    map.computeIfAbsent(
+        rowView.getColumn(mappingPrefix + "_uuid", UUID.class),
+        uuid -> (U) rowView.getRow(uniqueObjectImplClass));
   }
 
   /**
-   * Create basic reduce rows biconsumer for reduced selects (lists, paging)
-   *
-   * @return BiConsumer function
-   */
-  protected BiConsumer<Map<UUID, U>, RowView> createBasicReduceRowsBiConsumer() {
-    return (map, rowView) -> {
-      U uniqueObject =
-          map.computeIfAbsent(
-              rowView.getColumn(mappingPrefix + "_uuid", UUID.class),
-              fn -> {
-                return (U) rowView.getRow(uniqueObjectImplClass);
-              });
-    };
-  }
-
-  /**
-   * Create full reduce rows biconsumer for full selects (find one).<br>
-   * For a plain UniqueObject full ad basic are the same (minimal dataset of uuid, lastModified,
+   * The full reduce rows biconsumer for full selects (find one).<br>
+   * This method calls {@link #basicReduceRowsBiConsumer(Map, RowView)}, so make sure to call {@code
+   * super} first and only implement extraneous object building.<br>
+   * For a plain UniqueObject full and basic are the same (minimal dataset of uuid, lastModified,
    * created).
-   *
-   * @return BiConsumer function
    */
-  protected BiConsumer<Map<UUID, U>, RowView> createFullReduceRowsBiConcumer() {
-    return (map, rowView) -> {
-      U uniqueObject =
-          map.computeIfAbsent(
-              rowView.getColumn(mappingPrefix + "_uuid", UUID.class),
-              fn -> {
-                return (U) rowView.getRow(uniqueObjectImplClass);
-              });
-    };
+  protected void fullReduceRowsBiConsumer(Map<UUID, U> map, RowView rowView) {
+    basicReduceRowsBiConsumer(map, rowView);
   }
 
   @Override
@@ -172,36 +137,21 @@ public abstract class UniqueObjectRepositoryImpl<U extends UniqueObject>
   protected List<U> execSelectForList(final String sql, final Map<String, Object> bindings)
       throws RepositoryException {
     try {
-      if (bindings == null && basicReduceRowsBiConsumer == null) {
-        return (List<U>)
-            dbi.withHandle(
-                (Handle handle) -> handle.createQuery(sql).mapToBean(uniqueObjectImplClass).list());
-      } else if (bindings == null && basicReduceRowsBiConsumer != null) {
+      if (bindings == null)
         return dbi.withHandle(
             (Handle handle) ->
                 handle
                     .createQuery(sql)
-                    .reduceRows(basicReduceRowsBiConsumer)
+                    .reduceRows(this::basicReduceRowsBiConsumer)
                     .collect(Collectors.toList()));
-      } else if (bindings != null && basicReduceRowsBiConsumer == null) {
-        return (List<U>)
-            dbi.withHandle(
-                (Handle handle) ->
-                    handle
-                        .createQuery(sql)
-                        .bindMap(bindings)
-                        .mapToBean(uniqueObjectImplClass)
-                        .list());
-      } else {
-        // bindings != null && basicReduceRowsBiConsumer != null
-        return dbi.withHandle(
-            (Handle handle) ->
-                handle
-                    .createQuery(sql)
-                    .bindMap(bindings)
-                    .reduceRows(basicReduceRowsBiConsumer)
-                    .collect(Collectors.toList()));
-      }
+
+      return dbi.withHandle(
+          (Handle handle) ->
+              handle
+                  .createQuery(sql)
+                  .bindMap(bindings)
+                  .reduceRows(this::basicReduceRowsBiConsumer)
+                  .collect(Collectors.toList()));
     } catch (StatementException e) {
       String detailMessage = e.getCause() != null ? e.getCause().getMessage() : e.getMessage();
       throw new RepositoryException(
@@ -518,8 +468,8 @@ public abstract class UniqueObjectRepositoryImpl<U extends UniqueObject>
                           .bindMap(bindMap)
                           .reduceRows(
                               (Map<UUID, U> map, RowView rowView) -> {
-                                fullReduceRowsBiConsumer.accept(map, rowView);
-                                additionalReduceRowsBiConsumer.accept(map, rowView);
+                                fullReduceRowsBiConsumer(map, rowView);
+                                additionalReduceRowsBiConsumer(map, rowView);
                               }))
               .findFirst()
               .orElse(null);

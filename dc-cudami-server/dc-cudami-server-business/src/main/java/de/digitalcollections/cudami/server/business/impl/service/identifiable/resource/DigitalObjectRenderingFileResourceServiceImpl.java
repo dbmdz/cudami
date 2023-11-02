@@ -15,7 +15,6 @@ import de.digitalcollections.cudami.server.business.api.service.identifiable.res
 import de.digitalcollections.cudami.server.business.api.service.identifiable.resource.VideoFileResourceService;
 import de.digitalcollections.model.identifiable.entity.digitalobject.DigitalObject;
 import de.digitalcollections.model.identifiable.resource.FileResource;
-import java.util.ArrayList;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -119,8 +118,15 @@ public class DigitalObjectRenderingFileResourceServiceImpl
   }
 
   @Override
-  public List<FileResource> setRenderingFileResources(
+  public void setRenderingFileResources(
       DigitalObject digitalObject, List<FileResource> renderingResources) throws ServiceException {
+
+    // Remove the old relations
+    try {
+      digitalObjectRenderingFileResourceRepository.removeByDigitalObject(digitalObject);
+    } catch (RepositoryException e) {
+      throw new ServiceException("Backend failure", e);
+    }
 
     // Remove the old rendering resources, if present
     List<FileResource> existingRenderingResources = getRenderingFileResources(digitalObject);
@@ -133,17 +139,9 @@ public class DigitalObjectRenderingFileResourceServiceImpl
       }
     }
 
-    // Remove the old relations
-    try {
-      digitalObjectRenderingFileResourceRepository.removeByDigitalObject(digitalObject);
-    } catch (RepositoryException e) {
-      throw new ServiceException("Backend failure", e);
-    }
-
     // Persist the new rendering resources
     if (renderingResources != null) {
       // first save rendering resources
-      List<FileResource> savedRenderingResources = new ArrayList<>();
       for (FileResource renderingResource : renderingResources) {
         try {
           fileResourceMetadataService.save(renderingResource);
@@ -151,18 +149,15 @@ public class DigitalObjectRenderingFileResourceServiceImpl
           throw new ServiceException(
               "Cannot save RenderingResource" + renderingResource + ": " + e, e);
         }
-        savedRenderingResources.add(renderingResource);
       }
 
       // Persist the new relations
       try {
         digitalObjectRenderingFileResourceRepository.setRenderingFileResources(
-            digitalObject, savedRenderingResources);
+            digitalObject, renderingResources);
       } catch (RepositoryException e) {
         throw new ServiceException("Backend failure", e);
       }
     }
-
-    return renderingResources;
   }
 }

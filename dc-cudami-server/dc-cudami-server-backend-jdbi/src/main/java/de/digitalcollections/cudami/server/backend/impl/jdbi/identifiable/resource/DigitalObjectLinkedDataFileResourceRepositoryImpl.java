@@ -114,7 +114,7 @@ public class DigitalObjectLinkedDataFileResourceRepositoryImpl extends JdbiRepos
   }
 
   @Override
-  public List<LinkedDataFileResource> setLinkedDataFileResources(
+  public void setLinkedDataFileResources(
       UUID digitalObjectUuid, List<LinkedDataFileResource> linkedDataFileResources)
       throws RepositoryException {
     // as we store the whole list new: delete old entries
@@ -152,7 +152,6 @@ public class DigitalObjectLinkedDataFileResourceRepositoryImpl extends JdbiRepos
             preparedBatch.execute();
           });
     }
-    return getLinkedDataFileResources(digitalObjectUuid);
   }
 
   @Override

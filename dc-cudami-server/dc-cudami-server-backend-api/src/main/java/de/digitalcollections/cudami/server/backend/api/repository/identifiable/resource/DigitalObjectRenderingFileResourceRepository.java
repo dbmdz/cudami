@@ -59,18 +59,18 @@ public interface DigitalObjectRenderingFileResourceRepository {
 
   public int removeByDigitalObject(UUID digitalObjectUuid) throws RepositoryException;
 
-  default List<FileResource> setRenderingFileResources(
+  default void setRenderingFileResources(
       DigitalObject digitalObject, List<FileResource> renderingResources)
       throws RepositoryException {
     if (digitalObject == null) {
       throw new IllegalArgumentException("set failed: given object must not be null");
     }
     if (renderingResources == null) {
-      return null;
+      return;
     }
-    return setRenderingFileResources(digitalObject.getUuid(), renderingResources);
+    setRenderingFileResources(digitalObject.getUuid(), renderingResources);
   }
 
-  public List<FileResource> setRenderingFileResources(
+  public void setRenderingFileResources(
       UUID digitalObjectUuid, List<FileResource> renderingResources) throws RepositoryException;
 }

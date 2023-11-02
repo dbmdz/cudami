@@ -41,16 +41,16 @@ public interface DigitalObjectLinkedDataFileResourceRepository {
   List<LinkedDataFileResource> getLinkedDataFileResources(UUID digitalObjectUuid)
       throws RepositoryException;
 
-  default List<LinkedDataFileResource> setLinkedDataFileResources(
+  default void setLinkedDataFileResources(
       DigitalObject digitalObject, List<LinkedDataFileResource> linkedDataFileResources)
       throws RepositoryException {
     if (digitalObject == null || linkedDataFileResources == null) {
       throw new IllegalArgumentException("set failed: given objects must not be null");
     }
-    return setLinkedDataFileResources(digitalObject.getUuid(), linkedDataFileResources);
+    setLinkedDataFileResources(digitalObject.getUuid(), linkedDataFileResources);
   }
 
-  List<LinkedDataFileResource> setLinkedDataFileResources(
+  void setLinkedDataFileResources(
       UUID digitalObjectUuid, List<LinkedDataFileResource> linkedDataFileResources)
       throws RepositoryException;
 }

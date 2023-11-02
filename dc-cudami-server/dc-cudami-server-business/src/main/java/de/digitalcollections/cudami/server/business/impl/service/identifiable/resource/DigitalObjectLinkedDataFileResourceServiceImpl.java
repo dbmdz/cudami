@@ -77,11 +77,11 @@ public class DigitalObjectLinkedDataFileResourceServiceImpl
   }
 
   @Override
-  public List<LinkedDataFileResource> setLinkedDataFileResources(
+  public void setLinkedDataFileResources(
       DigitalObject digitalObject, List<LinkedDataFileResource> linkedDataFileResources)
       throws ServiceException {
     try {
-      return repository.setLinkedDataFileResources(digitalObject, linkedDataFileResources);
+      repository.setLinkedDataFileResources(digitalObject, linkedDataFileResources);
     } catch (RepositoryException e) {
       throw new ServiceException(
           "Cannot set linked data file resources for %s".formatted(digitalObject), e);

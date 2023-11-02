@@ -5,7 +5,9 @@ import de.digitalcollections.commons.jdbi.JsonbArgumentFactory;
 import de.digitalcollections.commons.jdbi.JsonbColumnMapperFactory;
 import de.digitalcollections.commons.jdbi.JsonbListArgumentFactory;
 import de.digitalcollections.commons.jdbi.JsonbListColumnMapperFactory;
+import de.digitalcollections.commons.jdbi.JsonbSetColumnMapperFactory;
 import de.digitalcollections.model.geo.CoordinateLocation;
+import de.digitalcollections.model.identifiable.Identifier;
 import de.digitalcollections.model.identifiable.entity.CustomAttributes;
 import de.digitalcollections.model.identifiable.entity.manifestation.DistributionInfo;
 import de.digitalcollections.model.identifiable.entity.manifestation.ProductionInfo;
@@ -60,5 +62,6 @@ public class JsonbJdbiPlugin implements JdbiPlugin {
     db.registerColumnMapper(new JsonbColumnMapperFactory(PublicationInfo.class, objectMapper));
     db.registerColumnMapper(new JsonbColumnMapperFactory(ProductionInfo.class, objectMapper));
     db.registerColumnMapper(new JsonbColumnMapperFactory(DistributionInfo.class, objectMapper));
+    db.registerColumnMapper(new JsonbSetColumnMapperFactory(Identifier.class, objectMapper));
   }
 }

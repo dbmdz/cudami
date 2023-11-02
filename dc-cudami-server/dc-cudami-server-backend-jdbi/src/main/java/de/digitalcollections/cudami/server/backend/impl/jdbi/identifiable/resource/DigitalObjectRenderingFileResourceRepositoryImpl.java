@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.core.statement.PreparedBatch;
 import org.springframework.stereotype.Repository;
@@ -58,7 +59,15 @@ public class DigitalObjectRenderingFileResourceRepositoryImpl extends JdbiReposi
                 .execute());
   }
 
-  private FileResource fillResourceType(FileResource untypedFileResource) {
+  /**
+   * Sets the {@link FileResource#getFileResourceType()} of the passed {@code FileResource}
+   * depending on the MIME type.
+   *
+   * @param untypedFileResource the object that the {@code fileResourceType} should be set of
+   * @return the passed object itself (for use in e.g. {@link
+   *     Stream#map(java.util.function.Function)})
+   */
+  public static FileResource fillResourceType(FileResource untypedFileResource) {
     switch (untypedFileResource.getMimeType().getPrimaryType()) {
       case "application":
         untypedFileResource.setFileResourceType(FileResourceType.APPLICATION);
@@ -127,7 +136,7 @@ public class DigitalObjectRenderingFileResourceRepositoryImpl extends JdbiReposi
     return fileResourceMetadataRepositoryImpl
         .retrieveList(fieldsSql, innerQuery, argumentMappings, "ORDER BY idx ASC")
         .stream()
-        .map(this::fillResourceType)
+        .map(DigitalObjectRenderingFileResourceRepositoryImpl::fillResourceType)
         .collect(Collectors.toList());
   }
 
@@ -146,7 +155,7 @@ public class DigitalObjectRenderingFileResourceRepositoryImpl extends JdbiReposi
   }
 
   @Override
-  public List<FileResource> setRenderingFileResources(
+  public void setRenderingFileResources(
       UUID digitalObjectUuid, List<FileResource> renderingResources) throws RepositoryException {
     dbi.useHandle(
         handle -> {
@@ -167,7 +176,6 @@ public class DigitalObjectRenderingFileResourceRepositoryImpl extends JdbiReposi
           }
           preparedBatch.execute();
         });
-    return getRenderingFileResources(digitalObjectUuid);
   }
 
   @Override
