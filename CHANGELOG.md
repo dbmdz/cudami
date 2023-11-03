@@ -13,6 +13,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
 - Identifiers of objects enclosed in `Work`, `Manifestation` & `Item`
 - SQL function to retrieve an identifiable's identifiers
 - SQL function to convert `dbidentifier[]` (composite database type) into json(b)
+- Filter `Identifiable`s by `Identifier` (namespace & id)
+- New filter operators for regular expressions, e.g. `?filtering=identifiers.namespace:regex:mdz-obj%28-child%29%3F`
+  (i.e. urlencoded `mdz-obj(-child)?`)
 
 ### Changed
 
