@@ -219,8 +219,9 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
   protected PageResponse<I> find(
       PageRequest pageRequest, String commonSql, Map<String, Object> argumentMappings)
       throws RepositoryException {
-    if (pageRequest.getFiltering().getFilterCriterionFor("identifiers.id") != null
-        || pageRequest.getFiltering().getFilterCriterionFor("identifiers.namespace") != null) {
+    if (pageRequest.getFiltering() != null
+        && (pageRequest.getFiltering().getFilterCriterionFor("identifiers.id") != null
+            || pageRequest.getFiltering().getFilterCriterionFor("identifiers.namespace") != null)) {
       commonSql =
           commonSql.replaceFirst(
               "(?iu)(from .+\\b)(\\bwhere .+)?\\s*$",
