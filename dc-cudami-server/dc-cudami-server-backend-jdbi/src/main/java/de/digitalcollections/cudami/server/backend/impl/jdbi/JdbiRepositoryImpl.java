@@ -601,6 +601,22 @@ public abstract class JdbiRepositoryImpl<U extends UniqueObject>
         // @see https://www.postgresql.org/docs/11/functions-comparison.html
         query.append("(").append(expression).append(" IS NULL").append(")");
         break;
+      case REGEX:
+        query.append(expression).append(" ~ ").append(":%s".formatted(criterionKey));
+        argumentMappings.put(criterionKey, fc.getValue());
+        break;
+      case IREGEX:
+        query.append(expression).append(" ~* ").append(":%s".formatted(criterionKey));
+        argumentMappings.put(criterionKey, fc.getValue());
+        break;
+      case NOT_REGEX:
+        query.append(expression).append(" !~ ").append(":%s".formatted(criterionKey));
+        argumentMappings.put(criterionKey, fc.getValue());
+        break;
+      case NOT_IREGEX:
+        query.append(expression).append(" !~* ").append(":%s".formatted(criterionKey));
+        argumentMappings.put(criterionKey, fc.getValue());
+        break;
       default:
         throw new UnsupportedOperationException(filterOperation + " not supported yet");
     }

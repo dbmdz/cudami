@@ -393,6 +393,86 @@ public class JdbiRepositoryImplTest {
   }
 
   @Test
+  public void testGetWhereClauseRegex() {
+    Map<String, Object> argumentMappings = new HashMap<>(0);
+
+    String filteringProperty = "label";
+    Filtering filtering =
+        Filtering.builder()
+            .add(
+                FilterCriterion.builder()
+                    .withExpression(filteringProperty)
+                    .regex("(some)? *label text")
+                    .build())
+            .build();
+    FilterCriterion<?> fc = filtering.getFilterCriterionFor(filteringProperty);
+    String whereClause = instance.getWhereClause(fc, argumentMappings, 1);
+
+    assertEquals("label ~ :filtervalue_1", whereClause);
+    assertEquals(argumentMappings.get("filtervalue_1"), "(some)? *label text");
+  }
+
+  @Test
+  public void testGetWhereClauseIRegex() {
+    Map<String, Object> argumentMappings = new HashMap<>(0);
+
+    String filteringProperty = "label";
+    Filtering filtering =
+        Filtering.builder()
+            .add(
+                FilterCriterion.builder()
+                    .withExpression(filteringProperty)
+                    .iregex("(some)? *label text")
+                    .build())
+            .build();
+    FilterCriterion<?> fc = filtering.getFilterCriterionFor(filteringProperty);
+    String whereClause = instance.getWhereClause(fc, argumentMappings, 1);
+
+    assertEquals("label ~* :filtervalue_1", whereClause);
+    assertEquals(argumentMappings.get("filtervalue_1"), "(some)? *label text");
+  }
+
+  @Test
+  public void testGetWhereClauseNotRegex() {
+    Map<String, Object> argumentMappings = new HashMap<>(0);
+
+    String filteringProperty = "label";
+    Filtering filtering =
+        Filtering.builder()
+            .add(
+                FilterCriterion.builder()
+                    .withExpression(filteringProperty)
+                    .notRegex("(some)? *label text")
+                    .build())
+            .build();
+    FilterCriterion<?> fc = filtering.getFilterCriterionFor(filteringProperty);
+    String whereClause = instance.getWhereClause(fc, argumentMappings, 1);
+
+    assertEquals("label !~ :filtervalue_1", whereClause);
+    assertEquals(argumentMappings.get("filtervalue_1"), "(some)? *label text");
+  }
+
+  @Test
+  public void testGetWhereClauseNotIRegex() {
+    Map<String, Object> argumentMappings = new HashMap<>(0);
+
+    String filteringProperty = "label";
+    Filtering filtering =
+        Filtering.builder()
+            .add(
+                FilterCriterion.builder()
+                    .withExpression(filteringProperty)
+                    .notIRegex("(some)? *label text")
+                    .build())
+            .build();
+    FilterCriterion<?> fc = filtering.getFilterCriterionFor(filteringProperty);
+    String whereClause = instance.getWhereClause(fc, argumentMappings, 1);
+
+    assertEquals("label !~* :filtervalue_1", whereClause);
+    assertEquals(argumentMappings.get("filtervalue_1"), "(some)? *label text");
+  }
+
+  @Test
   public void testDefaultPaging() {
     StringBuilder innerSql = new StringBuilder("SELECT d.* FROM digitalobjects AS d");
     PageRequest pageRequest =

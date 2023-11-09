@@ -219,13 +219,19 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
   protected PageResponse<I> find(
       PageRequest pageRequest, String commonSql, Map<String, Object> argumentMappings)
       throws RepositoryException {
+    if (pageRequest.getFiltering() != null
+        && (pageRequest.getFiltering().getFilterCriterionFor("identifiers.id") != null
+            || pageRequest.getFiltering().getFilterCriterionFor("identifiers.namespace") != null)) {
+      commonSql =
+          commonSql.replaceFirst(
+              "(?iu)(from .+\\b)(\\bwhere .+)?\\s*$",
+              "$1 LEFT JOIN {{identifiers}} {{identifiersAlias}} ON {{identifiersAlias}}.identifiable = {{tableAlias}}.uuid $2"
+                  .replace("{{tableAlias}}", tableAlias)
+                  .replace("{{identifiers}}", IdentifierRepositoryImpl.TABLE_NAME)
+                  .replace("{{identifiersAlias}}", IdentifierRepositoryImpl.TABLE_ALIAS));
+    }
     PageResponse<I> pageResponse = super.find(pageRequest, commonSql, argumentMappings);
-
-    // FIXME: try to avoid doing this after database select! Delete when jsonb
-    // search without
-    // split-field implemented
     filterByLocalizedTextFields(pageRequest, pageResponse, getJsonbFields());
-
     return pageResponse;
   }
 
@@ -379,6 +385,10 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
         return tableAlias + ".previewfileresource";
       case "type":
         return tableAlias + ".identifiable_type";
+      case "identifiers.id":
+        return IdentifierRepositoryImpl.TABLE_ALIAS + ".identifier";
+      case "identifiers.namespace":
+        return IdentifierRepositoryImpl.TABLE_ALIAS + ".namespace";
       default:
         return super.getColumnName(modelProperty);
     }
@@ -852,12 +862,10 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
 
   @Override
   protected boolean supportsCaseSensitivityForProperty(String modelProperty) {
-    switch (modelProperty) {
-      case "label":
-        return true;
-      default:
-        return false;
-    }
+    return switch (modelProperty) {
+      case "label", "identifiers.id", "identifiers.namespace" -> true;
+      default -> false;
+    };
   }
 
   @Override
