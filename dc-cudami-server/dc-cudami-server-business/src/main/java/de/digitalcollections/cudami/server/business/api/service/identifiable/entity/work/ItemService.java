@@ -2,7 +2,6 @@ package de.digitalcollections.cudami.server.business.api.service.identifiable.en
 
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.EntityService;
-import de.digitalcollections.model.identifiable.entity.digitalobject.DigitalObject;
 import de.digitalcollections.model.identifiable.entity.item.Item;
 import de.digitalcollections.model.identifiable.entity.manifestation.Manifestation;
 import de.digitalcollections.model.list.paging.PageRequest;
@@ -11,9 +10,6 @@ import java.util.List;
 import java.util.Locale;
 
 public interface ItemService extends EntityService<Item> {
-
-  PageResponse<DigitalObject> findDigitalObjects(Item item, PageRequest pageRequest)
-      throws ServiceException;
 
   PageResponse<Item> findItemsByManifestation(Manifestation manifestation, PageRequest pageRequest)
       throws ServiceException;

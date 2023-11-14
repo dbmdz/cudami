@@ -202,6 +202,16 @@ public class DigitalObjectServiceImpl extends EntityServiceImpl<DigitalObject>
     }
   }
 
+  @Override
+  public PageResponse<DigitalObject> findDigitalObjectsByItem(Item item, PageRequest pageRequest)
+      throws ServiceException {
+    try {
+      return ((DigitalObjectRepository) repository).findDigitalObjectsByItem(item, pageRequest);
+    } catch (RepositoryException e) {
+      throw new ServiceException("Backend failure", e);
+    }
+  }
+
   private void expandByWemiObjects(DigitalObject digitalObject) throws ServiceException {
     if (digitalObject == null || digitalObject.getItem() == null) return;
     // local function to set lastModified of the DigitalObject to the newest of its enclosed WMI

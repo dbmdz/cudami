@@ -317,26 +317,26 @@ public class ManifestationRepositoryImpl extends EntityRepositoryImpl<Manifestat
   @Override
   public PageResponse<Manifestation> findSubParts(UUID uuid, PageRequest pageRequest)
       throws RepositoryException {
-    final String doTableName = "manifestation_manifestations";
-    final String doTableAlias = "mms";
+    final String xtable = "manifestation_manifestations";
+    final String xtableAlias = "mms";
 
     StringBuilder commonSql =
         new StringBuilder(
             " FROM "
-                + doTableName
-                + " AS "
-                + doTableAlias
+                + xtable
+                + " "
+                + xtableAlias
                 + " INNER JOIN "
                 + tableName
                 + " "
                 + tableAlias
                 + " ON "
-                + doTableAlias
+                + xtableAlias
                 + ".object_uuid = "
                 + tableAlias
                 + ".uuid"
                 + " WHERE "
-                + doTableAlias
+                + xtableAlias
                 + ".subject_uuid = :subject_uuid");
 
     Map<String, Object> argumentMappings = new HashMap<>();

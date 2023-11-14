@@ -11,7 +11,6 @@ import de.digitalcollections.cudami.server.business.api.service.identifiable.ali
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.work.ItemService;
 import de.digitalcollections.cudami.server.business.impl.service.identifiable.entity.EntityServiceImpl;
 import de.digitalcollections.cudami.server.config.HookProperties;
-import de.digitalcollections.model.identifiable.entity.digitalobject.DigitalObject;
 import de.digitalcollections.model.identifiable.entity.item.Item;
 import de.digitalcollections.model.identifiable.entity.manifestation.Manifestation;
 import de.digitalcollections.model.list.filtering.FilterCriterion;
@@ -66,16 +65,6 @@ public class ItemServiceImpl extends EntityServiceImpl<Item> implements ItemServ
       throw new ServiceException("Cannot not clear part of item: " + e, e);
     }
     return true;
-  }
-
-  @Override
-  public PageResponse<DigitalObject> findDigitalObjects(Item item, PageRequest pageRequest)
-      throws ServiceException {
-    try {
-      return ((ItemRepository) repository).findDigitalObjects(item, pageRequest);
-    } catch (RepositoryException e) {
-      throw new ServiceException("Backend failure", e);
-    }
   }
 
   @Override

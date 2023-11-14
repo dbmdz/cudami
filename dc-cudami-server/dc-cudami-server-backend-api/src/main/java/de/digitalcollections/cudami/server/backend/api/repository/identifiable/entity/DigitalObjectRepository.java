@@ -4,6 +4,7 @@ import de.digitalcollections.cudami.server.backend.api.repository.exceptions.Rep
 import de.digitalcollections.model.identifiable.entity.Collection;
 import de.digitalcollections.model.identifiable.entity.Project;
 import de.digitalcollections.model.identifiable.entity.digitalobject.DigitalObject;
+import de.digitalcollections.model.identifiable.entity.item.Item;
 import de.digitalcollections.model.identifiable.resource.FileResource;
 import de.digitalcollections.model.identifiable.resource.ImageFileResource;
 import de.digitalcollections.model.list.paging.PageRequest;
@@ -66,6 +67,17 @@ public interface DigitalObjectRepository extends EntityRepository<DigitalObject>
   }
 
   PageResponse<Project> findProjects(UUID digitalObjectUuid, PageRequest pageRequest)
+      throws RepositoryException;
+
+  default PageResponse<DigitalObject> findDigitalObjectsByItem(Item item, PageRequest pageRequest)
+      throws RepositoryException {
+    if (item == null) {
+      throw new IllegalArgumentException("find failed: given object must not be null");
+    }
+    return findDigitalObjectsByItem(item.getUuid(), pageRequest);
+  }
+
+  PageResponse<DigitalObject> findDigitalObjectsByItem(UUID itemUuid, PageRequest pageRequest)
       throws RepositoryException;
 
   default List<FileResource> getFileResources(DigitalObject digitalObject)

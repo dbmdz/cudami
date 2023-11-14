@@ -502,6 +502,74 @@ class DigitalObjectRepositoryImplTest
     assertThat(digitalObject).isEqualToComparingFieldByField(persisted);
   }
 
+  @Test
+  @DisplayName("can return an empty set of connected digital objects for an null item")
+  void digitalObjectsForNullItem() throws RepositoryException {
+    PageRequest pageRequest = PageRequest.builder().pageSize(25).pageNumber(0).build();
+    assertThat(repo.findDigitalObjectsByItem((UUID) null, pageRequest)).isEmpty();
+  }
+
+  @Test
+  @DisplayName("can return an empty set of connected digital objects for an nonexisting item")
+  void digitalObjectsForNonexistingItem() throws RepositoryException {
+    PageRequest pageRequest = PageRequest.builder().pageSize(25).pageNumber(0).build();
+    assertThat(repo.findDigitalObjectsByItem(UUID.randomUUID(), pageRequest)).isEmpty();
+  }
+
+  @Test
+  @DisplayName(
+      "can return an empty set of connected digital objects for an item which has no digital objects connected to it")
+  void digitalObjectsForItemWithoutDigitalObjects() throws RepositoryException {
+    PageRequest pageRequest = PageRequest.builder().pageSize(25).pageNumber(0).build();
+    Item item = Item.builder().label("item without digital objects").build();
+    itemRepository.save(item);
+    DigitalObject digitalObject =
+        DigitalObject.builder().label("digital object without item").build();
+    repo.save(digitalObject);
+
+    assertThat(repo.findDigitalObjectsByItem(item.getUuid(), pageRequest)).isEmpty();
+  }
+
+  @Test
+  @DisplayName("can return digital objects connected to an item")
+  void digitalObjectsForItem() throws RepositoryException {
+    PageRequest pageRequest = PageRequest.builder().pageSize(25).pageNumber(0).build();
+    Item item1 = Item.builder().label("item1 with two digitalObject2").build();
+    itemRepository.save(item1);
+    Item item2 = Item.builder().label("item2 with one digitalObject").build();
+    itemRepository.save(item2);
+    DigitalObject digitalObject1 =
+        DigitalObject.builder().label("digital object 1 for item1").item(item1).build();
+    repo.save(digitalObject1);
+    DigitalObject digitalObject2 =
+        DigitalObject.builder().label("digital object 2 for item1").item(item1).build();
+    repo.save(digitalObject2);
+    DigitalObject digitalObject3 =
+        DigitalObject.builder().label("digital object 1 for item2").item(item2).build();
+    repo.save(digitalObject3);
+
+    PageResponse<DigitalObject> actual =
+        repo.findDigitalObjectsByItem(item1.getUuid(), pageRequest);
+    assertThat(actual.getContent()).containsExactlyInAnyOrder(digitalObject1, digitalObject2);
+  }
+
+  @Test
+  @DisplayName("can use paging on retrieval of digital objects connected to an item")
+  void pagedDigitalObjectsForItem() throws RepositoryException {
+    PageRequest pageRequest = PageRequest.builder().pageSize(1).pageNumber(0).build();
+    Item item = Item.builder().label("item1 with two digitalObject2").build();
+    itemRepository.save(item);
+    DigitalObject digitalObject1 =
+        DigitalObject.builder().label("digital object 1 for item1").item(item).build();
+    repo.save(digitalObject1);
+    DigitalObject digitalObject2 =
+        DigitalObject.builder().label("digital object 2 for item1").item(item).build();
+    repo.save(digitalObject2);
+
+    PageResponse<DigitalObject> actual = repo.findDigitalObjectsByItem(item.getUuid(), pageRequest);
+    assertThat(actual.getContent()).hasSize(1);
+  }
+
   // -----------------------------------------------------------------
   private void ensureLicense(License license) throws RepositoryException {
     if (licenseRepository.getByUuid(license.getUuid()) == null) {
