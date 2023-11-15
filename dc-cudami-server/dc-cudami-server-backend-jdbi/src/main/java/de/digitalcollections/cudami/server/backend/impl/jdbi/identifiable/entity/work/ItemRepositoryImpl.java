@@ -13,10 +13,8 @@ import de.digitalcollections.model.identifiable.entity.agent.Agent;
 import de.digitalcollections.model.identifiable.entity.agent.CorporateBody;
 import de.digitalcollections.model.identifiable.entity.agent.Family;
 import de.digitalcollections.model.identifiable.entity.agent.Person;
-import de.digitalcollections.model.identifiable.entity.digitalobject.DigitalObject;
 import de.digitalcollections.model.identifiable.entity.item.Item;
 import de.digitalcollections.model.identifiable.entity.manifestation.Manifestation;
-import de.digitalcollections.model.list.filtering.Filtering;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.text.LocalizedText;
@@ -141,68 +139,20 @@ public class ItemRepositoryImpl extends EntityRepositoryImpl<Item> implements It
   }
 
   @Override
-  public PageResponse<DigitalObject> findDigitalObjects(UUID itemUuid, PageRequest pageRequest)
-      throws RepositoryException {
-    final String doTableAlias = digitalObjectRepositoryImpl.getTableAlias();
-    final String doTableName = digitalObjectRepositoryImpl.getTableName();
-
-    StringBuilder commonSql =
-        new StringBuilder(
-            " FROM "
-                + doTableName
-                + " AS "
-                + doTableAlias
-                + " WHERE "
-                + doTableAlias
-                + ".item_uuid = :uuid");
-    Map<String, Object> argumentMappings = new HashMap<>();
-    argumentMappings.put("uuid", itemUuid);
-
-    Filtering filtering = pageRequest.getFiltering();
-    // as filtering has other target object type (digitalobject) than this
-    // repository (item)
-    // we have to rename filter field names to target table alias and column names:
-    mapFilterExpressionsToOtherTableColumnNames(filtering, digitalObjectRepositoryImpl);
-    addFiltering(pageRequest, commonSql, argumentMappings);
-
-    StringBuilder innerQuery = new StringBuilder("SELECT * " + commonSql);
-    digitalObjectRepositoryImpl.addPagingAndSorting(pageRequest, innerQuery);
-    List<DigitalObject> result =
-        digitalObjectRepositoryImpl.retrieveList(
-            digitalObjectRepositoryImpl.getSqlSelectReducedFields(),
-            innerQuery,
-            argumentMappings,
-            getOrderBy(pageRequest.getSorting()));
-
-    StringBuilder countQuery = new StringBuilder("SELECT count(*)" + commonSql);
-    long total = retrieveCount(countQuery, argumentMappings);
-
-    return new PageResponse<>(result, pageRequest, total);
-  }
-
-  @Override
   public PageResponse<Item> findItemsByManifestation(
       UUID manifestationUuid, PageRequest pageRequest) throws RepositoryException {
-    final String itemTableAlias = getTableAlias();
-    final String itemTableName = getTableName();
-
     StringBuilder commonSql =
         new StringBuilder(
             " FROM "
-                + itemTableName
-                + " AS "
-                + itemTableAlias
+                + tableName
+                + " "
+                + tableAlias
                 + " WHERE "
-                + itemTableAlias
+                + tableAlias
                 + ".manifestation = :uuid");
     Map<String, Object> argumentMappings = new HashMap<>();
     argumentMappings.put("uuid", manifestationUuid);
 
-    Filtering filtering = pageRequest.getFiltering();
-    // as filtering has other target object type (item) than this repository
-    // (manifestation)
-    // we have to rename filter field names to target table alias and column names:
-    mapFilterExpressionsToOtherTableColumnNames(filtering, this);
     addFiltering(pageRequest, commonSql, argumentMappings);
 
     StringBuilder innerQuery = new StringBuilder("SELECT * " + commonSql);

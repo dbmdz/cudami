@@ -32,7 +32,14 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @Tag(name = "Item controller")
@@ -74,6 +81,7 @@ public class ItemController extends AbstractEntityController<Item> {
         : new ResponseEntity<>(HttpStatus.NOT_FOUND);
   }
 
+  @Override
   @Operation(summary = "count all items")
   @GetMapping(
       value = {"/v6/items/count", "/v5/items/count", "/v2/items/count", "/latest/items/count"},
@@ -82,6 +90,7 @@ public class ItemController extends AbstractEntityController<Item> {
     return super.count();
   }
 
+  @Override
   @Operation(summary = "Delete an item")
   @DeleteMapping(
       value = {"/v6/items/{uuid:" + ParameterHelper.UUID_PATTERN + "}"},
@@ -92,6 +101,7 @@ public class ItemController extends AbstractEntityController<Item> {
     return super.delete(uuid);
   }
 
+  @Override
   @Operation(summary = "Get all items as (paged, sorted, filtered) list")
   @GetMapping(
       value = {"/v6/items"},
@@ -123,7 +133,7 @@ public class ItemController extends AbstractEntityController<Item> {
       Sorting sorting = new Sorting(sortBy);
       pageRequest.setSorting(sorting);
     }
-    return service.findDigitalObjects(buildExampleWithUuid(uuid), pageRequest);
+    return digitalObjectService.findDigitalObjectsByItem(buildExampleWithUuid(uuid), pageRequest);
   }
 
   @Operation(
@@ -187,6 +197,7 @@ public class ItemController extends AbstractEntityController<Item> {
     }
   }
 
+  @Override
   @Operation(
       summary = "Get languages of all items",
       description = "Get languages of all items",
@@ -274,6 +285,7 @@ public class ItemController extends AbstractEntityController<Item> {
         : new ResponseEntity<>(HttpStatus.NOT_FOUND);
   }
 
+  @Override
   @Operation(summary = "save a newly created item")
   @PostMapping(
       value = {"/v6/items", "/v5/items", "/v2/items", "/latest/items"},
@@ -283,6 +295,7 @@ public class ItemController extends AbstractEntityController<Item> {
     return super.save(item, errors);
   }
 
+  @Override
   @Operation(summary = "update an item")
   @PutMapping(
       value = {

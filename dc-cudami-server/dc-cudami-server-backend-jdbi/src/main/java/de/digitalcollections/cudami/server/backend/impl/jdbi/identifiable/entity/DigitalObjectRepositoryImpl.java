@@ -463,6 +463,38 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
   }
 
   @Override
+  public PageResponse<DigitalObject> findDigitalObjectsByItem(
+      UUID itemUuid, PageRequest pageRequest) throws RepositoryException {
+    StringBuilder commonSql =
+        new StringBuilder(
+            " FROM "
+                + tableName
+                + " "
+                + tableAlias
+                + " WHERE "
+                + tableAlias
+                + ".item_uuid = :uuid");
+    Map<String, Object> argumentMappings = new HashMap<>();
+    argumentMappings.put("uuid", itemUuid);
+
+    addFiltering(pageRequest, commonSql, argumentMappings);
+
+    StringBuilder innerQuery = new StringBuilder("SELECT * " + commonSql);
+    addPagingAndSorting(pageRequest, innerQuery);
+    List<DigitalObject> result =
+        retrieveList(
+            getSqlSelectReducedFields(),
+            innerQuery,
+            argumentMappings,
+            getOrderBy(pageRequest.getSorting()));
+
+    StringBuilder countQuery = new StringBuilder("SELECT count(*)" + commonSql);
+    long total = retrieveCount(countQuery, argumentMappings);
+
+    return new PageResponse<>(result, pageRequest, total);
+  }
+
+  @Override
   public String getColumnName(String modelProperty) {
     if (modelProperty == null) {
       return null;

@@ -3,6 +3,7 @@ package de.digitalcollections.cudami.server.controller.identifiable.entity.work;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
+import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.DigitalObjectService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.work.ItemService;
 import de.digitalcollections.cudami.server.controller.BaseControllerTest;
 import de.digitalcollections.model.identifiable.entity.item.Item;
@@ -19,6 +20,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 class V5ItemControllerTest extends BaseControllerTest {
 
   @MockBean private ItemService itemService;
+  @MockBean private DigitalObjectService digitalObjectService;
 
   @DisplayName("shall return a paged list of items")
   @ParameterizedTest
@@ -30,14 +32,13 @@ class V5ItemControllerTest extends BaseControllerTest {
       })
   public void find(String path) throws Exception {
     PageResponse<Item> expected =
-        (PageResponse<Item>)
-            PageResponse.builder()
-                .forRequestPage(0)
-                .forPageSize(1)
-                .withTotalElements(0)
-                .forAscendingOrderedField("label", "de")
-                .withoutContent()
-                .build();
+        PageResponse.builder()
+            .forRequestPage(0)
+            .forPageSize(1)
+            .withTotalElements(0)
+            .forAscendingOrderedField("label", "de")
+            .withoutContent()
+            .build();
 
     when(itemService.find(any(PageRequest.class))).thenReturn(expected);
 

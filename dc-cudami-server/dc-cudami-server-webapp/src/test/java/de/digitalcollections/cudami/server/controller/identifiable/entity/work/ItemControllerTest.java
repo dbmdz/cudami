@@ -185,7 +185,7 @@ class ItemControllerTest extends BaseControllerTest {
             .withTotalElements(1)
             .withContent(List.of(expectedDigitalObject))
             .build();
-    when(itemService.findDigitalObjects(
+    when(digitalObjectService.findDigitalObjectsByItem(
             eq(Item.builder().uuid(itemUuid).build()), any(PageRequest.class)))
         .thenReturn(expectedPageResponse);
 

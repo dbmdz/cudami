@@ -20,7 +20,6 @@ import de.digitalcollections.model.identifiable.entity.agent.Agent;
 import de.digitalcollections.model.identifiable.entity.agent.CorporateBody;
 import de.digitalcollections.model.identifiable.entity.agent.Gender;
 import de.digitalcollections.model.identifiable.entity.agent.Person;
-import de.digitalcollections.model.identifiable.entity.digitalobject.DigitalObject;
 import de.digitalcollections.model.identifiable.entity.item.Item;
 import de.digitalcollections.model.identifiable.entity.manifestation.Manifestation;
 import de.digitalcollections.model.list.filtering.FilterCriterion;
@@ -366,73 +365,6 @@ public class ItemRepositoryImplTest
     Item actualItem = actualPageResponse.getContent().get(0);
 
     assertThat(actualItem).isEqualTo(expectedItem);
-  }
-
-  @Test
-  @DisplayName("can return an empty set of connected digital objects for an null item")
-  void digitalObjectsForNullItem() throws RepositoryException {
-    PageRequest pageRequest = PageRequest.builder().pageSize(25).pageNumber(0).build();
-    assertThat(repo.findDigitalObjects((UUID) null, pageRequest)).isEmpty();
-  }
-
-  @Test
-  @DisplayName("can return an empty set of connected digital objects for an nonexisting item")
-  void digitalObjectsForNonexistingItem() throws RepositoryException {
-    PageRequest pageRequest = PageRequest.builder().pageSize(25).pageNumber(0).build();
-    assertThat(repo.findDigitalObjects(UUID.randomUUID(), pageRequest)).isEmpty();
-  }
-
-  @Test
-  @DisplayName(
-      "can return an empty set of connected digital objects for an item which has no digital objects connected to it")
-  void digitalObjectsForItemWithoutDigitalObjects() throws RepositoryException {
-    PageRequest pageRequest = PageRequest.builder().pageSize(25).pageNumber(0).build();
-    Item item = Item.builder().label("item without digital objects").build();
-    repo.save(item);
-    DigitalObject digitalObject =
-        DigitalObject.builder().label("digital object without item").build();
-    digitalObjectRepository.save(digitalObject);
-
-    assertThat(repo.findDigitalObjects(item.getUuid(), pageRequest)).isEmpty();
-  }
-
-  @Test
-  @DisplayName("can return digital objects connected to an item")
-  void digitalObjectsForItem() throws RepositoryException {
-    PageRequest pageRequest = PageRequest.builder().pageSize(25).pageNumber(0).build();
-    Item item1 = Item.builder().label("item1 with two digitalObject2").build();
-    repo.save(item1);
-    Item item2 = Item.builder().label("item2 with one digitalObject").build();
-    repo.save(item2);
-    DigitalObject digitalObject1 =
-        DigitalObject.builder().label("digital object 1 for item1").item(item1).build();
-    digitalObjectRepository.save(digitalObject1);
-    DigitalObject digitalObject2 =
-        DigitalObject.builder().label("digital object 2 for item1").item(item1).build();
-    digitalObjectRepository.save(digitalObject2);
-    DigitalObject digitalObject3 =
-        DigitalObject.builder().label("digital object 1 for item2").item(item2).build();
-    digitalObjectRepository.save(digitalObject3);
-
-    PageResponse<DigitalObject> actual = repo.findDigitalObjects(item1.getUuid(), pageRequest);
-    assertThat(actual.getContent()).containsExactlyInAnyOrder(digitalObject1, digitalObject2);
-  }
-
-  @Test
-  @DisplayName("can use paging on retrieval of digital objects connected to an item")
-  void pagedDigitalObjectsForItem() throws RepositoryException {
-    PageRequest pageRequest = PageRequest.builder().pageSize(1).pageNumber(0).build();
-    Item item = Item.builder().label("item1 with two digitalObject2").build();
-    repo.save(item);
-    DigitalObject digitalObject1 =
-        DigitalObject.builder().label("digital object 1 for item1").item(item).build();
-    digitalObjectRepository.save(digitalObject1);
-    DigitalObject digitalObject2 =
-        DigitalObject.builder().label("digital object 2 for item1").item(item).build();
-    digitalObjectRepository.save(digitalObject2);
-
-    PageResponse<DigitalObject> actual = repo.findDigitalObjects(item.getUuid(), pageRequest);
-    assertThat(actual.getContent()).hasSize(1);
   }
 
   @DisplayName("can retrieve items for a manifestation")

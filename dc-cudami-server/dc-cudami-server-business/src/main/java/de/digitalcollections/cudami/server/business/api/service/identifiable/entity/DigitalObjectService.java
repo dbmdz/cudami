@@ -30,6 +30,9 @@ public interface DigitalObjectService extends EntityService<DigitalObject> {
   PageResponse<Project> findProjects(DigitalObject digitalObject, PageRequest pageRequest)
       throws ServiceException;
 
+  PageResponse<DigitalObject> findDigitalObjectsByItem(Item item, PageRequest pageRequest)
+      throws ServiceException;
+
   @Override
   default DigitalObject getByExample(DigitalObject digitalObject) throws ServiceException {
     return getByExample(digitalObject, false);

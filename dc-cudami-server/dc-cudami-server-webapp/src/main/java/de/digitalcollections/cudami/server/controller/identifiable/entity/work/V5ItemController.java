@@ -3,6 +3,7 @@ package de.digitalcollections.cudami.server.controller.identifiable.entity.work;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
+import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.DigitalObjectService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.work.ItemService;
 import de.digitalcollections.cudami.server.controller.CudamiControllerException;
 import de.digitalcollections.cudami.server.controller.legacy.V5MigrationHelper;
@@ -34,10 +35,15 @@ import org.springframework.web.bind.annotation.RestController;
 public class V5ItemController {
 
   private final ItemService itemService;
+  private final DigitalObjectService digitalObjectService;
   private final ObjectMapper objectMapper;
 
-  public V5ItemController(ItemService itemService, ObjectMapper objectMapper) {
+  public V5ItemController(
+      ItemService itemService,
+      DigitalObjectService digitalObjectService,
+      ObjectMapper objectMapper) {
     this.itemService = itemService;
+    this.digitalObjectService = digitalObjectService;
     this.objectMapper = objectMapper;
   }
 
@@ -109,8 +115,8 @@ public class V5ItemController {
       @Parameter(name = "uuid", description = "UUID of the item") @PathVariable UUID uuid)
       throws ServiceException {
     return new HashSet<>(
-        itemService
-            .findDigitalObjects(
+        digitalObjectService
+            .findDigitalObjectsByItem(
                 Item.builder().uuid(uuid).build(),
                 PageRequest.builder().pageNumber(0).pageSize(Integer.MAX_VALUE).build())
             .getContent());
