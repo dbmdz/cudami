@@ -75,7 +75,7 @@
     "ts-loader": "^9.4.1",
     "typescript": "^4.8.4",
     "webpack-cli": "^4.10.0",
-    "webpack-merge": "^5.8.0"
+    "webpack-merge": "^5.10.0"
   },
   "importSort": {
     ".js, .jsx": {
