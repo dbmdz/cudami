@@ -2,9 +2,7 @@ package de.digitalcollections.cudami.server.controller.identifiable.entity;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.ProjectService;
 import de.digitalcollections.cudami.server.controller.BaseControllerTest;
@@ -12,6 +10,7 @@ import de.digitalcollections.model.identifiable.Identifier;
 import de.digitalcollections.model.identifiable.entity.Project;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
+import java.util.List;
 import java.util.Locale;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -44,7 +43,7 @@ class ProjectControllerTest extends BaseControllerTest {
             .refId(1300623)
             .build();
 
-    when(projectService.getByExample(any(Project.class))).thenReturn(expected);
+    when(projectService.getByExamples(any(List.class))).thenReturn(List.of(expected));
 
     testJson(path);
   }

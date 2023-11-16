@@ -17,6 +17,7 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
 import org.junit.jupiter.api.DisplayName;
@@ -117,7 +118,7 @@ public class LicenseControllerTest extends BaseControllerTest {
   @Test
   public void testGetByUuid() throws Exception {
     License license = createTestLicenseSaved();
-    when(licenseService.getByExample(any(License.class))).thenReturn(license);
+    when(licenseService.getByExamples(any(List.class))).thenReturn(List.of(license));
 
     testJson(
         "/v5/licenses/2780bee1-eeec-4b50-a95b-bba90793fc6a",

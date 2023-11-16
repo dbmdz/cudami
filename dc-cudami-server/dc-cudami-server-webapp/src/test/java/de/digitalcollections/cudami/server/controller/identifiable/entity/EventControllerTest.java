@@ -2,9 +2,7 @@ package de.digitalcollections.cudami.server.controller.identifiable.entity;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import de.digitalcollections.cudami.server.business.api.service.LocaleService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.EventService;
@@ -55,9 +53,9 @@ class EventControllerTest extends BaseControllerTest {
             .label(name)
             .identifier(identifier)
             .build();
-    when(eventService.getByExample(
-            eq(Event.builder().uuid("599a120c-2dd5-11e8-b467-0ed5f89f718b").build())))
-        .thenReturn(event);
+    List<Event> exampleList =
+        List.of(Event.builder().uuid("599a120c-2dd5-11e8-b467-0ed5f89f718b").build());
+    when(eventService.getByExamples(eq(exampleList))).thenReturn(List.of(event));
     testJson(path);
   }
 

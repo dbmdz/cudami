@@ -90,10 +90,9 @@ public abstract class AbstractUniqueObjectController<U extends UniqueObject>
   protected ResponseEntity<U> getByUuid(UUID uuid) throws ServiceException {
     List<U> result =
         getService().getByExamples(buildExamplesWithUuids(List.of(uuid).toArray(new UUID[0])));
-    if (result.isEmpty()) {
-      return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+    if (result == null || result.isEmpty()) {
+      return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
-
     return new ResponseEntity<>(result.stream().findFirst().orElse(null), HttpStatus.OK);
   }
 
