@@ -2,10 +2,7 @@ package de.digitalcollections.cudami.server.controller.identifiable.resource;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import de.digitalcollections.cudami.server.business.api.service.identifiable.resource.LinkedDataFileResourceService;
 import de.digitalcollections.cudami.server.controller.BaseControllerTest;
@@ -48,8 +45,8 @@ class LinkedDataFileResourceControllerTest extends BaseControllerTest {
             .objectType("LINKED_DATA")
             .build();
 
-    when(linkedDataFileResourceService.getByExample(any(LinkedDataFileResource.class)))
-        .thenReturn(expected);
+    when(linkedDataFileResourceService.getByExamples(any(List.class)))
+        .thenReturn(List.of(expected));
 
     testJson(path, "/v6/linkeddatafileresources/12345678-abcd-1234-abcd-123456789012.json");
   }

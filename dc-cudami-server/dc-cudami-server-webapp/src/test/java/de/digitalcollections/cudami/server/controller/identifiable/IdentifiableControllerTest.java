@@ -101,7 +101,7 @@ public class IdentifiableControllerTest extends BaseControllerTest {
       strings = {"/v5/identifiables/12345678-1234-1234-1234-123456789012/localizedUrlAliases"})
   public void emptyLocalizedUrlAlias(String path) throws Exception {
     Identifiable dummyIdentifiable = mock(Identifiable.class);
-    when(identifiableService.getByExample(any(Identifiable.class))).thenReturn(dummyIdentifiable);
+    when(identifiableService.getByExamples(any(List.class))).thenReturn(List.of(dummyIdentifiable));
     LocalizedUrlAliases expected = new LocalizedUrlAliases();
     when(urlAliasService.getByIdentifiable(any(Identifiable.class))).thenReturn(expected);
 
@@ -114,7 +114,7 @@ public class IdentifiableControllerTest extends BaseControllerTest {
       strings = {"/v5/identifiables/12345678-1234-1234-1234-123456789012/localizedUrlAliases"})
   public void localizedUrlAlias(String path) throws Exception {
     Identifiable dummyIdentifiable = mock(Identifiable.class);
-    when(identifiableService.getByExample(any(Identifiable.class))).thenReturn(dummyIdentifiable);
+    when(identifiableService.getByExamples(any(List.class))).thenReturn(List.of(dummyIdentifiable));
     LocalizedUrlAliases expected = new LocalizedUrlAliases();
     UrlAlias urlAlias1 =
         UrlAlias.builder()

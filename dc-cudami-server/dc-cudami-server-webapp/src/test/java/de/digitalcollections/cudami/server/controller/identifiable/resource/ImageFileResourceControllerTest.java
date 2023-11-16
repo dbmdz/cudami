@@ -3,10 +3,7 @@ package de.digitalcollections.cudami.server.controller.identifiable.resource;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import de.digitalcollections.cudami.server.business.api.service.identifiable.resource.ImageFileResourceService;
 import de.digitalcollections.cudami.server.controller.BaseControllerTest;
@@ -51,7 +48,7 @@ class ImageFileResourceControllerTest extends BaseControllerTest {
             .filename("baz.jpg")
             .build();
 
-    when(imageFileResourceService.getByExample(any(ImageFileResource.class))).thenReturn(expected);
+    when(imageFileResourceService.getByExamples(any(List.class))).thenReturn(List.of(expected));
 
     testJson(path, "/v6/imagefileresources/12345678-abcd-1234-abcd-123456789012.json");
   }
