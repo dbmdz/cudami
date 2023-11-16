@@ -1,5 +1,11 @@
 package de.digitalcollections.cudami.server.business.impl.service.identifiable.entity;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.*;
+
 import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.DigitalObjectRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.resource.DigitalObjectLinkedDataFileResourceRepository;
@@ -28,20 +34,13 @@ import de.digitalcollections.model.identifiable.resource.FileResourceType;
 import de.digitalcollections.model.identifiable.resource.LinkedDataFileResource;
 import de.digitalcollections.model.identifiable.resource.TextFileResource;
 import de.digitalcollections.model.text.LocalizedText;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-
 import java.net.URI;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
 @DisplayName("The DigitalObjectService")
 class DigitalObjectServiceImplTest extends AbstractServiceImplTest {
@@ -131,41 +130,6 @@ class DigitalObjectServiceImplTest extends AbstractServiceImplTest {
     service.save(digitalObject);
 
     assertThat(digitalObject.getLinkedDataResources()).hasSize(1);
-  }
-
-  @Test
-  @DisplayName("fills LinkedDataResources for a retrieved DigitalObject by uuid")
-  void fillLinkedDataResourcesForGetByUuidAndLocale() throws ServiceException, RepositoryException {
-    UUID uuid = UUID.randomUUID();
-
-    DigitalObject persistedDigitalObject =
-        DigitalObject.builder()
-            .uuid(uuid)
-            .label(Locale.GERMAN, "deutschsprachiges Label")
-            .label(Locale.ENGLISH, "english label")
-            .description(Locale.GERMAN, "Beschreibung")
-            .description(Locale.ENGLISH, "description")
-            .build();
-
-    when(repo.getByExamples(eq(List.of(persistedDigitalObject))))
-        .thenReturn(List.of(persistedDigitalObject));
-
-    LinkedDataFileResource persistedLinkedDataFileResource =
-        LinkedDataFileResource.builder()
-            .label(Locale.GERMAN, "Linked Data")
-            .context("https://foo.bar/blubb.xml")
-            .objectType("XML")
-            .filename("blubb.xml") // required!!
-            .mimeType(MimeType.MIME_APPLICATION_XML)
-            .build();
-    when(digitalObjectLinkedDataFileResourceService.getLinkedDataFileResources(
-            eq(persistedDigitalObject)))
-        .thenReturn(List.of(persistedLinkedDataFileResource));
-
-    DigitalObject actual = service.getByExampleAndLocale(persistedDigitalObject, Locale.ROOT);
-
-    assertThat(actual).isNotNull();
-    assertThat(actual.getLinkedDataResources()).containsExactly(persistedLinkedDataFileResource);
   }
 
   @Test

@@ -7,6 +7,10 @@ import de.digitalcollections.model.list.filtering.FilterCriterion;
 import de.digitalcollections.model.list.filtering.Filtering;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
+import java.time.LocalDateTime;
+import java.util.*;
+import java.util.function.BiFunction;
+import java.util.stream.Collectors;
 import org.jdbi.v3.core.Handle;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.core.JdbiException;
@@ -16,11 +20,6 @@ import org.jdbi.v3.core.statement.StatementException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
-
-import java.time.LocalDateTime;
-import java.util.*;
-import java.util.function.BiFunction;
-import java.util.stream.Collectors;
 
 public abstract class UniqueObjectRepositoryImpl<U extends UniqueObject>
     extends JdbiRepositoryImpl<U> implements UniqueObjectRepository<U> {

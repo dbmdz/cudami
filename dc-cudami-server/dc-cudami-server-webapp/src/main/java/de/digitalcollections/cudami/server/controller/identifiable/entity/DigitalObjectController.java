@@ -23,19 +23,18 @@ import de.digitalcollections.model.list.sorting.Order;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import java.util.List;
+import java.util.Locale;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.stream.Stream;
+import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-
-import javax.servlet.http.HttpServletRequest;
-import java.util.List;
-import java.util.Locale;
-import java.util.Optional;
-import java.util.UUID;
-import java.util.stream.Stream;
 
 @RestController
 @Tag(name = "Digital object controller")
@@ -172,10 +171,11 @@ public class DigitalObjectController extends AbstractEntityController<DigitalObj
   @Operation(summary = "Get a list of digital objects by their UUIDs")
   @GetMapping(
       value = {
-          "/v6/digitalobjects/list/{uuids}", // no REGEX possible here!
+        "/v6/digitalobjects/list/{uuids}", // no REGEX possible here!
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public PageResponse<DigitalObject> getByUuids(@PathVariable UUID[] uuids) throws ServiceException {
+  public PageResponse<DigitalObject> getByUuids(@PathVariable UUID[] uuids)
+      throws ServiceException {
     return super.getByUuids(uuids);
   }
 

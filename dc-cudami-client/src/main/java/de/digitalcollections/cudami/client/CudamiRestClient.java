@@ -7,14 +7,13 @@ import de.digitalcollections.model.exception.TechnicalException;
 import de.digitalcollections.model.exception.http.client.ResourceNotFoundException;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.net.http.HttpClient;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class CudamiRestClient<T extends UniqueObject> extends BaseRestClient<T> {
 
