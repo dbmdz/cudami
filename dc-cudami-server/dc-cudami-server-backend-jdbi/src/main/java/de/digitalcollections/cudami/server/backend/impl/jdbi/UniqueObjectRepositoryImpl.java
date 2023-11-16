@@ -56,8 +56,6 @@ public abstract class UniqueObjectRepositoryImpl<U extends UniqueObject>
 
   /**
    * For details select (only used in find one, not lists): if additional objects should be "joined"
-   * (the parameter {@code sqlAdditionalJoins} in {@link #retrieveOne(String, Filtering, String,
-   * Map)})
    */
   protected void additionalReduceRowsBiConsumer(Map<UUID, U> map, RowView rowView) {}
 
