@@ -78,8 +78,7 @@ public interface UniqueObjectRepository<U extends UniqueObject>
     if (uniqueObject == null) {
       throw new IllegalArgumentException("get failed: given object must not be null");
     }
-    List<U> uniqueObjects = getByUuidsAndFiltering(
-        List.of(uniqueObject.getUuid()), null);
+    List<U> uniqueObjects = getByUuidsAndFiltering(List.of(uniqueObject.getUuid()), null);
     return (uniqueObjects == null ? null : uniqueObjects.stream().findFirst().orElse(null));
   }
 
@@ -115,8 +114,7 @@ public interface UniqueObjectRepository<U extends UniqueObject>
     if (uniqueObject == null || filtering == null) {
       throw new IllegalArgumentException("get failed: given object must not be null");
     }
-    List<U> uniqueObjects = getByUuidsAndFiltering(
-        List.of(uniqueObject.getUuid()), filtering);
+    List<U> uniqueObjects = getByUuidsAndFiltering(List.of(uniqueObject.getUuid()), filtering);
     return (uniqueObjects == null ? null : uniqueObjects.stream().findFirst().orElse(null));
   }
 

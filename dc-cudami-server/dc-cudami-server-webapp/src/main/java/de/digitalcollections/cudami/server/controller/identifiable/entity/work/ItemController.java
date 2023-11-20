@@ -201,6 +201,14 @@ public class ItemController extends AbstractEntityController<Item> {
     return super.getByUuids(uuids);
   }
 
+  @Operation(summary = "Get a list of items objects by UUID")
+  @PostMapping(
+      value = {"/v6/items/list"},
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  public PageResponse<Item> getByManyUuids(@RequestBody UUID[] uuids) throws ServiceException {
+    return super.getByUuids(uuids);
+  }
+
   @Override
   @Operation(
       summary = "Get languages of all items",

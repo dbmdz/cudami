@@ -138,7 +138,7 @@ public abstract class AbstractUniqueObjectController<U extends UniqueObject>
     }
   }
 
-  protected List<U> buildExamplesWithUuids(UUID[] uuids) throws ServiceException {
+  protected List<U> buildExamplesWithUuids(UUID... uuids) throws ServiceException {
     try {
       List<U> exampleList = new ArrayList<>();
       for (UUID uuid : uuids) {
