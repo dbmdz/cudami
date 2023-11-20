@@ -174,7 +174,7 @@ public class DigitalObjectController extends AbstractEntityController<DigitalObj
         "/v6/digitalobjects/list/{uuids}", // no REGEX possible here!
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public PageResponse<DigitalObject> getByUuids(@PathVariable UUID[] uuids)
+  public PageResponse<DigitalObject> getByUuids(@PathVariable List<UUID> uuids)
       throws ServiceException {
     return super.getByUuids(uuids);
   }
@@ -183,7 +183,7 @@ public class DigitalObjectController extends AbstractEntityController<DigitalObj
   @PostMapping(
       value = {"/v6/digitalobjects/list"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public PageResponse<DigitalObject> getByManyUuids(@RequestBody UUID[] uuids)
+  public PageResponse<DigitalObject> getByManyUuids(@RequestBody List<UUID> uuids)
       throws ServiceException {
     return super.getByUuids(uuids);
   }

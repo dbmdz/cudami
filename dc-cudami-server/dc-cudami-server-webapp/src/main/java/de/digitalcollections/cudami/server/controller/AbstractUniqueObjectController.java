@@ -88,15 +88,14 @@ public abstract class AbstractUniqueObjectController<U extends UniqueObject>
   }
 
   protected ResponseEntity<U> getByUuid(UUID uuid) throws ServiceException {
-    List<U> result =
-        getService().getByExamples(buildExamplesWithUuids(List.of(uuid).toArray(new UUID[0])));
+    List<U> result = getService().getByExamples(buildExamplesWithUuids(List.of(uuid)));
     if (result == null || result.isEmpty()) {
       return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
     return new ResponseEntity<>(result.stream().findFirst().orElse(null), HttpStatus.OK);
   }
 
-  protected PageResponse<U> getByUuids(UUID[] uuids) throws ServiceException {
+  protected PageResponse<U> getByUuids(List<UUID> uuids) throws ServiceException {
     List<U> result = getService().getByExamples(buildExamplesWithUuids(uuids));
     return PageResponse.builder()
         .withContent(result)
@@ -138,7 +137,11 @@ public abstract class AbstractUniqueObjectController<U extends UniqueObject>
     }
   }
 
-  protected List<U> buildExamplesWithUuids(UUID... uuids) throws ServiceException {
+  protected List<U> buildExamplesWithUuids(List<UUID> uuids) throws ServiceException {
+    if (uuids == null) {
+      return null;
+    }
+
     try {
       List<U> exampleList = new ArrayList<>();
       for (UUID uuid : uuids) {
@@ -147,13 +150,7 @@ public abstract class AbstractUniqueObjectController<U extends UniqueObject>
       return exampleList;
     } catch (ServiceException e) {
       throw new ServiceException(
-          "Cannot construct example list of "
-              + objectType
-              + " for uuids="
-              + Arrays.toString(uuids)
-              + ": "
-              + e,
-          e);
+          "Cannot construct example list of " + objectType + " for uuids=" + uuids + ": " + e, e);
     }
   }
 }

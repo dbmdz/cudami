@@ -450,7 +450,8 @@ public class CollectionController extends AbstractEntityController<Collection> {
         "/v6/collections/list/{uuids}", // no REGEX possible here!
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public PageResponse<Collection> getByUuids(@PathVariable UUID[] uuids) throws ServiceException {
+  public PageResponse<Collection> getByUuids(@PathVariable List<UUID> uuids)
+      throws ServiceException {
     return super.getByUuids(uuids);
   }
 
@@ -458,7 +459,7 @@ public class CollectionController extends AbstractEntityController<Collection> {
   @PostMapping(
       value = {"/v6/collections/list"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public PageResponse<Collection> getByManyUuids(@RequestBody UUID[] uuids)
+  public PageResponse<Collection> getByManyUuids(@RequestBody List<UUID> uuids)
       throws ServiceException {
     return super.getByUuids(uuids);
   }
