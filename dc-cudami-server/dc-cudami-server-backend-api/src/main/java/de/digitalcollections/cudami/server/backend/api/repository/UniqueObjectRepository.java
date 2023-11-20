@@ -70,7 +70,7 @@ public interface UniqueObjectRepository<U extends UniqueObject>
   /**
    * Retrieve one {@code UniqueObject}s by given properties in example instance.
    *
-   * @param uniqueObject example instancescontaining unique property (PK: UUID)
+   * @param uniqueObject example instance containing unique property (PK: UUID)
    * @return The found {@code UniqueObject} or null
    * @throws RepositoryException in case of technical problems
    */
@@ -78,8 +78,9 @@ public interface UniqueObjectRepository<U extends UniqueObject>
     if (uniqueObject == null) {
       throw new IllegalArgumentException("get failed: given object must not be null");
     }
-    List<U> uniqueObjects = getByExamples(List.of(uniqueObject));
-    return (uniqueObjects.isEmpty() ? null : uniqueObjects.stream().findFirst().orElse(null));
+    List<U> uniqueObjects = getByUuidsAndFiltering(
+        List.of(uniqueObject.getUuid()), null);
+    return (uniqueObjects == null ? null : uniqueObjects.stream().findFirst().orElse(null));
   }
 
   /**
@@ -93,11 +94,12 @@ public interface UniqueObjectRepository<U extends UniqueObject>
     if (uniqueObjects == null) {
       throw new IllegalArgumentException("get failed: given objects must not be null");
     }
-    return getByUuids(
+    return getByUuidsAndFiltering(
         uniqueObjects.stream()
             .map(UniqueObject::getUuid)
             .filter(Objects::nonNull)
-            .collect(Collectors.toList()));
+            .collect(Collectors.toList()),
+        null);
   }
 
   /**
@@ -113,8 +115,9 @@ public interface UniqueObjectRepository<U extends UniqueObject>
     if (uniqueObject == null || filtering == null) {
       throw new IllegalArgumentException("get failed: given object must not be null");
     }
-    List<U> uniqueObjects = getByExamplesAndFiltering(List.of(uniqueObject), filtering);
-    return (uniqueObjects.isEmpty() ? null : uniqueObjects.stream().findFirst().orElse(null));
+    List<U> uniqueObjects = getByUuidsAndFiltering(
+        List.of(uniqueObject.getUuid()), filtering);
+    return (uniqueObjects == null ? null : uniqueObjects.stream().findFirst().orElse(null));
   }
 
   /**
@@ -146,8 +149,8 @@ public interface UniqueObjectRepository<U extends UniqueObject>
    * @throws RepositoryException
    */
   default U getByUuid(UUID uniqueObjectUuid) throws RepositoryException {
-    List<U> uniqueObjects = getByUuids(List.of(uniqueObjectUuid));
-    return (uniqueObjects.isEmpty() ? null : uniqueObjects.stream().findFirst().orElse(null));
+    List<U> uniqueObjects = getByUuidsAndFiltering(List.of(uniqueObjectUuid), null);
+    return (uniqueObjects == null ? null : uniqueObjects.stream().findFirst().orElse(null));
   }
 
   /**
