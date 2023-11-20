@@ -199,6 +199,14 @@ public class WorkController extends AbstractEntityController<Work> {
     return super.getByUuids(uuids);
   }
 
+  @Operation(summary = "Get a list of works by UUID")
+  @PostMapping(
+      value = {"/v6/works/list"},
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  public PageResponse<Work> getByManyUuids(@RequestBody UUID[] uuids) throws ServiceException {
+    return super.getByUuids(uuids);
+  }
+
   @Operation(summary = "Get creators of a work")
   @GetMapping(
       value = {
