@@ -183,7 +183,7 @@ public class ManifestationController extends AbstractEntityController<Manifestat
         "/v6/manifestations/list/{uuids}", // no REGEX possible here!
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public PageResponse<Manifestation> getByUuids(@PathVariable UUID[] uuids)
+  public PageResponse<Manifestation> getByUuids(@PathVariable List<UUID> uuids)
       throws ServiceException {
     return super.getByUuids(uuids);
   }
@@ -192,7 +192,7 @@ public class ManifestationController extends AbstractEntityController<Manifestat
   @PostMapping(
       value = {"/v6/manifestations/list"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public PageResponse<Manifestation> getByManyUuids(@RequestBody UUID[] uuids)
+  public PageResponse<Manifestation> getByManyUuids(@RequestBody List<UUID> uuids)
       throws ServiceException {
     return super.getByUuids(uuids);
   }

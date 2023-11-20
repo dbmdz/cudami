@@ -197,7 +197,7 @@ public class ItemController extends AbstractEntityController<Item> {
         "/v6/items/list/{uuids}", // no REGEX possible here!
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public PageResponse<Item> getByUuids(@PathVariable UUID[] uuids) throws ServiceException {
+  public PageResponse<Item> getByUuids(@PathVariable List<UUID> uuids) throws ServiceException {
     return super.getByUuids(uuids);
   }
 
@@ -205,7 +205,7 @@ public class ItemController extends AbstractEntityController<Item> {
   @PostMapping(
       value = {"/v6/items/list"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public PageResponse<Item> getByManyUuids(@RequestBody UUID[] uuids) throws ServiceException {
+  public PageResponse<Item> getByManyUuids(@RequestBody List<UUID> uuids) throws ServiceException {
     return super.getByUuids(uuids);
   }
 

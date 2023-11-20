@@ -195,7 +195,7 @@ public class WebpageController extends AbstractIdentifiableController<Webpage> {
         "/v6/webpages/list/{uuids}", // no REGEX possible here!
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public PageResponse<Webpage> getByUuids(@PathVariable UUID[] uuids) throws ServiceException {
+  public PageResponse<Webpage> getByUuids(@PathVariable List<UUID> uuids) throws ServiceException {
     return super.getByUuids(uuids);
   }
 
@@ -203,7 +203,8 @@ public class WebpageController extends AbstractIdentifiableController<Webpage> {
   @PostMapping(
       value = {"/v6/webpages/list"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public PageResponse<Webpage> getByManyUuids(@RequestBody UUID[] uuids) throws ServiceException {
+  public PageResponse<Webpage> getByManyUuids(@RequestBody List<UUID> uuids)
+      throws ServiceException {
     return super.getByUuids(uuids);
   }
 

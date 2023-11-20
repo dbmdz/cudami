@@ -195,7 +195,7 @@ public class WorkController extends AbstractEntityController<Work> {
         "/v6/works/list/{uuids}", // no REGEX possible here!
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public PageResponse<Work> getByUuids(@PathVariable UUID[] uuids) throws ServiceException {
+  public PageResponse<Work> getByUuids(@PathVariable List<UUID> uuids) throws ServiceException {
     return super.getByUuids(uuids);
   }
 
@@ -203,7 +203,7 @@ public class WorkController extends AbstractEntityController<Work> {
   @PostMapping(
       value = {"/v6/works/list"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public PageResponse<Work> getByManyUuids(@RequestBody UUID[] uuids) throws ServiceException {
+  public PageResponse<Work> getByManyUuids(@RequestBody List<UUID> uuids) throws ServiceException {
     return super.getByUuids(uuids);
   }
 
