@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 public class CudamiDigitalObjectsClient extends CudamiEntitiesClient<DigitalObject> {
 
@@ -74,6 +75,27 @@ public class CudamiDigitalObjectsClient extends CudamiEntitiesClient<DigitalObje
 
   public DigitalObject getByUuidAndFillWEMI(UUID uuid) throws TechnicalException {
     return getByUuid(uuid, Map.of("fill-wemi", "true"));
+  }
+
+  public PageResponse<DigitalObject> getByUuidsAndFillWEMI(List<UUID> uuids)
+      throws TechnicalException {
+    if (uuids == null) {
+      return null;
+    }
+
+    if (uuids.size() >= 30) {
+      return (PageResponse<DigitalObject>)
+          doPostRequestForObject(
+              String.format("%s/list?fill-wemi=true", baseEndpoint), uuids, PageResponse.class);
+    } else {
+      return (PageResponse<DigitalObject>)
+          doGetRequestForObject(
+              String.format(
+                  "%s/list/%s?fill-wemi=true",
+                  baseEndpoint,
+                  uuids.stream().map(Object::toString).collect(Collectors.joining(","))),
+              PageResponse.class);
+    }
   }
 
   public List<FileResource> getFileResources(UUID uuid) throws TechnicalException {

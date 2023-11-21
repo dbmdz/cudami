@@ -167,25 +167,34 @@ public class DigitalObjectController extends AbstractEntityController<DigitalObj
         result, result != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
   }
 
-  @Override
   @Operation(summary = "Get a list of digital objects by their UUIDs")
   @GetMapping(
       value = {
         "/v6/digitalobjects/list/{uuids}", // no REGEX possible here!
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public PageResponse<DigitalObject> getByUuids(@PathVariable List<UUID> uuids)
+  public PageResponse<DigitalObject> getByUuids(
+      @PathVariable List<UUID> uuids,
+      @RequestParam(name = "fill-wemi", required = false, defaultValue = "false") boolean fillWemi)
       throws ServiceException {
-    return super.getByUuids(uuids);
+    return getByManyUuids(uuids, fillWemi);
   }
 
   @Operation(summary = "Get a list of digital objects by UUID")
   @PostMapping(
       value = {"/v6/digitalobjects/list"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public PageResponse<DigitalObject> getByManyUuids(@RequestBody List<UUID> uuids)
+  public PageResponse<DigitalObject> getByManyUuids(
+      @RequestBody List<UUID> uuids,
+      @RequestParam(name = "fill-wemi", required = false, defaultValue = "false") boolean fillWemi)
       throws ServiceException {
-    return super.getByUuids(uuids);
+    List<DigitalObject> result = service.getByExamples(buildExamplesWithUuids(uuids), fillWemi);
+    return PageResponse.builder()
+        .withContent(result)
+        .forPageSize(Integer.MAX_VALUE)
+        .forRequestPage(0)
+        .withTotalElements(result.size())
+        .build();
   }
 
   @Operation(

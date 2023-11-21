@@ -45,6 +45,9 @@ public interface DigitalObjectService extends EntityService<DigitalObject> {
     return getByIdentifier(identifier, false);
   }
 
+  List<DigitalObject> getByExamples(List<DigitalObject> digitalObjects, boolean fillWemi)
+      throws ServiceException;
+
   DigitalObject getByIdentifier(Identifier identifier, boolean fillWemi) throws ServiceException;
 
   List<FileResource> getFileResources(DigitalObject digitalObject) throws ServiceException;
