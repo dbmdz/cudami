@@ -246,6 +246,17 @@ public class DigitalObjectServiceImpl extends EntityServiceImpl<DigitalObject>
     return digitalObject;
   }
 
+  public List<DigitalObject> getByExamples(List<DigitalObject> examples, boolean fillWemi)
+      throws ServiceException {
+    List<DigitalObject> digitalObjects = super.getByExamples(examples);
+    if (fillWemi) {
+      for (DigitalObject digitalObject : digitalObjects) {
+        expandByWemiObjects(digitalObject);
+      }
+    }
+    return digitalObjects;
+  }
+
   @Override
   public DigitalObject getByIdentifier(Identifier identifier, boolean fillWemi)
       throws ServiceException {
