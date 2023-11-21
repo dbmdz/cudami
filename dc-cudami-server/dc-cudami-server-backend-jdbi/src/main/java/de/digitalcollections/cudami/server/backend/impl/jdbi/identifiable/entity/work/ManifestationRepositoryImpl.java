@@ -153,128 +153,6 @@ public class ManifestationRepositoryImpl extends EntityRepositoryImpl<Manifestat
   }
 
   @Override
-  protected void fullReduceRowsBiConsumer(Map<UUID, Manifestation> map, RowView rowView) {
-    super.fullReduceRowsBiConsumer(map, rowView);
-    Manifestation manifestation = map.get(rowView.getColumn(MAPPING_PREFIX + "_uuid", UUID.class));
-    // This object should exist already. If not, the mistake is somewhere in
-    // IdentifiableRepo.
-
-    // publishers
-    Agent publAgent = null;
-    if (rowView.getColumn(AgentRepositoryImpl.MAPPING_PREFIX + "_uuid", UUID.class) != null) {
-      Agent ag = rowView.getRow(Agent.class);
-      publAgent =
-          switch (ag.getIdentifiableObjectType()) {
-            case CORPORATE_BODY -> DerivedAgentBuildHelper.build(ag, CorporateBody.class);
-            case PERSON -> DerivedAgentBuildHelper.build(ag, Person.class);
-            case FAMILY -> DerivedAgentBuildHelper.build(ag, Family.class);
-            default -> ag;
-          };
-    }
-    HumanSettlement publPlace =
-        rowView.getColumn(HumanSettlementRepositoryImpl.MAPPING_PREFIX + "_uuid", UUID.class)
-                != null
-            ? rowView.getRow(HumanSettlement.class)
-            : null;
-    if (manifestation.getDistributionInfo() != null)
-      fillPublishers(manifestation.getDistributionInfo().getPublishers(), publAgent, publPlace);
-    if (manifestation.getProductionInfo() != null)
-      fillPublishers(manifestation.getProductionInfo().getPublishers(), publAgent, publPlace);
-    if (manifestation.getPublicationInfo() != null)
-      fillPublishers(manifestation.getPublicationInfo().getPublishers(), publAgent, publPlace);
-  }
-
-  @Override
-  protected void basicReduceRowsBiConsumer(Map<UUID, Manifestation> map, RowView rowView) {
-    super.basicReduceRowsBiConsumer(map, rowView);
-    Manifestation manifestation = map.get(rowView.getColumn(mappingPrefix + "_uuid", UUID.class));
-
-    // parents
-    UUID parentUuid = rowView.getColumn("parent_uuid", UUID.class);
-    if (parentUuid != null) {
-      if (manifestation.getParents() == null) {
-        manifestation.setParents(new ArrayList<>(1));
-      }
-      String parentTitle = rowView.getColumn("parent_title", String.class);
-      if (!manifestation.getParents().parallelStream()
-          .anyMatch(
-              relSpec ->
-                  Objects.equals(relSpec.getSubject().getUuid(), parentUuid)
-                      && Objects.equals(relSpec.getTitle(), parentTitle))) {
-        Manifestation parent =
-            Manifestation.builder()
-                .uuid(parentUuid)
-                .label(rowView.getColumn("parent_label", LocalizedText.class))
-                .titles(rowView.getColumn("parent_titles", new GenericType<List<Title>>() {}))
-                .manifestationType(rowView.getColumn("parent_manifestationType", String.class))
-                .refId(rowView.getColumn("parent_refId", Integer.class))
-                .notes(
-                    rowView.getColumn(
-                        "parent_notes", new GenericType<List<LocalizedStructuredContent>>() {}))
-                .created(rowView.getColumn("parent_created", LocalDateTime.class))
-                .lastModified(rowView.getColumn("parent_lastModified", LocalDateTime.class))
-                .identifiableObjectType(
-                    rowView.getColumn(
-                        "parent_identifiableObjectType", IdentifiableObjectType.class))
-                .identifiers(
-                    rowView.getColumn("parent_identifiers", new GenericType<Set<Identifier>>() {}))
-                .build();
-        manifestation
-            .getParents()
-            .add(
-                RelationSpecification.<Manifestation>builder()
-                    .title(parentTitle)
-                    .sortKey(rowView.getColumn("parent_sortKey", String.class))
-                    .subject(parent)
-                    .build());
-      }
-    }
-
-    // relations
-    UUID entityUuid = rowView.getColumn(entityRepository.getMappingPrefix() + "_uuid", UUID.class);
-    if (entityUuid != null) {
-      if (manifestation.getRelations() == null || manifestation.getRelations().isEmpty()) {
-        int maxIndex = rowView.getColumn("relation_max_sortindex", Integer.class);
-        Vector<EntityRelation> relations = new Vector<>(++maxIndex);
-        relations.setSize(maxIndex);
-        manifestation.setRelations(relations);
-      }
-      String relationPredicate =
-          rowView.getColumn(
-              EntityToEntityRelationRepositoryImpl.MAPPING_PREFIX + "_predicate", String.class);
-      if (!manifestation.getRelations().stream()
-          .anyMatch(
-              relation ->
-                  relation != null
-                      && Objects.equals(entityUuid, relation.getSubject().getUuid())
-                      && Objects.equals(relationPredicate, relation.getPredicate()))) {
-        Entity relatedEntity = rowView.getRow(Entity.class);
-        manifestation
-            .getRelations()
-            .set(
-                rowView.getColumn(
-                    EntityToEntityRelationRepositoryImpl.MAPPING_PREFIX + "_sortindex",
-                    Integer.class),
-                EntityRelation.builder()
-                    .subject(relatedEntity)
-                    .predicate(relationPredicate)
-                    .additionalPredicates(
-                        rowView.getColumn(
-                            EntityToEntityRelationRepositoryImpl.MAPPING_PREFIX
-                                + "_additionalPredicates",
-                            new GenericType<List<String>>() {}))
-                    .build());
-      }
-    }
-
-    // work
-    if (manifestation.getWork() == null) {
-      Work work = rowView.getRow(Work.class);
-      if (work != null && work.getUuid() != null) manifestation.setWork(work);
-    }
-  }
-
-  @Override
   public PageResponse<Manifestation> findManifestationsByWork(
       UUID workUuid, PageRequest pageRequest) throws RepositoryException {
     final String manifestationTableAlias = getTableAlias();
@@ -439,42 +317,9 @@ public class ManifestationRepositoryImpl extends EntityRepositoryImpl<Manifestat
     return super.getSqlSelectAllFields(tableAlias, mappingPrefix)
         + """
         , %1$s.composition %2$s_composition, %1$s.dimensions %2$s_dimensions, %1$s.otherlanguages %2$s_otherLanguages,
-        %1$s.scale %2$s_scale, %1$s.version %2$s_version,
-        %1$s.publication_info %2$s_publicationInfo, %1$s.production_info %2$s_productionInfo,
-        %1$s.distribution_info %2$s_distributionInfo,
+        %1$s.scale %2$s_scale, %1$s.version %2$s_version
         """
-            .formatted(tableAlias, mappingPrefix)
-        // publishers
-        + """
-        {{agentFields}},
-        {{humanSettlementFields}},
-        get_identifiers({{agentAlias}}.uuid) {{agentMap}}_identifiers,
-        get_identifiers({{humanSettleAlias}}.uuid) {{humanSettleMap}}_identifiers
-        """
-            .replace("{{agentFields}}", agentRepository.getSqlSelectReducedFields())
-            .replace(
-                "{{humanSettlementFields}}", humanSettlementRepository.getSqlSelectReducedFields())
-            .replace("{{agentAlias}}", agentRepository.getTableAlias())
-            .replace("{{agentMap}}", agentRepository.getMappingPrefix())
-            .replace("{{humanSettleAlias}}", humanSettlementRepository.getTableAlias())
-            .replace("{{humanSettleMap}}", humanSettlementRepository.getMappingPrefix());
-  }
-
-  @Override
-  protected String getSqlSelectAllFieldsJoins() {
-    return super.getSqlSelectAllFieldsJoins()
-        + """
-        LEFT JOIN %2$s %3$s ON %3$s.uuid = ANY (%1$s.publishing_info_agent_uuids)
-        LEFT JOIN %4$s %5$s ON %5$s.uuid = ANY (%1$s.publishing_info_locations_uuids)
-        """
-            .formatted(
-                tableAlias,
-                /* 2-3 Publisher agents */
-                AgentRepositoryImpl.TABLE_NAME,
-                AgentRepositoryImpl.TABLE_ALIAS,
-                /* 4-5 Publisher locations */
-                HumanSettlementRepositoryImpl.TABLE_NAME,
-                HumanSettlementRepositoryImpl.TABLE_ALIAS);
+            .formatted(tableAlias, mappingPrefix);
   }
 
   @Override
@@ -484,7 +329,9 @@ public class ManifestationRepositoryImpl extends EntityRepositoryImpl<Manifestat
             , %1$s.expressiontypes %2$s_expressionTypes, %1$s.language %2$s_language, %1$s.manifestationtype %2$s_manifestationType,
             %1$s.manufacturingtype %2$s_manufacturingType, %1$s.mediatypes %2$s_mediaTypes,
             %1$s.titles %2$s_titles,
+            -- work
             %3$s.uuid %4$s_uuid, get_identifiers(%3$s.uuid) %4$s_identifiers, %3$s.label %4$s_label,
+            %3$s.titles %4$s_titles,
             """
             .formatted(
                 tableAlias,
@@ -497,6 +344,9 @@ public class ManifestationRepositoryImpl extends EntityRepositoryImpl<Manifestat
             parent.uuid parent_uuid, parent.label parent_label, parent.titles parent_titles, parent.manifestationtype parent_manifestationType,
             parent.refid parent_refId, parent.notes parent_notes, parent.created parent_created, parent.last_modified parent_lastModified,
             parent.identifiable_objecttype parent_identifiableObjectType, get_identifiers(parent.uuid) parent_identifiers,
+            -- parent's work
+            parentwork.uuid parentwork_uuid, get_identifiers(parentwork.uuid) parentwork_identifiers, parentwork.label parentwork_label,
+            parentwork.titles parentwork_titles,
             """
         // relations
         + """
@@ -510,7 +360,26 @@ public class ManifestationRepositoryImpl extends EntityRepositoryImpl<Manifestat
             .replace("{{entityRelationMap}}", EntityToEntityRelationRepositoryImpl.MAPPING_PREFIX)
             .replace("{{entityAlias}}", entityRepository.getTableAlias())
             .replace("{{entityMapping}}", entityRepository.getMappingPrefix())
-        + entityRepository.getSqlSelectReducedFields();
+        + entityRepository.getSqlSelectReducedFields()
+        // publishing infos
+        + """
+            , {{tableAlias}}.publication_info {{mappingPrefix}}_publicationInfo, {{tableAlias}}.production_info {{mappingPrefix}}_productionInfo,
+            {{tableAlias}}.distribution_info {{mappingPrefix}}_distributionInfo,
+            -- publisher
+            {{agentFields}},
+            {{humanSettlementFields}},
+            get_identifiers({{agentAlias}}.uuid) {{agentMap}}_identifiers,
+            get_identifiers({{humanSettleAlias}}.uuid) {{humanSettleMap}}_identifiers
+            """
+            .replace("{{tableAlias}}", tableAlias)
+            .replace("{{mappingPrefix}}", mappingPrefix)
+            .replace("{{agentFields}}", agentRepository.getSqlSelectReducedFields())
+            .replace(
+                "{{humanSettlementFields}}", humanSettlementRepository.getSqlSelectReducedFields())
+            .replace("{{agentAlias}}", agentRepository.getTableAlias())
+            .replace("{{agentMap}}", agentRepository.getMappingPrefix())
+            .replace("{{humanSettleAlias}}", humanSettlementRepository.getTableAlias())
+            .replace("{{humanSettleMap}}", humanSettlementRepository.getMappingPrefix());
   }
 
   @Override
@@ -521,6 +390,7 @@ public class ManifestationRepositoryImpl extends EntityRepositoryImpl<Manifestat
           manifestation_manifestations mms INNER JOIN manifestations parent
           ON parent.uuid = mms.subject_uuid
         ) ON mms.object_uuid = %1$s.uuid
+        LEFT JOIN %6$s parentwork ON parentwork.uuid = parent.work
         LEFT JOIN (
           %2$s %3$s INNER JOIN %4$s %5$s ON %3$s.subject_uuid = %5$s.uuid
         ) ON %3$s.object_uuid = %1$s.uuid
@@ -536,7 +406,146 @@ public class ManifestationRepositoryImpl extends EntityRepositoryImpl<Manifestat
                 EntityRepositoryImpl.TABLE_ALIAS,
                 /* 6-7 */
                 WorkRepositoryImpl.TABLE_NAME,
-                WorkRepositoryImpl.TABLE_ALIAS);
+                WorkRepositoryImpl.TABLE_ALIAS)
+        + """
+        LEFT JOIN %2$s %3$s ON %3$s.uuid = ANY (%1$s.publishing_info_agent_uuids)
+        LEFT JOIN %4$s %5$s ON %5$s.uuid = ANY (%1$s.publishing_info_locations_uuids)
+        """
+            .formatted(
+                tableAlias,
+                /* 2-3 Publisher agents */
+                AgentRepositoryImpl.TABLE_NAME,
+                AgentRepositoryImpl.TABLE_ALIAS,
+                /* 4-5 Publisher locations */
+                HumanSettlementRepositoryImpl.TABLE_NAME,
+                HumanSettlementRepositoryImpl.TABLE_ALIAS);
+  }
+
+  @Override
+  protected void basicReduceRowsBiConsumer(Map<UUID, Manifestation> map, RowView rowView) {
+    super.basicReduceRowsBiConsumer(map, rowView);
+    Manifestation manifestation = map.get(rowView.getColumn(mappingPrefix + "_uuid", UUID.class));
+
+    // parents
+    UUID parentUuid = rowView.getColumn("parent_uuid", UUID.class);
+    if (parentUuid != null) {
+      if (manifestation.getParents() == null) {
+        manifestation.setParents(new ArrayList<>(1));
+      }
+      String parentTitle = rowView.getColumn("parent_title", String.class);
+      if (!manifestation.getParents().parallelStream()
+          .anyMatch(
+              relSpec ->
+                  Objects.equals(relSpec.getSubject().getUuid(), parentUuid)
+                      && Objects.equals(relSpec.getTitle(), parentTitle))) {
+        Work parentWork =
+            rowView.getColumn("parentwork_uuid", UUID.class) != null
+                ? Work.builder()
+                    .uuid(rowView.getColumn("parentwork_uuid", UUID.class))
+                    .identifiers(
+                        rowView.getColumn(
+                            "parentwork_identifiers", new GenericType<Set<Identifier>>() {}))
+                    .label(rowView.getColumn("parentwork_label", LocalizedText.class))
+                    .titles(
+                        rowView.getColumn("parentwork_titles", new GenericType<List<Title>>() {}))
+                    .build()
+                : null;
+        Manifestation parent =
+            Manifestation.builder()
+                .uuid(parentUuid)
+                .label(rowView.getColumn("parent_label", LocalizedText.class))
+                .titles(rowView.getColumn("parent_titles", new GenericType<List<Title>>() {}))
+                .manifestationType(rowView.getColumn("parent_manifestationType", String.class))
+                .refId(rowView.getColumn("parent_refId", Integer.class))
+                .notes(
+                    rowView.getColumn(
+                        "parent_notes", new GenericType<List<LocalizedStructuredContent>>() {}))
+                .created(rowView.getColumn("parent_created", LocalDateTime.class))
+                .lastModified(rowView.getColumn("parent_lastModified", LocalDateTime.class))
+                .identifiableObjectType(
+                    rowView.getColumn(
+                        "parent_identifiableObjectType", IdentifiableObjectType.class))
+                .identifiers(
+                    rowView.getColumn("parent_identifiers", new GenericType<Set<Identifier>>() {}))
+                .work(parentWork)
+                .build();
+        manifestation
+            .getParents()
+            .add(
+                RelationSpecification.<Manifestation>builder()
+                    .title(parentTitle)
+                    .sortKey(rowView.getColumn("parent_sortKey", String.class))
+                    .subject(parent)
+                    .build());
+      }
+    }
+
+    // relations
+    UUID entityUuid = rowView.getColumn(entityRepository.getMappingPrefix() + "_uuid", UUID.class);
+    if (entityUuid != null) {
+      if (manifestation.getRelations() == null || manifestation.getRelations().isEmpty()) {
+        int maxIndex = rowView.getColumn("relation_max_sortindex", Integer.class);
+        Vector<EntityRelation> relations = new Vector<>(++maxIndex);
+        relations.setSize(maxIndex);
+        manifestation.setRelations(relations);
+      }
+      String relationPredicate =
+          rowView.getColumn(
+              EntityToEntityRelationRepositoryImpl.MAPPING_PREFIX + "_predicate", String.class);
+      if (!manifestation.getRelations().stream()
+          .anyMatch(
+              relation ->
+                  relation != null
+                      && Objects.equals(entityUuid, relation.getSubject().getUuid())
+                      && Objects.equals(relationPredicate, relation.getPredicate()))) {
+        Entity relatedEntity = rowView.getRow(Entity.class);
+        manifestation
+            .getRelations()
+            .set(
+                rowView.getColumn(
+                    EntityToEntityRelationRepositoryImpl.MAPPING_PREFIX + "_sortindex",
+                    Integer.class),
+                EntityRelation.builder()
+                    .subject(relatedEntity)
+                    .predicate(relationPredicate)
+                    .additionalPredicates(
+                        rowView.getColumn(
+                            EntityToEntityRelationRepositoryImpl.MAPPING_PREFIX
+                                + "_additionalPredicates",
+                            new GenericType<List<String>>() {}))
+                    .build());
+      }
+    }
+
+    // work
+    if (manifestation.getWork() == null) {
+      Work work = rowView.getRow(Work.class);
+      if (work != null && work.getUuid() != null) manifestation.setWork(work);
+    }
+
+    // publishers
+    Agent publAgent = null;
+    if (rowView.getColumn(AgentRepositoryImpl.MAPPING_PREFIX + "_uuid", UUID.class) != null) {
+      Agent ag = rowView.getRow(Agent.class);
+      publAgent =
+          switch (ag.getIdentifiableObjectType()) {
+            case CORPORATE_BODY -> DerivedAgentBuildHelper.build(ag, CorporateBody.class);
+            case PERSON -> DerivedAgentBuildHelper.build(ag, Person.class);
+            case FAMILY -> DerivedAgentBuildHelper.build(ag, Family.class);
+            default -> ag;
+          };
+    }
+    HumanSettlement publPlace =
+        rowView.getColumn(HumanSettlementRepositoryImpl.MAPPING_PREFIX + "_uuid", UUID.class)
+                != null
+            ? rowView.getRow(HumanSettlement.class)
+            : null;
+    if (manifestation.getDistributionInfo() != null)
+      fillPublishers(manifestation.getDistributionInfo().getPublishers(), publAgent, publPlace);
+    if (manifestation.getProductionInfo() != null)
+      fillPublishers(manifestation.getProductionInfo().getPublishers(), publAgent, publPlace);
+    if (manifestation.getPublicationInfo() != null)
+      fillPublishers(manifestation.getPublicationInfo().getPublishers(), publAgent, publPlace);
   }
 
   @Override
