@@ -87,15 +87,15 @@ public class CudamiDigitalObjectsClient extends CudamiEntitiesClient<DigitalObje
       return (PageResponse<DigitalObject>)
           doPostRequestForObject(
               String.format("%s/list?fill-wemi=true", baseEndpoint), uuids, PageResponse.class);
-    } else {
-      return (PageResponse<DigitalObject>)
-          doGetRequestForObject(
-              String.format(
-                  "%s/list/%s?fill-wemi=true",
-                  baseEndpoint,
-                  uuids.stream().map(Object::toString).collect(Collectors.joining(","))),
-              PageResponse.class);
     }
+
+    return (PageResponse<DigitalObject>)
+        doGetRequestForObject(
+            String.format(
+                "%s/list/%s?fill-wemi=true",
+                baseEndpoint,
+                uuids.stream().map(Object::toString).collect(Collectors.joining(","))),
+            PageResponse.class);
   }
 
   public List<FileResource> getFileResources(UUID uuid) throws TechnicalException {

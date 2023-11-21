@@ -73,15 +73,15 @@ public class CudamiRestClient<T extends UniqueObject> extends BaseRestClient<T> 
     if (uuids.size() >= 30) {
       return (PageResponse<T>)
           doPostRequestForObject(String.format("%s/list", baseEndpoint), uuids, PageResponse.class);
-    } else {
-      return (PageResponse<T>)
-          doGetRequestForObject(
-              String.format(
-                  "%s/list/%s",
-                  baseEndpoint,
-                  uuids.stream().map(Object::toString).collect(Collectors.joining(","))),
-              PageResponse.class);
     }
+
+    return (PageResponse<T>)
+        doGetRequestForObject(
+            String.format(
+                "%s/list/%s",
+                baseEndpoint,
+                uuids.stream().map(Object::toString).collect(Collectors.joining(","))),
+            PageResponse.class);
   }
 
   public T save(T object) throws TechnicalException {
