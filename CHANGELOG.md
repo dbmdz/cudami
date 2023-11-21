@@ -22,6 +22,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
 
 - Replaced `data-colwidth` with `data-label` in table rendering
 - `DigitalObject` is retrieved 90 percent faster by SQL joins instead of single `getByUuid` calls
+- Expand `Manifestation` with reduced fields by…
+  - work title
+  - work of parent of manifestation
+  - move `PublishingInfo` objects from full fields
 
 ### Removed
 
