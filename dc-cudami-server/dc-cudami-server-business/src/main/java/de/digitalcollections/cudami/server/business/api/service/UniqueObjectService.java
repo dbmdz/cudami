@@ -30,7 +30,7 @@ public interface UniqueObjectService<U extends UniqueObject> {
   Set<U> getAll() throws ServiceException;
 
   /**
-   * Retrieve one {@code UniqueObject}s by given properties in example instance.
+   * Retrieve one {@code UniqueObject} by given properties in example instance.
    *
    * @param uniqueObject example instance containing unique property
    * @return the found {@code UniqueObject} or null
@@ -38,7 +38,7 @@ public interface UniqueObjectService<U extends UniqueObject> {
    */
   default U getByExample(U uniqueObject) throws ServiceException {
     List<U> uniqueObjects = getByExamples(List.of(uniqueObject));
-    return (uniqueObjects.isEmpty() ? null : uniqueObjects.stream().findFirst().orElse(null));
+    return (uniqueObjects == null ? null : uniqueObjects.stream().findFirst().orElse(null));
   }
 
   /**
