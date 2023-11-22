@@ -9,9 +9,6 @@ import de.digitalcollections.model.identifiable.entity.Entity;
 import de.digitalcollections.model.identifiable.entity.relation.EntityRelation;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
-import de.digitalcollections.model.list.sorting.Direction;
-import de.digitalcollections.model.list.sorting.Order;
-import de.digitalcollections.model.list.sorting.Sorting;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -79,7 +76,7 @@ public class EntityToEntityRelationRepositoryImpl extends JdbiRepositoryImpl
         new StringBuilder(
             "SELECT rel.subject_uuid rel_subject, rel.predicate rel_predicate, rel.object_uuid rel_object, rel.additional_predicates rel_addpredicates"
                 + commonSql);
-    pageRequest.setSorting(new Sorting(new Order(Direction.ASC, "rel.sortindex")));
+    if (pageRequest == null || !pageRequest.hasSorting()) query.append(" ORDER BY rel.sortindex");
     addPagingAndSorting(pageRequest, query);
     List<EntityRelation> result =
         dbi.withHandle(
