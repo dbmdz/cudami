@@ -233,5 +233,6 @@ public class EntityToEntityRelationRepositoryTest {
     PageResponse response = repository.find(request);
     List<EntityRelation> content = response.getContent();
     assertThat(content).hasSize(10);
+    assertThat(content).containsExactlyElementsOf(relations.subList(0, 10));
   }
 }
