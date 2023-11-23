@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
 
 ## [Unreleased]
 
+## [8.0.0](https://github.com/dbmdz/cudami/releases/tag/8.0.0)
+
 ### Added
 
 - Hierarchically filled `DigitalObject` (by UUID or identifier); the `lastModified` date of the `DigitalObject`
