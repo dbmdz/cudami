@@ -22,6 +22,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import org.jdbi.v3.core.Jdbi;
@@ -362,13 +363,26 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
   }
 
   @Override
-  public Topic getByUuidAndFiltering(UUID uuid, Filtering filtering) throws RepositoryException {
-    Topic topic = super.getByUuidAndFiltering(uuid, filtering);
+  public List<Topic> getByUuidsAndFiltering(List<UUID> uuids, Filtering filtering)
+      throws RepositoryException {
+    List<Topic> topics = super.getByUuidsAndFiltering(uuids, filtering);
 
-    if (topic != null) {
-      topic.setChildren(getChildren(topic));
-    }
-    return topic;
+    Optional.ofNullable(topics)
+        .map(List::parallelStream)
+        .ifPresent(
+            stream ->
+                stream.forEach(
+                    topic -> {
+                      try {
+                        topic.setChildren(getChildren(topic.getUuid()));
+                      } catch (RepositoryException e) {
+                        LOGGER.error(
+                            "Cannot get children of topic with UUID %s: %s"
+                                .formatted(topic.getUuid(), e),
+                            e);
+                      }
+                    }));
+    return topics;
   }
 
   @Override

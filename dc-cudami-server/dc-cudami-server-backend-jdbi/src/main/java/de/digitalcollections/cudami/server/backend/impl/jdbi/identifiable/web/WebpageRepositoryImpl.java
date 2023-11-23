@@ -20,14 +20,19 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.core.statement.PreparedBatch;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
 
 @Repository
 public class WebpageRepositoryImpl extends IdentifiableRepositoryImpl<Webpage>
     implements WebpageRepository {
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(WebpageRepositoryImpl.class);
 
   public static final String MAPPING_PREFIX = "webp";
   public static final String TABLE_ALIAS = "webp";
@@ -236,13 +241,26 @@ public class WebpageRepositoryImpl extends IdentifiableRepositoryImpl<Webpage>
   }
 
   @Override
-  public Webpage getByUuidAndFiltering(UUID uuid, Filtering filtering) throws RepositoryException {
-    Webpage webpage = super.getByUuidAndFiltering(uuid, filtering);
+  public List<Webpage> getByUuidsAndFiltering(List<UUID> uuids, Filtering filtering)
+      throws RepositoryException {
+    List<Webpage> webpages = super.getByUuidsAndFiltering(uuids, filtering);
 
-    if (webpage != null) {
-      webpage.setChildren(getChildren(webpage));
-    }
-    return webpage;
+    Optional.ofNullable(webpages)
+        .map(List::parallelStream)
+        .ifPresent(
+            stream ->
+                stream.forEach(
+                    webpage -> {
+                      try {
+                        webpage.setChildren(getChildren(webpage.getUuid()));
+                      } catch (RepositoryException e) {
+                        LOGGER.error(
+                            "Cannot get children of webpage with UUID %s: %s"
+                                .formatted(webpage.getUuid(), e),
+                            e);
+                      }
+                    }));
+    return webpages;
   }
 
   @Override
