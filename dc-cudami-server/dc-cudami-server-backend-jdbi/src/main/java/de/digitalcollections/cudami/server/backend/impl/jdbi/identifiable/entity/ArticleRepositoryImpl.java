@@ -17,6 +17,7 @@ import de.digitalcollections.model.list.filtering.Filtering;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import org.jdbi.v3.core.Jdbi;
@@ -110,14 +111,26 @@ public class ArticleRepositoryImpl extends EntityRepositoryImpl<Article>
   }
 
   @Override
-  public Article getByUuidAndFiltering(UUID uuid, Filtering filtering) throws RepositoryException {
-    Article article = super.getByUuidAndFiltering(uuid, filtering);
+  public List<Article> getByUuidsAndFiltering(List<UUID> uuids, Filtering filtering)
+      throws RepositoryException {
+    List<Article> articles = super.getByUuidsAndFiltering(uuids, filtering);
 
-    if (article != null) {
-      List<Agent> creators = getCreators(uuid);
-      article.setCreators(creators);
-    }
-    return article;
+    Optional.ofNullable(articles)
+        .map(List::parallelStream)
+        .ifPresent(
+            stream ->
+                stream.forEach(
+                    article -> {
+                      try {
+                        article.setCreators(getCreators(article.getUuid()));
+                      } catch (RepositoryException e) {
+                        LOGGER.error(
+                            "Cannot get creators of article with UUID %s: %s"
+                                .formatted(article.getUuid(), e),
+                            e);
+                      }
+                    }));
+    return articles;
   }
 
   @Override

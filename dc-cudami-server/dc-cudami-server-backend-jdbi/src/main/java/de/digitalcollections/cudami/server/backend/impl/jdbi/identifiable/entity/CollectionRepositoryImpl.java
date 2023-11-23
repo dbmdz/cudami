@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.core.statement.PreparedBatch;
@@ -295,14 +296,26 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
   }
 
   @Override
-  public Collection getByUuidAndFiltering(UUID uuid, Filtering filtering)
+  public List<Collection> getByUuidsAndFiltering(List<UUID> uuids, Filtering filtering)
       throws RepositoryException {
-    Collection collection = super.getByUuidAndFiltering(uuid, filtering);
+    List<Collection> collections = super.getByUuidsAndFiltering(uuids, filtering);
 
-    if (collection != null) {
-      collection.setChildren(getChildren(collection));
-    }
-    return collection;
+    Optional.ofNullable(collections)
+        .map(List::parallelStream)
+        .ifPresent(
+            stream ->
+                stream.forEach(
+                    collection -> {
+                      try {
+                        collection.setChildren(getChildren(collection.getUuid()));
+                      } catch (RepositoryException e) {
+                        LOGGER.error(
+                            "Cannot get children of collection with UUID %s: %s"
+                                .formatted(collection.getUuid(), e),
+                            e);
+                      }
+                    }));
+    return collections;
   }
 
   @Override

@@ -19,6 +19,7 @@ import de.digitalcollections.model.semantic.Headword;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import org.jdbi.v3.core.Jdbi;
@@ -124,15 +125,26 @@ public class HeadwordEntryRepositoryImpl extends EntityRepositoryImpl<HeadwordEn
   }
 
   @Override
-  public HeadwordEntry getByUuidAndFiltering(UUID uuid, Filtering filtering)
+  public List<HeadwordEntry> getByUuidsAndFiltering(List<UUID> uuids, Filtering filtering)
       throws RepositoryException {
-    HeadwordEntry headwordEntry = super.getByUuidAndFiltering(uuid, filtering);
+    List<HeadwordEntry> headwordEntries = super.getByUuidsAndFiltering(uuids, filtering);
 
-    if (headwordEntry != null) {
-      List<Agent> creators = getCreators(uuid);
-      headwordEntry.setCreators(creators);
-    }
-    return headwordEntry;
+    Optional.ofNullable(headwordEntries)
+        .map(List::parallelStream)
+        .ifPresent(
+            stream ->
+                stream.forEach(
+                    headwordEntry -> {
+                      try {
+                        headwordEntry.setCreators(getCreators(headwordEntry.getUuid()));
+                      } catch (RepositoryException e) {
+                        LOGGER.error(
+                            "Cannot get creators of headword entry with UUID %s: %s"
+                                .formatted(headwordEntry.getUuid(), e),
+                            e);
+                      }
+                    }));
+    return headwordEntries;
   }
 
   @Override
