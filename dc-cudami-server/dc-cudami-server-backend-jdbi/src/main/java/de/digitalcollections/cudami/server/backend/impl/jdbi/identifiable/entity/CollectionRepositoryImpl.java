@@ -80,7 +80,7 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
                 preparedBatch
                     .bind("parentCollectionUuid", parentUuid)
                     .bind("childCollectionUuid", childUuid)
-                    .bind("sortIndex", nextSortIndex + getIndex(childrenUuids, childUuid))
+                    .bind("sortIndex", nextSortIndex + childrenUuids.indexOf(childUuid))
                     .add();
               });
           preparedBatch.execute();

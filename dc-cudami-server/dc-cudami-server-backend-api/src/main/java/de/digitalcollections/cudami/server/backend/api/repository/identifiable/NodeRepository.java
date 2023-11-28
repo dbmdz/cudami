@@ -33,7 +33,7 @@ public interface NodeRepository<N extends Identifiable> extends IdentifiableRepo
     }
     List<UUID> childrenUuids =
         children.stream()
-            .filter(c -> c.getUuid() == null)
+            .filter(c -> c.getUuid() != null)
             .map(c -> c.getUuid())
             .collect(Collectors.toList());
     return addChildren(parent.getUuid(), childrenUuids);

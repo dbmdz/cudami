@@ -83,7 +83,7 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
                 preparedBatch
                     .bind("parentTopicUuid", parentUuid)
                     .bind("childTopicUuid", childUuid)
-                    .bind("sortIndex", nextSortIndex + getIndex(childrenUuids, childUuid))
+                    .bind("sortIndex", nextSortIndex + childrenUuids.indexOf(childUuid))
                     .add();
               });
           preparedBatch.execute();

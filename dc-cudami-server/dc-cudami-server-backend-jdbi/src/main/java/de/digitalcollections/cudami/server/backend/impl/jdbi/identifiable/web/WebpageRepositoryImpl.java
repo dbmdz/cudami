@@ -74,7 +74,7 @@ public class WebpageRepositoryImpl extends IdentifiableRepositoryImpl<Webpage>
                 preparedBatch
                     .bind("parentWebpageUuid", parentUuid)
                     .bind("childWebpageUuid", childUuid)
-                    .bind("sortIndex", nextSortIndex + getIndex(childrenUuids, childUuid))
+                    .bind("sortIndex", nextSortIndex + childrenUuids.indexOf(childUuid))
                     .add();
               });
           preparedBatch.execute();
