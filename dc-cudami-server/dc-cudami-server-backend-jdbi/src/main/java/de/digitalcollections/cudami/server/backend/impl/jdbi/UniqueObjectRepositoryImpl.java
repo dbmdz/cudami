@@ -8,7 +8,14 @@ import de.digitalcollections.model.list.filtering.Filtering;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 import org.jdbi.v3.core.Handle;
@@ -245,17 +252,6 @@ public abstract class UniqueObjectRepositoryImpl<U extends UniqueObject>
     for (UniqueObject uo : list) {
       pos += 1;
       if (uo.getUuid().equals(uniqueObject.getUuid())) {
-        return pos;
-      }
-    }
-    return -1;
-  }
-
-  public int getIndex(List<UUID> list, UUID uuid) {
-    int pos = -1;
-    for (UUID u : list) {
-      pos += 1;
-      if (u.equals(uuid)) {
         return pos;
       }
     }
