@@ -39,6 +39,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
 
 - Fixed selection of rendering template for webpages
 - Fixed entity to entity relations ordered by `rel.sortindex`
+- Add existing collection as subcollection to another one
 
 ## [7.1.1](https://github.com/dbmdz/cudami/releases/tag/7.1.1) - 2023-10-11
 
