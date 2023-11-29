@@ -1,0 +1,19 @@
+include:
+  - project: "mdz/devops/ci"
+    file: "gitlab-ci-base.yml"
+
+image: "$BUILD_IMAGE_ANSIBLE_MAVEN_JDK17"
+
+####################
+### Stage deploy ###
+####################
+
+deploy_dev:
+  parallel:
+    matrix:
+      - PLAYBOOK: [ "cudami/repository-server.yml", "cudami/admin-webapp.yml" ]
+
+deploy_version_to_environment:
+  parallel:
+    matrix:
+      - PLAYBOOK: [ "cudami/repository-server.yml", "cudami/admin-webapp.yml" ]
