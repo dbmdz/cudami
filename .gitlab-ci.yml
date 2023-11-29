@@ -4,6 +4,14 @@ include:
 
 image: "$BUILD_IMAGE_ANSIBLE_MAVEN_JDK17"
 
+variables:
+  DOCKER_HOST: "tcp://docker:2375"
+  DOCKER_TLS_CERTDIR: ""
+
+services:
+  - name: "$BUILD_IMAGE_DOCKER_DIND"
+    alias: docker
+
 ####################
 ### Stage deploy ###
 ####################
