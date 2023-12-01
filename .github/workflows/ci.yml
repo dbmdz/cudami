@@ -65,8 +65,6 @@ jobs:
   publish:
     if: (github.event_name == 'push' && (contains(github.ref, 'main') || startsWith(github.ref, 'release/'))) || github.event_name == 'release'
     needs: build
-    outputs:
-      PROJECT_VERSION: ${{ steps.projectversion.outputs.PROJECT_VERSION }}
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository
@@ -84,9 +82,6 @@ jobs:
         run: sudo apt update && sudo apt install libxml2-utils
       - name: Extract project version
         run: echo "PROJECT_VERSION=$(xmllint --xpath '/*[local-name()="project"]/*[local-name()="version"]/text()' pom.xml)" >> $GITHUB_ENV
-      - name: Set project version as output variable
-        id: projectversion
-        run: echo "PROJECT_VERSION=${{ env.PROJECT_VERSION }}" >> $GITHUB_OUTPUT
       # Publish snapshot
       - name: Set up JDK 17 for publishing a snapshot
         if: github.event_name == 'push' && endswith(env.PROJECT_VERSION, 'SNAPSHOT')
@@ -124,10 +119,3 @@ jobs:
           MAVEN_GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
           MAVEN_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
           MAVEN_USERNAME: ${{ secrets.OSSRH_USERNAME }}
-  deploy:
-    if: github.event_name == 'push' && contains(github.ref, 'main') && endswith(needs.publish.outputs.PROJECT_VERSION, 'SNAPSHOT')
-    runs-on: ubuntu-latest
-    needs: publish
-    steps:
-      - name: Deploy cudami
-        run: curl -X POST -F token=${{ secrets.TRIGGER_TOKEN }} -F ref=main -F "variables[DEPLOY_VERSION_TO_ENVIRONMENT]=$(printf '%s > development' ${{ needs.publish.outputs.PROJECT_VERSION }})" ${{ secrets.TRIGGER_URL }}
