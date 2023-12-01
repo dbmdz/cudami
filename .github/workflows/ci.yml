@@ -100,7 +100,7 @@ jobs:
           server-username: MAVEN_USERNAME
       - name: Publish snapshot to the Maven Central Repository
         if: github.event_name == 'push' && endswith(env.PROJECT_VERSION, 'SNAPSHOT')
-        run: mvn -B deploy -DskipTests
+        run: mvn -B deploy -DskipTests -Pmaven-central
         env:
           MAVEN_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
           MAVEN_USERNAME: ${{ secrets.OSSRH_USERNAME }}
@@ -119,7 +119,7 @@ jobs:
           server-username: MAVEN_USERNAME
       - name: Publish release to the Maven Central Repository
         if: github.event_name == 'release' && !endswith(env.PROJECT_VERSION, 'SNAPSHOT')
-        run: mvn -B deploy -DskipTests -Pdeploy
+        run: mvn -B deploy -DskipTests -Pmaven-central,sign
         env:
           MAVEN_GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
           MAVEN_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
