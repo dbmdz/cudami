@@ -44,6 +44,66 @@ Use the `filtering` parameter as follows:
   So whenever possible use anchors (`^` or `$`) and avoid unbound quantifiers (e.g. `*`, `{1,}`).
   This does not only make a small difference, it increases speed up to 95 percent.
 
+### Fields with subproperties
+
+Generally speaking subproperties are separated from the field name by a dot (`.`). That is the only general rule because
+filtering by a field within another field is always a special case and thus a special implementation.
+Please check out the methods `getColumnName` of the desired object's repository implementation.
+
+The specials that are shared by all `Identifiable`s are:
+
+- label filtering:
+
+  - for the sake of performance use `like` operator
+  - filtering with `like` searches for the occurrence of the single words (whole words) w/o considering their order
+    or any intermediate words (you might filter the result in your consumer app by your needs)
+  - filtering with `eq` (**not recommended**) is much slower and searches for an exact match of the supplied string
+    within the label (i.e. somewhere in the label string, not anchored)
+  - `label` ignores the language and is fastest
+  - `label.<language>`, e.g. `label.de`, `label.und-Latn` filters by language too but is slower
+
+- for `NamedEntity`s only: name filtering:
+
+  - field is `name` or `name.<language>`
+  - the rules and hints for label filtering (see above) apply analogously
+
+- `identifiers.namespace` and/or `identifiers.id` (both are string fields)
+
+### List of available filter operators
+
+<table border="1">
+<caption>Filter operators for URL query params</caption>
+<thead>
+<tr><th>Symbol    </th><th>Operation                                 </th><th>Example filter query param (unescaped) </th></tr>
+</thead>
+<tbody>
+<tr><td>eq        </td><td>equals                                    </td><td>city:eq:Munich                         </td></tr>
+<tr><td>eq_notset </td><td>equals or not set                         </td><td>city:eq_notset:Munich                  </td></tr>
+<tr><td>neq       </td><td>not equals                                </td><td>country:neq:de                         </td></tr>
+<tr><td>gt        </td><td>greater than                              </td><td>amount:gt:10000                        </td></tr>
+<tr><td>gt_notset </td><td>greater than or not set                   </td><td>presentationEnd:gt_notset:2020-10-06   </td></tr>
+<tr><td>gte       </td><td>greater than or equals                    </td><td>amount:gte:10000                       </td></tr>
+<tr><td>gte_notset</td><td>greater than or equals or not set         </td><td>amount:gte_notset:10000                </td></tr>
+<tr><td>lt        </td><td>less than                                 </td><td>amount:lt:10000                        </td></tr>
+<tr><td>lt_notset </td><td>less than or not set                      </td><td>amount:lt_notset:10000                 </td></tr>
+<tr><td>lt_set    </td><td>less than and set                         </td><td>amount:lt_set:10000                    </td></tr>
+<tr><td>lte       </td><td>less than or equals to                    </td><td>amount:lte:10000                       </td></tr>
+<tr><td>lte_set   </td><td>less than or equals and set               </td><td>presentationStart:lte_set:2020-10-06   </td></tr>
+<tr><td>lte_notset</td><td>less than or equals or not set            </td><td>presentationStart:lte_notset:2020-10-06</td></tr>
+<tr><td>in        </td><td>in                                        </td><td>country:in:uk,usa,au                   </td></tr>
+<tr><td>nin       </td><td>not in                                    </td><td>country:nin:fr,de,nz                   </td></tr>
+<tr><td>btn       </td><td>between (inclusive)                       </td><td>joiningDate:btn:2018-01-01,2016-01-01  </td></tr>
+<tr><td>like      </td><td>like                                      </td><td>firstName:like:John                    </td></tr>
+<tr><td>stw       </td><td>starts with                               </td><td>firstName:stw:A                        </td></tr>
+<tr><td>set       </td><td>value exists (not null)                   </td><td>firstName:set:                         </td></tr>
+<tr><td>notset    </td><td>value is not set (null)                   </td><td>firstName:notset:                      </td></tr>
+<tr><td>regex     </td><td>regexp matching (case sensitive)          </td><td>firstName:regex:Joh?n.\{1,\}           </td></tr>
+<tr><td>iregex    </td><td>regexp matching (case insensitive)        </td><td>firstName:iregex:Joh?n.\{1,\}          </td></tr>
+<tr><td>nregex    </td><td>regexp not matching (case sensitive)      </td><td>firstName:nregex:Joh?n.\{1,\}          </td></tr>
+<tr><td>niregex   </td><td>regexp not matching (case insensitive)    </td><td>firstName:niregex:Joh?n.\{1,\}         </td></tr>
+</tbody>
+</table>
+
 Sorting
 -------
 
