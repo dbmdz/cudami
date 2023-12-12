@@ -121,6 +121,7 @@ public class DigitalObjectRenderingFileResourceServiceImpl
   public void setRenderingFileResources(
       DigitalObject digitalObject, List<FileResource> renderingResources) throws ServiceException {
 
+    List<FileResource> existingRenderingResources = getRenderingFileResources(digitalObject);
     // Remove the old relations
     try {
       digitalObjectRenderingFileResourceRepository.removeByDigitalObject(digitalObject);
@@ -129,7 +130,6 @@ public class DigitalObjectRenderingFileResourceServiceImpl
     }
 
     // Remove the old rendering resources, if present
-    List<FileResource> existingRenderingResources = getRenderingFileResources(digitalObject);
     for (FileResource existingRenderingResource : existingRenderingResources) {
       try {
         fileResourceMetadataService.delete(existingRenderingResource);
