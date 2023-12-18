@@ -37,6 +37,7 @@ import de.digitalcollections.model.text.LocalizedStructuredContent;
 import de.digitalcollections.model.text.LocalizedText;
 import de.digitalcollections.model.text.Title;
 import de.digitalcollections.model.time.LocalDateRange;
+import de.digitalcollections.model.validation.ValidationException;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.lang.reflect.InvocationTargetException;
 import java.time.LocalDateTime;
@@ -649,7 +650,7 @@ public class ManifestationRepositoryImpl extends EntityRepositoryImpl<Manifestat
 
   @Override
   public void save(Manifestation manifestation, Map<String, Object> bindings)
-      throws RepositoryException {
+      throws RepositoryException, ValidationException {
     if (bindings == null) {
       bindings = new HashMap<>(3);
     }
@@ -756,7 +757,7 @@ public class ManifestationRepositoryImpl extends EntityRepositoryImpl<Manifestat
 
   @Override
   public void update(Manifestation manifestation, Map<String, Object> bindings)
-      throws RepositoryException {
+      throws RepositoryException, ValidationException {
     if (bindings == null) {
       bindings = new HashMap<>(3);
     }

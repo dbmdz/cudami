@@ -5,6 +5,7 @@ import de.digitalcollections.model.identifiable.entity.digitalobject.DigitalObje
 import de.digitalcollections.model.identifiable.resource.LinkedDataFileResource;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
+import de.digitalcollections.model.validation.ValidationException;
 import java.util.List;
 import java.util.UUID;
 
@@ -43,7 +44,7 @@ public interface DigitalObjectLinkedDataFileResourceRepository {
 
   default void setLinkedDataFileResources(
       DigitalObject digitalObject, List<LinkedDataFileResource> linkedDataFileResources)
-      throws RepositoryException {
+      throws RepositoryException, ValidationException {
     if (digitalObject == null || linkedDataFileResources == null) {
       throw new IllegalArgumentException("set failed: given objects must not be null");
     }
@@ -52,5 +53,5 @@ public interface DigitalObjectLinkedDataFileResourceRepository {
 
   void setLinkedDataFileResources(
       UUID digitalObjectUuid, List<LinkedDataFileResource> linkedDataFileResources)
-      throws RepositoryException;
+      throws RepositoryException, ValidationException;
 }

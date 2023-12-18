@@ -7,6 +7,8 @@ import de.digitalcollections.model.list.filtering.FilterCriterion;
 import de.digitalcollections.model.list.filtering.Filtering;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
+import de.digitalcollections.model.validation.ValidationException;
+import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -16,7 +18,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiFunction;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import org.jdbi.v3.core.Handle;
 import org.jdbi.v3.core.Jdbi;
@@ -97,9 +101,22 @@ public abstract class UniqueObjectRepositoryImpl<U extends UniqueObject>
     return execUpdateWithList(sql, "uuids", uuids);
   }
 
+  protected boolean isConstraintViolationException(
+      Throwable throwable, Consumer<String> useMessage) {
+    if (throwable == null) return false;
+    if (throwable instanceof SQLException sqlexc) {
+      useMessage.accept(sqlexc.getMessage());
+      return List.of("foreign_key_violation", "unique_violation", "check_violation")
+          .contains(sqlexc.getSQLState());
+    }
+    return throwable.getCause() != null
+        ? isConstraintViolationException(throwable.getCause(), useMessage)
+        : false;
+  }
+
   private void execInsertUpdate(
       final String sql, U uniqueObject, final Map<String, Object> bindings, boolean withCallback)
-      throws RepositoryException {
+      throws RepositoryException, ValidationException {
     // because of a significant difference in execution duration it makes sense to
     // distinguish here
     try {
@@ -124,6 +141,10 @@ public abstract class UniqueObjectRepositoryImpl<U extends UniqueObject>
         }
       }
     } catch (StatementException e) {
+      AtomicReference<String> constraintMessage = new AtomicReference<>();
+      if (isConstraintViolationException(e, constraintMessage::set)) {
+        throw new ValidationException(constraintMessage.get());
+      }
       String detailMessage = e.getCause() != null ? e.getCause().getMessage() : e.getMessage();
       throw new RepositoryException(
           String.format("The SQL statement is defective: %s", detailMessage), e);
@@ -489,7 +510,8 @@ public abstract class UniqueObjectRepositoryImpl<U extends UniqueObject>
   }
 
   @Override
-  public void save(U uniqueObject, Map<String, Object> bindings) throws RepositoryException {
+  public void save(U uniqueObject, Map<String, Object> bindings)
+      throws RepositoryException, ValidationException {
     save(uniqueObject, bindings, null);
   }
 
@@ -497,7 +519,7 @@ public abstract class UniqueObjectRepositoryImpl<U extends UniqueObject>
       U uniqueObject,
       Map<String, Object> bindings,
       BiFunction<String, Map<String, Object>, String> sqlModifier)
-      throws RepositoryException {
+      throws RepositoryException, ValidationException {
     if (uniqueObject == null) {
       throw new IllegalArgumentException("Given object must not be null");
     }
@@ -536,7 +558,8 @@ public abstract class UniqueObjectRepositoryImpl<U extends UniqueObject>
   }
 
   @Override
-  public void update(U uniqueObject, Map<String, Object> bindings) throws RepositoryException {
+  public void update(U uniqueObject, Map<String, Object> bindings)
+      throws RepositoryException, ValidationException {
     update(uniqueObject, bindings, null);
   }
 
@@ -544,7 +567,7 @@ public abstract class UniqueObjectRepositoryImpl<U extends UniqueObject>
       U uniqueObject,
       Map<String, Object> bindings,
       BiFunction<String, Map<String, Object>, String> sqlModifier)
-      throws RepositoryException {
+      throws RepositoryException, ValidationException {
     if (uniqueObject == null) {
       throw new IllegalArgumentException("Given object must not be null");
     }

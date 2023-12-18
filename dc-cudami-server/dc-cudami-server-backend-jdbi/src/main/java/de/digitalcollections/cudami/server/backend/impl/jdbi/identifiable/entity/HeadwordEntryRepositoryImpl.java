@@ -16,6 +16,7 @@ import de.digitalcollections.model.identifiable.entity.agent.Family;
 import de.digitalcollections.model.identifiable.entity.agent.Person;
 import de.digitalcollections.model.list.filtering.Filtering;
 import de.digitalcollections.model.semantic.Headword;
+import de.digitalcollections.model.validation.ValidationException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -267,7 +268,7 @@ public class HeadwordEntryRepositoryImpl extends EntityRepositoryImpl<HeadwordEn
   }
 
   @Override
-  public void save(HeadwordEntry headwordEntry) throws RepositoryException {
+  public void save(HeadwordEntry headwordEntry) throws RepositoryException, ValidationException {
     Map<String, Object> bindings = new HashMap<>();
     UUID headwordUuid = null;
     if (headwordEntry.getHeadword() != null) {
@@ -311,7 +312,7 @@ public class HeadwordEntryRepositoryImpl extends EntityRepositoryImpl<HeadwordEn
   }
 
   @Override
-  public void update(HeadwordEntry headwordEntry) throws RepositoryException {
+  public void update(HeadwordEntry headwordEntry) throws RepositoryException, ValidationException {
     Map<String, Object> bindings = new HashMap<>();
     UUID headwordUuid = null;
     if (headwordEntry.getHeadword() != null) {

@@ -9,6 +9,7 @@ import de.digitalcollections.model.identifiable.semantic.Subject;
 import de.digitalcollections.model.list.filtering.FilterCriterion;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
+import de.digitalcollections.model.validation.ValidationException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -224,7 +225,7 @@ public class SubjectRepositoryImpl extends UniqueObjectRepositoryImpl<Subject>
   }
 
   @Override
-  public void save(Subject subject) throws RepositoryException {
+  public void save(Subject subject) throws RepositoryException, ValidationException {
     HashMap<String, Object> bindings = new HashMap<>(0);
     bindings.put("split_label", splitToArray(subject.getLabel()));
     super.save(subject, bindings);
@@ -246,7 +247,7 @@ public class SubjectRepositoryImpl extends UniqueObjectRepositoryImpl<Subject>
   }
 
   @Override
-  public void update(Subject subject) throws RepositoryException {
+  public void update(Subject subject) throws RepositoryException, ValidationException {
     HashMap<String, Object> bindings = new HashMap<>(0);
     bindings.put("split_label", splitToArray(subject.getLabel()));
     super.update(subject, bindings);

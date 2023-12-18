@@ -19,6 +19,7 @@ import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.list.sorting.Sorting;
 import de.digitalcollections.model.text.LocalizedText;
+import de.digitalcollections.model.validation.ValidationException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -469,7 +470,7 @@ public class UrlAliasRepositoryImpl extends UniqueObjectRepositoryImpl<UrlAlias>
   }
 
   @Override
-  public void save(UrlAlias urlAlias) throws RepositoryException {
+  public void save(UrlAlias urlAlias) throws RepositoryException, ValidationException {
     Map<String, Object> bindings = getSpecialBindings(urlAlias);
     super.save(urlAlias, bindings);
   }
@@ -480,7 +481,7 @@ public class UrlAliasRepositoryImpl extends UniqueObjectRepositoryImpl<UrlAlias>
   }
 
   @Override
-  public void update(UrlAlias urlAlias) throws RepositoryException {
+  public void update(UrlAlias urlAlias) throws RepositoryException, ValidationException {
     Map<String, Object> bindings = getSpecialBindings(urlAlias);
     super.update(urlAlias, bindings);
   }

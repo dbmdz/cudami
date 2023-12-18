@@ -4,6 +4,7 @@ import de.digitalcollections.cudami.server.backend.api.repository.UniqueObjectRe
 import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
 import de.digitalcollections.model.identifiable.Identifiable;
 import de.digitalcollections.model.identifiable.Identifier;
+import de.digitalcollections.model.validation.ValidationException;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -50,5 +51,5 @@ public interface IdentifierRepository extends UniqueObjectRepository<Identifier>
   }
 
   Set<Identifier> saveForIdentifiable(Identifiable identifiable, Set<Identifier> identifiers)
-      throws RepositoryException;
+      throws RepositoryException, ValidationException;
 }

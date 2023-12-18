@@ -3,7 +3,12 @@ package de.digitalcollections.cudami.server.backend.api.repository;
 import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
 import de.digitalcollections.model.UniqueObject;
 import de.digitalcollections.model.list.filtering.Filtering;
-import java.util.*;
+import de.digitalcollections.model.validation.ValidationException;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 public interface UniqueObjectRepository<U extends UniqueObject>
@@ -182,18 +187,19 @@ public interface UniqueObjectRepository<U extends UniqueObject>
    *
    * @param uniqueObject the unique object to save
    * @throws RepositoryException
+   * @throws ValidationException
    */
-  default void save(U uniqueObject) throws RepositoryException {
+  default void save(U uniqueObject) throws RepositoryException, ValidationException {
     if (uniqueObject == null) {
       throw new IllegalArgumentException("save failed: given object must not be null");
     }
     save(uniqueObject, null);
   }
 
-  // FIXME: get rid of this (mappings are implementation specific?)
-  void save(U uniqueObject, Map<String, Object> bindings) throws RepositoryException;
+  void save(U uniqueObject, Map<String, Object> bindings)
+      throws RepositoryException, ValidationException;
 
-  default void saveOrUpdate(U uniqueObject) throws RepositoryException {
+  default void saveOrUpdate(U uniqueObject) throws RepositoryException, ValidationException {
     UUID uuid = uniqueObject.getUuid();
     if (uuid != null) {
       update(uniqueObject);
@@ -207,8 +213,9 @@ public interface UniqueObjectRepository<U extends UniqueObject>
    *
    * @param uniqueObject the existing object with changed properties
    * @throws RepositoryException
+   * @throws ValidationException
    */
-  default void update(U uniqueObject) throws RepositoryException {
+  default void update(U uniqueObject) throws RepositoryException, ValidationException {
     if (uniqueObject == null) {
       throw new IllegalArgumentException("update failed: given object must not be null");
     }
@@ -216,5 +223,6 @@ public interface UniqueObjectRepository<U extends UniqueObject>
   }
 
   // FIXME: get rid of this (mappings are implementation specific?)
-  void update(U uniqueObject, Map<String, Object> bindings) throws RepositoryException;
+  void update(U uniqueObject, Map<String, Object> bindings)
+      throws RepositoryException, ValidationException;
 }
