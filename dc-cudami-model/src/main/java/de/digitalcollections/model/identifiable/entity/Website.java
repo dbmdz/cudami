@@ -6,6 +6,7 @@ import java.net.URL;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import lombok.experimental.SuperBuilder;
 
 /** A Website. */
@@ -59,6 +60,22 @@ public class Website extends Entity {
 
   public void setUrl(URL url) {
     this.url = url;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (!(o instanceof Website)) return false;
+    if (!super.equals(o)) return false;
+    Website website = (Website) o;
+    return Objects.equals(registrationDate, website.registrationDate)
+        && Objects.equals(rootPages, website.rootPages)
+        && Objects.equals(url, website.url);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(super.hashCode(), registrationDate, rootPages, url);
   }
 
   @Override

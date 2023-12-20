@@ -1,6 +1,7 @@
 package de.digitalcollections.model.identifiable.entity;
 
 import de.digitalcollections.model.semantic.Headword;
+import java.util.Objects;
 import lombok.experimental.SuperBuilder;
 
 /**
@@ -40,6 +41,20 @@ public class HeadwordEntry extends Article {
 
   public void setHeadword(Headword headword) {
     this.headword = headword;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (!(o instanceof HeadwordEntry)) return false;
+    if (!super.equals(o)) return false;
+    HeadwordEntry that = (HeadwordEntry) o;
+    return Objects.equals(headword, that.headword);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(super.hashCode(), headword);
   }
 
   public abstract static class HeadwordEntryBuilder<

@@ -1,9 +1,12 @@
 package de.digitalcollections.model.file;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.FileSystemNotFoundException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -19,6 +22,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import org.apache.commons.io.FilenameUtils;
 
+@SuppressFBWarnings(value = "OS_OPEN_STREAM", justification = "Using try with resource now")
 public class MimeType {
 
   /** Regular Expression used for decoding a MIME type * */
@@ -35,57 +39,63 @@ public class MimeType {
     // Load list of known MIME types and their extensions from the IANA list in the
     // package resources (obtained from
     // https://svn.apache.org/repos/asf/httpd/httpd/trunk/docs/conf/mime.types)
-    InputStream mimeStream = MimeType.class.getClassLoader().getResourceAsStream("dc.mime.types");
-    BufferedReader mimeReader = new BufferedReader(new InputStreamReader(mimeStream));
+    try (InputStream mimeStream =
+        MimeType.class.getClassLoader().getResourceAsStream("dc.mime.types")) {
+      BufferedReader mimeReader =
+          new BufferedReader(new InputStreamReader(mimeStream, StandardCharsets.UTF_8));
 
-    Function<String[], String[]> substituteMissingExtensions =
-        columns -> {
-          if (columns.length > 1) {
-            return columns;
-          }
-          return new String[] {columns[0], ""};
-        };
+      Function<String[], String[]> substituteMissingExtensions =
+          columns -> {
+            if (columns.length > 1) {
+              return columns;
+            }
+            return new String[] {columns[0], ""};
+          };
 
-    knownTypes =
-        mimeReader
-            .lines()
-            .map(l -> l.replaceAll("^# ", ""))
-            .filter(l -> !l.isEmpty())
-            .map(line -> line.split("\t+"))
-            .filter(columns -> columns.length > 0)
-            .filter(columns -> MIME_PATTERN.matcher(columns[0]).matches())
-            .map(substituteMissingExtensions)
-            .collect(
-                Collectors.toMap(
-                    columns -> columns[0],
-                    columns ->
-                        new MimeType(
-                            columns[0],
-                            "".equals(columns[1])
-                                ? Collections.<String>emptyList()
-                                : List.of(columns[1].split(" ")))));
+      knownTypes =
+          mimeReader
+              .lines()
+              .map(l -> l.replaceAll("^# ", ""))
+              .filter(l -> !l.isEmpty())
+              .map(line -> line.split("\t+"))
+              .filter(columns -> columns.length > 0)
+              .filter(columns -> MIME_PATTERN.matcher(columns[0]).matches())
+              .map(substituteMissingExtensions)
+              .collect(
+                  Collectors.toMap(
+                      columns -> columns[0],
+                      columns ->
+                          new MimeType(
+                              columns[0],
+                              "".equals(columns[1])
+                                  ? Collections.<String>emptyList()
+                                  : List.of(columns[1].split(" ")))));
 
-    // Some custom overrides to influence the order of file extensions
-    // Since these are added to the end of the list, they take precedence over the
-    // types from the `mime.types` file
-    knownTypes.get("image/jpeg").setExtensions(Arrays.asList("jpg", "jpeg", "jpe"));
-    knownTypes.get("image/tiff").setExtensions(Arrays.asList("tif", "tiff"));
+      // Some custom overrides to influence the order of file extensions
+      // Since these are added to the end of the list, they take precedence over the
+      // types from the `mime.types` file
+      knownTypes.get("image/jpeg").setExtensions(Arrays.asList("jpg", "jpeg", "jpe"));
+      knownTypes.get("image/tiff").setExtensions(Arrays.asList("tif", "tiff"));
 
-    List<String> xmlExtensions = new ArrayList<>(knownTypes.get("application/xml").getExtensions());
-    xmlExtensions.add("ent");
-    knownTypes.get("application/xml").setExtensions(xmlExtensions);
+      List<String> xmlExtensions =
+          new ArrayList<>(knownTypes.get("application/xml").getExtensions());
+      xmlExtensions.add("ent");
+      knownTypes.get("application/xml").setExtensions(xmlExtensions);
 
-    knownTypes.put("audio/*", new MimeType("audio/*", Collections.emptyList()));
-    knownTypes.put("image/*", new MimeType("image/*", Collections.emptyList()));
-    knownTypes.put("text/*", new MimeType("text/*", Collections.emptyList()));
-    knownTypes.put("video/*", new MimeType("video/*", Collections.emptyList()));
+      knownTypes.put("audio/*", new MimeType("audio/*", Collections.emptyList()));
+      knownTypes.put("image/*", new MimeType("image/*", Collections.emptyList()));
+      knownTypes.put("text/*", new MimeType("text/*", Collections.emptyList()));
+      knownTypes.put("video/*", new MimeType("video/*", Collections.emptyList()));
 
-    extensionMapping = new HashMap<>();
-    for (Map.Entry<String, MimeType> entry : knownTypes.entrySet()) {
-      String typeName = entry.getKey();
-      for (String ext : entry.getValue().getExtensions()) {
-        extensionMapping.put(ext, typeName);
+      extensionMapping = new HashMap<>();
+      for (Map.Entry<String, MimeType> entry : knownTypes.entrySet()) {
+        String typeName = entry.getKey();
+        for (String ext : entry.getValue().getExtensions()) {
+          extensionMapping.put(ext, typeName);
+        }
       }
+    } catch (IOException e) {
+      throw new RuntimeException("Cannot read resource file dc.mime.types: " + e, e);
     }
   }
 
@@ -198,6 +208,7 @@ public class MimeType {
     }
   }
 
+  @SuppressFBWarnings(value = "EQ_UNUSUAL")
   @Override
   public boolean equals(Object obj) {
     if (obj == null || !(obj.getClass().isAssignableFrom(MimeType.class))) {

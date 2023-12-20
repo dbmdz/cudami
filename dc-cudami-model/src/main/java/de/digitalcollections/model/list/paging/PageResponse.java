@@ -71,6 +71,10 @@ public class PageResponse<T> extends ListResponse<T, PageRequest> {
   public PageResponse(List<T> content, PageRequest request, long total, String executedSearchTerm) {
     super(content, request, executedSearchTerm);
 
+    if (content == null) {
+      throw new RuntimeException("Content must not be null!");
+    }
+
     this.total =
         !content.isEmpty() && request != null && request.getOffset() + request.getPageSize() > total
             ? request.getOffset() + content.size()

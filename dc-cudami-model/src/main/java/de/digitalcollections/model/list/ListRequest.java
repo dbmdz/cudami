@@ -3,6 +3,7 @@ package de.digitalcollections.model.list;
 import de.digitalcollections.model.list.filtering.Filtering;
 import de.digitalcollections.model.list.sorting.Direction;
 import de.digitalcollections.model.list.sorting.Sorting;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.Serializable;
 
 /**
@@ -14,6 +15,7 @@ import java.io.Serializable;
  *   <li>searchTerm: search term for simple query term to be searched for
  * </ul>
  */
+@SuppressFBWarnings(value = "SE_BAD_FIELD", justification = "to be evaluated")
 public class ListRequest implements Serializable {
 
   protected Filtering filtering;

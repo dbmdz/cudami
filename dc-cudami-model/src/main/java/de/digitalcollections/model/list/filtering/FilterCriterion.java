@@ -640,6 +640,8 @@ public class FilterCriterion<T> {
       case MULTIVALUE:
         criterion += values.stream().map(Object::toString).collect(Collectors.joining(","));
         break;
+      default:
+        // nop
     }
     if (nativeExpression) {
       return "native expression / " + criterion;

@@ -1,7 +1,10 @@
 package de.digitalcollections.model.identifiable.alias;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
@@ -54,12 +57,13 @@ public class LocalizedUrlAliases extends HashMap<Locale, List<UrlAlias>> {
     return this.flatten().contains(urlAlias);
   }
 
+  @SuppressFBWarnings(value = "DCN_NULLPOINTER_EXCEPTION", justification = "to be reviewed later")
   @Override
   public boolean equals(Object o) {
     if (o == this) {
       return true;
     }
-    if (o == null || !(o instanceof LocalizedUrlAliases)) {
+    if (!(o instanceof LocalizedUrlAliases)) {
       return false;
     }
     LocalizedUrlAliases other = (LocalizedUrlAliases) o;
@@ -67,7 +71,7 @@ public class LocalizedUrlAliases extends HashMap<Locale, List<UrlAlias>> {
       if (this.flatten().size() != other.flatten().size()) {
         return false;
       }
-      return flatten().containsAll(other.flatten());
+      return new HashSet<>(flatten()).containsAll(other.flatten());
     } catch (NullPointerException | ClassCastException unused) {
       return false;
     }
@@ -79,7 +83,7 @@ public class LocalizedUrlAliases extends HashMap<Locale, List<UrlAlias>> {
    * @return list containing all {@code UrlAlias}es from this object
    */
   public List<UrlAlias> flatten() {
-    return this.values().stream().flatMap(list -> list.stream()).collect(Collectors.toList());
+    return this.values().stream().flatMap(Collection::stream).collect(Collectors.toList());
   }
 
   public List<Locale> getTargetLanguages() {

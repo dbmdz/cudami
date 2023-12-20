@@ -1,5 +1,6 @@
 package de.digitalcollections.model.time;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.DateTimeException;
 import java.time.LocalDate;
 import java.util.Objects;
@@ -41,6 +42,7 @@ import org.wikidata.wdtk.datamodel.interfaces.ValueVisitor;
  *
  * @author Markus Kroetzsch
  */
+@SuppressFBWarnings(value = "NM_SAME_SIMPLE_NAME_AS_INTERFACE")
 public class TimeValue implements org.wikidata.wdtk.datamodel.interfaces.TimeValue {
 
   private int afterTolerance;

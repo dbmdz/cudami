@@ -4,6 +4,8 @@ import de.digitalcollections.model.UniqueObject;
 import de.digitalcollections.model.list.ListRequest;
 import de.digitalcollections.model.list.filtering.Filtering;
 import de.digitalcollections.model.list.sorting.Sorting;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.Objects;
 
 /**
  * A BucketsRequest allows you to break a list / result set into a specified number of approximately
@@ -13,6 +15,7 @@ import de.digitalcollections.model.list.sorting.Sorting;
  *
  * @param <T> type of an UniqueObject contained in a Bucket
  */
+@SuppressFBWarnings(value = "SE_BAD_FIELD", justification = "unused code")
 public class BucketsRequest<T extends UniqueObject> extends ListRequest {
 
   private static final long serialVersionUID = 1L;
@@ -94,5 +97,20 @@ public class BucketsRequest<T extends UniqueObject> extends ListRequest {
    */
   public void setParentBucket(Bucket<T> parentBucket) {
     this.parentBucket = parentBucket;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (!(o instanceof BucketsRequest)) return false;
+    if (!super.equals(o)) return false;
+    BucketsRequest<?> that = (BucketsRequest<?>) o;
+    return numberOfBuckets == that.numberOfBuckets
+        && Objects.equals(parentBucket, that.parentBucket);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(super.hashCode(), numberOfBuckets, parentBucket);
   }
 }

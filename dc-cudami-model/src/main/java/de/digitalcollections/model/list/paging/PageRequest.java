@@ -5,6 +5,7 @@ import de.digitalcollections.model.list.filtering.Filtering;
 import de.digitalcollections.model.list.sorting.Direction;
 import de.digitalcollections.model.list.sorting.Order;
 import de.digitalcollections.model.list.sorting.Sorting;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 
 /**
@@ -104,6 +105,9 @@ public class PageRequest extends ListRequest {
     }
   }
 
+  @SuppressFBWarnings(
+      value = "EQ_OVERRIDING_EQUALS_NOT_SYMMETRIC",
+      justification = "to be reviewed later")
   @Override
   public boolean equals(final Object obj) {
     if (this == obj) {

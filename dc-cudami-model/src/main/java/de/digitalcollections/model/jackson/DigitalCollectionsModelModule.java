@@ -202,7 +202,7 @@ import org.wikidata.wdtk.datamodel.interfaces.TimeValue;
 public class DigitalCollectionsModelModule extends SimpleModule {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(DigitalCollectionsModelModule.class);
-  protected static ResourceBundle rb = ResourceBundle.getBundle("dc-model-jackson-version");
+  protected static final ResourceBundle rb = ResourceBundle.getBundle("dc-model-jackson-version");
 
   public DigitalCollectionsModelModule() {
     super();

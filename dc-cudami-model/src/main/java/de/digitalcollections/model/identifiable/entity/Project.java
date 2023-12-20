@@ -2,6 +2,7 @@ package de.digitalcollections.model.identifiable.entity;
 
 import de.digitalcollections.model.text.LocalizedStructuredContent;
 import java.time.LocalDate;
+import java.util.Objects;
 import lombok.experimental.SuperBuilder;
 
 /**
@@ -64,6 +65,22 @@ public class Project extends Entity {
    */
   public void setText(LocalizedStructuredContent text) {
     this.text = text;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (!(o instanceof Project)) return false;
+    if (!super.equals(o)) return false;
+    Project project = (Project) o;
+    return Objects.equals(endDate, project.endDate)
+        && Objects.equals(startDate, project.startDate)
+        && Objects.equals(text, project.text);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(super.hashCode(), endDate, startDate, text);
   }
 
   public abstract static class ProjectBuilder<C extends Project, B extends ProjectBuilder<C, B>>

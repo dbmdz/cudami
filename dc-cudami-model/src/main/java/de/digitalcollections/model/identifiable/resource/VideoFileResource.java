@@ -1,6 +1,7 @@
 package de.digitalcollections.model.identifiable.resource;
 
 import de.digitalcollections.model.file.MimeType;
+import java.util.Objects;
 import lombok.experimental.SuperBuilder;
 
 /** A video file resource. Mimetype starts with "video/". */
@@ -34,6 +35,20 @@ public class VideoFileResource extends FileResource {
    */
   public void setDuration(int duration) {
     this.duration = duration;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (!(o instanceof VideoFileResource)) return false;
+    if (!super.equals(o)) return false;
+    VideoFileResource that = (VideoFileResource) o;
+    return duration == that.duration;
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(super.hashCode(), duration);
   }
 
   public abstract static class VideoFileResourceBuilder<

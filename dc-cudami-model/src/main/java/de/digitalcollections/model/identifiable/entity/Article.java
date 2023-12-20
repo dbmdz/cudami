@@ -5,6 +5,7 @@ import de.digitalcollections.model.text.LocalizedStructuredContent;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import lombok.experimental.SuperBuilder;
 import org.wikidata.wdtk.datamodel.interfaces.TimeValue;
 
@@ -59,6 +60,23 @@ public class Article extends Entity {
 
   public void setTimeValuePublished(TimeValue timeValuePublished) {
     this.timeValuePublished = timeValuePublished;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (!(o instanceof Article)) return false;
+    if (!super.equals(o)) return false;
+    Article article = (Article) o;
+    return Objects.equals(creators, article.creators)
+        && Objects.equals(datePublished, article.datePublished)
+        && Objects.equals(text, article.text)
+        && Objects.equals(timeValuePublished, article.timeValuePublished);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(super.hashCode(), creators, datePublished, text, timeValuePublished);
   }
 
   public abstract static class ArticleBuilder<C extends Article, B extends ArticleBuilder<C, B>>

@@ -5,6 +5,7 @@ import de.digitalcollections.model.identifiable.Node;
 import de.digitalcollections.model.identifiable.resource.FileResource;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import lombok.experimental.SuperBuilder;
 
 /**
@@ -70,6 +71,22 @@ public class Topic extends Entity implements INode<Topic> {
   @Override
   public Topic getParent() {
     return node.getParent();
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (!(o instanceof Topic)) return false;
+    if (!super.equals(o)) return false;
+    Topic topic = (Topic) o;
+    return Objects.equals(entities, topic.entities)
+        && Objects.equals(fileResources, topic.fileResources)
+        && Objects.equals(node, topic.node);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(super.hashCode(), entities, fileResources, node);
   }
 
   @Override

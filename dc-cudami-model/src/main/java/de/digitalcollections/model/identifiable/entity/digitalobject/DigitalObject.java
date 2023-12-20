@@ -9,6 +9,7 @@ import de.digitalcollections.model.identifiable.versioning.Version;
 import de.digitalcollections.model.legal.License;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import lombok.experimental.SuperBuilder;
 
 /**
@@ -223,6 +224,38 @@ public class DigitalObject extends Entity {
    */
   public void setVersion(Version version) {
     this.version = version;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (!(o instanceof DigitalObject)) return false;
+    if (!super.equals(o)) return false;
+    DigitalObject that = (DigitalObject) o;
+    return Objects.equals(creationInfo, that.creationInfo)
+        && Objects.equals(fileResources, that.fileResources)
+        && Objects.equals(item, that.item)
+        && Objects.equals(license, that.license)
+        && Objects.equals(linkedDataResources, that.linkedDataResources)
+        && Objects.equals(numberOfBinaryResources, that.numberOfBinaryResources)
+        && Objects.equals(parent, that.parent)
+        && Objects.equals(renderingResources, that.renderingResources)
+        && Objects.equals(version, that.version);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(
+        super.hashCode(),
+        creationInfo,
+        fileResources,
+        item,
+        license,
+        linkedDataResources,
+        numberOfBinaryResources,
+        parent,
+        renderingResources,
+        version);
   }
 
   @Override
