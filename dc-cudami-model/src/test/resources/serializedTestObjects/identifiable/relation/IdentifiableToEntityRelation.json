@@ -1,0 +1,17 @@
+{
+  "object" : {
+    "uuid" : "baf5a649-dd8a-43f2-8fac-f535b311af03",
+    "identifiableObjectType" : "DIGITAL_OBJECT",
+    "identifiers" : [ ],
+    "type" : "ENTITY",
+    "refId" : 0,
+    "entityType" : "DIGITAL_OBJECT"
+  },
+  "predicate" : "is_digital_represented_by",
+  "subject" : {
+    "uuid" : "8a9c3c34-c36c-4671-8f2f-9d96a5fc32e4",
+    "identifiableObjectType" : "IDENTIFIABLE",
+    "identifiers" : [ ]
+  },
+  "additionalPredicates" : [ "another_relation" ]
+}

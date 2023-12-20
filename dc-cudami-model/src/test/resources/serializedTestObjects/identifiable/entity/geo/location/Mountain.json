@@ -1,0 +1,20 @@
+{
+  "identifiableObjectType" : "MOUNTAIN",
+  "identifiers" : [ ],
+  "label" : {
+    "en" : "Mountain"
+  },
+  "type" : "ENTITY",
+  "customAttributes" : {
+    "height" : 8999
+  },
+  "refId" : 0,
+  "coordinateLocation" : {
+    "altitude" : 0.0,
+    "latitude" : 48.15093479009475,
+    "longitude" : 11.52559973769878,
+    "precision" : 6.0
+  },
+  "geoLocationType" : "MOUNTAIN",
+  "entityType" : "GEOLOCATION"
+}

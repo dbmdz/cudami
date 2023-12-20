@@ -5,7 +5,7 @@
   <parent>
     <groupId>de.digitalcollections.cudami</groupId>
     <artifactId>dc-cudami-server</artifactId>
-    <version>8.0.4-SNAPSHOT</version>
+    <version>9.0.0-SNAPSHOT</version>
   </parent>
 
   <name>DigitalCollections: cudami Repository Server (Backend IMPL File)</name>

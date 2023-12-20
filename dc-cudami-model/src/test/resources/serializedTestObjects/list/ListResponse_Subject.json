@@ -1,0 +1,14 @@
+{
+  "listResponseType" : "LIST_RESPONSE",
+  "content" : [ {
+    "objectType" : "SUBJECT",
+    "identifiableObjectType" : "SUBJECT",
+    "identifiers" : [ ],
+    "type" : "RESOURCE",
+    "subjectType" : "foo"
+  } ],
+  "request" : {
+    "listRequestType" : "LIST_REQUEST"
+  },
+  "totalElements" : 1
+}

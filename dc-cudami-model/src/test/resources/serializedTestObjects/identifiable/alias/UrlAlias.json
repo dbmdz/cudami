@@ -1,0 +1,25 @@
+{
+  "objectType" : "URL_ALIAS",
+  "created" : "2021-01-01T00:00:00",
+  "uuid" : "d1dfbfbf-364e-4983-9d15-c33549145928",
+  "lastPublished" : "2021-12-24T12:00:00",
+  "primary" : true,
+  "slug" : "foobar",
+  "target" : {
+    "uuid" : "c31593a4-9620-484b-a4f5-4112731d953b",
+    "identifiableObjectType" : "COLLECTION",
+    "identifiers" : [ ],
+    "type" : "ENTITY",
+    "refId" : 0,
+    "entityType" : "COLLECTION"
+  },
+  "targetLanguage" : "de",
+  "website" : {
+    "uuid" : "9b676195-f505-400c-acb2-b7aabb7c62f7",
+    "identifiableObjectType" : "WEBSITE",
+    "identifiers" : [ ],
+    "type" : "ENTITY",
+    "refId" : 0,
+    "entityType" : "WEBSITE"
+  }
+}

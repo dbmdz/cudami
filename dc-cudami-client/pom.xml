@@ -6,7 +6,7 @@
   <parent>
     <groupId>de.digitalcollections.cudami</groupId>
     <artifactId>dc-cudami</artifactId>
-    <version>8.0.4-SNAPSHOT</version>
+    <version>9.0.0-SNAPSHOT</version>
   </parent>
 
   <name>DigitalCollections: cudami Repository Client</name>
@@ -27,19 +27,10 @@
     <dependency>
       <groupId>com.google.guava</groupId>
       <artifactId>guava</artifactId>
-      <version>32.1.3-jre</version>
     </dependency>
     <dependency>
       <groupId>de.digitalcollections.cudami</groupId>
       <artifactId>dc-cudami-model</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>de.digitalcollections.model</groupId>
-      <artifactId>dc-model</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>de.digitalcollections.model</groupId>
-      <artifactId>dc-model-jackson</artifactId>
     </dependency>
     <dependency>
       <groupId>org.apache.httpcomponents</groupId>

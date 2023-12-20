@@ -1,0 +1,6 @@
+{
+  "listRequestType" : "PAGE_REQUEST",
+  "searchTerm" : "hallo",
+  "pageNumber" : 3,
+  "pageSize" : 15
+}

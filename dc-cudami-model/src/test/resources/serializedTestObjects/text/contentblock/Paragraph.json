@@ -1,0 +1,12 @@
+{
+  "type" : "paragraph",
+  "content" : [ {
+    "type" : "text",
+    "text" : "Imprint"
+  }, {
+    "type" : "hard_break"
+  }, {
+    "type" : "text",
+    "text" : "Privacy"
+  } ]
+}

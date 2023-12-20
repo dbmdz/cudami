@@ -1,0 +1,11 @@
+{
+  "listResponseType" : "LIST_RESPONSE",
+  "content" : [ {
+    "objectType" : "TAG",
+    "value" : "foo"
+  } ],
+  "request" : {
+    "listRequestType" : "LIST_REQUEST"
+  },
+  "totalElements" : 1
+}

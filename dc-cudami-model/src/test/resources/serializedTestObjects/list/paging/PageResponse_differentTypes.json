@@ -1,0 +1,33 @@
+{
+  "listResponseType" : "PAGE_RESPONSE",
+  "content" : [ {
+    "objectType" : "DIGITAL_OBJECT",
+    "identifiableObjectType" : "DIGITAL_OBJECT",
+    "identifiers" : [ ],
+    "label" : {
+      "und" : "DigitalObject-Label"
+    },
+    "type" : "ENTITY",
+    "refId" : 0,
+    "entityType" : "DIGITAL_OBJECT"
+  }, {
+    "objectType" : "WEBPAGE",
+    "identifiableObjectType" : "WEBPAGE",
+    "identifiers" : [ ],
+    "label" : {
+      "und" : "Webpage-Label"
+    },
+    "type" : "RESOURCE",
+    "renderingHints" : {
+      "showInPageNavigation" : false
+    }
+  } ],
+  "executedSearchTerm" : "Label",
+  "totalElements" : 2,
+  "pageRequest" : {
+    "listRequestType" : "PAGE_REQUEST",
+    "searchTerm" : "Label",
+    "pageNumber" : 3,
+    "pageSize" : 15
+  }
+}
