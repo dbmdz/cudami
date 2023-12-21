@@ -1,7 +1,6 @@
 package de.digitalcollections.model.jackson;
 
 import com.fasterxml.jackson.core.Version;
-import com.fasterxml.jackson.core.util.VersionUtil;
 import com.fasterxml.jackson.databind.deser.std.StdDelegatingDeserializer;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.ser.std.StdDelegatingSerializer;
@@ -193,7 +192,6 @@ import de.digitalcollections.model.view.RenderingHints;
 import de.digitalcollections.model.view.RenderingHintsPreviewImage;
 import de.digitalcollections.model.view.RenderingTemplate;
 import java.util.Locale;
-import java.util.ResourceBundle;
 import java.util.function.Function;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -202,7 +200,6 @@ import org.wikidata.wdtk.datamodel.interfaces.TimeValue;
 public class DigitalCollectionsModelModule extends SimpleModule {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(DigitalCollectionsModelModule.class);
-  protected static final ResourceBundle rb = ResourceBundle.getBundle("dc-model-jackson-version");
 
   public DigitalCollectionsModelModule() {
     super();
@@ -222,22 +219,14 @@ public class DigitalCollectionsModelModule extends SimpleModule {
 
   @Override
   public String getModuleName() {
-    return "DigitalCollections Model jackson module";
-  }
-
-  @Override
-  public Version version() {
-    return VersionUtil.parseVersion(
-        rb.getString("project.version"),
-        rb.getString("project.groupId"),
-        rb.getString("project.artifactId"));
+    return "Cudami DigitalCollections Model jackson module";
   }
 
   @Override
   public void setupModule(SetupContext context) {
     super.setupModule(context);
 
-    LOGGER.info("Using DigitalCollectionsModelModule " + version().toFullString());
+    LOGGER.info("Using Cudami DigitalCollectionsModelModule");
 
     // agent
     context.setMixInAnnotations(Agent.class, AgentMixIn.class);
