@@ -2,6 +2,7 @@ package de.digitalcollections.cudami.server.controller.advice;
 
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ConflictException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ResourceNotFoundException;
+import de.digitalcollections.model.exception.Problem;
 import de.digitalcollections.model.validation.ValidationException;
 import java.util.Date;
 import java.util.LinkedHashMap;
@@ -21,10 +22,17 @@ public class ExceptionAdvice {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ExceptionAdvice.class);
 
-  @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
   @ExceptionHandler(Exception.class)
-  public void handleAllOther(Exception exception) {
+  public ResponseEntity<Problem> handleAllOther(Exception exception) {
     LOGGER.error("exception stack trace", exception);
+    Throwable cause = exception;
+    while (cause.getCause() != null) {
+      cause = cause.getCause();
+    }
+    Problem problem =
+        new Problem(
+            cause.getClass().getSimpleName(), "Service Exception", 500, cause.getMessage(), null);
+    return new ResponseEntity<>(problem, HttpStatus.INTERNAL_SERVER_ERROR);
   }
 
   @ResponseStatus(HttpStatus.CONFLICT)

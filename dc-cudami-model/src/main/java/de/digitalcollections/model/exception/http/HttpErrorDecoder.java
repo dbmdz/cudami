@@ -1,5 +1,6 @@
 package de.digitalcollections.model.exception.http;
 
+import de.digitalcollections.model.exception.Problem;
 import de.digitalcollections.model.exception.http.client.ForbiddenException;
 import de.digitalcollections.model.exception.http.client.HttpClientException;
 import de.digitalcollections.model.exception.http.client.ImATeapotException;
@@ -13,6 +14,7 @@ import de.digitalcollections.model.exception.http.server.HttpServerException;
 import de.digitalcollections.model.exception.http.server.HttpVersionNotSupportedException;
 import de.digitalcollections.model.exception.http.server.NotImplementedException;
 import de.digitalcollections.model.exception.http.server.ServiceUnavailableException;
+import de.digitalcollections.model.jackson.DigitalCollectionsObjectMapper;
 import java.net.MalformedURLException;
 import java.net.http.HttpResponse;
 import org.slf4j.Logger;
@@ -50,6 +52,17 @@ public class HttpErrorDecoder {
       }
     } catch (MalformedURLException ex) {
       LOGGER.warn("Invalid request Url for: " + response.request().uri());
+    }
+
+    final byte[] body = (byte[]) response.body();
+    if (body != null && body.length > 0) {
+      try {
+        Problem problem =
+            new DigitalCollectionsObjectMapper().readerFor(Problem.class).readValue(body);
+        LOGGER.error("Got problem=" + problem);
+      } catch (Exception e) {
+        LOGGER.error("Got response=" + new String(body) + " but cannot construct problem: " + e, e);
+      }
     }
 
     if (400 <= statusCode && statusCode < 500) {

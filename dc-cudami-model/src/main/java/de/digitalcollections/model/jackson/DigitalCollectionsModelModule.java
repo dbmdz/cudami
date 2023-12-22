@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.ser.std.StdDelegatingSerializer;
 import com.fasterxml.jackson.databind.util.Converter;
 import com.fasterxml.jackson.databind.util.StdConverter;
 import de.digitalcollections.model.UniqueObject;
+import de.digitalcollections.model.exception.Problem;
 import de.digitalcollections.model.file.MimeType;
 import de.digitalcollections.model.geo.CoordinateLocation;
 import de.digitalcollections.model.identifiable.Identifiable;
@@ -54,6 +55,7 @@ import de.digitalcollections.model.identifiable.resource.TextFileResource;
 import de.digitalcollections.model.identifiable.resource.VideoFileResource;
 import de.digitalcollections.model.identifiable.semantic.Subject;
 import de.digitalcollections.model.identifiable.web.Webpage;
+import de.digitalcollections.model.jackson.mixin.ProblemMixIn;
 import de.digitalcollections.model.jackson.mixin.UniqueObjectMixIn;
 import de.digitalcollections.model.jackson.mixin.geo.CoordinateLocationMixIn;
 import de.digitalcollections.model.jackson.mixin.identifiable.IdentifiableMixIn;
@@ -340,6 +342,9 @@ public class DigitalCollectionsModelModule extends SimpleModule {
     context.setMixInAnnotations(Webpage.class, WebpageMixIn.class);
     context.setMixInAnnotations(Website.class, WebsiteMixIn.class);
     context.setMixInAnnotations(Title.class, TitleMixIn.class);
+
+    // Error handling
+    context.setMixInAnnotations(Problem.class, ProblemMixIn.class);
   }
 
   /** Helper function to create Converter from lambda * */
