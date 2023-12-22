@@ -1,11 +1,6 @@
 package de.digitalcollections.cudami.server.backend.impl.jdbi.plugins;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import de.digitalcollections.commons.jdbi.JsonbArgumentFactory;
-import de.digitalcollections.commons.jdbi.JsonbColumnMapperFactory;
-import de.digitalcollections.commons.jdbi.JsonbListArgumentFactory;
-import de.digitalcollections.commons.jdbi.JsonbListColumnMapperFactory;
-import de.digitalcollections.commons.jdbi.JsonbSetColumnMapperFactory;
 import de.digitalcollections.model.geo.CoordinateLocation;
 import de.digitalcollections.model.identifiable.Identifier;
 import de.digitalcollections.model.identifiable.entity.CustomAttributes;

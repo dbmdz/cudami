@@ -25,19 +25,14 @@
       <artifactId>spotbugs-annotations</artifactId>
     </dependency>
     <dependency>
+      <groupId>com.ibm.icu</groupId>
+      <artifactId>icu4j</artifactId>
+      <version>72.1</version>
+    </dependency>
+    <dependency>
       <groupId>com.zaxxer</groupId>
       <artifactId>HikariCP</artifactId>
       <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>de.digitalcollections.commons</groupId>
-      <artifactId>dc-commons-jdbi</artifactId>
-      <version>7.0.4</version>
-    </dependency>
-    <dependency>
-      <groupId>de.digitalcollections.commons</groupId>
-      <artifactId>dc-commons-web</artifactId>
-      <version>1.1.0</version>
     </dependency>
     <dependency>
       <groupId>de.digitalcollections.iiif</groupId>
