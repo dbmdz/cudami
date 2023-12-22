@@ -1,9 +1,9 @@
 package de.digitalcollections.cudami.server.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import de.digitalcollections.commons.springmvc.converter.StringToOrderConverter;
-import de.digitalcollections.commons.springmvc.thymeleaf.SpacesDialect;
+import de.digitalcollections.cudami.server.converter.StringToOrderConverter;
 import de.digitalcollections.cudami.server.interceptors.RequestIdLoggingInterceptor;
+import de.digitalcollections.cudami.server.thymeleaf.SpacesDialect;
 import de.digitalcollections.model.jackson.DigitalCollectionsObjectMapper;
 import java.time.format.DateTimeFormatter;
 import java.util.Map;

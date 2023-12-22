@@ -1,8 +1,8 @@
-package de.digitalcollections.cudami.admin.actuator;
+package de.digitalcollections.cudami.server.actuator;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import de.digitalcollections.cudami.admin.model.monitoring.VersionInfo;
+import de.digitalcollections.cudami.server.monitoring.VersionInfo;
 import org.springframework.boot.actuate.endpoint.annotation.Endpoint;
 import org.springframework.boot.actuate.endpoint.annotation.ReadOperation;
 import org.springframework.stereotype.Component;
@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 @Endpoint(id = "version")
 public class VersionActuatorEndpoint {
 
-  private final VersionInfo versionInfo;
+  private static VersionInfo versionInfo = null;
 
   public VersionActuatorEndpoint(VersionInfo versionInfo) {
     this.versionInfo = versionInfo;

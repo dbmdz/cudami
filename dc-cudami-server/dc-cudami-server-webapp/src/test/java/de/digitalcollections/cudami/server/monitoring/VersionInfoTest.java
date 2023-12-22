@@ -1,7 +1,8 @@
-package de.digitalcollections.cudami.admin.model.monitoring;
+package de.digitalcollections.cudami.server.monitoring;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.Map;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -24,8 +25,21 @@ class VersionInfoTest {
   @Test
   @DisplayName("Testing application info from application.yml")
   void testApplicationInfoFromApplicationYml() {
-    assertThat(versionInfo.getApplicationName()).isEqualTo("cudami-admin-webapp");
+    assertThat(versionInfo.getApplicationName())
+        .isEqualTo("DigitalCollections: cudami Repository Server (Webapp)");
     assertThat(versionInfo.getVersionInfo()).isEqualTo("1.2.3");
     assertThat(versionInfo.getBuildDetails()).isEqualTo("build by foo@bar.com");
+  }
+
+  @Test
+  @DisplayName("Testing dependency detail info")
+  void testBuildDetails() {
+    Map<String, String> versions = versionInfo.getArtifactVersions();
+
+    String jarVersion = versions.get("junit-jupiter-" + junitVersion + ".jar");
+    if (jarVersion != null) {
+      // jar version can be null, if we have no jar artifact available
+      assertThat(jarVersion).isEqualTo(junitVersion);
+    }
   }
 }

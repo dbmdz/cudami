@@ -34,16 +34,6 @@
       <artifactId>HikariCP</artifactId>
     </dependency>
     <dependency>
-      <groupId>de.digitalcollections.commons</groupId>
-      <artifactId>dc-commons-springboot</artifactId>
-      <version>4.1.3</version>
-    </dependency>
-    <dependency>
-      <groupId>de.digitalcollections.commons</groupId>
-      <artifactId>dc-commons-springmvc</artifactId>
-      <version>7.0.4</version>
-    </dependency>
-    <dependency>
       <groupId>de.digitalcollections.cudami</groupId>
       <artifactId>dc-cudami-client</artifactId>
     </dependency>

@@ -86,7 +86,7 @@ public class Identifiable extends UniqueObject {
       return false;
     }
     Identifiable that = (Identifiable) o;
-    return super.equals(o)
+    return Objects.equals(uuid, that.uuid)
         && Objects.equals(description, that.description)
         && identifiableObjectType == that.identifiableObjectType
         && Objects.equals(identifiers, that.identifiers)

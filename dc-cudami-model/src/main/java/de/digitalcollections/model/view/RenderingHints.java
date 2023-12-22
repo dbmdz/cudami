@@ -1,5 +1,6 @@
 package de.digitalcollections.model.view;
 
+import java.util.Objects;
 import lombok.experimental.SuperBuilder;
 
 /** Contains hints for rendering a webpage */
@@ -33,5 +34,30 @@ public class RenderingHints {
 
   public void setTemplateName(String templateName) {
     this.templateName = templateName;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (!(o instanceof RenderingHints)) return false;
+    RenderingHints that = (RenderingHints) o;
+    return showInPageNavigation == that.showInPageNavigation
+        && Objects.equals(templateName, that.templateName);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(showInPageNavigation, templateName);
+  }
+
+  @Override
+  public String toString() {
+    return "RenderingHints{"
+        + "showInPageNavigation="
+        + showInPageNavigation
+        + ", templateName='"
+        + templateName
+        + '\''
+        + '}';
   }
 }

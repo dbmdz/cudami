@@ -1,4 +1,4 @@
-package de.digitalcollections.cudami.admin.model.monitoring;
+package de.digitalcollections.cudami.server.monitoring;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.InputStream;
@@ -85,8 +85,8 @@ public class VersionInfo implements InitializingBean {
     return projectBuildDetails;
   }
 
-  @SuppressFBWarnings(value = "EI_EXPOSE_REP", justification = "managed attribute")
   @ManagedAttribute
+  @SuppressFBWarnings(value = "EI_EXPOSE_REP", justification = "managed attribute")
   public Map<String, String> getArtifactVersions() {
     return versions;
   }
