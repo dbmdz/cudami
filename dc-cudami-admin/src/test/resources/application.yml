@@ -1,0 +1,8 @@
+info:
+  app:
+    project:
+      name: 'cudami-admin'
+      groupId: 'de.digitalcollections.cudami'
+      artifactId: 'cudami-admin'
+      version: '1.2.3'
+      buildDetails: 'build by foo@bar.com'

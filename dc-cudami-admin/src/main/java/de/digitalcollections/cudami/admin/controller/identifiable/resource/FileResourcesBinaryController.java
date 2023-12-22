@@ -1,6 +1,6 @@
 package de.digitalcollections.cudami.admin.controller.identifiable.resource;
 
-import de.digitalcollections.commons.springmvc.controller.AbstractController;
+import de.digitalcollections.cudami.admin.controller.AbstractController;
 import de.digitalcollections.cudami.client.CudamiClient;
 import de.digitalcollections.cudami.client.identifiable.resource.CudamiFileResourcesBinaryClient;
 import de.digitalcollections.model.exception.TechnicalException;

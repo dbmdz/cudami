@@ -1,6 +1,5 @@
 package de.digitalcollections.cudami.admin.controller;
 
-import de.digitalcollections.commons.springmvc.controller.AbstractController;
 import de.digitalcollections.cudami.admin.business.i18n.LanguageService;
 import de.digitalcollections.cudami.admin.model.bootstraptable.BTRequest;
 import de.digitalcollections.model.exception.TechnicalException;
