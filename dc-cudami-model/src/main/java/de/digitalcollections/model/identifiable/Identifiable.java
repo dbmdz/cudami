@@ -187,18 +187,18 @@ public class Identifiable extends UniqueObject {
 
   @Override
   public int hashCode() {
-    return super.hashCode()
-        + Objects.hash(
-            description,
-            identifiableObjectType,
-            identifiers,
-            label,
-            localizedUrlAliases,
-            previewImage,
-            previewImageRenderingHints,
-            subjects,
-            tags,
-            type);
+    return Objects.hash(
+        uuid,
+        description,
+        identifiableObjectType,
+        identifiers,
+        label,
+        localizedUrlAliases,
+        previewImage,
+        previewImageRenderingHints,
+        subjects,
+        tags,
+        type);
   }
 
   @Override
