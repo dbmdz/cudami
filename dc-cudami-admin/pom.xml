@@ -335,6 +335,12 @@
 
     <profile>
       <id>production</id>
+      <activation>
+        <property>
+          <name>env.BUILD_PROFILE</name>
+          <value>production</value>
+        </property>
+      </activation>
       <build>
         <plugins>
           <plugin>

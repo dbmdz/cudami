@@ -7,11 +7,19 @@ image: "$BUILD_IMAGE_ANSIBLE_MAVEN_JDK17"
 variables:
   DOCKER_HOST: "tcp://docker:2375"
   DOCKER_TLS_CERTDIR: ""
-  MAVEN_CLI_OPTS: "-Dmaven.repo.local=.m2/repository --batch-mode -Pproduction,custom-nexus"
+  MAVEN_CLI_OPTS: "-Dmaven.repo.local=.m2/repository --batch-mode -Pcustom-nexus"
 
 services:
   - name: "$BUILD_IMAGE_DOCKER_DIND"
     alias: docker
+
+###################
+### Stage build ###
+###################
+
+compile:
+  variables:
+    BUILD_PROFILE: production
 
 ####################
 ### Stage deploy ###
