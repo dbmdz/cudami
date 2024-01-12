@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
 
 ## [Unreleased]
 
+## [8.0.2](https://github.com/dbmdz/cudami/releases/tag/8.0.2) – 2024-01-12
+
+### Fixed
+
+- Fixed production build by including the build assets from `dc-cudami-editor`
+
 ## [8.0.1](https://github.com/dbmdz/cudami/releases/tag/8.0.1) – 2023-12-20
 
 ### Fixed
