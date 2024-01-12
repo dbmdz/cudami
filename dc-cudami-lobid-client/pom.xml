@@ -7,7 +7,7 @@
   <parent>
     <groupId>de.digitalcollections.cudami</groupId>
     <artifactId>dc-cudami</artifactId>
-    <version>8.0.2-SNAPSHOT</version>
+    <version>8.0.2</version>
   </parent>
 
   <name>DigitalCollections: cudami lobid.org Client</name>
