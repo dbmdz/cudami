@@ -477,7 +477,7 @@ public class WebpageRepositoryImpl extends IdentifiableRepositoryImpl<Webpage>
 
   @Override
   public boolean updateChildrenOrder(UUID parentUuid, List<UUID> children) {
-    if (parentUuid == null || children == null) {
+    if (parentUuid == null || children == null || children.isEmpty()) {
       throw new IllegalArgumentException("update failed: given objects must not be null");
     }
     String query =

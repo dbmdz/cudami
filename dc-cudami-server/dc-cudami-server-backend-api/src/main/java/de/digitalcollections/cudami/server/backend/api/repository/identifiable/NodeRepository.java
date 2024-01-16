@@ -8,6 +8,7 @@ import de.digitalcollections.model.view.BreadcrumbNavigation;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -128,8 +129,9 @@ public interface NodeRepository<N extends Identifiable> extends IdentifiableRepo
     }
     List<UUID> childrenUuids =
         children.stream()
-            .filter(c -> c.getUuid() == null)
-            .map(c -> c.getUuid())
+            .filter(Objects::nonNull)
+            .map(Identifiable::getUuid)
+            .filter(Objects::nonNull)
             .collect(Collectors.toList());
     return updateChildrenOrder(parent.getUuid(), childrenUuids);
   }
