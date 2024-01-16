@@ -49,8 +49,8 @@ public class WebpagesAPIController
       @RequestParam(name = "offset", required = false, defaultValue = "0") int offset,
       @RequestParam(name = "limit", required = false, defaultValue = "10") int limit,
       @RequestParam(name = "search", required = false) String searchTerm,
-      @RequestParam(name = "sort", required = false, defaultValue = "label") String sortProperty,
-      @RequestParam(name = "order", required = false, defaultValue = "asc") String sortOrder,
+      @RequestParam(name = "sort", required = false) String sortProperty,
+      @RequestParam(name = "order", required = false) String sortOrder,
       @RequestParam(name = "dataLanguage", required = false) String dataLanguage)
       throws TechnicalException {
     BTRequest btRequest =
