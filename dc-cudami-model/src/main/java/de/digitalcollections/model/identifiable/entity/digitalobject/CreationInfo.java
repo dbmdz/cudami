@@ -3,6 +3,7 @@ package de.digitalcollections.model.identifiable.entity.digitalobject;
 import de.digitalcollections.model.identifiable.entity.agent.Agent;
 import de.digitalcollections.model.identifiable.entity.geo.location.GeoLocation;
 import java.time.LocalDate;
+import java.util.Objects;
 
 /** Details (who, when and where) about the creation of the digital object. */
 public class CreationInfo {
@@ -78,6 +79,16 @@ public class CreationInfo {
         + ", creator="
         + creator
         + '}';
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) return true;
+    if (obj == null || !(obj instanceof CreationInfo)) return false;
+    CreationInfo that = (CreationInfo) obj;
+    return Objects.equals(creator, that.creator)
+        && Objects.equals(date, that.date)
+        && Objects.equals(geoLocation, that.geoLocation);
   }
 
   public static class Builder {
