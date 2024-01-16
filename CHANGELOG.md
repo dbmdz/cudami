@@ -10,6 +10,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
 
 - Update of nodes' children order
 - Admin-GUI no longer sorts children webpage alphabetically, but keeps their real order
+- User management (create & change an user)
 
 ## [8.0.2](https://github.com/dbmdz/cudami/releases/tag/8.0.2) – 2024-01-12
 
