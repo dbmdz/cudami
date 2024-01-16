@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 @Endpoint(id = "version")
 public class VersionActuatorEndpoint {
 
-  private static VersionInfo versionInfo = null;
+  private final VersionInfo versionInfo;
 
   public VersionActuatorEndpoint(VersionInfo versionInfo) {
     this.versionInfo = versionInfo;
