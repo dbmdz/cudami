@@ -128,6 +128,10 @@ public abstract class AbstractPagingAndSortingController extends AbstractControl
   private Sorting createSorting(
       Class targetClass, String sortProperty, String sortOrder, String dataLanguage)
       throws TechnicalException {
+    if (sortProperty == null) {
+      return null;
+    }
+
     String sortLanguage = null;
     if (isMultiLanguageField(targetClass, sortProperty)) {
       sortLanguage = getDataLanguage(dataLanguage, languageService);
