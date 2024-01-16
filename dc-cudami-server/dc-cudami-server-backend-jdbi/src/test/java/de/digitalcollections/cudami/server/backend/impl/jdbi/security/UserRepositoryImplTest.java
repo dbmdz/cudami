@@ -22,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.jdbc.Sql;
+import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @ExtendWith(SpringExtension.class)
@@ -30,7 +31,9 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
     classes = UserRepositoryImpl.class)
 @ContextConfiguration(classes = SpringConfigBackendTestDatabase.class)
 @DisplayName("The User Repository")
-@Sql(scripts = "classpath:cleanup_database.sql")
+@Sql(
+    scripts = {"classpath:cleanup_database.sql"},
+    executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
 public class UserRepositoryImplTest {
 
   UserRepositoryImpl repo;
