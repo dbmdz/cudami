@@ -8,7 +8,7 @@
   <parent>
     <groupId>de.digitalcollections.cudami</groupId>
     <artifactId>dc-cudami-server</artifactId>
-    <version>8.0.3-SNAPSHOT</version>
+    <version>8.0.3-RC1</version>
   </parent>
 
   <name>DigitalCollections: cudami Repository Server (Backend IMPL JDBI PostgreSql)</name>

@@ -11,7 +11,7 @@
 
   <groupId>de.digitalcollections.cudami</groupId>
   <artifactId>dc-cudami</artifactId>
-  <version>8.0.3-SNAPSHOT</version>
+  <version>8.0.3-RC1</version>
   <packaging>pom</packaging>
 
   <name>DigitalCollections: cudami</name>
