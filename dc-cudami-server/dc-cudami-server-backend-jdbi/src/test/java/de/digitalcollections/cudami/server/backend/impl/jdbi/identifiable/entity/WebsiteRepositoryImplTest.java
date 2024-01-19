@@ -14,7 +14,6 @@ import de.digitalcollections.model.text.StructuredContent;
 import de.digitalcollections.model.text.contentblock.Text;
 import java.util.List;
 import java.util.Locale;
-import java.util.function.Function;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -80,11 +79,23 @@ class WebsiteRepositoryImplTest
             .build();
     repo.save(website);
 
+    webpageRepository.saveWithParentWebsite(webpage1.getUuid(), website.getUuid());
+    webpageRepository.saveWithParentWebsite(webpage2.getUuid(), website.getUuid());
     website.setRootPages(List.of(webpage1, webpage2));
 
     Website beforeUpdate = createDeepCopy(website);
     updateAndAssertUpdatedLastModifiedTimestamp(website);
-    assertInDatabaseIsEqualToUpdateable(website, beforeUpdate, Function.identity());
+    assertInDatabaseIsEqualToUpdateable(
+        website,
+        beforeUpdate,
+        ws -> {
+          try {
+            ws.setRootPages(repo.getRootWebpages(ws.getUuid()));
+          } catch (RepositoryException e) {
+            e.printStackTrace();
+          }
+          return ws;
+        });
   }
 
   @Test

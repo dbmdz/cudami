@@ -91,6 +91,11 @@ public class CreationInfo {
         && Objects.equals(geoLocation, that.geoLocation);
   }
 
+  @Override
+  public int hashCode() {
+    return 1217 + Objects.hash(creator, date, geoLocation);
+  }
+
   public static class Builder {
 
     CreationInfo creationInfo = new CreationInfo();

@@ -550,6 +550,11 @@ class DigitalObjectRepositoryImplTest
 
     PageResponse<DigitalObject> actual =
         repo.findDigitalObjectsByItem(item1.getUuid(), pageRequest);
+    // The Item contained in the DigitalObjects has only UUID, Identifiers and Label set.
+    // Therefore we must "adjust" `item1`
+    Item containedItem = Item.builder().uuid(item1.getUuid()).label(item1.getLabel()).build();
+    digitalObject1.setItem(containedItem);
+    digitalObject2.setItem(containedItem);
     assertThat(actual.getContent()).containsExactlyInAnyOrder(digitalObject1, digitalObject2);
   }
 

@@ -225,7 +225,7 @@ class WebpageServiceImplTest extends AbstractServiceImplTest {
         () -> {
           service.update(webpage);
         });
-    verify(repo, times(0)).update(any(Webpage.class));
+    verify(repo, times(1)).update(any(Webpage.class));
   }
 
   @Test
