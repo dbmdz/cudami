@@ -116,21 +116,21 @@ public class WebsiteRepositoryImpl extends EntityRepositoryImpl<Website>
 
     StringBuilder innerQuery =
         new StringBuilder(
-            "SELECT * FROM "
-                + wpTableName
-                + " AS "
-                + wpTableAlias
-                + " INNER JOIN website_webpages ww ON "
-                + wpTableAlias
-                + ".uuid = ww.webpage_uuid"
-                + " WHERE ww.website_uuid = :uuid");
+            """
+            SELECT {{webpageAlias}}.*, ww.sortindex wpidx FROM {{webpage}} {{webpageAlias}}
+                INNER JOIN website_webpages ww ON {{webpageAlias}}.uuid = ww.webpage_uuid
+            WHERE ww.website_uuid = :uuid
+            """
+                .replace("{{webpage}}", wpTableName)
+                .replace("{{webpageAlias}}", wpTableAlias));
     Map<String, Object> argumentMappings = new HashMap<>();
     argumentMappings.put("uuid", uuid);
 
-    List<Webpage> result =
-        webpageRepositoryImpl.retrieveList(
-            webpageRepositoryImpl.getSqlSelectReducedFields(), innerQuery, argumentMappings, null);
-    return result;
+    return webpageRepositoryImpl.retrieveList(
+        webpageRepositoryImpl.getSqlSelectReducedFields(),
+        innerQuery,
+        argumentMappings,
+        "%s.wpidx".formatted(wpTableAlias));
   }
 
   @Override
