@@ -1,3 +1,13 @@
+cudami:
+  defaults:
+    language: en
+    locale: en_US
+  offsetForAlternativePaging: 5000
+  repositoryFolderPath: '~/cudami/fileResources'
+  urlalias:
+    generationExcludes: []
+    maxlength: 64
+
 info:
   app:
     project:

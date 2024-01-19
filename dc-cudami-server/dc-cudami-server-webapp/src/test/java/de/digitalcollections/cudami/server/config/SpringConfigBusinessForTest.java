@@ -9,36 +9,25 @@ import de.digitalcollections.cudami.server.business.api.service.identifiable.res
 import java.util.Locale;
 import org.mockito.Mockito;
 import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
 
 @TestConfiguration
 public class SpringConfigBusinessForTest {
 
-  @Bean
-  public DigitalObjectService digitalObjectService() {
-    return Mockito.mock(DigitalObjectService.class);
-  }
+  @MockBean public DigitalObjectService digitalObjectService;
 
-  @Bean
-  public EntityService entityService() {
-    return Mockito.mock(EntityService.class);
-  }
+  @MockBean(name = "entityService")
+  public EntityService entityService;
 
-  @Bean
-  public FileResourceMetadataService fileResourceMetadataService() {
-    return Mockito.mock(FileResourceMetadataService.class);
-  }
+  @MockBean(name = "fileResourceMetadataService")
+  public FileResourceMetadataService fileResourceMetadataService;
 
-  @Bean
-  public IdentifiableService identifiableService() {
-    return Mockito.mock(IdentifiableService.class);
-  }
+  @MockBean(name = "identifiableService")
+  public IdentifiableService identifiableService;
 
-  @Bean
-  public IdentifierTypeService identifierTypeService() {
-    return Mockito.mock(IdentifierTypeService.class);
-  }
+  @MockBean public IdentifierTypeService identifierTypeService;
 
   @Bean
   @Primary
