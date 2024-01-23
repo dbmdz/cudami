@@ -54,11 +54,11 @@ public interface ManagedContentService<T extends ManagedContent> {
                 managedContentObject.getPublicationEnd()),
             LocalDate.now());
     switch (tbs) {
-      case NOT_YET_IN_RANGE -> managedContentObject.setPublicationStatus(
-          PublicationStatus.NOT_YET_PUBLISHED);
+      case NOT_YET_IN_RANGE ->
+          managedContentObject.setPublicationStatus(PublicationStatus.NOT_YET_PUBLISHED);
       case IS_IN_RANGE -> managedContentObject.setPublicationStatus(PublicationStatus.PUBLISHED);
-      case NO_LONGER_IN_RANGE -> managedContentObject.setPublicationStatus(
-          PublicationStatus.NO_LONGER_PUBLISHED);
+      case NO_LONGER_IN_RANGE ->
+          managedContentObject.setPublicationStatus(PublicationStatus.NO_LONGER_PUBLISHED);
     }
   }
 }

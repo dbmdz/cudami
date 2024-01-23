@@ -53,14 +53,14 @@ public abstract class AbstractPagingAndSortingController {
     FilterOperation filterOperation = fc.getOperation();
     String operationValue =
         switch (filterOperation.getOperandCount()) {
-          case SINGLEVALUE -> fc.getValue() instanceof String svalue
-              ? svalue
-              : fc.getValue().toString();
+          case SINGLEVALUE ->
+              fc.getValue() instanceof String svalue ? svalue : fc.getValue().toString();
           case MULTIVALUE -> String.join(",", fc.getValues());
-          case MIN_MAX_VALUES -> String.join(
-              ",",
-              fc.getMinValue() instanceof String smin ? smin : fc.getMinValue().toString(),
-              fc.getMaxValue() instanceof String smax ? smax : fc.getMaxValue().toString());
+          case MIN_MAX_VALUES ->
+              String.join(
+                  ",",
+                  fc.getMinValue() instanceof String smin ? smin : fc.getMinValue().toString(),
+                  fc.getMaxValue() instanceof String smax ? smax : fc.getMaxValue().toString());
           case NO_VALUE -> null;
         };
     try {
