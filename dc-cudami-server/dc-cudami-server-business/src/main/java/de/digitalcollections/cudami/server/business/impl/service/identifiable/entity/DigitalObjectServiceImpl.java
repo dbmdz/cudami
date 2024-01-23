@@ -7,7 +7,6 @@ import de.digitalcollections.cudami.server.business.api.service.LocaleService;
 import de.digitalcollections.cudami.server.business.api.service.content.ManagedContentService;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ConflictException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
-import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifierService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.alias.UrlAliasService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.CollectionService;
@@ -33,6 +32,7 @@ import de.digitalcollections.model.identifiable.resource.LinkedDataFileResource;
 import de.digitalcollections.model.list.filtering.Filtering;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
+import de.digitalcollections.model.validation.ValidationException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -246,6 +246,7 @@ public class DigitalObjectServiceImpl extends EntityServiceImpl<DigitalObject>
     return digitalObject;
   }
 
+  @Override
   public List<DigitalObject> getByExamples(List<DigitalObject> examples, boolean fillWemi)
       throws ServiceException {
     List<DigitalObject> digitalObjects = super.getByExamples(examples);
@@ -383,7 +384,8 @@ public class DigitalObjectServiceImpl extends EntityServiceImpl<DigitalObject>
 
   @Override
   public List<FileResource> setFileResources(
-      DigitalObject digitalObject, List<FileResource> fileResources) throws ServiceException {
+      DigitalObject digitalObject, List<FileResource> fileResources)
+      throws ServiceException, ValidationException {
     try {
       return ((DigitalObjectRepository) repository).setFileResources(digitalObject, fileResources);
     } catch (RepositoryException e) {
@@ -435,7 +437,7 @@ public class DigitalObjectServiceImpl extends EntityServiceImpl<DigitalObject>
   @Override
   public void setLinkedDataFileResources(
       DigitalObject digitalObject, List<LinkedDataFileResource> linkedDataFileResources)
-      throws ServiceException {
+      throws ServiceException, ValidationException {
     digitalObjectLinkedDataFileResourceService.setLinkedDataFileResources(
         digitalObject, linkedDataFileResources);
   }

@@ -7,11 +7,11 @@ import static org.mockito.Mockito.when;
 
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
-import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifierService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifierTypeService;
 import de.digitalcollections.cudami.server.business.impl.service.AbstractUniqueObjectServiceImplTest;
 import de.digitalcollections.model.identifiable.Identifier;
+import de.digitalcollections.model.validation.ValidationException;
 import java.util.Map;
 import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;

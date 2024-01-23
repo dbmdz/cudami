@@ -11,6 +11,7 @@ import de.digitalcollections.model.list.sorting.Direction;
 import de.digitalcollections.model.list.sorting.Sorting;
 import de.digitalcollections.model.security.Role;
 import de.digitalcollections.model.security.User;
+import de.digitalcollections.model.validation.ValidationException;
 import java.util.List;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -31,7 +32,7 @@ public class UserServiceImpl extends UniqueObjectServiceImpl<User, UserRepositor
 
   @Override
   // @Transactional(readOnly = false)
-  public User activate(User user) throws ServiceException {
+  public User activate(User user) throws ServiceException, ValidationException {
     User userFromRepo;
     try {
       userFromRepo = repository.getByExample(user);
@@ -66,7 +67,7 @@ public class UserServiceImpl extends UniqueObjectServiceImpl<User, UserRepositor
 
   @Override
   // @Transactional(readOnly = false)
-  public User deactivate(User user) throws ServiceException {
+  public User deactivate(User user) throws ServiceException, ValidationException {
     User userFromRepo;
     try {
       userFromRepo = repository.getByExample(user);
@@ -136,7 +137,7 @@ public class UserServiceImpl extends UniqueObjectServiceImpl<User, UserRepositor
 
   @Override
   // @Transactional(readOnly = false)
-  public User save(User user, Errors results) throws ServiceException {
+  public User save(User user, Errors results) throws ServiceException, ValidationException {
     uniqueUsernameValidator.validate(user, results);
     if (!results.hasErrors()) {
       try {
@@ -159,7 +160,7 @@ public class UserServiceImpl extends UniqueObjectServiceImpl<User, UserRepositor
 
   @Override
   // @Transactional(readOnly = false)
-  public User update(User user, Errors results) throws ServiceException {
+  public User update(User user, Errors results) throws ServiceException, ValidationException {
     try {
       repository.update(user);
     } catch (RepositoryException e) {

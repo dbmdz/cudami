@@ -6,7 +6,6 @@ import de.digitalcollections.cudami.server.backend.api.repository.identifiable.e
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.agent.ExternalCorporateBodyRepository;
 import de.digitalcollections.cudami.server.business.api.service.LocaleService;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
-import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifierService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.alias.UrlAliasService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.agent.CorporateBodyService;
@@ -15,6 +14,7 @@ import de.digitalcollections.cudami.server.config.HookProperties;
 import de.digitalcollections.model.identifiable.entity.Collection;
 import de.digitalcollections.model.identifiable.entity.agent.CorporateBody;
 import de.digitalcollections.model.list.filtering.Filtering;
+import de.digitalcollections.model.validation.ValidationException;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,7 +51,8 @@ public class CorporateBodyServiceImpl extends AgentServiceImpl<CorporateBody>
   }
 
   @Override
-  public CorporateBody fetchAndSaveByGndId(String gndId) throws ServiceException {
+  public CorporateBody fetchAndSaveByGndId(String gndId)
+      throws ServiceException, ValidationException {
     CorporateBody corporateBody = externalRepository.getByGndId(gndId);
     if (corporateBody == null) {
       return null;

@@ -1,9 +1,9 @@
 package de.digitalcollections.cudami.server.business.api.service.identifiable.versioning;
 
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
-import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.model.identifiable.Identifiable;
 import de.digitalcollections.model.identifiable.versioning.Version;
+import de.digitalcollections.model.validation.ValidationException;
 import java.util.UUID;
 
 public interface VersionService {

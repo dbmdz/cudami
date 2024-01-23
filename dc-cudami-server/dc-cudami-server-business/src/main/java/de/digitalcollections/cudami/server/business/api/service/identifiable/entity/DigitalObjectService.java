@@ -2,7 +2,6 @@ package de.digitalcollections.cudami.server.business.api.service.identifiable.en
 
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ConflictException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
-import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.model.identifiable.Identifier;
 import de.digitalcollections.model.identifiable.entity.Collection;
 import de.digitalcollections.model.identifiable.entity.Project;
@@ -13,6 +12,7 @@ import de.digitalcollections.model.identifiable.resource.ImageFileResource;
 import de.digitalcollections.model.identifiable.resource.LinkedDataFileResource;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
+import de.digitalcollections.model.validation.ValidationException;
 import java.util.List;
 import java.util.Locale;
 
@@ -73,14 +73,14 @@ public interface DigitalObjectService extends EntityService<DigitalObject> {
   List<FileResource> getRenderingFileResources(DigitalObject digitalObject) throws ServiceException;
 
   List<FileResource> setFileResources(DigitalObject digitalObject, List<FileResource> fileResources)
-      throws ServiceException;
+      throws ServiceException, ValidationException;
 
   boolean setItem(DigitalObject digitalObject, Item item)
       throws ConflictException, ValidationException, ServiceException;
 
   void setLinkedDataFileResources(
       DigitalObject digitalObject, List<LinkedDataFileResource> linkedDataFileResources)
-      throws ServiceException;
+      throws ServiceException, ValidationException;
 
   void setRenderingFileResources(
       DigitalObject digitalObject, List<FileResource> renderingFileResources)
