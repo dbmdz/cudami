@@ -169,9 +169,8 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
       case "navdate" -> tableAlias + ".navdate";
       case "refId" -> tableAlias + ".refid";
       case "name" -> isRepoForNamedEntity() ? "name" : null;
-      case "nameLocalesOfOriginalScripts" -> isRepoForNamedEntity()
-          ? "name_locales_original_scripts"
-          : null;
+      case "nameLocalesOfOriginalScripts" ->
+          isRepoForNamedEntity() ? "name_locales_original_scripts" : null;
       case "notes" -> tableAlias + ".notes";
       default -> super.getColumnName(modelProperty);
     };
