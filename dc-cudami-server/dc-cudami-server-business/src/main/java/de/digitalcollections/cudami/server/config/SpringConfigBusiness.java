@@ -1,7 +1,7 @@
 package de.digitalcollections.cudami.server.config;
 
 import de.digitalcollections.cudami.model.config.CudamiConfig;
-import de.digitalcollections.cudami.server.backend.impl.util.SlugGenerator;
+import de.digitalcollections.model.util.SlugGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;

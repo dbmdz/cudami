@@ -1,4 +1,4 @@
-package de.digitalcollections.cudami.server.backend.impl.util;
+package de.digitalcollections.model.util;
 
 import com.ibm.icu.text.Transliterator;
 import java.util.Locale;
