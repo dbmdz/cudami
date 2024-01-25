@@ -4,7 +4,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.web.WebpageRepository;
@@ -222,7 +225,7 @@ class WebpageServiceImplTest extends AbstractServiceImplTest {
         () -> {
           service.update(webpage);
         });
-    verify(repo, times(1)).update(any(Webpage.class));
+    verify(repo, times(0)).update(any(Webpage.class));
   }
 
   @Test

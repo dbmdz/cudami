@@ -6,7 +6,7 @@
   <parent>
     <groupId>de.digitalcollections.cudami</groupId>
     <artifactId>dc-cudami</artifactId>
-    <version>8.0.4-SNAPSHOT</version>
+    <version>9.0.0-SNAPSHOT</version>
   </parent>
 
   <name>DigitalCollections: cudami Management Webapp</name>
@@ -55,14 +55,6 @@
     <dependency>
       <groupId>de.digitalcollections.cudami</groupId>
       <artifactId>dc-cudami-model</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>de.digitalcollections.model</groupId>
-      <artifactId>dc-model</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>de.digitalcollections.model</groupId>
-      <artifactId>dc-model-jackson</artifactId>
     </dependency>
     <dependency>
       <groupId>io.micrometer</groupId>

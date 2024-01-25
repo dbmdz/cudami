@@ -1,0 +1,39 @@
+{
+  "created" : "2021-01-13T12:34:54",
+  "lastModified" : "2021-01-14T02:45:24",
+  "uuid" : "e17f3225-f907-4194-9c2a-c8612174e0e5",
+  "description" : {
+    "de" : {
+      "type" : "doc",
+      "content" : [ {
+        "type" : "paragraph",
+        "content" : [ {
+          "type" : "text",
+          "text" : "Beispiel-Beschreibung"
+        } ]
+      } ]
+    },
+    "en" : {
+      "type" : "doc",
+      "content" : [ {
+        "type" : "paragraph",
+        "content" : [ {
+          "type" : "text",
+          "text" : "Example Description"
+        } ]
+      } ]
+    }
+  },
+  "identifiableObjectType" : "EVENT",
+  "identifiers" : [ ],
+  "label" : {
+    "de" : "Beispiel Beschriftung",
+    "en" : "Example Label"
+  },
+  "type" : "ENTITY",
+  "refId" : 0,
+  "name" : {
+    "it-IT" : "Bello Gallico"
+  },
+  "entityType" : "EVENT"
+}

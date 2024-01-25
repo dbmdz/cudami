@@ -1,0 +1,20 @@
+{
+  "description" : {
+    "it-IT" : {
+      "type" : "doc",
+      "content" : [ {
+        "type" : "paragraph",
+        "content" : [ {
+          "type" : "text",
+          "text" : "Buon Giorno!"
+        } ]
+      } ]
+    }
+  },
+  "identifiableObjectType" : "WEBSITE",
+  "identifiers" : [ ],
+  "type" : "ENTITY",
+  "refId" : 0,
+  "url" : "http://www.example.org/",
+  "entityType" : "WEBSITE"
+}

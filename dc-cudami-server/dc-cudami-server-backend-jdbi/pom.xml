@@ -8,7 +8,7 @@
   <parent>
     <groupId>de.digitalcollections.cudami</groupId>
     <artifactId>dc-cudami-server</artifactId>
-    <version>8.0.4-SNAPSHOT</version>
+    <version>9.0.0-SNAPSHOT</version>
   </parent>
 
   <name>DigitalCollections: cudami Repository Server (Backend IMPL JDBI PostgreSql)</name>
@@ -53,12 +53,8 @@
       <artifactId>dc-cudami-server-backend-api</artifactId>
     </dependency>
     <dependency>
-      <groupId>de.digitalcollections.model</groupId>
-      <artifactId>dc-model</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>de.digitalcollections.model</groupId>
-      <artifactId>dc-model-jackson</artifactId>
+      <groupId>net.logstash.logback</groupId>
+      <artifactId>logstash-logback-encoder</artifactId>
     </dependency>
     <dependency>
       <groupId>org.assertj</groupId>

@@ -1,0 +1,11 @@
+{
+  "objectType" : "LICENSE",
+  "created" : "2000-01-01T10:15:00",
+  "lastModified" : "2015-01-01T10:45:00",
+  "uuid" : "1e2d8b1e-c29d-475b-8f61-67b22ca6de89",
+  "acronym" : "CC0 1.0",
+  "label" : {
+    "en" : "Public Domain"
+  },
+  "url" : "http://rightsstatements.org/vocab/InC-NC/1.0/"
+}

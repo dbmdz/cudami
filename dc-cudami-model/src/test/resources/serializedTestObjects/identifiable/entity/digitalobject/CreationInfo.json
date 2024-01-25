@@ -1,0 +1,24 @@
+{
+  "creator" : {
+    "identifiableObjectType" : "CORPORATE_BODY",
+    "identifiers" : [ ],
+    "label" : {
+      "de" : "Acme Inc."
+    },
+    "type" : "ENTITY",
+    "refId" : 0,
+    "entityType" : "CORPORATE_BODY"
+  },
+  "date" : "2022-01-01",
+  "geoLocation" : {
+    "identifiableObjectType" : "HUMAN_SETTLEMENT",
+    "identifiers" : [ ],
+    "label" : {
+      "de" : "Dorfstadt"
+    },
+    "type" : "ENTITY",
+    "refId" : 0,
+    "geoLocationType" : "HUMAN_SETTLEMENT",
+    "entityType" : "GEOLOCATION"
+  }
+}

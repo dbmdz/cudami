@@ -1,0 +1,309 @@
+{
+  "identifiableObjectType" : "MANIFESTATION",
+  "identifiers" : [ {
+    "objectType" : "IDENTIFIER",
+    "id" : "bar",
+    "namespace" : "foo"
+  } ],
+  "label" : {
+    "de" : "Zimmer-Gymnastik ohne Geräte"
+  },
+  "subjects" : [ {
+    "identifiableObjectType" : "SUBJECT",
+    "identifiers" : [ {
+      "objectType" : "IDENTIFIER",
+      "id" : "id3",
+      "namespace" : "namespace3"
+    } ],
+    "label" : {
+      "de" : "Subject B"
+    },
+    "type" : "RESOURCE",
+    "subjectType" : "type"
+  }, {
+    "identifiableObjectType" : "SUBJECT",
+    "identifiers" : [ {
+      "objectType" : "IDENTIFIER",
+      "id" : "id1",
+      "namespace" : "namespace1"
+    }, {
+      "objectType" : "IDENTIFIER",
+      "id" : "id2",
+      "namespace" : "namespace2"
+    } ],
+    "label" : {
+      "de" : "Subject A"
+    },
+    "type" : "RESOURCE",
+    "subjectType" : "type"
+  } ],
+  "tags" : [ {
+    "objectType" : "TAG",
+    "value" : "tag-value"
+  } ],
+  "type" : "ENTITY",
+  "navDate" : "2022-08-30",
+  "refId" : 0,
+  "notes" : [ {
+    "de" : {
+      "type" : "doc",
+      "content" : [ {
+        "type" : "paragraph",
+        "content" : [ {
+          "type" : "text",
+          "text" : "Plattendruck"
+        } ]
+      } ]
+    }
+  }, {
+    "de" : {
+      "type" : "doc",
+      "content" : [ {
+        "type" : "paragraph",
+        "content" : [ {
+          "type" : "text",
+          "text" : "Pr. 54 kr"
+        } ]
+      } ]
+    }
+  } ],
+  "composition" : "1 Partitur (11 Seiten)",
+  "dimensions" : "26,5 x 70 x 2 cm",
+  "expressionTypes" : [ {
+    "mainType" : "TEXT",
+    "subType" : "PRINT"
+  }, {
+    "mainType" : "TEXT",
+    "subType" : "HANDWRITING"
+  } ],
+  "relations" : [ {
+    "predicate" : "is_author_of",
+    "subject" : {
+      "identifiableObjectType" : "PERSON",
+      "identifiers" : [ ],
+      "label" : {
+        "de" : "Arnold Hiller"
+      },
+      "type" : "ENTITY",
+      "refId" : 0,
+      "entityType" : "PERSON"
+    }
+  } ],
+  "language" : "de",
+  "manifestationType" : "SINGLE",
+  "manufacturingType" : "PRINT",
+  "mediaTypes" : [ "Buch", "CD" ],
+  "otherLanguages" : [ "it" ],
+  "parents" : [ {
+    "title" : "Parent",
+    "sortKey" : "sortme",
+    "subject" : {
+      "uuid" : "8a9c3c34-c36c-4671-8f2f-9d96a5fc32e4",
+      "identifiableObjectType" : "MANIFESTATION",
+      "identifiers" : [ ],
+      "label" : {
+        "und" : "Parent"
+      },
+      "type" : "ENTITY",
+      "refId" : 0,
+      "entityType" : "MANIFESTATION"
+    }
+  } ],
+  "publicationInfo" : {
+    "publishers" : [ {
+      "objectType" : "PUBLISHER",
+      "locations" : [ {
+        "identifiableObjectType" : "HUMAN_SETTLEMENT",
+        "identifiers" : [ ],
+        "label" : {
+          "und" : "Köln"
+        },
+        "previewImageRenderingHints" : {
+          "openLinkInNewWindow" : false,
+          "title" : {
+            "de" : "Köln"
+          }
+        },
+        "type" : "ENTITY",
+        "refId" : 0,
+        "geoLocationType" : "HUMAN_SETTLEMENT",
+        "entityType" : "GEOLOCATION"
+      } ],
+      "agent" : {
+        "identifiableObjectType" : "PERSON",
+        "identifiers" : [ ],
+        "label" : {
+          "und" : "Karl Ranseier"
+        },
+        "previewImageRenderingHints" : {
+          "openLinkInNewWindow" : false,
+          "title" : {
+            "de" : "Karl Ranseier"
+          }
+        },
+        "type" : "ENTITY",
+        "refId" : 0,
+        "entityType" : "PERSON"
+      }
+    }, {
+      "objectType" : "PUBLISHER",
+      "locations" : [ {
+        "identifiableObjectType" : "HUMAN_SETTLEMENT",
+        "identifiers" : [ ],
+        "label" : {
+          "und" : "Frankfurt"
+        },
+        "previewImageRenderingHints" : {
+          "openLinkInNewWindow" : false,
+          "title" : {
+            "de" : "Frankfurt"
+          }
+        },
+        "type" : "ENTITY",
+        "refId" : 0,
+        "geoLocationType" : "HUMAN_SETTLEMENT",
+        "entityType" : "GEOLOCATION"
+      }, {
+        "identifiableObjectType" : "HUMAN_SETTLEMENT",
+        "identifiers" : [ ],
+        "label" : {
+          "und" : "München"
+        },
+        "previewImageRenderingHints" : {
+          "openLinkInNewWindow" : false,
+          "title" : {
+            "de" : "München"
+          }
+        },
+        "type" : "ENTITY",
+        "refId" : 0,
+        "geoLocationType" : "HUMAN_SETTLEMENT",
+        "entityType" : "GEOLOCATION"
+      } ],
+      "agent" : {
+        "identifiableObjectType" : "PERSON",
+        "identifiers" : [ ],
+        "label" : {
+          "und" : "Hans Dampf"
+        },
+        "previewImageRenderingHints" : {
+          "openLinkInNewWindow" : false,
+          "title" : {
+            "de" : "Hans Dampf"
+          }
+        },
+        "type" : "ENTITY",
+        "refId" : 0,
+        "entityType" : "PERSON"
+      }
+    }, {
+      "objectType" : "PUBLISHER",
+      "locations" : [ {
+        "identifiableObjectType" : "HUMAN_SETTLEMENT",
+        "identifiers" : [ ],
+        "label" : {
+          "und" : "München"
+        },
+        "previewImageRenderingHints" : {
+          "openLinkInNewWindow" : false,
+          "title" : {
+            "de" : "München"
+          }
+        },
+        "type" : "ENTITY",
+        "refId" : 0,
+        "geoLocationType" : "HUMAN_SETTLEMENT",
+        "entityType" : "GEOLOCATION"
+      }, {
+        "identifiableObjectType" : "HUMAN_SETTLEMENT",
+        "identifiers" : [ ],
+        "label" : {
+          "und" : "Berlin"
+        },
+        "previewImageRenderingHints" : {
+          "openLinkInNewWindow" : false,
+          "title" : {
+            "de" : "Berlin"
+          }
+        },
+        "type" : "ENTITY",
+        "refId" : 0,
+        "geoLocationType" : "HUMAN_SETTLEMENT",
+        "entityType" : "GEOLOCATION"
+      } ]
+    }, {
+      "objectType" : "PUBLISHER",
+      "agent" : {
+        "identifiableObjectType" : "PERSON",
+        "identifiers" : [ ],
+        "label" : {
+          "und" : "Max Moritz"
+        },
+        "previewImageRenderingHints" : {
+          "openLinkInNewWindow" : false,
+          "title" : {
+            "de" : "Max Moritz"
+          }
+        },
+        "type" : "ENTITY",
+        "refId" : 0,
+        "entityType" : "PERSON"
+      }
+    } ],
+    "datePresentation" : "2020",
+    "navDateRange" : {
+      "end" : "2020-04-28",
+      "start" : "2020-04-28"
+    },
+    "timeValueRange" : {
+      "end" : {
+        "afterTolerance" : 0,
+        "beforeTolerance" : 0,
+        "day" : 0,
+        "hour" : 0,
+        "minute" : 0,
+        "month" : 0,
+        "precision" : 9,
+        "preferredCalendarModel" : "http://www.wikidata.org/entity/Q1985727",
+        "second" : 0,
+        "timezoneOffset" : 0,
+        "year" : 2020
+      },
+      "start" : {
+        "afterTolerance" : 0,
+        "beforeTolerance" : 0,
+        "day" : 0,
+        "hour" : 0,
+        "minute" : 0,
+        "month" : 0,
+        "precision" : 9,
+        "preferredCalendarModel" : "http://www.wikidata.org/entity/Q1985727",
+        "second" : 0,
+        "timezoneOffset" : 0,
+        "year" : 2020
+      }
+    }
+  },
+  "scale" : "[Ca. 1:820 000]",
+  "titles" : [ {
+    "text" : {
+      "de" : "Titel",
+      "zh-Hani" : "圖註八十一難經辨眞"
+    },
+    "textLocalesOfOriginalScripts" : [ "zh-Hani" ],
+    "titleType" : {
+      "mainType" : "MAIN",
+      "subType" : "MAIN"
+    }
+  }, {
+    "text" : {
+      "de" : "Ein Test"
+    },
+    "titleType" : {
+      "mainType" : "MAIN",
+      "subType" : "SUB"
+    }
+  } ],
+  "version" : "2. Auflage",
+  "entityType" : "MANIFESTATION"
+}

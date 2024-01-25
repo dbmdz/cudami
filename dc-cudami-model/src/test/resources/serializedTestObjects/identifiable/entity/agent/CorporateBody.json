@@ -1,0 +1,10 @@
+{
+  "identifiableObjectType" : "CORPORATE_BODY",
+  "identifiers" : [ ],
+  "label" : {
+    "de" : "Bayerische Staatsbibliothek"
+  },
+  "type" : "ENTITY",
+  "refId" : 0,
+  "entityType" : "CORPORATE_BODY"
+}

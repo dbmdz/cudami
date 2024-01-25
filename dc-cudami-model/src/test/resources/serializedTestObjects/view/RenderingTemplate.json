@@ -1,0 +1,11 @@
+{
+  "objectType" : "RENDERING_TEMPLATE",
+  "uuid" : "2552a82e-8d5c-4bfd-87df-e2f185476885",
+  "description" : {
+    "en" : "Template description"
+  },
+  "label" : {
+    "en" : "Template label"
+  },
+  "name" : "Template name"
+}

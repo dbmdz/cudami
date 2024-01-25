@@ -92,8 +92,12 @@ public class TypeDeclarations {
    * @return list of matching types or an empty list
    */
   public List<ExpressionType> findExpressionTypes(String mainType, String subType) {
-    if (mainType == null && subType == null) {
-      return Collections.emptyList();
+    if (mainType == null) {
+      if (subType == null) {
+        return Collections.emptyList();
+      } else {
+        throw new RuntimeException("mainType must not be null!");
+      }
     }
     ExpressionType pattern = new ExpressionType(mainType, subType);
     return searchMainSubType(expressionTypes, pattern);
@@ -108,8 +112,12 @@ public class TypeDeclarations {
    * @return list of matching types or an empty list
    */
   public List<TitleType> findTitleTypes(String mainType, String subType) {
-    if (mainType == null && subType == null) {
-      return Collections.emptyList();
+    if (mainType == null) {
+      if (subType == null) {
+        return Collections.emptyList();
+      } else {
+        throw new RuntimeException("mainType must not be null!");
+      }
     }
     TitleType pattern = new TitleType(mainType, subType);
     return searchMainSubType(titleTypes, pattern);

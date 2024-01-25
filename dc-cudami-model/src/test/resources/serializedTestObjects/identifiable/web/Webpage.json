@@ -1,0 +1,83 @@
+{
+  "created" : "2000-01-01T10:15:00",
+  "lastModified" : "2000-01-03T23:15:00",
+  "description" : {
+    "de-DE" : {
+      "type" : "doc",
+      "content" : [ {
+        "type" : "paragraph",
+        "content" : [ {
+          "type" : "text",
+          "text" : ""
+        } ]
+      } ]
+    }
+  },
+  "identifiableObjectType" : "WEBPAGE",
+  "identifiers" : [ ],
+  "label" : {
+    "de-DE" : "Meine Homepage"
+  },
+  "type" : "RESOURCE",
+  "publicationEnd" : "+999999999-12-31",
+  "publicationStart" : "-999999999-01-01",
+  "renderingHints" : {
+    "showInPageNavigation" : false
+  },
+  "text" : {
+    "de-DE" : {
+      "type" : "doc",
+      "content" : [ {
+        "type" : "heading",
+        "content" : [ {
+          "type" : "text",
+          "text" : "Bayerische Staatsbibliothek",
+          "marks" : [ {
+            "type" : "strong"
+          } ]
+        } ],
+        "attrs" : {
+          "level" : 4
+        }
+      }, {
+        "type" : "paragraph",
+        "content" : [ {
+          "type" : "text",
+          "text" : "Internet:",
+          "marks" : [ {
+            "type" : "strong"
+          } ]
+        }, {
+          "type" : "text",
+          "text" : "   "
+        }, {
+          "type" : "text",
+          "text" : "www.bsb-muenchen.de",
+          "marks" : [ {
+            "type" : "link",
+            "attrs" : {
+              "href" : "https://www.bsb-muenchen.de/"
+            }
+          } ]
+        } ]
+      }, {
+        "type" : "image",
+        "attrs" : {
+          "width" : "33%",
+          "resourceId" : "135ec10b-ac65-4217-83fc-db5e9ff62cac",
+          "alignment" : "left",
+          "linkNewTab" : true,
+          "url" : "https://www.bsb-muenchen.de/logo.png"
+        }
+      }, {
+        "type" : "iframe",
+        "attrs" : {
+          "width" : "90%",
+          "title" : "Iframe title",
+          "src" : "https://external.content.org/index.php?language=de&action=test",
+          "height" : "150px"
+        }
+      } ]
+    }
+  }
+}

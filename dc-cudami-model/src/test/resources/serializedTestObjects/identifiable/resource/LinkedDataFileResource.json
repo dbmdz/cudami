@@ -1,0 +1,10 @@
+{
+  "identifiableObjectType" : "LINKED_DATA_FILE_RESOURCE",
+  "identifiers" : [ ],
+  "type" : "RESOURCE",
+  "fileResourceType" : "LINKED_DATA",
+  "readonly" : false,
+  "sizeInBytes" : 0,
+  "context" : "http://iiif.io/api/presentation/2/context.json",
+  "objectType" : "sc:Manifest"
+}

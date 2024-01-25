@@ -1,0 +1,30 @@
+{
+  "listResponseType" : "LIST_RESPONSE",
+  "content" : [ {
+    "objectType" : "USER",
+    "email" : "test@user.de",
+    "enabled" : true,
+    "roles" : [ ]
+  } ],
+  "request" : {
+    "listRequestType" : "LIST_REQUEST",
+    "filtering" : {
+      "filterCriteriaList" : [ {
+        "criterionLink" : "AND",
+        "content" : [ {
+          "expression" : "longField",
+          "nativeExpression" : false,
+          "operation" : "EQUALS",
+          "value" : [ "java.lang.Long", 5 ]
+        }, {
+          "expression" : "dateField",
+          "nativeExpression" : false,
+          "operation" : "BETWEEN",
+          "minValue" : [ "java.time.LocalDate", "2020-01-01" ],
+          "maxValue" : [ "java.time.LocalDate", "2020-01-31" ]
+        } ]
+      } ]
+    }
+  },
+  "totalElements" : 1
+}

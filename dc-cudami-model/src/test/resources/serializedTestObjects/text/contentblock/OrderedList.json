@@ -1,0 +1,25 @@
+{
+  "type" : "ordered_list",
+  "content" : [ {
+    "type" : "list_item",
+    "content" : [ {
+      "type" : "paragraph",
+      "content" : [ {
+        "type" : "text",
+        "text" : "Punkt 1"
+      } ]
+    } ]
+  }, {
+    "type" : "list_item",
+    "content" : [ {
+      "type" : "paragraph",
+      "content" : [ {
+        "type" : "text",
+        "text" : "Punkt 2"
+      } ]
+    } ]
+  } ],
+  "attrs" : {
+    "order" : 1
+  }
+}
