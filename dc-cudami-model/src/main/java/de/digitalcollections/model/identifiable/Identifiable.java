@@ -86,7 +86,7 @@ public class Identifiable extends UniqueObject {
       return false;
     }
     Identifiable that = (Identifiable) o;
-    return super.equals(o)
+    return Objects.equals(uuid, that.uuid)
         && Objects.equals(description, that.description)
         && identifiableObjectType == that.identifiableObjectType
         && Objects.equals(identifiers, that.identifiers)
@@ -187,18 +187,18 @@ public class Identifiable extends UniqueObject {
 
   @Override
   public int hashCode() {
-    return super.hashCode()
-        + Objects.hash(
-            description,
-            identifiableObjectType,
-            identifiers,
-            label,
-            localizedUrlAliases,
-            previewImage,
-            previewImageRenderingHints,
-            subjects,
-            tags,
-            type);
+    return Objects.hash(
+        uuid,
+        description,
+        identifiableObjectType,
+        identifiers,
+        label,
+        localizedUrlAliases,
+        previewImage,
+        previewImageRenderingHints,
+        subjects,
+        tags,
+        type);
   }
 
   @Override

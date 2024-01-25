@@ -2,14 +2,12 @@ package de.digitalcollections.cudami.admin.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.mxab.thymeleaf.extras.dataattribute.dialect.DataAttributeDialect;
-import de.digitalcollections.commons.servlet.filter.LogSessionIdFilter;
-import de.digitalcollections.commons.springmvc.config.SpringConfigCommonsMvc;
-import de.digitalcollections.commons.springmvc.controller.ErrorController;
-import de.digitalcollections.commons.springmvc.converter.StringToOrderConverter;
-import de.digitalcollections.commons.springmvc.thymeleaf.SpacesDialect;
 import de.digitalcollections.cudami.admin.converter.GrantedAuthorityJsonFilter;
+import de.digitalcollections.cudami.admin.converter.StringToOrderConverter;
 import de.digitalcollections.cudami.admin.interceptors.CreateAdminUserInterceptor;
 import de.digitalcollections.cudami.admin.interceptors.RequestIdLoggingInterceptor;
+import de.digitalcollections.cudami.admin.servlet.filter.LogSessionIdFilter;
+import de.digitalcollections.cudami.admin.thymeleaf.SpacesDialect;
 import de.digitalcollections.model.jackson.DigitalCollectionsObjectMapper;
 import nz.net.ultraq.thymeleaf.layoutdialect.LayoutDialect;
 import org.slf4j.Logger;
@@ -17,10 +15,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.FilterType;
-import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Primary;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 import org.springframework.format.FormatterRegistry;
@@ -33,14 +28,10 @@ import org.springframework.web.servlet.i18n.LocaleChangeInterceptor;
 import org.springframework.web.servlet.i18n.SessionLocaleResolver;
 import org.thymeleaf.dialect.AbstractProcessorDialect;
 import org.thymeleaf.extras.springsecurity5.dialect.SpringSecurityDialect;
+import org.thymeleaf.templatemode.TemplateMode;
+import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
 
 @Configuration
-@ComponentScan(
-    basePackages = {"de.digitalcollections.commons.springmvc.controller"},
-    excludeFilters = {
-      @ComponentScan.Filter(value = ErrorController.class, type = FilterType.ASSIGNABLE_TYPE)
-    })
-@Import(SpringConfigCommonsMvc.class)
 public class SpringConfigWeb implements WebMvcConfigurer {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(SpringConfigWeb.class);
@@ -102,6 +93,17 @@ public class SpringConfigWeb implements WebMvcConfigurer {
   @Bean
   public SessionLocaleResolver localeResolver() {
     return new SessionLocaleResolver();
+  }
+
+  @Bean(name = "CommonsClasspathThymeleafResolver")
+  public ClassLoaderTemplateResolver commonsClassLoaderThymeleafTemplateResolver() {
+    ClassLoaderTemplateResolver templateResolver = new ClassLoaderTemplateResolver();
+    templateResolver.setPrefix("/de/digitalcollections/commons/springmvc/thymeleaf/templates/");
+    templateResolver.setSuffix(".html");
+    templateResolver.setCheckExistence(true);
+    templateResolver.setCharacterEncoding("UTF-8");
+    templateResolver.setTemplateMode(TemplateMode.HTML);
+    return templateResolver;
   }
 
   @Bean

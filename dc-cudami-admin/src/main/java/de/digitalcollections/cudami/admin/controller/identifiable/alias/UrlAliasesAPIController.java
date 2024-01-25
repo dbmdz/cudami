@@ -1,7 +1,7 @@
 package de.digitalcollections.cudami.admin.controller.identifiable.alias;
 
 import com.github.openjson.JSONObject;
-import de.digitalcollections.commons.springmvc.controller.AbstractController;
+import de.digitalcollections.cudami.admin.controller.AbstractController;
 import de.digitalcollections.cudami.admin.controller.ParameterHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
 import de.digitalcollections.cudami.client.identifiable.alias.CudamiUrlAliasClient;

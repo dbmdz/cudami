@@ -99,6 +99,26 @@ public class Webpage extends Identifiable implements INode<Webpage>, ManagedCont
   }
 
   @Override
+  public String toString() {
+    return "Webpage{"
+        + "node="
+        + node
+        + ", publicationEnd="
+        + publicationEnd
+        + ", publicationStart="
+        + publicationStart
+        + ", publicationStatus="
+        + publicationStatus
+        + ", renderingHints="
+        + renderingHints
+        + ", text="
+        + text
+        + ", "
+        + super.toString()
+        + '}';
+  }
+
+  @Override
   protected void init() {
     super.init();
     this.type = IdentifiableType.RESOURCE;

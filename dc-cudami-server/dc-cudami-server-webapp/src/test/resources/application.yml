@@ -1,0 +1,21 @@
+cudami:
+  defaults:
+    language: en
+    locale: en_US
+  offsetForAlternativePaging: 5000
+  repositoryFolderPath: '~/cudami/fileResources'
+  urlalias:
+    generationExcludes: []
+    maxlength: 64
+
+info:
+  app:
+    project:
+      name: 'DigitalCollections: cudami Repository Server (Webapp)'
+      groupId: 'de.digitalcollections.cudami'
+      artifactId: 'cudami-server-webapp'
+      version: '1.2.3'
+      buildDetails: 'build by foo@bar.com'
+
+junit:
+  version: "@version.junit@"

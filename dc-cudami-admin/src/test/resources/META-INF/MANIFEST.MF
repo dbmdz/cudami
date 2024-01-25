@@ -1,0 +1,5 @@
+Manifest-Version: 1.0
+Implementation-Title: spring-security-web
+Automatic-Module-Name: spring.security.web
+Implementation-Version: 5.0.1.RELEASE
+Created-By: 1.8.0_151 (Oracle Corporation)

@@ -1,0 +1,24 @@
+info:
+  app:
+    project:
+      name: 'cudami-admin-webapp'
+      groupId: 'de.digitalcollections.cudami'
+      artifactId: 'cudami-admin-webapp'
+      version: '1.2.3'
+      buildDetails: 'build by foo@bar.com'
+
+junit:
+  version: "@version.junit@"
+
+management:
+  endpoints:
+    web:
+      base-path: '/monitoring'
+
+spring:
+  security:
+    rememberme:
+      secret-key: '12345'
+    user:
+      name: admin
+      password: password

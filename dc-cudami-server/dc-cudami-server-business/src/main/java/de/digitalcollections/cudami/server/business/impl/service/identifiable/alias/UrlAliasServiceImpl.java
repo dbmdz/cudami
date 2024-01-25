@@ -3,7 +3,6 @@ package de.digitalcollections.cudami.server.business.impl.service.identifiable.a
 import static de.digitalcollections.cudami.server.backend.api.repository.identifiable.alias.UrlAliasRepository.grabLanguage;
 import static de.digitalcollections.cudami.server.backend.api.repository.identifiable.alias.UrlAliasRepository.grabLanguageLocale;
 
-import de.digitalcollections.commons.web.SlugGenerator;
 import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.alias.UrlAliasRepository;
 import de.digitalcollections.cudami.server.business.api.service.LocaleService;
@@ -18,6 +17,7 @@ import de.digitalcollections.model.identifiable.alias.UrlAlias;
 import de.digitalcollections.model.identifiable.entity.Website;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
+import de.digitalcollections.model.util.SlugGenerator;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;

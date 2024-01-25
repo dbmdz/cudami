@@ -1,8 +1,8 @@
 package de.digitalcollections.cudami.admin.controller.security;
 
-import de.digitalcollections.commons.springmvc.controller.AbstractController;
 import de.digitalcollections.cudami.admin.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.admin.business.api.service.security.UserService;
+import de.digitalcollections.cudami.admin.controller.AbstractController;
 import de.digitalcollections.cudami.admin.controller.ParameterHelper;
 import de.digitalcollections.model.exception.ResourceNotFoundException;
 import de.digitalcollections.model.exception.TechnicalException;

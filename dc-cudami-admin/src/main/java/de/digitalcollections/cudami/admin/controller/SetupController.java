@@ -1,6 +1,5 @@
 package de.digitalcollections.cudami.admin.controller;
 
-import de.digitalcollections.commons.springmvc.controller.AbstractController;
 import de.digitalcollections.cudami.admin.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.admin.business.api.service.security.UserService;
 import de.digitalcollections.model.security.User;

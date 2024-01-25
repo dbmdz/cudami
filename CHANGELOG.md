@@ -8,7 +8,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
 
 ### Changed
 
+- **BREAKING**: Java version of `dc-cudami-client` & `dc-cudami-model` (thus former `dc-model` as well) upgraded to 17
 - Integrated previously independent [digitalcollections-model](https://github.com/dbmdz/digitalcollections-model)
+- Integrated several former independent modules from `dc-commons`
+
+### Fixed
+
+- Several missing `equals` & `hashCode` methods are added to model classes
+- Order of a website's root webpages is retained
 
 ## [8.0.3](https://github.com/dbmdz/cudami/releases/tag/8.0.3) – 2024-01-19
 

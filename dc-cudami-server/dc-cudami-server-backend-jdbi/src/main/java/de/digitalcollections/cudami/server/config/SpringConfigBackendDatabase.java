@@ -1,7 +1,7 @@
 package de.digitalcollections.cudami.server.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import de.digitalcollections.commons.jdbi.DcCommonsJdbiPlugin;
+import de.digitalcollections.cudami.server.backend.impl.jdbi.plugins.DcCommonsJdbiPlugin;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.plugins.JsonbJdbiPlugin;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.type.DbIdentifierMapper;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.type.LocalDateRangeMapper;

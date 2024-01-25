@@ -19,17 +19,17 @@
       <artifactId>spotbugs-annotations</artifactId>
     </dependency>
     <dependency>
-      <groupId>de.digitalcollections.commons</groupId>
-      <artifactId>dc-commons-web</artifactId>
-      <version>1.1.0</version>
-    </dependency>
-    <dependency>
       <groupId>de.digitalcollections.cudami</groupId>
       <artifactId>dc-cudami-model</artifactId>
     </dependency>
     <dependency>
       <groupId>de.digitalcollections.cudami</groupId>
       <artifactId>dc-cudami-server-backend-api</artifactId>
+    </dependency>
+    <!-- The backend-jdbi dependency is used only because of the slug generator -->
+    <dependency>
+      <groupId>de.digitalcollections.cudami</groupId>
+      <artifactId>dc-cudami-server-backend-jdbi</artifactId>
     </dependency>
     <dependency>
       <groupId>org.assertj</groupId>

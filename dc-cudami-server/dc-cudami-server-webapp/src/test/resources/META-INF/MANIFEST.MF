@@ -1,0 +1,5 @@
+Manifest-Version: 1.0
+Implementation-Title: cudami-server-webapp
+Automatic-Module-Name: cudami.server.webapp
+Implementation-Version: 1.2.3
+Created-By: 1.8.0_151 (Oracle Corporation)
