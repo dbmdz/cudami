@@ -2,7 +2,6 @@ package de.digitalcollections.cudami.server.controller.identifiable.entity.agent
 
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ConflictException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
-import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.EntityService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.agent.CorporateBodyService;
 import de.digitalcollections.cudami.server.controller.AbstractEntityController;
@@ -12,6 +11,7 @@ import de.digitalcollections.model.list.filtering.FilterCriterion;
 import de.digitalcollections.model.list.filtering.Filtering;
 import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.list.sorting.Order;
+import de.digitalcollections.model.validation.ValidationException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -24,7 +24,14 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @Tag(name = "Corporate body controller")
@@ -38,6 +45,7 @@ public class CorporateBodyController extends AbstractEntityController<CorporateB
     this.service = corporateBodyservice;
   }
 
+  @Override
   @Operation(summary = "Delete a corporate body")
   @DeleteMapping(
       value = {"/v6/corporatebodies/{uuid:" + ParameterHelper.UUID_PATTERN + "}"},
@@ -68,7 +76,7 @@ public class CorporateBodyController extends AbstractEntityController<CorporateB
               description = "GND-ID of the corporate body, e.g. <tt>2007744-0</tt>")
           @PathVariable("gndId")
           String gndId)
-      throws ServiceException {
+      throws ServiceException, ValidationException {
     if (!GNDID_PATTERN.matcher(gndId).matches()) {
       throw new IllegalArgumentException("Invalid GND ID: " + gndId);
     }
@@ -77,6 +85,7 @@ public class CorporateBodyController extends AbstractEntityController<CorporateB
         corporateBody, corporateBody != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
   }
 
+  @Override
   @Operation(summary = "Get all corporate bodies as (paged, sorted, filtered) list")
   @GetMapping(
       value = {"/v6/corporatebodies"},
@@ -109,6 +118,7 @@ public class CorporateBodyController extends AbstractEntityController<CorporateB
     return super.getByIdentifier(request);
   }
 
+  @Override
   @Operation(summary = "Get corporate body by refId")
   @GetMapping(
       value = {
@@ -154,6 +164,7 @@ public class CorporateBodyController extends AbstractEntityController<CorporateB
     }
   }
 
+  @Override
   @Operation(summary = "Get languages of all corporatebodies")
   @GetMapping(
       value = {
@@ -167,6 +178,7 @@ public class CorporateBodyController extends AbstractEntityController<CorporateB
     return super.getLanguages();
   }
 
+  @Override
   @Operation(summary = "Save a newly created corporate body")
   @PostMapping(
       value = {
@@ -181,6 +193,7 @@ public class CorporateBodyController extends AbstractEntityController<CorporateB
     return super.save(corporateBody, errors);
   }
 
+  @Override
   @Operation(summary = "Update a corporate body")
   @PutMapping(
       value = {
