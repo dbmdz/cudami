@@ -133,6 +133,7 @@ class IdentifiableServiceImplTest extends AbstractUniqueObjectServiceImplTest {
     assertThat(actualUrlAliases.get(0).getSlug()).isEqualTo("yu-ji-shan-ren");
   }
 
+  @Override
   @BeforeEach
   public void beforeEach() throws Exception {
     repo = mock(IdentifiableRepository.class);
@@ -290,7 +291,7 @@ class IdentifiableServiceImplTest extends AbstractUniqueObjectServiceImplTest {
 
   @DisplayName("throws an Exception to trigger a rollback on save, when saving in the repo fails")
   @Test
-  public void exceptionOnSaveWhenRepoFails() throws RepositoryException {
+  public void exceptionOnSaveWhenRepoFails() throws RepositoryException, ValidationException {
     doThrow(RepositoryException.class).when(repo).save(any(Identifiable.class));
 
     Identifiable identifiable = createIdentifiable();
@@ -326,7 +327,7 @@ class IdentifiableServiceImplTest extends AbstractUniqueObjectServiceImplTest {
   @DisplayName(
       "throws an Exception to trigger a rollback on update, when updating in the repo fails")
   @Test
-  public void exceptionOnUpdateWhenRepoFails() throws RepositoryException {
+  public void exceptionOnUpdateWhenRepoFails() throws RepositoryException, ValidationException {
     doThrow(NullPointerException.class).when(repo).update(any(Identifiable.class));
 
     Identifiable identifiable = Identifiable.builder().label("label").build();

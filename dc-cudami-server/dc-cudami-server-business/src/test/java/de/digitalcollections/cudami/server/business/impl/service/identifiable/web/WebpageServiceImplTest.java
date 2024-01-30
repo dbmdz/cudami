@@ -190,7 +190,7 @@ class WebpageServiceImplTest extends AbstractServiceImplTest {
 
   @Test
   @DisplayName("does not allow empty UrlAliases at save")
-  public void saveWithEmptyUrlAliases() throws RepositoryException {
+  public void saveWithEmptyUrlAliases() throws RepositoryException, ValidationException {
     Webpage webpage = new Webpage();
     webpage.setLabel("test");
     assertThrows(

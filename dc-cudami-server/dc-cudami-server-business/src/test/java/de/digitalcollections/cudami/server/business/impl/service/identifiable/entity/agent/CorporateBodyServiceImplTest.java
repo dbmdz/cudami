@@ -37,6 +37,7 @@ class CorporateBodyServiceImplTest extends AbstractServiceImplTest {
   private IdentifierService identifierService;
   private UrlAliasService urlAliasService;
 
+  @Override
   @BeforeEach
   public void beforeEach() throws Exception {
     super.beforeEach();
@@ -81,7 +82,7 @@ class CorporateBodyServiceImplTest extends AbstractServiceImplTest {
 
   @Test
   @DisplayName("can retrieve and save corporate bodies without preview image")
-  void saveWithoutPreviewImage() throws ServiceException {
+  void saveWithoutPreviewImage() throws ServiceException, ValidationException {
     CorporateBody corporateBodyWithoutPreviewImage = new CorporateBody();
     when(externalCorporateBodyRepository.getByGndId(any(String.class)))
         .thenReturn(corporateBodyWithoutPreviewImage);
@@ -90,7 +91,7 @@ class CorporateBodyServiceImplTest extends AbstractServiceImplTest {
 
   @Test
   @DisplayName("returns null when no corporate body was found")
-  void returnsNullForNullCorporateBody() throws ServiceException {
+  void returnsNullForNullCorporateBody() throws ServiceException, ValidationException {
     when(externalCorporateBodyRepository.getByGndId(any(String.class))).thenReturn(null);
     assertThat(corporateBodyService.fetchAndSaveByGndId("12345")).isNull();
   }

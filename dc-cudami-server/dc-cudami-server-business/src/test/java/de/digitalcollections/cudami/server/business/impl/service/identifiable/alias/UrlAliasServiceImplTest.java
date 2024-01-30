@@ -88,6 +88,7 @@ class UrlAliasServiceImplTest extends AbstractUniqueObjectServiceImplTest {
     service.validate(localizedUrlAliases);
   }
 
+  @Override
   @BeforeEach
   public void beforeEach() throws Exception {
     repo = mock(UrlAliasRepository.class);
@@ -520,7 +521,8 @@ class UrlAliasServiceImplTest extends AbstractUniqueObjectServiceImplTest {
 
   @DisplayName("raises a ServiceException when creating leads to an exception in the repository")
   @Test
-  public void raiseExceptionWhenSaveLeadsToAnException() throws RepositoryException {
+  public void raiseExceptionWhenSaveLeadsToAnException()
+      throws RepositoryException, ValidationException {
     doThrow(RepositoryException.class).when(repo).save(any(UrlAlias.class));
 
     assertThrows(
@@ -535,7 +537,7 @@ class UrlAliasServiceImplTest extends AbstractUniqueObjectServiceImplTest {
   @DisplayName("raises a ServiceException when trying to create an empty UrlAlias")
   @Test
   public void raiseExceptionWhenSaveWithNullUrlAlias()
-      throws ServiceException, RepositoryException {
+      throws ServiceException, RepositoryException, ValidationException {
     doThrow(RepositoryException.class).when(repo).save(null);
     assertThrows(
         ServiceException.class,
@@ -561,7 +563,8 @@ class UrlAliasServiceImplTest extends AbstractUniqueObjectServiceImplTest {
   @DisplayName(
       "raises a ServiceException when updating leads to an exception in the repository at persisting")
   @Test
-  public void raiseExceptionWhenUpdateLeadsToAnExceptionAtPersisting() throws RepositoryException {
+  public void raiseExceptionWhenUpdateLeadsToAnExceptionAtPersisting()
+      throws RepositoryException, ValidationException {
     UrlAlias expected =
         createUrlAlias("hützligrütz", true, "de", false, UUID.randomUUID(), UUID.randomUUID());
     expected.setLastPublished(null);
