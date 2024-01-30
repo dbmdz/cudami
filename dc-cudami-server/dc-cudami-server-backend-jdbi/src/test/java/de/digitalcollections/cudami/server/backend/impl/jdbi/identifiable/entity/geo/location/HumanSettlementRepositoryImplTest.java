@@ -6,6 +6,7 @@ import de.digitalcollections.cudami.server.backend.api.repository.identifiable.a
 import de.digitalcollections.cudami.server.backend.impl.jdbi.AbstractIdentifiableRepositoryImplTest;
 import de.digitalcollections.model.geo.CoordinateLocation;
 import de.digitalcollections.model.identifiable.entity.geo.location.HumanSettlement;
+import de.digitalcollections.model.validation.ValidationException;
 import java.util.function.Function;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -32,7 +33,7 @@ class HumanSettlementRepositoryImplTest
 
   @Test
   @DisplayName("can save (create) a human settlement")
-  void testSave() throws RepositoryException {
+  void testSave() throws RepositoryException, ValidationException {
     HumanSettlement geolocation =
         HumanSettlement.builder()
             .label("Test")
@@ -44,7 +45,7 @@ class HumanSettlementRepositoryImplTest
 
   @Test
   @DisplayName("can update a human settlement")
-  void testUpdate() throws RepositoryException {
+  void testUpdate() throws RepositoryException, ValidationException {
     HumanSettlement geolocation =
         HumanSettlement.builder()
             .label("Test")

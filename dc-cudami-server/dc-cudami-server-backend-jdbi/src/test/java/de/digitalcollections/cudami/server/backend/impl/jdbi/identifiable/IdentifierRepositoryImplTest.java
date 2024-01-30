@@ -8,6 +8,7 @@ import de.digitalcollections.cudami.server.backend.api.repository.identifiable.w
 import de.digitalcollections.cudami.server.backend.impl.database.config.SpringConfigBackendTestDatabase;
 import de.digitalcollections.model.identifiable.Identifier;
 import de.digitalcollections.model.identifiable.web.Webpage;
+import de.digitalcollections.model.validation.ValidationException;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
@@ -43,7 +44,7 @@ class IdentifierRepositoryImplTest {
 
   @Test
   @DisplayName("can save and return the saved object")
-  void checkSave() throws RepositoryException {
+  void checkSave() throws RepositoryException, ValidationException {
     Webpage webpage = createWebpage();
     Identifier identifier = Identifier.builder().namespace("namespace").id("id").build();
     webpage.addIdentifier(identifier);
@@ -63,7 +64,7 @@ class IdentifierRepositoryImplTest {
 
   @Test
   @DisplayName("can return a list of identifiers for an identifiable, when retrieved by uuid")
-  void identifiersForIdentifiable() throws RepositoryException {
+  void identifiersForIdentifiable() throws RepositoryException, ValidationException {
     Webpage webpage = createWebpage();
     Identifier identifier1 = Identifier.builder().namespace("namespace").id("1").build();
     Identifier identifier2 = Identifier.builder().namespace("namespace").id("2").build();
@@ -78,7 +79,7 @@ class IdentifierRepositoryImplTest {
 
   @Test
   @DisplayName("can return an identifier by its uuid")
-  void getByUuid() throws RepositoryException {
+  void getByUuid() throws RepositoryException, ValidationException {
     Webpage webpage = createWebpage();
     Identifier identifier = Identifier.builder().namespace("namespace").id("id").build();
     webpage.addIdentifier(identifier);

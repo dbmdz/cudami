@@ -6,6 +6,7 @@ import de.digitalcollections.cudami.server.backend.api.repository.identifiable.a
 import de.digitalcollections.cudami.server.backend.impl.jdbi.AbstractIdentifiableRepositoryImplTest;
 import de.digitalcollections.model.geo.CoordinateLocation;
 import de.digitalcollections.model.identifiable.entity.geo.location.River;
+import de.digitalcollections.model.validation.ValidationException;
 import java.util.function.Function;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -29,7 +30,7 @@ class RiverRepositoryImplTest extends AbstractIdentifiableRepositoryImplTest<Riv
 
   @Test
   @DisplayName("can save (create) a river")
-  void testSave() throws RepositoryException {
+  void testSave() throws RepositoryException, ValidationException {
     River geolocation =
         River.builder()
             .label("Test")
@@ -41,7 +42,7 @@ class RiverRepositoryImplTest extends AbstractIdentifiableRepositoryImplTest<Riv
 
   @Test
   @DisplayName("can update a river")
-  void testUpdate() throws RepositoryException {
+  void testUpdate() throws RepositoryException, ValidationException {
     River geolocation =
         River.builder()
             .label("Test")

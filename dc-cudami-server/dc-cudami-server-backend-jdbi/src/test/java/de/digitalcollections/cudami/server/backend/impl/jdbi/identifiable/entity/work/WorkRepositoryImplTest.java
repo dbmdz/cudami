@@ -30,6 +30,7 @@ import de.digitalcollections.model.text.Title;
 import de.digitalcollections.model.text.TitleType;
 import de.digitalcollections.model.time.LocalDateRange;
 import de.digitalcollections.model.time.TimeValue;
+import de.digitalcollections.model.validation.ValidationException;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -97,7 +98,7 @@ class WorkRepositoryImplTest extends AbstractIdentifiableRepositoryImplTest<Work
 
   @DisplayName("fills and returns the UUID on a saved work")
   @Test
-  public void saveFillsAndReturnsUuid() throws RepositoryException {
+  public void saveFillsAndReturnsUuid() throws RepositoryException, ValidationException {
     Work actual = Work.builder().label(Locale.GERMAN, "Erstlingswerk").build();
     repo.save(actual);
     assertThat(actual.getUuid()).isNotNull();
@@ -105,7 +106,7 @@ class WorkRepositoryImplTest extends AbstractIdentifiableRepositoryImplTest<Work
 
   @DisplayName("persists all fields of a saved work")
   @Test
-  public void persistAllFieldsOnSave() throws RepositoryException {
+  public void persistAllFieldsOnSave() throws RepositoryException, ValidationException {
     Work parentWork =
         Work.builder()
             .label(Locale.GERMAN, "Parent")
@@ -139,7 +140,7 @@ class WorkRepositoryImplTest extends AbstractIdentifiableRepositoryImplTest<Work
 
   @DisplayName("can update all fields of a work")
   @Test
-  public void testUpdate() throws RepositoryException {
+  public void testUpdate() throws RepositoryException, ValidationException {
     Work parentWork1 = Work.builder().label(Locale.GERMAN, "Parent").build();
     repo.save(parentWork1);
 
@@ -206,7 +207,7 @@ class WorkRepositoryImplTest extends AbstractIdentifiableRepositoryImplTest<Work
   @DisplayName(
       "can return null for getByItemUuid, when no item is connected to a manifestation and a work")
   @Test
-  public void getByItemUuidReturnsNull() throws RepositoryException {
+  public void getByItemUuidReturnsNull() throws RepositoryException, ValidationException {
     // First test: Query for nonexisting item must return null
     assertThat(repo.getByItem(UUID.randomUUID())).isNull();
 
@@ -219,7 +220,7 @@ class WorkRepositoryImplTest extends AbstractIdentifiableRepositoryImplTest<Work
 
   @DisplayName("can return the work, connected to an item")
   @Test
-  public void getByItemUuidReturnsWork() throws RepositoryException {
+  public void getByItemUuidReturnsWork() throws RepositoryException, ValidationException {
     Work work = Work.builder().label(Locale.GERMAN, "Erstlingswerk").build();
     repo.save(work);
 
@@ -251,7 +252,7 @@ class WorkRepositoryImplTest extends AbstractIdentifiableRepositoryImplTest<Work
   @DisplayName(
       "can return an empty set for getByPersonUuid, when no persons are connected with a work")
   @Test
-  public void getByPersonUuidReturnsEmptySet() throws RepositoryException {
+  public void getByPersonUuidReturnsEmptySet() throws RepositoryException, ValidationException {
     // First test: Query for nonexisting person must return null
     assertThat(repo.getByPerson(UUID.randomUUID())).isEmpty();
 
@@ -269,7 +270,7 @@ class WorkRepositoryImplTest extends AbstractIdentifiableRepositoryImplTest<Work
 
   @DisplayName("can return the set of connected persons for a work")
   @Test
-  public void getByPersonUuidReturnsSet() throws RepositoryException {
+  public void getByPersonUuidReturnsSet() throws RepositoryException, ValidationException {
     Person person =
         Person.builder()
             .label(Locale.GERMAN, "Karl Ranseier")

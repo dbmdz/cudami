@@ -6,6 +6,7 @@ import de.digitalcollections.cudami.server.backend.api.repository.identifiable.a
 import de.digitalcollections.cudami.server.backend.impl.jdbi.AbstractIdentifiableRepositoryImplTest;
 import de.digitalcollections.model.identifiable.agent.GivenName;
 import de.digitalcollections.model.identifiable.agent.GivenName.Gender;
+import de.digitalcollections.model.validation.ValidationException;
 import java.util.Locale;
 import java.util.function.Function;
 import org.junit.jupiter.api.BeforeEach;
@@ -30,7 +31,7 @@ class GivenNameRepositoryImplTest
 
   @Test
   @DisplayName("can save and fill uuid and timestamps")
-  void testSave() throws RepositoryException {
+  void testSave() throws RepositoryException, ValidationException {
     GivenName givenName =
         GivenName.builder().label(Locale.GERMAN, "Karl Ranseier").gender(Gender.MALE).build();
     saveAndAssertTimestampsAndEqualityToSaveable(givenName);
@@ -38,7 +39,7 @@ class GivenNameRepositoryImplTest
 
   @Test
   @DisplayName("can update and modify lastModified timestamp")
-  void testUpdate() throws RepositoryException {
+  void testUpdate() throws RepositoryException, ValidationException {
     GivenName givenName =
         GivenName.builder().label(Locale.GERMAN, "Karl Ranseier").gender(Gender.MALE).build();
     repo.save(givenName);

@@ -29,6 +29,7 @@ import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.text.LocalizedText;
 import de.digitalcollections.model.text.Title;
 import de.digitalcollections.model.text.TitleType;
+import de.digitalcollections.model.validation.ValidationException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -83,7 +84,7 @@ public class ItemRepositoryImplTest
 
   @Test
   @DisplayName("can save an item")
-  public void saveItem() throws RepositoryException {
+  public void saveItem() throws RepositoryException, ValidationException {
     Item item =
         Item.builder()
             .label(Locale.GERMAN, "Item")
@@ -94,7 +95,7 @@ public class ItemRepositoryImplTest
 
   @Test
   @DisplayName("can update an item")
-  void testUpdate() throws RepositoryException {
+  void testUpdate() throws RepositoryException, ValidationException {
     Item item = Item.builder().label(Locale.GERMAN, "Item").build();
     repo.save(item);
 
@@ -116,7 +117,7 @@ public class ItemRepositoryImplTest
 
   @Test
   @DisplayName("Save one holder")
-  void saveAndRetrieveOneHolder() throws RepositoryException {
+  void saveAndRetrieveOneHolder() throws RepositoryException, ValidationException {
     List<Agent> holders = new ArrayList<>();
     holders.add(
         CorporateBody.builder()
@@ -162,7 +163,7 @@ public class ItemRepositoryImplTest
 
   @Test
   @DisplayName("Save two holders")
-  void saveAndRetrieveTwoHolders() throws RepositoryException {
+  void saveAndRetrieveTwoHolders() throws RepositoryException, ValidationException {
     List<Agent> holders = new ArrayList<>();
     holders.add(
         CorporateBody.builder()
@@ -202,7 +203,7 @@ public class ItemRepositoryImplTest
   @Test
   @DisplayName(
       "returns holder(s) as concrete agents but only with UUID and label and no other fields")
-  void returnHoldersAsAgents() throws RepositoryException {
+  void returnHoldersAsAgents() throws RepositoryException, ValidationException {
     CorporateBody holder1 =
         CorporateBody.builder()
             .label("ACME Inc.")
@@ -246,7 +247,7 @@ public class ItemRepositoryImplTest
 
   @Test
   @DisplayName("Update one of two holders")
-  void updateHolders() throws RepositoryException {
+  void updateHolders() throws RepositoryException, ValidationException {
     List<Agent> holders = new ArrayList<>();
     holders.add(
         CorporateBody.builder()
@@ -300,7 +301,8 @@ public class ItemRepositoryImplTest
 
   @Test
   @DisplayName("return holder and part_of_item uuids in the search result")
-  void testSetHolderAndPartofItemUuidInSearchResult() throws RepositoryException {
+  void testSetHolderAndPartofItemUuidInSearchResult()
+      throws RepositoryException, ValidationException {
     CorporateBody holder =
         CorporateBody.builder()
             .label(Locale.GERMAN, "A Company")
@@ -339,7 +341,7 @@ public class ItemRepositoryImplTest
 
   @Test
   @DisplayName("can filter by the is_part_of uuid")
-  void testIsPartOfFiltering() throws RepositoryException {
+  void testIsPartOfFiltering() throws RepositoryException, ValidationException {
     Item parentItem = Item.builder().label("parent").build();
     repo.save(parentItem);
     Item expectedItem = Item.builder().partOfItem(parentItem).label("expected").build();
@@ -369,7 +371,7 @@ public class ItemRepositoryImplTest
 
   @DisplayName("can retrieve items for a manifestation")
   @Test
-  public void retrieveItems() throws RepositoryException {
+  public void retrieveItems() throws RepositoryException, ValidationException {
     Manifestation manifestation =
         Manifestation.builder()
             .label(Locale.GERMAN, "Test-Manifestation")
@@ -395,7 +397,7 @@ public class ItemRepositoryImplTest
 
   @DisplayName("can retrieve the list of locales for the items of a manifestation")
   @Test
-  public void retrieveListOfLocalesForItems() throws RepositoryException {
+  public void retrieveListOfLocalesForItems() throws RepositoryException, ValidationException {
     Manifestation manifestation =
         Manifestation.builder()
             .label(Locale.GERMAN, "Test-Manifestation")

@@ -45,6 +45,7 @@ import de.digitalcollections.model.text.LocalizedText;
 import de.digitalcollections.model.text.StructuredContent;
 import de.digitalcollections.model.text.contentblock.Paragraph;
 import de.digitalcollections.model.text.contentblock.Text;
+import de.digitalcollections.model.validation.ValidationException;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 import java.time.format.DateTimeFormatter;
@@ -129,7 +130,7 @@ class DigitalObjectRepositoryImplTest
 
   @Test
   @DisplayName("can save and retrieve a DigitalObject with its directly embedded resources")
-  void saveDigitalObject() throws RepositoryException {
+  void saveDigitalObject() throws RepositoryException, ValidationException {
     // Insert a license with uuid
     ensureLicense(EXISTING_LICENSE);
 
@@ -220,7 +221,7 @@ class DigitalObjectRepositoryImplTest
 
   @Test
   @DisplayName("returns the reduced DigitalObject without any creation info and embedded resources")
-  void returnReduced() throws RepositoryException {
+  void returnReduced() throws RepositoryException, ValidationException {
     DigitalObject digitalObject = buildDigitalObject();
 
     // The "save" method internally retrieves the object by findOne
@@ -242,7 +243,7 @@ class DigitalObjectRepositoryImplTest
 
   @Test
   @DisplayName("should return properly sized pages on search")
-  void testSearchPageSize() throws RepositoryException {
+  void testSearchPageSize() throws RepositoryException, ValidationException {
     // Insert a bunch of DigitalObjects with labels
     IntStream.range(0, 20)
         .forEach(
@@ -259,7 +260,8 @@ class DigitalObjectRepositoryImplTest
                   | IllegalArgumentException
                   | InvocationTargetException
                   | NoSuchMethodException
-                  | SecurityException e) {
+                  | SecurityException
+                  | ValidationException e) {
               } catch (RepositoryException e) {
                 throw new RuntimeException(e);
               }
@@ -295,7 +297,8 @@ class DigitalObjectRepositoryImplTest
           InvocationTargetException,
           NoSuchMethodException,
           SecurityException,
-          RepositoryException {
+          RepositoryException,
+          ValidationException {
     // Insert the parent DigitalObject
     DigitalObject parent =
         TestModelFixture.createDigitalObject(Map.of(Locale.GERMAN, "Parent"), Map.of());
@@ -328,7 +331,7 @@ class DigitalObjectRepositoryImplTest
 
   @Test
   @DisplayName("returns all identifiers for a DigitalObject")
-  void returnIdentifiers() throws RepositoryException {
+  void returnIdentifiers() throws RepositoryException, ValidationException {
     // Step1: Create and persist a DigitalObject with two identifiers
     DigitalObject digitalObject = DigitalObject.builder().label(Locale.GERMAN, "Label").build();
     Identifier identifier1 = Identifier.builder().namespace("namespace1").id("1").build();
@@ -363,7 +366,7 @@ class DigitalObjectRepositoryImplTest
 
   @Test
   @DisplayName("returns the partially filled DigitalObject by getByIdentifer")
-  void returnGetByIdentifier() throws RepositoryException {
+  void returnGetByIdentifier() throws RepositoryException, ValidationException {
     DigitalObject digitalObject = buildDigitalObject();
     digitalObject.addIdentifier(Identifier.builder().namespace("namespace").id("key").build());
     repo.save(digitalObject);
@@ -380,7 +383,7 @@ class DigitalObjectRepositoryImplTest
 
   @Test
   @DisplayName("save item UUID with digital object and retrieve it properly")
-  void saveAndRetrieveItemUuid() throws RepositoryException {
+  void saveAndRetrieveItemUuid() throws RepositoryException, ValidationException {
     DigitalObject digitalObject = buildDigitalObject();
     Item item =
         Item.builder()
@@ -409,7 +412,7 @@ class DigitalObjectRepositoryImplTest
   @Test
   @Order(Integer.MAX_VALUE)
   @DisplayName("can return all label languages")
-  void returnLanguages() throws RepositoryException {
+  void returnLanguages() throws RepositoryException, ValidationException {
     repo.save(DigitalObject.builder().label(Locale.GERMAN, "Test").build());
     repo.save(DigitalObject.builder().label(Locale.ENGLISH, "Test").build());
 
@@ -431,7 +434,7 @@ class DigitalObjectRepositoryImplTest
    */
   @Test
   @DisplayName("can update a DigitalObject with its directly embedded resources")
-  void update() throws RepositoryException {
+  void update() throws RepositoryException, ValidationException {
     // Insert a license with uuid
     ensureLicense(EXISTING_LICENSE);
 
@@ -519,7 +522,8 @@ class DigitalObjectRepositoryImplTest
   @Test
   @DisplayName(
       "can return an empty set of connected digital objects for an item which has no digital objects connected to it")
-  void digitalObjectsForItemWithoutDigitalObjects() throws RepositoryException {
+  void digitalObjectsForItemWithoutDigitalObjects()
+      throws RepositoryException, ValidationException {
     PageRequest pageRequest = PageRequest.builder().pageSize(25).pageNumber(0).build();
     Item item = Item.builder().label("item without digital objects").build();
     itemRepository.save(item);
@@ -532,7 +536,7 @@ class DigitalObjectRepositoryImplTest
 
   @Test
   @DisplayName("can return digital objects connected to an item")
-  void digitalObjectsForItem() throws RepositoryException {
+  void digitalObjectsForItem() throws RepositoryException, ValidationException {
     PageRequest pageRequest = PageRequest.builder().pageSize(25).pageNumber(0).build();
     Item item1 = Item.builder().label("item1 with two digitalObject2").build();
     itemRepository.save(item1);
@@ -560,7 +564,7 @@ class DigitalObjectRepositoryImplTest
 
   @Test
   @DisplayName("can use paging on retrieval of digital objects connected to an item")
-  void pagedDigitalObjectsForItem() throws RepositoryException {
+  void pagedDigitalObjectsForItem() throws RepositoryException, ValidationException {
     PageRequest pageRequest = PageRequest.builder().pageSize(1).pageNumber(0).build();
     Item item = Item.builder().label("item1 with two digitalObject2").build();
     itemRepository.save(item);
@@ -576,13 +580,13 @@ class DigitalObjectRepositoryImplTest
   }
 
   // -----------------------------------------------------------------
-  private void ensureLicense(License license) throws RepositoryException {
+  private void ensureLicense(License license) throws RepositoryException, ValidationException {
     if (licenseRepository.getByUuid(license.getUuid()) == null) {
       licenseRepository.save(license);
     }
   }
 
-  private DigitalObject buildDigitalObject() throws RepositoryException {
+  private DigitalObject buildDigitalObject() throws RepositoryException, ValidationException {
     // Insert a license with uuid
     ensureLicense(EXISTING_LICENSE);
 

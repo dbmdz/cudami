@@ -13,6 +13,7 @@ import de.digitalcollections.model.list.sorting.Direction;
 import de.digitalcollections.model.list.sorting.Order;
 import de.digitalcollections.model.list.sorting.Sorting;
 import de.digitalcollections.model.semantic.Tag;
+import de.digitalcollections.model.validation.ValidationException;
 import org.jdbi.v3.core.Jdbi;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -47,7 +48,7 @@ class TagRepositoryImplTest {
 
   @DisplayName("can save and retrieve by uuid")
   @Test
-  void saveAndRetrieveByUuid() throws RepositoryException {
+  void saveAndRetrieveByUuid() throws RepositoryException, ValidationException {
     Tag tag = Tag.builder().value("foo").build();
     repo.save(tag);
 
@@ -63,7 +64,7 @@ class TagRepositoryImplTest {
 
   @DisplayName("can save and successfully delete")
   @Test
-  void saveAndDelete() throws RepositoryException {
+  void saveAndDelete() throws RepositoryException, ValidationException {
     Tag savedTag = ensureSavedTag("Test");
     boolean success = repo.deleteByUuid(savedTag.getUuid());
     assertThat(success).isTrue();
@@ -74,7 +75,7 @@ class TagRepositoryImplTest {
 
   @DisplayName("can save and update")
   @Test
-  void saveAndUpdate() throws RepositoryException {
+  void saveAndUpdate() throws RepositoryException, ValidationException {
     Tag savedTag = ensureSavedTag("Test");
 
     Tag tagToUpdate =
@@ -90,7 +91,7 @@ class TagRepositoryImplTest {
 
   @DisplayName("can retrieve all tags with paging")
   @Test
-  void findAllPaged() throws RepositoryException {
+  void findAllPaged() throws RepositoryException, ValidationException {
     Tag savedTag = ensureSavedTag("Test");
 
     PageResponse<Tag> pageResponse =
@@ -100,7 +101,7 @@ class TagRepositoryImplTest {
 
   @DisplayName("can retrieve all tags with sorting")
   @Test
-  void findAllPagedAndSorted() throws RepositoryException {
+  void findAllPagedAndSorted() throws RepositoryException, ValidationException {
     Tag savedTag1 = ensureSavedTag("Test1");
     Tag savedTag2 = ensureSavedTag("Test2");
 
@@ -119,7 +120,7 @@ class TagRepositoryImplTest {
 
   @DisplayName("can retrieve tags with filtering")
   @Test
-  void findFiltered() throws RepositoryException {
+  void findFiltered() throws RepositoryException, ValidationException {
     Tag savedTag = ensureSavedTag("Test");
 
     PageResponse<Tag> pageResponse =
@@ -141,7 +142,7 @@ class TagRepositoryImplTest {
 
   @DisplayName("can return an empty filtered set when no matches are found")
   @Test
-  void noMatches() throws RepositoryException {
+  void noMatches() throws RepositoryException, ValidationException {
     ensureSavedTag("Test");
 
     PageResponse<Tag> pageResponse =
@@ -163,7 +164,7 @@ class TagRepositoryImplTest {
 
   @DisplayName("can return by value")
   @Test
-  void getByValue() throws RepositoryException {
+  void getByValue() throws RepositoryException, ValidationException {
     Tag savedTag = ensureSavedTag("foo");
     Tag foundTag = repo.getByValue("foo");
     assertThat(foundTag).isEqualTo(savedTag);
@@ -171,7 +172,7 @@ class TagRepositoryImplTest {
 
   @DisplayName("can find 'like' by value")
   @Test
-  void findByValue() throws RepositoryException {
+  void findByValue() throws RepositoryException, ValidationException {
     Tag savedTag = ensureSavedTag("Testtag1");
     ensureSavedTag("Testtag2");
 
@@ -194,7 +195,7 @@ class TagRepositoryImplTest {
   }
 
   // ------------------------------------------------------------------------------------------
-  private Tag ensureSavedTag(String value) throws RepositoryException {
+  private Tag ensureSavedTag(String value) throws RepositoryException, ValidationException {
     Tag tag = Tag.builder().value(value).build();
     repo.save(tag);
     return tag;

@@ -5,6 +5,7 @@ import static de.digitalcollections.cudami.server.backend.impl.asserts.CudamiAss
 import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifiableRepository;
 import de.digitalcollections.model.identifiable.Identifiable;
+import de.digitalcollections.model.validation.ValidationException;
 import java.time.LocalDateTime;
 import java.util.Locale;
 import java.util.function.Function;
@@ -22,7 +23,7 @@ public abstract class AbstractIdentifiableRepositoryImplTest<R extends Identifia
       new Locale.Builder().setLanguage("zh").setScript("Hani").build();
 
   protected <I extends Identifiable> void saveAndAssertTimestampsAndEqualityToSaveable(
-      I identifiable) throws RepositoryException {
+      I identifiable) throws RepositoryException, ValidationException {
     repo.save(identifiable);
     Assertions.assertThat(identifiable.getUuid()).isNotNull();
     Assertions.assertThat(identifiable.getCreated()).isNotNull();
@@ -34,7 +35,7 @@ public abstract class AbstractIdentifiableRepositoryImplTest<R extends Identifia
   }
 
   protected <I extends Identifiable> void updateAndAssertUpdatedLastModifiedTimestamp(
-      I identifiable) throws RepositoryException {
+      I identifiable) throws RepositoryException, ValidationException {
     LocalDateTime timestampBeforeUpdate = LocalDateTime.now();
     repo.update(identifiable);
     LocalDateTime timestampAfterUpdate = LocalDateTime.now();

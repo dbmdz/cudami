@@ -9,6 +9,7 @@ import de.digitalcollections.model.list.filtering.FilterCriterion;
 import de.digitalcollections.model.list.filtering.Filtering;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
+import de.digitalcollections.model.validation.ValidationException;
 import de.digitalcollections.model.view.RenderingTemplate;
 import java.util.List;
 import org.jdbi.v3.core.Jdbi;
@@ -44,7 +45,7 @@ public class RenderingTemplateRepositoryImplTest {
 
   @Test
   @DisplayName("can find rendering templates")
-  void find() throws RepositoryException {
+  void find() throws RepositoryException, ValidationException {
     String name1 = "my-first-template";
     String name2 = "my-second-template";
 

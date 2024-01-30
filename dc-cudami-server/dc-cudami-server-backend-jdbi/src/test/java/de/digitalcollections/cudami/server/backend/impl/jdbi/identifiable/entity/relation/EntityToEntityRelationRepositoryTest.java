@@ -13,6 +13,7 @@ import de.digitalcollections.model.identifiable.entity.relation.EntityRelation;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.relation.Predicate;
+import de.digitalcollections.model.validation.ValidationException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -65,7 +66,8 @@ public class EntityToEntityRelationRepositoryTest {
           InvocationTargetException,
           NoSuchMethodException,
           SecurityException,
-          RepositoryException {
+          RepositoryException,
+          ValidationException {
     Predicate predicate = new Predicate();
     predicate.setValue("is_test");
     EntityRelation expectedRelation =
@@ -105,7 +107,8 @@ public class EntityToEntityRelationRepositoryTest {
           InvocationTargetException,
           NoSuchMethodException,
           SecurityException,
-          RepositoryException {
+          RepositoryException,
+          ValidationException {
     Predicate predicate = new Predicate();
     predicate.setValue("is_test");
     EntityRelation expectedRelation =
@@ -153,7 +156,8 @@ public class EntityToEntityRelationRepositoryTest {
           InvocationTargetException,
           NoSuchMethodException,
           SecurityException,
-          RepositoryException {
+          RepositoryException,
+          ValidationException {
     Predicate predicate = new Predicate();
     predicate.setValue("is_test");
     EntityRelation expectedRelation =
@@ -188,7 +192,7 @@ public class EntityToEntityRelationRepositoryTest {
 
   @Test
   @DisplayName("returns properly sized pages")
-  void testSearchPageSize() throws RepositoryException {
+  void testSearchPageSize() throws RepositoryException, ValidationException {
     Predicate predicate = new Predicate();
     predicate.setValue("is_test");
     predicateRepository.save(predicate);
@@ -218,12 +222,12 @@ public class EntityToEntityRelationRepositoryTest {
         rel -> {
           try {
             entityRepository.save(rel.getSubject());
-          } catch (RepositoryException e) {
+          } catch (RepositoryException | ValidationException e) {
             throw new RuntimeException(e);
           }
           try {
             entityRepository.save(rel.getObject());
-          } catch (RepositoryException e) {
+          } catch (RepositoryException | ValidationException e) {
             throw new RuntimeException(e);
           }
         });

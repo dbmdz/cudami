@@ -13,6 +13,7 @@ import de.digitalcollections.model.list.filtering.Filtering;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.text.LocalizedText;
+import de.digitalcollections.model.validation.ValidationException;
 import java.util.Locale;
 import java.util.Set;
 import java.util.function.Function;
@@ -41,7 +42,7 @@ class CorporateBodyRepositoryImplTest
 
   @Test
   @DisplayName("can save a CorporateBody")
-  public void saveCorporateBody() throws RepositoryException {
+  public void saveCorporateBody() throws RepositoryException, ValidationException {
     CorporateBody creator =
         CorporateBody.builder()
             .label(Locale.GERMAN, "Körperschaft")
@@ -53,7 +54,7 @@ class CorporateBodyRepositoryImplTest
 
   @Test
   @DisplayName("can update a CorporateBody")
-  void testUpdate() throws RepositoryException {
+  void testUpdate() throws RepositoryException, ValidationException {
     CorporateBody corporateBody =
         CorporateBody.builder().label("Test").addName("some name").build();
     repo.save(corporateBody);
@@ -74,7 +75,7 @@ class CorporateBodyRepositoryImplTest
 
   @Test
   @DisplayName("can retrieve a CorporateBody")
-  public void saveAndRetrieveCorporateBody() throws RepositoryException {
+  public void saveAndRetrieveCorporateBody() throws RepositoryException, ValidationException {
     CorporateBody creator =
         CorporateBody.builder()
             .label(Locale.GERMAN, "Körperschaft")
@@ -92,7 +93,7 @@ class CorporateBodyRepositoryImplTest
 
   @Test
   @DisplayName("can retrieve a CorporateBody by name")
-  public void findCorporateBodyByName() throws RepositoryException {
+  public void findCorporateBodyByName() throws RepositoryException, ValidationException {
     CorporateBody creator =
         CorporateBody.builder()
             .label(Locale.GERMAN, "Körperschaft")

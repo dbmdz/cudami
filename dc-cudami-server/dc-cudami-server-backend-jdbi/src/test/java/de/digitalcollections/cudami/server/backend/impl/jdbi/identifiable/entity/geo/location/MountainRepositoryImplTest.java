@@ -6,6 +6,7 @@ import de.digitalcollections.cudami.server.backend.api.repository.identifiable.a
 import de.digitalcollections.cudami.server.backend.impl.jdbi.AbstractIdentifiableRepositoryImplTest;
 import de.digitalcollections.model.geo.CoordinateLocation;
 import de.digitalcollections.model.identifiable.entity.geo.location.Mountain;
+import de.digitalcollections.model.validation.ValidationException;
 import java.util.function.Function;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -30,7 +31,7 @@ class MountainRepositoryImplTest
 
   @Test
   @DisplayName("can save (create) a mountain")
-  void testSave() throws RepositoryException {
+  void testSave() throws RepositoryException, ValidationException {
     Mountain geolocation =
         Mountain.builder()
             .label("Test")
@@ -43,7 +44,7 @@ class MountainRepositoryImplTest
 
   @Test
   @DisplayName("can update a mountain")
-  void testUpdate() throws RepositoryException {
+  void testUpdate() throws RepositoryException, ValidationException {
     Mountain geolocation =
         Mountain.builder()
             .label("Test")

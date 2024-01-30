@@ -22,6 +22,7 @@ import de.digitalcollections.model.list.filtering.FilterCriterion;
 import de.digitalcollections.model.list.filtering.Filtering;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
+import de.digitalcollections.model.validation.ValidationException;
 import java.net.MalformedURLException;
 import java.time.LocalDateTime;
 import java.util.Arrays;
@@ -56,7 +57,8 @@ public class UrlAliasRepositoryImplTest extends AbstractRepositoryImplTest {
 
   @DisplayName("can save and retrieve an UrlAlias for a webpage with website")
   @Test
-  public void saveUrlAliasWithWebsite() throws MalformedURLException, RepositoryException {
+  public void saveUrlAliasWithWebsite()
+      throws MalformedURLException, RepositoryException, ValidationException {
     Webpage webpage = ensurePersistedWebpage();
     Identifiable target = copyWebpageToIdentifiable(webpage);
     Website website = ensurePresistedWebsite(webpage);
@@ -95,7 +97,7 @@ public class UrlAliasRepositoryImplTest extends AbstractRepositoryImplTest {
 
   @DisplayName("can save and retrieve an UrlAlias for a webpage without website")
   @Test
-  public void saveUrlAliasWithoutWebsite() throws RepositoryException {
+  public void saveUrlAliasWithoutWebsite() throws RepositoryException, ValidationException {
     Webpage webpage = ensurePersistedWebpage();
     Identifiable target = copyWebpageToIdentifiable(webpage);
     UrlAlias urlAlias =
@@ -114,7 +116,7 @@ public class UrlAliasRepositoryImplTest extends AbstractRepositoryImplTest {
 
   @DisplayName("can update an UrlAlias for a webpage without website")
   @Test
-  public void updateWithoutWebsite() throws RepositoryException {
+  public void updateWithoutWebsite() throws RepositoryException, ValidationException {
     Webpage webpage = ensurePersistedWebpage();
     Identifiable target = copyWebpageToIdentifiable(webpage);
     UrlAlias urlAlias =
@@ -139,7 +141,8 @@ public class UrlAliasRepositoryImplTest extends AbstractRepositoryImplTest {
 
   @DisplayName("can update an UrlAlias for a webpage with website")
   @Test
-  public void updateWithWebsite() throws RepositoryException, MalformedURLException {
+  public void updateWithWebsite()
+      throws RepositoryException, MalformedURLException, ValidationException {
     Webpage webpage = ensurePersistedWebpage();
     Identifiable target = copyWebpageToIdentifiable(webpage);
     Website website = ensurePresistedWebsite(webpage);
@@ -176,7 +179,8 @@ public class UrlAliasRepositoryImplTest extends AbstractRepositoryImplTest {
 
   @DisplayName("can retrieve for targetUuid")
   @Test
-  public void retrieveForTargetUuid() throws RepositoryException, MalformedURLException {
+  public void retrieveForTargetUuid()
+      throws RepositoryException, MalformedURLException, ValidationException {
     Webpage webpage = ensurePersistedWebpage();
     Identifiable target = copyWebpageToIdentifiable(webpage);
 
@@ -201,7 +205,8 @@ public class UrlAliasRepositoryImplTest extends AbstractRepositoryImplTest {
 
   @DisplayName("can retrieve the main link for a target uuid")
   @Test
-  public void findMainLinks() throws RepositoryException, MalformedURLException {
+  public void findMainLinks()
+      throws RepositoryException, MalformedURLException, ValidationException {
     Webpage webpageWirUeberUns = ensurePersistedWebpage();
     Identifiable target = copyWebpageToIdentifiable(webpageWirUeberUns);
     Website website = ensurePresistedWebsite(webpageWirUeberUns);
@@ -264,7 +269,7 @@ public class UrlAliasRepositoryImplTest extends AbstractRepositoryImplTest {
 
   @DisplayName("can find filtered UrlAliases")
   @Test
-  public void find() throws RepositoryException {
+  public void find() throws RepositoryException, ValidationException {
     Webpage webpage = ensurePersistedWebpage();
     Identifiable target = copyWebpageToIdentifiable(webpage);
     UrlAlias urlAliasUeber =
@@ -301,7 +306,7 @@ public class UrlAliasRepositoryImplTest extends AbstractRepositoryImplTest {
 
   @DisplayName("Check method hasUrlAlias")
   @Test
-  public void hasUrlAlias() throws RepositoryException, MalformedURLException {
+  public void hasUrlAlias() throws RepositoryException, MalformedURLException, ValidationException {
     Webpage webpage = ensurePersistedWebpage();
     Identifiable target = copyWebpageToIdentifiable(webpage);
     Website website = ensurePresistedWebsite(webpage);
@@ -334,7 +339,7 @@ public class UrlAliasRepositoryImplTest extends AbstractRepositoryImplTest {
 
   @DisplayName("can delete an UrlAlias")
   @Test
-  public void delete() throws RepositoryException {
+  public void delete() throws RepositoryException, ValidationException {
     Webpage webpage = ensurePersistedWebpage();
     Identifiable target = copyWebpageToIdentifiable(webpage);
     UrlAlias urlAliasWithoutWebsite =
@@ -350,7 +355,7 @@ public class UrlAliasRepositoryImplTest extends AbstractRepositoryImplTest {
 
   @DisplayName("deleteByIdentifiable with force deletes everything")
   @Test
-  public void deleteByIdentifiableWithForce() throws RepositoryException {
+  public void deleteByIdentifiableWithForce() throws RepositoryException, ValidationException {
     Identifiable targetIdentifiable = createIdentifiable();
     LocalizedUrlAliases targetLocalizedUrlAliases = new LocalizedUrlAliases();
     targetLocalizedUrlAliases.add(
@@ -393,14 +398,14 @@ public class UrlAliasRepositoryImplTest extends AbstractRepositoryImplTest {
   }
 
   // --------------------------------------------------------------------
-  private Webpage ensurePersistedWebpage() throws RepositoryException {
+  private Webpage ensurePersistedWebpage() throws RepositoryException, ValidationException {
     Webpage webpage = Webpage.builder().label(Locale.GERMAN, "webpage").build();
     webpageRepository.save(webpage);
     return webpage;
   }
 
   private Website ensurePresistedWebsite(Webpage... rootPages)
-      throws MalformedURLException, RepositoryException {
+      throws MalformedURLException, RepositoryException, ValidationException {
     Website website =
         Website.builder()
             .url("https://my-first-website.com")

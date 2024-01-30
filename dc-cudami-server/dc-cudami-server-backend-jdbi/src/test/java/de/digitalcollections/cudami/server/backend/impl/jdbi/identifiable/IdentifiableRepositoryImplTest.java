@@ -1,6 +1,7 @@
 package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable;
 
 import static de.digitalcollections.cudami.server.backend.impl.asserts.CudamiAssertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
@@ -28,9 +29,15 @@ import de.digitalcollections.model.text.LocalizedStructuredContent;
 import de.digitalcollections.model.text.LocalizedText;
 import de.digitalcollections.model.text.StructuredContent;
 import de.digitalcollections.model.text.contentblock.Paragraph;
+import de.digitalcollections.model.validation.ValidationException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import org.junit.jupiter.api.BeforeEach;
@@ -107,7 +114,7 @@ class IdentifiableRepositoryImplTest
 
   @Test
   @DisplayName("can retrieve a single identifiable by its uuid")
-  void testGetByUuid() throws RepositoryException {
+  void testGetByUuid() throws RepositoryException, ValidationException {
     Identifiable identifiable = new Identifiable();
     identifiable.setUuid(UUID.randomUUID());
     identifiable.setCreated(LocalDateTime.now());
@@ -137,7 +144,7 @@ class IdentifiableRepositoryImplTest
 
                   try {
                     repo.save(identifiable);
-                  } catch (RepositoryException e) {
+                  } catch (RepositoryException | ValidationException e) {
                     throw new RuntimeException(e);
                   }
 
@@ -162,7 +169,7 @@ class IdentifiableRepositoryImplTest
 
   @Test
   @DisplayName("can return a subset of identifiables, queried by their uuid")
-  void getByUuidWithPartialResult() throws RepositoryException {
+  void getByUuidWithPartialResult() throws RepositoryException, ValidationException {
     Identifiable identifiable = new Identifiable();
     identifiable.setUuid(UUID.randomUUID());
     identifiable.setCreated(LocalDateTime.now());
@@ -232,7 +239,7 @@ class IdentifiableRepositoryImplTest
 
   @Test
   @DisplayName("saves an Identifiable and fills uuid and timestamps")
-  void testSave() throws RepositoryException {
+  void testSave() throws RepositoryException, ValidationException {
     Subject subject =
         Subject.builder()
             .label(new LocalizedText(Locale.ENGLISH, "My first subject"))
@@ -265,7 +272,7 @@ class IdentifiableRepositoryImplTest
 
   @DisplayName("can update and return an Identifiable with updated lastModified timestamp")
   @Test
-  public void testUpdate() throws RepositoryException {
+  public void testUpdate() throws RepositoryException, ValidationException {
     Identifiable identifiable =
         Identifiable.builder()
             .type(IdentifiableType.ENTITY)
@@ -300,14 +307,14 @@ class IdentifiableRepositoryImplTest
 
   @Test
   @DisplayName("returns properly sized pages on search")
-  void testSearchPageSize() throws RepositoryException {
+  void testSearchPageSize() throws RepositoryException, ValidationException {
     // Insert a bunch of DigitalObjects with labels
     IntStream.range(0, 20)
         .forEach(
             i -> {
               try {
                 repo.save(createDigitalObjectWithLabels("test" + i));
-              } catch (RepositoryException e) {
+              } catch (RepositoryException | ValidationException e) {
                 throw new RuntimeException(e);
               }
             });
@@ -420,7 +427,7 @@ class IdentifiableRepositoryImplTest
 
   @Test
   @DisplayName("save and update `split_label`")
-  void testSaveUpdateOfSplitLabel() throws RepositoryException {
+  void testSaveUpdateOfSplitLabel() throws RepositoryException, ValidationException {
     // test save method
     DigitalObject digitalObject = new DigitalObject();
     digitalObject.setLabel(

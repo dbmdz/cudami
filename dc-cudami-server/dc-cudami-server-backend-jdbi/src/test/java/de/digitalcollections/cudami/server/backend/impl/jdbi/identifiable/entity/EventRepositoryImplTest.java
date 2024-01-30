@@ -16,6 +16,7 @@ import de.digitalcollections.model.list.sorting.Direction;
 import de.digitalcollections.model.list.sorting.Order;
 import de.digitalcollections.model.list.sorting.Sorting;
 import de.digitalcollections.model.text.LocalizedText;
+import de.digitalcollections.model.validation.ValidationException;
 import java.util.List;
 import java.util.Locale;
 import org.junit.jupiter.api.BeforeEach;
@@ -41,7 +42,7 @@ class EventRepositoryImplTest extends AbstractIdentifiableRepositoryImplTest<Eve
 
   @DisplayName("can save and retrieve by uuid")
   @Test
-  void saveAndRetrieveByUuid() throws RepositoryException {
+  void saveAndRetrieveByUuid() throws RepositoryException, ValidationException {
     final LocalizedText label = new LocalizedText(Locale.GERMAN, "Test");
     Event event = Event.builder().label(label).name(label).build();
 
@@ -60,7 +61,7 @@ class EventRepositoryImplTest extends AbstractIdentifiableRepositoryImplTest<Eve
 
   @DisplayName("can save and successfully delete")
   @Test
-  void saveAndDelete() throws RepositoryException {
+  void saveAndDelete() throws RepositoryException, ValidationException {
     final LocalizedText label = new LocalizedText(Locale.GERMAN, "Test");
     Event savedEvent = Event.builder().label(label).name(label).build();
     repo.save(savedEvent);
@@ -77,7 +78,7 @@ class EventRepositoryImplTest extends AbstractIdentifiableRepositoryImplTest<Eve
 
   @DisplayName("can save and update")
   @Test
-  void saveAndUpdate() throws RepositoryException {
+  void saveAndUpdate() throws RepositoryException, ValidationException {
     final LocalizedText label = new LocalizedText(Locale.GERMAN, "Test");
     Event event = Event.builder().label(label).name(label).build();
     repo.save(event);
@@ -93,7 +94,7 @@ class EventRepositoryImplTest extends AbstractIdentifiableRepositoryImplTest<Eve
 
   @DisplayName("can retrieve all events with paging")
   @Test
-  void findAllPaged() throws RepositoryException {
+  void findAllPaged() throws RepositoryException, ValidationException {
     final LocalizedText label = new LocalizedText(Locale.GERMAN, "Test");
     Event savedEvent = Event.builder().label(label).name(label).build();
     repo.save(savedEvent);
@@ -105,7 +106,7 @@ class EventRepositoryImplTest extends AbstractIdentifiableRepositoryImplTest<Eve
 
   @DisplayName("can retrieve all events with sorting")
   @Test
-  void findAllPagedAndSorted() throws RepositoryException {
+  void findAllPagedAndSorted() throws RepositoryException, ValidationException {
     final LocalizedText label1 = new LocalizedText(Locale.GERMAN, "Test 1");
     Event savedEvent1 = Event.builder().label(label1).name(label1).build();
     repo.save(savedEvent1);
@@ -129,7 +130,7 @@ class EventRepositoryImplTest extends AbstractIdentifiableRepositoryImplTest<Eve
 
   @DisplayName("can retrieve events with filtering")
   @Test
-  void findFiltered() throws RepositoryException {
+  void findFiltered() throws RepositoryException, ValidationException {
     final LocalizedText label = new LocalizedText(Locale.GERMAN, "Test");
     Event savedEvent = Event.builder().label(label).name(label).build();
     repo.save(savedEvent);
@@ -153,7 +154,7 @@ class EventRepositoryImplTest extends AbstractIdentifiableRepositoryImplTest<Eve
 
   @DisplayName("can return an empty filtered set when no matches are found")
   @Test
-  void noMatches() throws RepositoryException {
+  void noMatches() throws RepositoryException, ValidationException {
     final LocalizedText label = new LocalizedText(Locale.GERMAN, "Test");
     Event savedEvent = Event.builder().label(label).name(label).build();
     repo.save(savedEvent);

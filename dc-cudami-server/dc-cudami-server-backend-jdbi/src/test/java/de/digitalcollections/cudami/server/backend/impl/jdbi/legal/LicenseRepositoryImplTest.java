@@ -9,6 +9,7 @@ import de.digitalcollections.cudami.server.backend.impl.model.TestModelFixture;
 import de.digitalcollections.model.legal.License;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
+import de.digitalcollections.model.validation.ValidationException;
 import java.net.URL;
 import java.util.List;
 import java.util.Locale;
@@ -62,7 +63,7 @@ public class LicenseRepositoryImplTest {
 
   @Test
   @DisplayName("should return count of records in table")
-  public void testCount() throws RepositoryException {
+  public void testCount() throws RepositoryException, ValidationException {
     License license1 = createLicense("1");
     repo.save(license1);
     UUID uuid1 = license1.getUuid();
@@ -79,7 +80,7 @@ public class LicenseRepositoryImplTest {
 
   @Test
   @DisplayName("should delete a license by given url")
-  public void testDeleteByUrl() throws RepositoryException {
+  public void testDeleteByUrl() throws RepositoryException, ValidationException {
     License license = createLicense();
     repo.save(license);
     UUID uuid = license.getUuid();
@@ -93,7 +94,7 @@ public class LicenseRepositoryImplTest {
 
   @Test
   @DisplayName("should delete a license by given uuid")
-  public void testDeleteByUuid() throws RepositoryException {
+  public void testDeleteByUuid() throws RepositoryException, ValidationException {
     License license = createLicense();
     repo.save(license);
     UUID uuid = license.getUuid();
@@ -107,7 +108,7 @@ public class LicenseRepositoryImplTest {
 
   @Test
   @DisplayName("should delete a list of licenses by given uuids")
-  public void testDeleteByUuids() throws RepositoryException {
+  public void testDeleteByUuids() throws RepositoryException, ValidationException {
     License license1 = createLicense("1");
     repo.save(license1);
     UUID uuid1 = license1.getUuid();
@@ -127,7 +128,7 @@ public class LicenseRepositoryImplTest {
 
   @Test
   @DisplayName("should get a paged list of licenses")
-  public void testFind() throws RepositoryException {
+  public void testFind() throws RepositoryException, ValidationException {
     // create 4 licenses
     License license1 = createLicense("1");
     repo.save(license1);
@@ -156,7 +157,7 @@ public class LicenseRepositoryImplTest {
 
   @Test
   @DisplayName("should get a license by given url")
-  public void testGetByUrl() throws RepositoryException {
+  public void testGetByUrl() throws RepositoryException, ValidationException {
     License license = createLicense();
     repo.save(license);
     UUID uuid = license.getUuid();
@@ -170,7 +171,7 @@ public class LicenseRepositoryImplTest {
 
   @Test
   @DisplayName("should get a license by given uuid")
-  public void testGetByUuid() throws RepositoryException {
+  public void testGetByUuid() throws RepositoryException, ValidationException {
     License license = createLicense();
     repo.save(license);
     UUID uuid = license.getUuid();
@@ -183,7 +184,7 @@ public class LicenseRepositoryImplTest {
 
   @Test
   @DisplayName("should save a license")
-  public void testSave() throws RepositoryException {
+  public void testSave() throws RepositoryException, ValidationException {
     License license = createLicense();
     repo.save(license);
 
@@ -200,7 +201,7 @@ public class LicenseRepositoryImplTest {
 
   @Test
   @DisplayName("should update a license")
-  public void testUpdate() throws RepositoryException {
+  public void testUpdate() throws RepositoryException, ValidationException {
     License license = createLicense();
     repo.save(license);
 
