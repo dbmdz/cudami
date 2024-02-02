@@ -106,8 +106,14 @@ public abstract class UniqueObjectRepositoryImpl<U extends UniqueObject>
     if (throwable == null) return false;
     if (throwable instanceof SQLException sqlexc) {
       useMessage.accept(sqlexc.getMessage());
-      return List.of("foreign_key_violation", "unique_violation", "check_violation")
-          .contains(sqlexc.getSQLState());
+      /*
+       * Postgres error codes: https://www.postgresql.org/docs/13/errcodes-appendix.html
+       *
+       * foreign_key_violation: 23503
+       * unique_violation: 23505
+       * check_violation: 23514
+       */
+      return List.of("23503", "23505", "23514").contains(sqlexc.getSQLState());
     }
     return throwable.getCause() != null
         ? isConstraintViolationException(throwable.getCause(), useMessage)
