@@ -7,6 +7,7 @@ import de.digitalcollections.model.identifiable.entity.Website;
 import de.digitalcollections.model.identifiable.web.Webpage;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
+import de.digitalcollections.model.validation.ValidationException;
 import java.util.List;
 import java.util.Locale;
 
@@ -49,5 +50,6 @@ public interface WebpageService extends NodeService<Webpage>, ManagedContentServ
 
   Website getWebsite(Webpage webpage) throws ServiceException;
 
-  Webpage saveWithParentWebsite(Webpage webpage, Website website) throws ServiceException;
+  Webpage saveWithParentWebsite(Webpage webpage, Website website)
+      throws ServiceException, ValidationException;
 }

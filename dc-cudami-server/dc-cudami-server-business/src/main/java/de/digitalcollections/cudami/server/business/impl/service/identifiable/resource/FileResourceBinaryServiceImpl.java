@@ -90,8 +90,9 @@ public class FileResourceBinaryServiceImpl implements FileResourceBinaryService 
       binaryRepository.save(fileResource, binaryData);
       metadataService.save(fileResource);
     } catch (RepositoryException e) {
-      LOGGER.error("Cannot save fileResource " + fileResource.getFilename() + ": ", e);
-      throw new ServiceException(e.getMessage());
+      throw new ServiceException(
+          "Cannot save fileResource %s: %s".formatted(fileResource.getFilename(), e.getMessage()),
+          e);
     }
   }
 }

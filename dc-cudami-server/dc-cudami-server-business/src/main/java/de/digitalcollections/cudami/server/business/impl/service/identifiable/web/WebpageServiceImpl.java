@@ -330,14 +330,13 @@ public class WebpageServiceImpl extends IdentifiableServiceImpl<Webpage, Webpage
       setPublicationStatus(webpage);
       return webpage;
     } catch (Exception e) {
-      LOGGER.error("Cannot save webpage " + child + ": ", e);
-      throw new ServiceException(e.getMessage());
+      throw new ServiceException("Cannot save webpage %s: %s".formatted(child, e.getMessage()), e);
     }
   }
 
   @Override
   public Webpage saveWithParentWebsite(Webpage webpage, Website parentWebsite)
-      throws ServiceException {
+      throws ServiceException, ValidationException {
     try {
       if (webpage.getUuid() == null) {
         save(webpage);
@@ -349,9 +348,9 @@ public class WebpageServiceImpl extends IdentifiableServiceImpl<Webpage, Webpage
       }
       setPublicationStatus(webpage);
       return webpage;
-    } catch (ServiceException | ValidationException e) {
-      LOGGER.error("Cannot save top-level webpage " + webpage + ": ", e);
-      throw new ServiceException(e.getMessage());
+    } catch (ServiceException e) {
+      throw new ServiceException(
+          "Cannot save top-level webpage %s: %s".formatted(webpage, e.getMessage()), e);
     }
   }
 

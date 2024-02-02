@@ -204,8 +204,7 @@ public class IdentifiableServiceImpl<I extends Identifiable, R extends Identifia
         identifiable.setLocalizedUrlAliases(savedUrlAliases);
       }
     } catch (ServiceException e) {
-      LOGGER.error(String.format("Cannot save UrlAliases for: %s", identifiable), e);
-      throw e;
+      throw new ServiceException("Cannot save UrlAliases for: %s".formatted(identifiable), e);
     }
   }
 
@@ -290,8 +289,8 @@ public class IdentifiableServiceImpl<I extends Identifiable, R extends Identifia
         }
       }
     } catch (ServiceException e) {
-      LOGGER.error("Error while updating URL aliases for " + identifiable, e);
-      throw e;
+      throw new ServiceException(
+          "Error while updating URL aliases for %s".formatted(identifiable), e);
     }
   }
 

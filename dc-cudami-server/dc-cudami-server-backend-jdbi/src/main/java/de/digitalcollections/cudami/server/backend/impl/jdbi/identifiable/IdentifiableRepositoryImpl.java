@@ -699,7 +699,7 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
       identifiable.setIdentifiers(
           identifierRepository.saveForIdentifiable(identifiable, identifiable.getIdentifiers()));
     } catch (RepositoryException e) {
-      LOGGER.error(
+      LOGGER.debug(
           String.format(
               "Cannot save Identifiers %s: %s for %s",
               identifiable.getIdentifiers(), e.getMessage(), identifiable),
@@ -920,7 +920,7 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
         providedIdentifiers.addAll(savedIdentifiers);
       }
     } catch (RepositoryException e) {
-      LOGGER.error(
+      LOGGER.debug(
           String.format(
               "Cannot save Identifiers %s: %s for %s",
               identifiable.getIdentifiers(), e.getMessage(), identifiable),

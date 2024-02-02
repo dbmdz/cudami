@@ -350,8 +350,8 @@ public class CollectionServiceImpl extends EntityServiceImpl<Collection>
       setPublicationStatus(collection);
       return collection;
     } catch (Exception e) {
-      LOGGER.error("Cannot save collection " + child + ": ", e);
-      throw new ServiceException(e.getMessage());
+      throw new ServiceException(
+          "Cannot save collection %s: %s".formatted(child, e.getMessage()), e);
     }
   }
 
