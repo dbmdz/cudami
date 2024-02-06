@@ -15,6 +15,7 @@ import de.digitalcollections.model.identifiable.entity.digitalobject.DigitalObje
 import de.digitalcollections.model.identifiable.entity.geo.location.GeoLocation;
 import de.digitalcollections.model.identifiable.entity.geo.location.GeoLocationType;
 import de.digitalcollections.model.text.LocalizedText;
+import de.digitalcollections.model.validation.ValidationException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -258,7 +259,7 @@ public class PersonRepositoryImpl extends AgentRepositoryImpl<Person> implements
   }
 
   @Override
-  public void save(Person person) throws RepositoryException {
+  public void save(Person person) throws RepositoryException, ValidationException {
     final UUID locationOfBirthUuid =
         person.getPlaceOfBirth() == null ? null : person.getPlaceOfBirth().getUuid();
     final UUID locationOfDeathUuid =
@@ -323,7 +324,7 @@ public class PersonRepositoryImpl extends AgentRepositoryImpl<Person> implements
   }
 
   @Override
-  public void update(Person person) throws RepositoryException {
+  public void update(Person person) throws RepositoryException, ValidationException {
     final UUID locationOfBirthUuid =
         person.getPlaceOfBirth() == null ? null : person.getPlaceOfBirth().getUuid();
     final UUID locationOfDeathUuid =

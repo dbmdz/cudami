@@ -7,7 +7,6 @@ import de.digitalcollections.cudami.server.backend.api.repository.identifiable.w
 import de.digitalcollections.cudami.server.business.api.service.LocaleService;
 import de.digitalcollections.cudami.server.business.api.service.content.ManagedContentService;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
-import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifierService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.alias.UrlAliasService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.web.WebpageService;
@@ -20,6 +19,7 @@ import de.digitalcollections.model.identifiable.web.Webpage;
 import de.digitalcollections.model.list.filtering.Filtering;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
+import de.digitalcollections.model.validation.ValidationException;
 import de.digitalcollections.model.view.BreadcrumbNavigation;
 import java.util.List;
 import java.util.Locale;
@@ -330,14 +330,13 @@ public class WebpageServiceImpl extends IdentifiableServiceImpl<Webpage, Webpage
       setPublicationStatus(webpage);
       return webpage;
     } catch (Exception e) {
-      LOGGER.error("Cannot save webpage " + child + ": ", e);
-      throw new ServiceException(e.getMessage());
+      throw new ServiceException("Cannot save webpage %s: %s".formatted(child, e.getMessage()), e);
     }
   }
 
   @Override
   public Webpage saveWithParentWebsite(Webpage webpage, Website parentWebsite)
-      throws ServiceException {
+      throws ServiceException, ValidationException {
     try {
       if (webpage.getUuid() == null) {
         save(webpage);
@@ -349,9 +348,9 @@ public class WebpageServiceImpl extends IdentifiableServiceImpl<Webpage, Webpage
       }
       setPublicationStatus(webpage);
       return webpage;
-    } catch (ServiceException | ValidationException e) {
-      LOGGER.error("Cannot save top-level webpage " + webpage + ": ", e);
-      throw new ServiceException(e.getMessage());
+    } catch (ServiceException e) {
+      throw new ServiceException(
+          "Cannot save top-level webpage %s: %s".formatted(webpage, e.getMessage()), e);
     }
   }
 

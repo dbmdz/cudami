@@ -4,7 +4,6 @@ import de.digitalcollections.cudami.server.backend.api.repository.exceptions.Rep
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.resource.DigitalObjectRenderingFileResourceRepository;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ConflictException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
-import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.resource.ApplicationFileResourceService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.resource.AudioFileResourceService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.resource.DigitalObjectRenderingFileResourceService;
@@ -15,6 +14,7 @@ import de.digitalcollections.cudami.server.business.api.service.identifiable.res
 import de.digitalcollections.cudami.server.business.api.service.identifiable.resource.VideoFileResourceService;
 import de.digitalcollections.model.identifiable.entity.digitalobject.DigitalObject;
 import de.digitalcollections.model.identifiable.resource.FileResource;
+import de.digitalcollections.model.validation.ValidationException;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;

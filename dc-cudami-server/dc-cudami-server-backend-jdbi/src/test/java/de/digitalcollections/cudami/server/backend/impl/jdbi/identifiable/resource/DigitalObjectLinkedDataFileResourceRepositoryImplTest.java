@@ -9,6 +9,7 @@ import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity
 import de.digitalcollections.model.file.MimeType;
 import de.digitalcollections.model.identifiable.entity.digitalobject.DigitalObject;
 import de.digitalcollections.model.identifiable.resource.LinkedDataFileResource;
+import de.digitalcollections.model.validation.ValidationException;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
@@ -52,7 +53,8 @@ class DigitalObjectLinkedDataFileResourceRepositoryImplTest {
 
   @DisplayName("can save and retrieve LinkedDataFileResources for a DigitalObject")
   @Test
-  void setLinkedDataFileResourcesForDigitalObject() throws RepositoryException {
+  void setLinkedDataFileResourcesForDigitalObject()
+      throws RepositoryException, ValidationException {
     // Persist the DigitalObject
     DigitalObject digitalObject =
         DigitalObject.builder()
@@ -82,7 +84,7 @@ class DigitalObjectLinkedDataFileResourceRepositoryImplTest {
 
   @DisplayName("can delete a list of LinkedDataFileResources by their uuids")
   @Test
-  void delete() throws RepositoryException {
+  void delete() throws RepositoryException, ValidationException {
     // Persist the DigitalObject
     DigitalObject digitalObject =
         DigitalObject.builder()
@@ -123,7 +125,7 @@ class DigitalObjectLinkedDataFileResourceRepositoryImplTest {
   @DisplayName(
       "can count the number of entries for a provided LinkedDataFileResource uuid when entries exist")
   @Test
-  void countMoreThanZero() throws RepositoryException {
+  void countMoreThanZero() throws RepositoryException, ValidationException {
     // Persist the DigitalObject
     DigitalObject digitalObject =
         DigitalObject.builder()
@@ -156,7 +158,7 @@ class DigitalObjectLinkedDataFileResourceRepositoryImplTest {
 
   @DisplayName("returns the number of deleted items")
   @Test
-  void deletionReturnsNumberOfDeletedItems() throws RepositoryException {
+  void deletionReturnsNumberOfDeletedItems() throws RepositoryException, ValidationException {
     // Persist the DigitalObject
     DigitalObject digitalObject =
         DigitalObject.builder()

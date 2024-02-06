@@ -1,12 +1,12 @@
 package de.digitalcollections.cudami.server.controller.identifiable;
 
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
-import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifiableService;
 import de.digitalcollections.cudami.server.controller.AbstractUniqueObjectController;
 import de.digitalcollections.cudami.server.controller.ParameterHelper;
 import de.digitalcollections.model.identifiable.Identifiable;
 import de.digitalcollections.model.identifiable.Identifier;
+import de.digitalcollections.model.validation.ValidationException;
 import java.util.List;
 import java.util.Locale;
 import javax.servlet.http.HttpServletRequest;

@@ -6,6 +6,7 @@ import de.digitalcollections.cudami.server.backend.api.repository.identifiable.a
 import de.digitalcollections.cudami.server.backend.impl.jdbi.AbstractIdentifiableRepositoryImplTest;
 import de.digitalcollections.model.identifiable.agent.FamilyName;
 import de.digitalcollections.model.text.LocalizedText;
+import de.digitalcollections.model.validation.ValidationException;
 import java.util.Locale;
 import java.util.function.Function;
 import org.junit.jupiter.api.BeforeEach;
@@ -31,14 +32,14 @@ class FamilyNameRepositoryImplTest
 
   @Test
   @DisplayName("can save a FamilyName and fill uuid and timestamps")
-  void testSave() throws RepositoryException {
+  void testSave() throws RepositoryException, ValidationException {
     FamilyName familyName = FamilyName.builder().label(Locale.GERMAN, "Ranseier").build();
     saveAndAssertTimestampsAndEqualityToSaveable(familyName);
   }
 
   @Test
   @DisplayName("can update and modify lastModified timestamp")
-  void testUpdate() throws RepositoryException {
+  void testUpdate() throws RepositoryException, ValidationException {
     FamilyName familyName = FamilyName.builder().label(Locale.GERMAN, "Ranseier").build();
     repo.save(familyName);
 

@@ -7,7 +7,6 @@ import de.digitalcollections.cudami.server.business.api.service.LocaleService;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ConflictException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ResourceNotFoundException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
-import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifiableService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifierService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.alias.UrlAliasService;
@@ -21,6 +20,7 @@ import de.digitalcollections.model.identifiable.resource.FileResource;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.text.LocalizedText;
+import de.digitalcollections.model.validation.ValidationException;
 import java.util.List;
 import java.util.Locale;
 import org.slf4j.Logger;
@@ -204,8 +204,7 @@ public class IdentifiableServiceImpl<I extends Identifiable, R extends Identifia
         identifiable.setLocalizedUrlAliases(savedUrlAliases);
       }
     } catch (ServiceException e) {
-      LOGGER.error(String.format("Cannot save UrlAliases for: %s", identifiable), e);
-      throw e;
+      throw new ServiceException("Cannot save UrlAliases for: %s".formatted(identifiable), e);
     }
   }
 
@@ -290,8 +289,8 @@ public class IdentifiableServiceImpl<I extends Identifiable, R extends Identifia
         }
       }
     } catch (ServiceException e) {
-      LOGGER.error("Error while updating URL aliases for " + identifiable, e);
-      throw e;
+      throw new ServiceException(
+          "Error while updating URL aliases for %s".formatted(identifiable), e);
     }
   }
 

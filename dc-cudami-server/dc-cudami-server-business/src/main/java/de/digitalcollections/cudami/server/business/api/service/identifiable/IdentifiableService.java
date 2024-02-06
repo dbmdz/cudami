@@ -2,7 +2,6 @@ package de.digitalcollections.cudami.server.business.api.service.identifiable;
 
 import de.digitalcollections.cudami.server.business.api.service.UniqueObjectService;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
-import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.model.identifiable.Identifiable;
 import de.digitalcollections.model.identifiable.Identifier;
 import de.digitalcollections.model.identifiable.entity.Entity;
@@ -10,6 +9,7 @@ import de.digitalcollections.model.identifiable.resource.FileResource;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.text.LocalizedText;
+import de.digitalcollections.model.validation.ValidationException;
 import java.util.List;
 import java.util.Locale;
 

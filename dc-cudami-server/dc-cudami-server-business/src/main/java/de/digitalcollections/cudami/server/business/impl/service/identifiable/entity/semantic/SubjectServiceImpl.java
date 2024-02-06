@@ -4,11 +4,11 @@ import de.digitalcollections.cudami.server.backend.api.repository.exceptions.Rep
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.semantic.SubjectRepository;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ConflictException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
-import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.semantic.SubjectService;
 import de.digitalcollections.cudami.server.business.impl.service.UniqueObjectServiceImpl;
 import de.digitalcollections.model.identifiable.Identifier;
 import de.digitalcollections.model.identifiable.semantic.Subject;
+import de.digitalcollections.model.validation.ValidationException;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;

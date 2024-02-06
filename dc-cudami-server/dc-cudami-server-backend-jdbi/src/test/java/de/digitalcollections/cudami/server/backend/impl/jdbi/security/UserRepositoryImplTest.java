@@ -11,6 +11,7 @@ import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.security.Role;
 import de.digitalcollections.model.security.User;
+import de.digitalcollections.model.validation.ValidationException;
 import java.util.List;
 import java.util.UUID;
 import org.jdbi.v3.core.Jdbi;
@@ -49,7 +50,7 @@ public class UserRepositoryImplTest {
 
   @Test
   @DisplayName("should return count of records in table")
-  public void testCount() throws RepositoryException {
+  public void testCount() throws RepositoryException, ValidationException {
     User user1 =
         User.builder().email("home@simpson.de").firstname("Homer").lastname("Simpson").build();
     repo.save(user1);
@@ -68,7 +69,7 @@ public class UserRepositoryImplTest {
 
   @Test
   @DisplayName("can find users")
-  void find() throws RepositoryException {
+  void find() throws RepositoryException, ValidationException {
     User user1 = new User();
     user1.setEmail("homer@simpson.de");
     user1.setFirstname("Homer");
@@ -130,7 +131,7 @@ public class UserRepositoryImplTest {
 
   @Test
   @DisplayName("should return list of active admin users")
-  public void getActiveAdminUsers() throws RepositoryException {
+  public void getActiveAdminUsers() throws RepositoryException, ValidationException {
     User user1 = new User();
     user1.setEmail("homer@simpson.de");
     user1.setFirstname("Homer");

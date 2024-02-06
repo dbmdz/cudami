@@ -5,7 +5,6 @@ import de.digitalcollections.cudami.server.backend.api.repository.exceptions.Rep
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.EntityRepository;
 import de.digitalcollections.cudami.server.business.api.service.LocaleService;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
-import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifierService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.alias.UrlAliasService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.EntityService;
@@ -14,6 +13,7 @@ import de.digitalcollections.cudami.server.config.HookProperties;
 import de.digitalcollections.model.identifiable.IdentifiableObjectType;
 import de.digitalcollections.model.identifiable.entity.Entity;
 import de.digitalcollections.model.identifiable.resource.FileResource;
+import de.digitalcollections.model.validation.ValidationException;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -54,7 +54,7 @@ public class EntityServiceImpl<E extends Entity>
   @Override
   public void addRelatedFileresource(E entity, FileResource fileResource) throws ServiceException {
     try {
-      ((EntityRepository<E>) repository).addRelatedFileresource(entity, fileResource);
+      repository.addRelatedFileresource(entity, fileResource);
     } catch (RepositoryException e) {
       throw new ServiceException("Backend failure", e);
     }
@@ -79,7 +79,7 @@ public class EntityServiceImpl<E extends Entity>
   @Override
   public E getByRefId(long refId) throws ServiceException {
     try {
-      return ((EntityRepository<E>) repository).getByRefId(refId);
+      return repository.getByRefId(refId);
     } catch (RepositoryException e) {
       throw new ServiceException("Backend failure", e);
     }
@@ -91,8 +91,7 @@ public class EntityServiceImpl<E extends Entity>
       super.save(entity);
       sendNotification("save", "POST", entity.getUuid(), entity.getIdentifiableObjectType());
     } catch (ServiceException e) {
-      LOGGER.error("Cannot save entity " + entity + ": ", e);
-      throw e;
+      throw new ServiceException("Cannot save entity %s: %s".formatted(entity, e.getMessage()), e);
     }
   }
 
@@ -136,8 +135,8 @@ public class EntityServiceImpl<E extends Entity>
       super.update(entity);
       sendNotification("update", "PUT", entity.getUuid(), entity.getIdentifiableObjectType());
     } catch (ServiceException e) {
-      LOGGER.error("Cannot update identifiable " + entity + ": ", e);
-      throw e;
+      throw new ServiceException(
+          "Cannot update identifiable %s: %s".formatted(entity, e.getMessage()), e);
     }
   }
 }

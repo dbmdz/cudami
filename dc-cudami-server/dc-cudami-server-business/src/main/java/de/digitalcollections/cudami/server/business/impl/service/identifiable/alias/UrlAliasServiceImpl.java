@@ -8,7 +8,6 @@ import de.digitalcollections.cudami.server.backend.api.repository.identifiable.a
 import de.digitalcollections.cudami.server.business.api.service.LocaleService;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ConflictException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
-import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.alias.UrlAliasService;
 import de.digitalcollections.cudami.server.business.impl.service.UniqueObjectServiceImpl;
 import de.digitalcollections.model.identifiable.Identifiable;
@@ -18,6 +17,7 @@ import de.digitalcollections.model.identifiable.entity.Website;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.util.SlugGenerator;
+import de.digitalcollections.model.validation.ValidationException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;

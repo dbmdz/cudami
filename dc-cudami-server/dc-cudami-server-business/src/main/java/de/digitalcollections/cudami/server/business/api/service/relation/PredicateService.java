@@ -2,8 +2,8 @@ package de.digitalcollections.cudami.server.business.api.service.relation;
 
 import de.digitalcollections.cudami.server.business.api.service.UniqueObjectService;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
-import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.model.relation.Predicate;
+import de.digitalcollections.model.validation.ValidationException;
 import java.util.List;
 import java.util.Locale;
 

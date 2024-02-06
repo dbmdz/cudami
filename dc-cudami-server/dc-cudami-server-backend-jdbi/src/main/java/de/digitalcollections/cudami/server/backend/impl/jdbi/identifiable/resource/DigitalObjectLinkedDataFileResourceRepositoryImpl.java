@@ -7,6 +7,7 @@ import de.digitalcollections.cudami.server.backend.impl.jdbi.JdbiRepositoryImpl;
 import de.digitalcollections.model.identifiable.resource.LinkedDataFileResource;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
+import de.digitalcollections.model.validation.ValidationException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -116,7 +117,7 @@ public class DigitalObjectLinkedDataFileResourceRepositoryImpl extends JdbiRepos
   @Override
   public void setLinkedDataFileResources(
       UUID digitalObjectUuid, List<LinkedDataFileResource> linkedDataFileResources)
-      throws RepositoryException {
+      throws RepositoryException, ValidationException {
     // as we store the whole list new: delete old entries
     dbi.withHandle(
         h ->

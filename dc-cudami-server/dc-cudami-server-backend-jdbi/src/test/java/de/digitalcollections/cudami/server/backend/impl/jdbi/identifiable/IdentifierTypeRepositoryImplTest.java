@@ -9,6 +9,7 @@ import de.digitalcollections.model.list.filtering.FilterCriterion;
 import de.digitalcollections.model.list.filtering.Filtering;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
+import de.digitalcollections.model.validation.ValidationException;
 import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
@@ -39,7 +40,7 @@ class IdentifierTypeRepositoryImplTest extends AbstractRepositoryImplTest {
 
   @Test
   @DisplayName("can save a new identifier type")
-  void saveNewIdentifierType() throws RepositoryException {
+  void saveNewIdentifierType() throws RepositoryException, ValidationException {
     IdentifierType actual = new IdentifierType();
     actual.setLabel("type-label");
     actual.setNamespace("type-namespace-" + System.currentTimeMillis()); // Namespace is PK
@@ -57,7 +58,7 @@ class IdentifierTypeRepositoryImplTest extends AbstractRepositoryImplTest {
 
   @Test
   @DisplayName("can retrieve an identifier type by uuid")
-  void getByUuid() throws RepositoryException {
+  void getByUuid() throws RepositoryException, ValidationException {
     IdentifierType actual = new IdentifierType();
     actual.setLabel("type-label");
     actual.setNamespace("type-namespace-" + System.currentTimeMillis());
@@ -77,7 +78,7 @@ class IdentifierTypeRepositoryImplTest extends AbstractRepositoryImplTest {
 
   @Test
   @DisplayName("returns null when no identifier type by uuid was found")
-  void getByUuidNotFound() throws RepositoryException {
+  void getByUuidNotFound() throws RepositoryException, ValidationException {
     IdentifierType expected = new IdentifierType();
     expected.setLabel("type-label");
     expected.setNamespace("type-namespace-" + System.currentTimeMillis());
@@ -90,7 +91,7 @@ class IdentifierTypeRepositoryImplTest extends AbstractRepositoryImplTest {
 
   @Test
   @DisplayName("can retrieve an identifier type by namespace")
-  void getByNamespace() throws RepositoryException {
+  void getByNamespace() throws RepositoryException, ValidationException {
     String namespace = "type-namespace-" + System.currentTimeMillis();
 
     IdentifierType expected = new IdentifierType();
@@ -109,7 +110,7 @@ class IdentifierTypeRepositoryImplTest extends AbstractRepositoryImplTest {
 
   @Test
   @DisplayName("returns null with no identifier type by namespace was found")
-  void getByNamespaceNotFound() throws RepositoryException {
+  void getByNamespaceNotFound() throws RepositoryException, ValidationException {
     IdentifierType expected = new IdentifierType();
     expected.setLabel("type-label");
     expected.setNamespace("type-namespace-" + System.currentTimeMillis());
@@ -122,7 +123,7 @@ class IdentifierTypeRepositoryImplTest extends AbstractRepositoryImplTest {
 
   @Test
   @DisplayName("can update an identifier type")
-  void update() throws RepositoryException {
+  void update() throws RepositoryException, ValidationException {
     IdentifierType initial = new IdentifierType();
     initial.setLabel("type-label");
     initial.setNamespace("type-namespace-" + System.currentTimeMillis());
@@ -143,7 +144,7 @@ class IdentifierTypeRepositoryImplTest extends AbstractRepositoryImplTest {
 
   @Test
   @DisplayName("can delete an identifier type")
-  void delete() throws RepositoryException {
+  void delete() throws RepositoryException, ValidationException {
     IdentifierType initial = new IdentifierType();
     initial.setLabel("type-label");
     initial.setNamespace("type-namespace-" + System.currentTimeMillis());
@@ -163,7 +164,7 @@ class IdentifierTypeRepositoryImplTest extends AbstractRepositoryImplTest {
 
   @Test
   @DisplayName("can find identifier types")
-  void find() throws RepositoryException {
+  void find() throws RepositoryException, ValidationException {
     // Insert two identifier types
     String namespace1 = "type-namespace-" + System.currentTimeMillis();
     String namespace2 = "type-namespace-" + (System.currentTimeMillis() + 1);

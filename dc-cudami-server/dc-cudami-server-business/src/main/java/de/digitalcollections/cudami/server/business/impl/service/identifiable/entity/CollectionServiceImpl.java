@@ -8,7 +8,6 @@ import de.digitalcollections.cudami.server.business.api.service.LocaleService;
 import de.digitalcollections.cudami.server.business.api.service.content.ManagedContentService;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ConflictException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
-import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifierService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.alias.UrlAliasService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.CollectionService;
@@ -19,6 +18,7 @@ import de.digitalcollections.model.identifiable.entity.digitalobject.DigitalObje
 import de.digitalcollections.model.list.filtering.Filtering;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
+import de.digitalcollections.model.validation.ValidationException;
 import de.digitalcollections.model.view.BreadcrumbNavigation;
 import java.util.List;
 import java.util.Locale;
@@ -350,8 +350,8 @@ public class CollectionServiceImpl extends EntityServiceImpl<Collection>
       setPublicationStatus(collection);
       return collection;
     } catch (Exception e) {
-      LOGGER.error("Cannot save collection " + child + ": ", e);
-      throw new ServiceException(e.getMessage());
+      throw new ServiceException(
+          "Cannot save collection %s: %s".formatted(child, e.getMessage()), e);
     }
   }
 

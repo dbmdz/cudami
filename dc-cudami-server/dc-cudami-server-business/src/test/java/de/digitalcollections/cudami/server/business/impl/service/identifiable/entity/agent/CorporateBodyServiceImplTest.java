@@ -13,7 +13,6 @@ import de.digitalcollections.cudami.server.backend.api.repository.identifiable.e
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.agent.ExternalCorporateBodyRepository;
 import de.digitalcollections.cudami.server.business.api.service.LocaleService;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
-import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifierService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.alias.UrlAliasService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.resource.ImageFileResourceService;
@@ -21,6 +20,7 @@ import de.digitalcollections.cudami.server.business.impl.service.AbstractService
 import de.digitalcollections.cudami.server.config.HookProperties;
 import de.digitalcollections.model.identifiable.entity.agent.CorporateBody;
 import de.digitalcollections.model.identifiable.resource.ImageFileResource;
+import de.digitalcollections.model.validation.ValidationException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import org.junit.jupiter.api.BeforeEach;
@@ -37,6 +37,7 @@ class CorporateBodyServiceImplTest extends AbstractServiceImplTest {
   private IdentifierService identifierService;
   private UrlAliasService urlAliasService;
 
+  @Override
   @BeforeEach
   public void beforeEach() throws Exception {
     super.beforeEach();
@@ -81,7 +82,7 @@ class CorporateBodyServiceImplTest extends AbstractServiceImplTest {
 
   @Test
   @DisplayName("can retrieve and save corporate bodies without preview image")
-  void saveWithoutPreviewImage() throws ServiceException {
+  void saveWithoutPreviewImage() throws ServiceException, ValidationException {
     CorporateBody corporateBodyWithoutPreviewImage = new CorporateBody();
     when(externalCorporateBodyRepository.getByGndId(any(String.class)))
         .thenReturn(corporateBodyWithoutPreviewImage);
@@ -90,7 +91,7 @@ class CorporateBodyServiceImplTest extends AbstractServiceImplTest {
 
   @Test
   @DisplayName("returns null when no corporate body was found")
-  void returnsNullForNullCorporateBody() throws ServiceException {
+  void returnsNullForNullCorporateBody() throws ServiceException, ValidationException {
     when(externalCorporateBodyRepository.getByGndId(any(String.class))).thenReturn(null);
     assertThat(corporateBodyService.fetchAndSaveByGndId("12345")).isNull();
   }

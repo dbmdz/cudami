@@ -11,6 +11,7 @@ import de.digitalcollections.cudami.server.business.api.service.identifiable.ent
 import de.digitalcollections.cudami.server.controller.BaseControllerTest;
 import de.digitalcollections.model.identifiable.Identifier;
 import de.digitalcollections.model.identifiable.entity.agent.CorporateBody;
+import de.digitalcollections.model.validation.ValidationException;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import org.junit.jupiter.api.BeforeEach;
@@ -46,7 +47,8 @@ class CorporateBodyControllerTest extends BaseControllerTest {
         "abcd-e, false",
         "11489308X, true"
       })
-  void gndIdVerification(String gndId, boolean isValue) throws ServiceException {
+  void gndIdVerification(String gndId, boolean isValue)
+      throws ServiceException, ValidationException {
     if (isValue) {
       corporateBodyController.fetchAndSaveByGndId(gndId);
     } else {

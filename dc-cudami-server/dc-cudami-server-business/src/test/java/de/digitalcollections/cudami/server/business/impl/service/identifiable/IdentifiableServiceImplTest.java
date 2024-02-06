@@ -4,14 +4,18 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifiableRepository;
 import de.digitalcollections.cudami.server.business.api.service.LocaleService;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
-import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifierService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.alias.UrlAliasService;
 import de.digitalcollections.cudami.server.business.impl.service.AbstractUniqueObjectServiceImplTest;
@@ -25,8 +29,14 @@ import de.digitalcollections.model.identifiable.entity.agent.Person;
 import de.digitalcollections.model.identifiable.entity.manifestation.Manifestation;
 import de.digitalcollections.model.identifiable.resource.FileResource;
 import de.digitalcollections.model.text.LocalizedText;
+import de.digitalcollections.model.validation.ValidationException;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Locale;
+import java.util.Set;
+import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -123,6 +133,7 @@ class IdentifiableServiceImplTest extends AbstractUniqueObjectServiceImplTest {
     assertThat(actualUrlAliases.get(0).getSlug()).isEqualTo("yu-ji-shan-ren");
   }
 
+  @Override
   @BeforeEach
   public void beforeEach() throws Exception {
     repo = mock(IdentifiableRepository.class);
@@ -280,7 +291,7 @@ class IdentifiableServiceImplTest extends AbstractUniqueObjectServiceImplTest {
 
   @DisplayName("throws an Exception to trigger a rollback on save, when saving in the repo fails")
   @Test
-  public void exceptionOnSaveWhenRepoFails() throws RepositoryException {
+  public void exceptionOnSaveWhenRepoFails() throws RepositoryException, ValidationException {
     doThrow(RepositoryException.class).when(repo).save(any(Identifiable.class));
 
     Identifiable identifiable = createIdentifiable();
@@ -316,7 +327,7 @@ class IdentifiableServiceImplTest extends AbstractUniqueObjectServiceImplTest {
   @DisplayName(
       "throws an Exception to trigger a rollback on update, when updating in the repo fails")
   @Test
-  public void exceptionOnUpdateWhenRepoFails() throws RepositoryException {
+  public void exceptionOnUpdateWhenRepoFails() throws RepositoryException, ValidationException {
     doThrow(NullPointerException.class).when(repo).update(any(Identifiable.class));
 
     Identifiable identifiable = Identifiable.builder().label("label").build();

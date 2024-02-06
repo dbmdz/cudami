@@ -1,11 +1,11 @@
 package de.digitalcollections.cudami.server.controller.identifiable.resource;
 
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
-import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.resource.FileResourceBinaryService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.resource.FileResourceMetadataService;
 import de.digitalcollections.model.file.MimeType;
 import de.digitalcollections.model.identifiable.resource.FileResource;
+import de.digitalcollections.model.validation.ValidationException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.io.IOException;

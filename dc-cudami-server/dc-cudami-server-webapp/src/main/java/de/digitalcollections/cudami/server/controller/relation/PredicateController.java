@@ -26,7 +26,14 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @Tag(name = "Predicate controller")
@@ -38,6 +45,7 @@ public class PredicateController extends AbstractUniqueObjectController<Predicat
     this.service = predicateService;
   }
 
+  @Override
   @DeleteMapping(value = {"/v6/predicates/{uuid:" + ParameterHelper.UUID_PATTERN + "}"})
   public ResponseEntity delete(
       @Parameter(
@@ -50,6 +58,7 @@ public class PredicateController extends AbstractUniqueObjectController<Predicat
     return super.delete(uuid);
   }
 
+  @Override
   @Operation(summary = "Get all predicates as (paged, sorted, filtered) list")
   @GetMapping(
       value = {"/v6/predicates"},
@@ -99,9 +108,7 @@ public class PredicateController extends AbstractUniqueObjectController<Predicat
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Predicate saveWithValidation(
       @Valid @RequestBody Predicate predicate, BindingResult bindingResult)
-      throws ServiceException,
-          ValidationException,
-          de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException {
+      throws ServiceException, ValidationException {
     if (bindingResult.hasErrors()) {
       ValidationException validationException = new ValidationException("validation error");
       bindingResult
@@ -132,8 +139,7 @@ public class PredicateController extends AbstractUniqueObjectController<Predicat
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Predicate update(
       @PathVariable("valueOrUuid") String valueOrUuid, @NotNull @RequestBody Predicate predicate)
-      throws ServiceException,
-          de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException {
+      throws ServiceException, ValidationException {
 
     if (valueOrUuid.matches(ParameterHelper.UUID_PATTERN)) {
       UUID uuid = UUID.fromString(valueOrUuid);

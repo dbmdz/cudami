@@ -3,13 +3,14 @@ package de.digitalcollections.cudami.server.business.impl.service.identifiable.e
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.EventRepository;
 import de.digitalcollections.cudami.server.business.api.service.LocaleService;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
-import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifierService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.alias.UrlAliasService;
 import de.digitalcollections.cudami.server.business.impl.service.AbstractServiceImplTest;
@@ -17,6 +18,7 @@ import de.digitalcollections.cudami.server.config.HookProperties;
 import de.digitalcollections.model.identifiable.Identifier;
 import de.digitalcollections.model.identifiable.entity.Event;
 import de.digitalcollections.model.text.LocalizedText;
+import de.digitalcollections.model.validation.ValidationException;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;

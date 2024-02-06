@@ -3,12 +3,12 @@ package de.digitalcollections.cudami.server.business.impl.service.identifiable.r
 import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.resource.FileResourceBinaryRepository;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
-import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.resource.FileResourceBinaryService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.resource.FileResourceMetadataService;
 import de.digitalcollections.model.exception.ResourceNotFoundException;
 import de.digitalcollections.model.file.MimeType;
 import de.digitalcollections.model.identifiable.resource.FileResource;
+import de.digitalcollections.model.validation.ValidationException;
 import java.io.InputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -90,8 +90,9 @@ public class FileResourceBinaryServiceImpl implements FileResourceBinaryService 
       binaryRepository.save(fileResource, binaryData);
       metadataService.save(fileResource);
     } catch (RepositoryException e) {
-      LOGGER.error("Cannot save fileResource " + fileResource.getFilename() + ": ", e);
-      throw new ServiceException(e.getMessage());
+      throw new ServiceException(
+          "Cannot save fileResource %s: %s".formatted(fileResource.getFilename(), e.getMessage()),
+          e);
     }
   }
 }

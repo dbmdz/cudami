@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.util.StringUtils;
 import org.springframework.web.HttpMediaTypeNotAcceptableException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -41,9 +42,10 @@ public class ExceptionAdvice {
 
   @ExceptionHandler(ValidationException.class)
   public ResponseEntity<Object> handleValidationException(ValidationException exception) {
-    Map<String, Object> body = new LinkedHashMap<>(2);
+    Map<String, Object> body = new LinkedHashMap<>(3);
     body.put("timestamp", new Date());
     body.put("errors", exception.getErrors());
+    if (StringUtils.hasText(exception.getMessage())) body.put("message", exception.getMessage());
 
     return new ResponseEntity<>(body, HttpStatus.UNPROCESSABLE_ENTITY);
   }

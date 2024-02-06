@@ -9,6 +9,7 @@ import de.digitalcollections.model.identifiable.resource.FileResource;
 import de.digitalcollections.model.identifiable.resource.ImageFileResource;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
+import de.digitalcollections.model.validation.ValidationException;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
@@ -143,7 +144,8 @@ public interface DigitalObjectRepository extends EntityRepository<DigitalObject>
   List<Locale> getLanguagesOfProjects(UUID uuid) throws RepositoryException;
 
   default List<FileResource> setFileResources(
-      DigitalObject digitalObject, List<FileResource> fileResources) throws RepositoryException {
+      DigitalObject digitalObject, List<FileResource> fileResources)
+      throws RepositoryException, ValidationException {
     if (digitalObject == null || fileResources == null) {
       throw new IllegalArgumentException("set failed: given objects must not be null");
     }
@@ -151,5 +153,5 @@ public interface DigitalObjectRepository extends EntityRepository<DigitalObject>
   }
 
   List<FileResource> setFileResources(UUID digitalObjectUuid, List<FileResource> fileResources)
-      throws RepositoryException;
+      throws RepositoryException, ValidationException;
 }

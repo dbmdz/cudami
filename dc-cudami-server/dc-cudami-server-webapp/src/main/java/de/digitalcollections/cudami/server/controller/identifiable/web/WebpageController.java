@@ -2,7 +2,6 @@ package de.digitalcollections.cudami.server.controller.identifiable.web;
 
 import de.digitalcollections.cudami.server.business.api.service.LocaleService;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
-import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifiableService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.web.WebpageService;
 import de.digitalcollections.cudami.server.controller.ParameterHelper;
@@ -15,6 +14,7 @@ import de.digitalcollections.model.list.filtering.Filtering;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.list.sorting.Order;
+import de.digitalcollections.model.validation.ValidationException;
 import de.digitalcollections.model.view.BreadcrumbNavigation;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -26,7 +26,14 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @Tag(name = "Webpage controller")
@@ -63,6 +70,7 @@ public class WebpageController extends AbstractIdentifiableController<Webpage> {
         buildExampleWithUuid(uuid), FileResource.builder().uuid(fileResourceUuid).build());
   }
 
+  @Override
   @Operation(summary = "Get all webpages as (paged, sorted, filtered) list")
   @GetMapping(
       value = {"/v6/webpages"},
@@ -319,11 +327,12 @@ public class WebpageController extends AbstractIdentifiableController<Webpage> {
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Webpage saveWithParentWebsite(
       @PathVariable UUID parentWebsiteUuid, @RequestBody Webpage webpage, BindingResult errors)
-      throws ServiceException {
+      throws ServiceException, ValidationException {
     return service.saveWithParentWebsite(
         webpage, Website.builder().uuid(parentWebsiteUuid).build());
   }
 
+  @Override
   @Operation(summary = "Update a webpage")
   @PutMapping(
       value = {

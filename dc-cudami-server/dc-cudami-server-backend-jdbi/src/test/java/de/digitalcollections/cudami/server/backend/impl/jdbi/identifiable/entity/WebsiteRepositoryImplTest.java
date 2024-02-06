@@ -12,6 +12,7 @@ import de.digitalcollections.model.identifiable.web.Webpage;
 import de.digitalcollections.model.text.LocalizedStructuredContent;
 import de.digitalcollections.model.text.StructuredContent;
 import de.digitalcollections.model.text.contentblock.Text;
+import de.digitalcollections.model.validation.ValidationException;
 import java.util.List;
 import java.util.Locale;
 import org.assertj.core.api.Assertions;
@@ -41,7 +42,7 @@ class WebsiteRepositoryImplTest
 
   @Test
   @DisplayName("can save a website")
-  void saveWebsite() throws RepositoryException {
+  void saveWebsite() throws RepositoryException, ValidationException {
     Webpage webpage = Webpage.builder().label("webpage").build();
     webpageRepository.save(webpage);
     Website website =
@@ -64,7 +65,7 @@ class WebsiteRepositoryImplTest
 
   @Test
   @DisplayName("can update a website")
-  void testUpdate() throws RepositoryException {
+  void testUpdate() throws RepositoryException, ValidationException {
     Webpage webpage1 = Webpage.builder().label("webpage1").build();
     webpageRepository.save(webpage1);
     Webpage webpage2 = Webpage.builder().label("webpage2").build();
@@ -100,7 +101,7 @@ class WebsiteRepositoryImplTest
 
   @Test
   @DisplayName("save a website with notes")
-  void saveWebsiteWithNotes() throws RepositoryException {
+  void saveWebsiteWithNotes() throws RepositoryException, ValidationException {
     var noteContent1 = new StructuredContent();
     noteContent1.addContentBlock(new Text("eine Bemerkung"));
     LocalizedStructuredContent note1 = new LocalizedStructuredContent();

@@ -273,8 +273,7 @@ public class TopicServiceImpl extends EntityServiceImpl<Topic> implements TopicS
       Topic topic = ((TopicRepository) repository).saveParentRelation(child, parent);
       return topic;
     } catch (Exception e) {
-      LOGGER.error("Cannot save topic " + child + ": ", e);
-      throw new ServiceException(e.getMessage());
+      throw new ServiceException("Cannot save topic %s: %s".formatted(child, e.getMessage()), e);
     }
   }
 

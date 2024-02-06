@@ -7,6 +7,7 @@ import de.digitalcollections.cudami.server.business.api.service.identifiable.res
 import de.digitalcollections.cudami.server.business.api.service.identifiable.resource.LinkedDataFileResourceService;
 import de.digitalcollections.model.identifiable.entity.digitalobject.DigitalObject;
 import de.digitalcollections.model.identifiable.resource.LinkedDataFileResource;
+import de.digitalcollections.model.validation.ValidationException;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -79,7 +80,7 @@ public class DigitalObjectLinkedDataFileResourceServiceImpl
   @Override
   public void setLinkedDataFileResources(
       DigitalObject digitalObject, List<LinkedDataFileResource> linkedDataFileResources)
-      throws ServiceException {
+      throws ServiceException, ValidationException {
     try {
       repository.setLinkedDataFileResources(digitalObject, linkedDataFileResources);
     } catch (RepositoryException e) {

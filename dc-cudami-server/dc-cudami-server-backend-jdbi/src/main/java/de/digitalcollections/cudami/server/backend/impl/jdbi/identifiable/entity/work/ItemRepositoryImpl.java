@@ -18,6 +18,7 @@ import de.digitalcollections.model.identifiable.entity.manifestation.Manifestati
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.text.LocalizedText;
+import de.digitalcollections.model.validation.ValidationException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -294,14 +295,14 @@ public class ItemRepositoryImpl extends EntityRepositoryImpl<Item> implements It
   }
 
   @Override
-  public void save(Item item) throws RepositoryException {
+  public void save(Item item) throws RepositoryException, ValidationException {
     HashMap<String, Object> bindings = new HashMap<>();
     bindings.put("holder_uuids", extractUuids(item.getHolders()));
     super.save(item, bindings);
   }
 
   @Override
-  public void update(Item item) throws RepositoryException {
+  public void update(Item item) throws RepositoryException, ValidationException {
     HashMap<String, Object> bindings = new HashMap<>();
     bindings.put("holder_uuids", extractUuids(item.getHolders()));
     super.update(item, bindings);

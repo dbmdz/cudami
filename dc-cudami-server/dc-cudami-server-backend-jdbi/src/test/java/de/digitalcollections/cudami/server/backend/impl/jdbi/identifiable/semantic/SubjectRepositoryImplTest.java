@@ -15,6 +15,7 @@ import de.digitalcollections.model.list.sorting.Direction;
 import de.digitalcollections.model.list.sorting.Order;
 import de.digitalcollections.model.list.sorting.Sorting;
 import de.digitalcollections.model.text.LocalizedText;
+import de.digitalcollections.model.validation.ValidationException;
 import java.util.Locale;
 import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
@@ -41,7 +42,7 @@ class SubjectRepositoryImplTest extends AbstractRepositoryImplTest {
 
   @DisplayName("can save and retrieve by uuid")
   @Test
-  void saveAndRetrieveByUuid() throws RepositoryException {
+  void saveAndRetrieveByUuid() throws RepositoryException, ValidationException {
     final LocalizedText label = new LocalizedText(Locale.GERMAN, "Test");
     final Identifier identifier1 = Identifier.builder().namespace("name,space1").id("id1").build();
     final Identifier identifier2 = Identifier.builder().namespace("namespace2").id("id2").build();
@@ -68,7 +69,7 @@ class SubjectRepositoryImplTest extends AbstractRepositoryImplTest {
 
   @DisplayName("can save and successfully delete")
   @Test
-  void saveAndDelete() throws RepositoryException {
+  void saveAndDelete() throws RepositoryException, ValidationException {
     Subject savedSubject =
         ensureSavedSubject(Locale.GERMAN, "Test", "sbject-namespace", "subject-id2", "type");
     boolean success = repo.deleteByUuid(savedSubject.getUuid());
@@ -83,7 +84,7 @@ class SubjectRepositoryImplTest extends AbstractRepositoryImplTest {
 
   @DisplayName("can save and update")
   @Test
-  void saveAndUpdate() throws RepositoryException {
+  void saveAndUpdate() throws RepositoryException, ValidationException {
     Subject subject =
         ensureSavedSubject(Locale.GERMAN, "Test", "subject-namespace", "subject-id3", "type");
     Identifier savedSubjectIdentifier = subject.getIdentifiers().stream().findFirst().orElse(null);
@@ -106,7 +107,7 @@ class SubjectRepositoryImplTest extends AbstractRepositoryImplTest {
 
   @DisplayName("can retrieve all subjects with paging")
   @Test
-  void findAllPaged() throws RepositoryException {
+  void findAllPaged() throws RepositoryException, ValidationException {
     Subject savedSubject =
         ensureSavedSubject(Locale.GERMAN, "Test", "subject-namespace", "subject-id4", "type");
 
@@ -117,7 +118,7 @@ class SubjectRepositoryImplTest extends AbstractRepositoryImplTest {
 
   @DisplayName("can retrieve all subjects with sorting")
   @Test
-  void findAllPagedAndSorted() throws RepositoryException {
+  void findAllPagedAndSorted() throws RepositoryException, ValidationException {
     Subject savedSubject1 =
         ensureSavedSubject(Locale.GERMAN, "Test", "subject-namespace", "subject-id5b", "type-b");
     Subject savedSubject2 =
@@ -142,7 +143,7 @@ class SubjectRepositoryImplTest extends AbstractRepositoryImplTest {
 
   @DisplayName("can retrieve subjects with filtering")
   @Test
-  void findFiltered() throws RepositoryException {
+  void findFiltered() throws RepositoryException, ValidationException {
     Subject savedSubject =
         ensureSavedSubject(Locale.GERMAN, "Test", "subject-namespace", "subject-id6", "type");
 
@@ -175,7 +176,7 @@ class SubjectRepositoryImplTest extends AbstractRepositoryImplTest {
 
   @DisplayName("can return an empty filtered set when no matches are found")
   @Test
-  void noMatches() throws RepositoryException {
+  void noMatches() throws RepositoryException, ValidationException {
     Subject savedSubject =
         ensureSavedSubject(Locale.GERMAN, "Test", "subject-namespace", "subject-id7", "type");
 
@@ -203,7 +204,7 @@ class SubjectRepositoryImplTest extends AbstractRepositoryImplTest {
 
   @DisplayName("can return by type, namespace and id")
   @Test
-  void getByTypeAndIdentifier() throws RepositoryException {
+  void getByTypeAndIdentifier() throws RepositoryException, ValidationException {
     Subject savedSubject =
         ensureSavedSubject(null, null, "subject-namespace", "subject-id8", "type");
 
@@ -213,7 +214,7 @@ class SubjectRepositoryImplTest extends AbstractRepositoryImplTest {
 
   @DisplayName("can find 'like' by label")
   @Test
-  void findByLabel() throws RepositoryException {
+  void findByLabel() throws RepositoryException, ValidationException {
     Subject savedSubject =
         ensureSavedSubject(Locale.forLanguageTag("und-Latn"), "Testsubject1", null, null, "type");
     ensureSavedSubject(Locale.GERMAN, "Testsubject2", null, null, "type");
@@ -238,7 +239,7 @@ class SubjectRepositoryImplTest extends AbstractRepositoryImplTest {
 
   @DisplayName("can find exact by label")
   @Test
-  void findExactByLabel() throws RepositoryException {
+  void findExactByLabel() throws RepositoryException, ValidationException {
     Subject savedSubject =
         ensureSavedSubject(Locale.forLanguageTag("und-Latn"), "Karl Ranseier", null, null, "type");
     ensureSavedSubject(Locale.forLanguageTag("und-Latn"), "Hans Dampf", null, null, "type");
@@ -265,7 +266,7 @@ class SubjectRepositoryImplTest extends AbstractRepositoryImplTest {
 
   private Subject ensureSavedSubject(
       Locale labelLocale, String labelText, String namespace, String id, String type)
-      throws RepositoryException {
+      throws RepositoryException, ValidationException {
     Subject subject =
         Subject.builder()
             .label(

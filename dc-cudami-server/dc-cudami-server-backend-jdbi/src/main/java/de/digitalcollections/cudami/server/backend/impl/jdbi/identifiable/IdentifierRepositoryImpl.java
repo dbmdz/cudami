@@ -6,6 +6,7 @@ import de.digitalcollections.cudami.server.backend.api.repository.identifiable.I
 import de.digitalcollections.cudami.server.backend.impl.jdbi.UniqueObjectRepositoryImpl;
 import de.digitalcollections.model.identifiable.Identifiable;
 import de.digitalcollections.model.identifiable.Identifier;
+import de.digitalcollections.model.validation.ValidationException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -144,7 +145,7 @@ public class IdentifierRepositoryImpl extends UniqueObjectRepositoryImpl<Identif
 
   @Override
   public Set<Identifier> saveForIdentifiable(Identifiable identifiable, Set<Identifier> identifiers)
-      throws RepositoryException {
+      throws RepositoryException, ValidationException {
     if (identifiers == null) {
       return new HashSet<>(0);
     }

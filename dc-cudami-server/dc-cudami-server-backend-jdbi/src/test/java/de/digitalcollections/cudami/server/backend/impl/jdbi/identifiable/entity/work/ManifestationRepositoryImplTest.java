@@ -42,6 +42,7 @@ import de.digitalcollections.model.text.Title;
 import de.digitalcollections.model.text.TitleType;
 import de.digitalcollections.model.text.contentblock.Text;
 import de.digitalcollections.model.time.LocalDateRange;
+import de.digitalcollections.model.validation.ValidationException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -96,7 +97,7 @@ class ManifestationRepositoryImplTest
 
   @Test
   @DisplayName("1.0. Save a manifestation with parent")
-  void testSaveManifestation() throws RepositoryException {
+  void testSaveManifestation() throws RepositoryException, ValidationException {
     // agents for relations
     CorporateBody editor =
         CorporateBody.builder()
@@ -194,7 +195,7 @@ class ManifestationRepositoryImplTest
 
   @Test
   @DisplayName("1.1. Update a manifestation")
-  void testUpdateManifestation() throws RepositoryException {
+  void testUpdateManifestation() throws RepositoryException, ValidationException {
     Subject subject = ensurePersistedSubject();
     Manifestation parent = ensurePersistedParentManifestation();
     List<Title> titles = prepareTitles();
@@ -225,7 +226,7 @@ class ManifestationRepositoryImplTest
 
   @Test
   @DisplayName("2.0. Find any manifestation")
-  void testFind() throws RepositoryException {
+  void testFind() throws RepositoryException, ValidationException {
     Subject subject = ensurePersistedSubject();
     Manifestation parent = ensurePersistedParentManifestation();
     List<Title> titles = prepareTitles();
@@ -241,7 +242,7 @@ class ManifestationRepositoryImplTest
 
   @Test
   @DisplayName("can find children")
-  public void findChildren() throws RepositoryException {
+  public void findChildren() throws RepositoryException, ValidationException {
     Manifestation parent =
         Manifestation.builder()
             .label(Locale.GERMAN, "Parent")
@@ -294,7 +295,7 @@ class ManifestationRepositoryImplTest
 
   @Test
   @DisplayName("can return the languages of manifestations for a work")
-  public void languagesForManifestationsOfWork() throws RepositoryException {
+  public void languagesForManifestationsOfWork() throws RepositoryException, ValidationException {
     Work work = Work.builder().label(Locale.GERMAN, "Werk").build();
     workRepository.save(work);
     LocalizedText labelText = new LocalizedText();
@@ -314,7 +315,7 @@ class ManifestationRepositoryImplTest
 
   @Test
   @DisplayName("can find manifestations for a work")
-  public void findManifestationsForWork() throws RepositoryException {
+  public void findManifestationsForWork() throws RepositoryException, ValidationException {
     Work work = Work.builder().label(Locale.GERMAN, "Werk").build();
     workRepository.save(work);
 
@@ -362,7 +363,7 @@ class ManifestationRepositoryImplTest
 
   @DisplayName("can remove a parent manifestation from a manifestation")
   @Test
-  public void removeParentManifestation() throws RepositoryException {
+  public void removeParentManifestation() throws RepositoryException, ValidationException {
     Manifestation parent =
         Manifestation.builder()
             .label(Locale.GERMAN, "Parent")
@@ -401,7 +402,8 @@ class ManifestationRepositoryImplTest
   }
 
   // -------------------------------------------------------------------
-  private Manifestation ensurePersistedParentManifestation() throws RepositoryException {
+  private Manifestation ensurePersistedParentManifestation()
+      throws RepositoryException, ValidationException {
     var noteText = new StructuredContent();
     noteText.addContentBlock(new Text("some notes"));
     var note = new LocalizedStructuredContent();
@@ -427,7 +429,8 @@ class ManifestationRepositoryImplTest
   }
 
   private Manifestation prepareManifestation(
-      Subject subject, Manifestation parent, List<Title> titles) throws RepositoryException {
+      Subject subject, Manifestation parent, List<Title> titles)
+      throws RepositoryException, ValidationException {
     CorporateBody publisherAgent =
         CorporateBody.builder()
             .name(new LocalizedText(Locale.ENGLISH, "Publisher"))
@@ -490,7 +493,7 @@ class ManifestationRepositoryImplTest
     return manifestation;
   }
 
-  private Subject ensurePersistedSubject() throws RepositoryException {
+  private Subject ensurePersistedSubject() throws RepositoryException, ValidationException {
     Subject subject =
         Subject.builder()
             .label(new LocalizedText(Locale.ENGLISH, "My subject"))

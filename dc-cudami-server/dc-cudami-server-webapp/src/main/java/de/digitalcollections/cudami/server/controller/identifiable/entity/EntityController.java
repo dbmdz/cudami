@@ -1,7 +1,6 @@
 package de.digitalcollections.cudami.server.controller.identifiable.entity;
 
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
-import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.EntityService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.relation.EntityToEntityRelationService;
 import de.digitalcollections.cudami.server.controller.AbstractEntityController;
@@ -14,6 +13,7 @@ import de.digitalcollections.model.list.filtering.Filtering;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.list.sorting.Order;
+import de.digitalcollections.model.validation.ValidationException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;

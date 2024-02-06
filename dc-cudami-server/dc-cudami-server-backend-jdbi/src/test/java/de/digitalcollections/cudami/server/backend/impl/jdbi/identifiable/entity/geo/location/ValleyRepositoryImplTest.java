@@ -6,6 +6,7 @@ import de.digitalcollections.cudami.server.backend.api.repository.identifiable.a
 import de.digitalcollections.cudami.server.backend.impl.jdbi.AbstractIdentifiableRepositoryImplTest;
 import de.digitalcollections.model.geo.CoordinateLocation;
 import de.digitalcollections.model.identifiable.entity.geo.location.Valley;
+import de.digitalcollections.model.validation.ValidationException;
 import java.util.function.Function;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -30,7 +31,7 @@ class ValleyRepositoryImplTest
 
   @Test
   @DisplayName("can save (create) a valley")
-  void testSave() throws RepositoryException {
+  void testSave() throws RepositoryException, ValidationException {
     Valley geolocation =
         Valley.builder()
             .label("Test")
@@ -42,7 +43,7 @@ class ValleyRepositoryImplTest
 
   @Test
   @DisplayName("can update a valley")
-  void testUpdate() throws RepositoryException {
+  void testUpdate() throws RepositoryException, ValidationException {
     Valley geolocation =
         Valley.builder()
             .label("Test")

@@ -6,6 +6,7 @@ import de.digitalcollections.cudami.server.backend.api.repository.identifiable.a
 import de.digitalcollections.cudami.server.backend.impl.jdbi.AbstractIdentifiableRepositoryImplTest;
 import de.digitalcollections.model.geo.CoordinateLocation;
 import de.digitalcollections.model.identifiable.entity.geo.location.Continent;
+import de.digitalcollections.model.validation.ValidationException;
 import java.util.function.Function;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -31,7 +32,7 @@ class ContinentRepositoryImplTest
 
   @Test
   @DisplayName("can save (create) a continent")
-  void testSave() throws RepositoryException {
+  void testSave() throws RepositoryException, ValidationException {
     Continent geolocation =
         Continent.builder()
             .label("Test")
@@ -43,7 +44,7 @@ class ContinentRepositoryImplTest
 
   @Test
   @DisplayName("can update a continent")
-  void testUpdate() throws RepositoryException {
+  void testUpdate() throws RepositoryException, ValidationException {
     Continent geolocation =
         Continent.builder()
             .label("Test")

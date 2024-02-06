@@ -24,6 +24,7 @@ import de.digitalcollections.model.text.LocalizedStructuredContent;
 import de.digitalcollections.model.text.LocalizedText;
 import de.digitalcollections.model.text.Title;
 import de.digitalcollections.model.time.LocalDateRange;
+import de.digitalcollections.model.validation.ValidationException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -398,7 +399,8 @@ public class WorkRepositoryImpl extends EntityRepositoryImpl<Work> implements Wo
   }
 
   @Override
-  public void save(Work work, Map<String, Object> bindings) throws RepositoryException {
+  public void save(Work work, Map<String, Object> bindings)
+      throws RepositoryException, ValidationException {
     if (bindings == null) {
       bindings = new HashMap<>(3);
     }
@@ -449,7 +451,8 @@ public class WorkRepositoryImpl extends EntityRepositoryImpl<Work> implements Wo
   }
 
   @Override
-  public void update(Work work, Map<String, Object> bindings) throws RepositoryException {
+  public void update(Work work, Map<String, Object> bindings)
+      throws RepositoryException, ValidationException {
     if (bindings == null) {
       bindings = new HashMap<>(3);
     }

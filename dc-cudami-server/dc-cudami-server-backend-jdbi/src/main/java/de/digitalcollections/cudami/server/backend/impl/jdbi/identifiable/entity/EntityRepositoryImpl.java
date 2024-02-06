@@ -16,6 +16,7 @@ import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.list.sorting.Direction;
 import de.digitalcollections.model.list.sorting.Order;
 import de.digitalcollections.model.list.sorting.Sorting;
+import de.digitalcollections.model.validation.ValidationException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -295,7 +296,7 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
       E entity,
       Map<String, Object> bindings,
       BiFunction<String, Map<String, Object>, String> sqlModifier)
-      throws RepositoryException {
+      throws RepositoryException, ValidationException {
     if (bindings == null) {
       bindings = new HashMap<>(0);
     }
@@ -337,7 +338,8 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
   }
 
   @Override
-  public void update(E entity, Map<String, Object> bindings) throws RepositoryException {
+  public void update(E entity, Map<String, Object> bindings)
+      throws RepositoryException, ValidationException {
     update(entity, bindings, null);
   }
 
@@ -346,7 +348,7 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
       E entity,
       Map<String, Object> bindings,
       BiFunction<String, Map<String, Object>, String> sqlModifier)
-      throws RepositoryException {
+      throws RepositoryException, ValidationException {
     if (bindings == null) {
       bindings = new HashMap<>(0);
     }

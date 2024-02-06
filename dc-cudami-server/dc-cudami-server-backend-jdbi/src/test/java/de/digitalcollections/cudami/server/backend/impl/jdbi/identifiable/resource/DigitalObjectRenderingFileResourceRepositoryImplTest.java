@@ -10,6 +10,7 @@ import de.digitalcollections.model.file.MimeType;
 import de.digitalcollections.model.identifiable.entity.digitalobject.DigitalObject;
 import de.digitalcollections.model.identifiable.resource.FileResource;
 import de.digitalcollections.model.identifiable.resource.TextFileResource;
+import de.digitalcollections.model.validation.ValidationException;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
@@ -56,7 +57,7 @@ class DigitalObjectRenderingFileResourceRepositoryImplTest {
 
   @DisplayName("can delete a list of RenderingResources by their uuids")
   @Test
-  void delete() throws RepositoryException {
+  void delete() throws RepositoryException, ValidationException {
     // Persist the DigitalObject
     DigitalObject digitalObject =
         DigitalObject.builder()
@@ -95,7 +96,7 @@ class DigitalObjectRenderingFileResourceRepositoryImplTest {
   @DisplayName(
       "can count the number of entries for a provided LinkedDataFileResource uuid when entries exist")
   @Test
-  void countMoreThanZero() throws RepositoryException {
+  void countMoreThanZero() throws RepositoryException, ValidationException {
     // Persist the DigitalObject
     DigitalObject digitalObject =
         DigitalObject.builder()
@@ -134,7 +135,7 @@ class DigitalObjectRenderingFileResourceRepositoryImplTest {
 
   @DisplayName("returns the number of deleted items")
   @Test
-  void deletionReturnsNumberOfDeletedItems() throws RepositoryException {
+  void deletionReturnsNumberOfDeletedItems() throws RepositoryException, ValidationException {
     // Persist the DigitalObject
     DigitalObject digitalObject =
         DigitalObject.builder()

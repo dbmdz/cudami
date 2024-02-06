@@ -10,6 +10,7 @@ import de.digitalcollections.model.list.buckets.Bucket;
 import de.digitalcollections.model.list.buckets.BucketsRequest;
 import de.digitalcollections.model.list.buckets.BucketsResponse;
 import de.digitalcollections.model.semantic.Headword;
+import de.digitalcollections.model.validation.ValidationException;
 import java.util.Locale;
 import org.apache.commons.lang3.StringUtils;
 import org.jdbi.v3.core.Jdbi;
@@ -46,7 +47,7 @@ class HeadwordRepositoryImplTest {
 
   @Test
   @DisplayName("can save and retrieve")
-  void saveHeadword() throws RepositoryException {
+  void saveHeadword() throws RepositoryException, ValidationException {
     Headword headword = new Headword("Eiffelturm", Locale.GERMAN);
     repo.save(headword);
 
@@ -57,7 +58,7 @@ class HeadwordRepositoryImplTest {
 
   @Test
   @DisplayName("get buckets")
-  void findBuckets() throws RepositoryException {
+  void findBuckets() throws RepositoryException, ValidationException {
     // save 100 headwords
     for (int i = 1; i <= 100; i++) {
       Headword headword =
