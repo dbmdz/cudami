@@ -2,27 +2,21 @@
 /.idea
 **/*.iml
 .factorypath
-/dc-cudami-admin/dc-cudami-admin-webapp/nbproject/
-/dc-cudami-admin/dc-cudami-admin-business/nbproject/
 /nb-configuration.xml
 **/nbactions.xml
-build
-dist
-node_modules
-/dc-cudami-editor/nbproject/private/
-/dc-cudami-editor/nbproject/project.xml
-/dc-cudami-editor/nbproject/project.properties
-/dc-cudami-editor/bin
+build/
+dist/
+node_modules/
+/client/nbproject/private/
+/client/nbproject/project.xml
+/client/nbproject/project.properties
+/client/bin/
 **/nbproject/
 application-local.yaml
 application-local.yml
 
-/dc-cudami-client/nb-configuration.xml
 **/.settings
 **/.classpath
 **/.project
 **/.dbeaver
-
-/docker/repository/postgres-initdb.d/**
-!/docker/repository/postgres-initdb.d/*.sh
 
