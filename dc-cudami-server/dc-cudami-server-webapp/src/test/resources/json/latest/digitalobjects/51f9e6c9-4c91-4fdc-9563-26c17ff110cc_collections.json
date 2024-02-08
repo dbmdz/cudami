@@ -1,1 +1,0 @@
-{"content":[],"pageRequest":{"filtering":{"filterCriteria":[{"expression":"c.publication_start","operation":"LESS_THAN_OR_EQUAL_TO_AND_SET","value":["java.time.LocalDate","2021-03-31"]},{"expression":"c.publication_end","operation":"GREATER_THAN_OR_NOT_SET","value":["java.time.LocalDate","2021-03-31"]}]},"pageNumber":0,"pageSize":1000},"totalElements":0}

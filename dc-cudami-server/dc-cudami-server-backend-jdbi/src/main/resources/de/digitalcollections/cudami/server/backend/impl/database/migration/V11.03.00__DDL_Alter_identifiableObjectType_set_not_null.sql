@@ -1,1 +1,0 @@
-ALTER TABLE identifiables ALTER COLUMN identifiable_objecttype SET NOT NULL;

@@ -1,9 +1,0 @@
-{
-  "type" : "text",
-  "text" : "TEST",
-  "marks" : [ {
-    "type" : "strong"
-  }, {
-    "type" : "em"
-  } ]
-}

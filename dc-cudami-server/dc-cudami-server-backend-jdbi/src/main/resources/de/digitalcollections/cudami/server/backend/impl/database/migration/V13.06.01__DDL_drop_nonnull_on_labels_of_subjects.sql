@@ -1,1 +1,0 @@
-ALTER TABLE subjects ALTER COLUMN label DROP NOT NULL;

@@ -1,1 +1,0 @@
-ALTER TABLE entities DROP COLUMN entity_type;

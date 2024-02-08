@@ -1,1 +1,0 @@
-UPDATE fileresources_image SET previewfileresource=uuid WHERE previewfileresource IS NULL;

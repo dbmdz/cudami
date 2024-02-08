@@ -1,4 +1,0 @@
-DROP TRIGGER IF EXISTS tr_manifestations_publications_locations_humansettlements ON manifestations;
-DROP TRIGGER IF EXISTS tr_manifestations_publications_publishers_agents ON manifestations;
-
-ALTER TABLE manifestations DROP COLUMN IF EXISTS publications;

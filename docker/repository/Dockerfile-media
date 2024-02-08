@@ -1,7 +1,0 @@
-FROM eclipse-temurin:11-jre-jammy
-
-ARG EUPHORIA_VERSION
-
-ADD https://oss.sonatype.org/content/repositories/releases/de/digitalcollections/streaming-server-euphoria/$EUPHORIA_VERSION/streaming-server-euphoria-$EUPHORIA_VERSION-exec.jar euphoria.jar
-
-ENTRYPOINT [ "java", "-jar", "/euphoria.jar", "--management.server.port=9001", "--server.port=9000", "--spring.config.additional-location=file:/application-media.yml" ]
