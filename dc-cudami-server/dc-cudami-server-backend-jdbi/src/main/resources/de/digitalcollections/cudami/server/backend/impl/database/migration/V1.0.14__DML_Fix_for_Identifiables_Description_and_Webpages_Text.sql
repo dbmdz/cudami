@@ -1,2 +1,0 @@
-UPDATE identifiables SET description = (regexp_replace(description::text, '"documents"', '"localizedStructuredContent"'))::json;
-UPDATE webpages SET text = (regexp_replace(text::text, '"documents"', '"localizedStructuredContent"'))::json;

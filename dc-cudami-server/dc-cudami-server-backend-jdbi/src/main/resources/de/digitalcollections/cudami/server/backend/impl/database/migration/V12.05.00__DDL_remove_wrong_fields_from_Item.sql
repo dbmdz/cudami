@@ -1,5 +1,0 @@
-ALTER TABLE items DROP COLUMN IF EXISTS language;
-ALTER TABLE items DROP COLUMN IF EXISTS publication_date;
-ALTER TABLE items DROP COLUMN IF EXISTS publication_place;
-ALTER TABLE items DROP COLUMN IF EXISTS publisher;
-ALTER TABLE items DROP COLUMN IF EXISTS version;

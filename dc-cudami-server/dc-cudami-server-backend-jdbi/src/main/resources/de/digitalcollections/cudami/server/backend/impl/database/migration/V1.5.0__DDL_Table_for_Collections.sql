@@ -1,6 +1,0 @@
-CREATE TABLE IF NOT EXISTS collections (
-  id SERIAL PRIMARY KEY NOT NULL,
-  uuid UUID NOT NULL UNIQUE,
-
-  text JSONB
-) INHERITS (entities);

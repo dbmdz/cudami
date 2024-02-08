@@ -1,9 +1,0 @@
-{
-  "type" : "iframe",
-  "attrs" : {
-    "width" : "98%",
-    "title" : "OptOut page",
-    "src" : "https://www.example.org/index.php?module=CoreAdminHome&amp;action=optOut&amp;language=de",
-    "height" : "auto"
-  }
-}

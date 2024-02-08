@@ -1,7 +1,0 @@
-CREATE TABLE IF NOT EXISTS identifiertypes (
-  id SERIAL PRIMARY KEY NOT NULL,
-
-  label VARCHAR NOT NULL,
-  namespace VARCHAR NOT NULL UNIQUE,
-  regex VARCHAR
-);

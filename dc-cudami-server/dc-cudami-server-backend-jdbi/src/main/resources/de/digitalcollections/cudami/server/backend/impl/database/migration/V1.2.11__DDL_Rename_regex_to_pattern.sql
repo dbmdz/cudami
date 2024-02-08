@@ -1,1 +1,0 @@
-ALTER TABLE identifiertypes RENAME COLUMN regex TO pattern;

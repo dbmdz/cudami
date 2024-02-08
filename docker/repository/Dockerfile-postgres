@@ -1,5 +1,0 @@
-FROM postgres:12.8-alpine
-
-RUN apk update -q && apk add -q p7zip
-RUN test -d /docker-entrypoint-initdb.d || mkdir /docker-entrypoint-initdb.d
-
