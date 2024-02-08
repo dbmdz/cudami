@@ -2,6 +2,26 @@
 
 This is the GUI for administrating (content and users in) cudami.
 
+## Requirements
+
+The minimum version of the JRE used to start the applications is `17`.
+
+## Build
+
+### Development
+
+```
+$ cd <cudami source directory>
+$ mvn clean install
+```
+
+### Production
+
+```
+$ cd <cudami source directory>
+$ mvn clean install -Pproduction
+```
+
 ## Usage
 
 Start webapp JAR by specifiying cudami backend rest url using params:
@@ -11,6 +31,15 @@ Example:
 ``` sh
 java -jar dc-cudami-admin-webapp-7.0.0-SNAPSHOT.jar --cudami.server.address=<your_endpoint_address> --cudami.server.url=<your_endpoint_url>
 ```
+
+### GUI
+
+Local running cudami: http://localhost:9898
+
+The cudami admin webapp connects to cudami repository server and if no admin user exists, the admin user creation assistant is launched.
+Create an admin user and log in.
+
+Enjoy!
 
 ## Frameworks
 
