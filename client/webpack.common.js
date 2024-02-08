@@ -61,7 +61,7 @@ module.exports = {
     libraryTarget: 'umd',
     path: path.resolve(
       __dirname,
-      '../dc-cudami-admin/target/classes/static/js',
+      '../target/classes/static/js',
     ),
   },
   resolve: {
