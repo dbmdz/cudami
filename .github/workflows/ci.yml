@@ -39,7 +39,7 @@ jobs:
           node-version: 12
       - name: Check Javascript codestyle
         run: npm install && npm run format-check
-        working-directory: dc-cudami-editor
+        working-directory: client
       - name: Build with Maven
         run: mvn -B -U clean verify -Pproduction
     strategy:

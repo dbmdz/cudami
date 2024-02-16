@@ -6,7 +6,7 @@ updates:
     schedule:
       interval: daily
       time: "04:00"
-  - directory: "/dc-cudami-editor"
+  - directory: "/client"
     open-pull-requests-limit: 25
     package-ecosystem: npm
     schedule:
