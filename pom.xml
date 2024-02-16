@@ -105,13 +105,13 @@
       <version>2.15.1</version>
     </dependency>
     <dependency>
-      <groupId>de.digitalcollections.cudami</groupId>
-      <artifactId>dc-cudami-client</artifactId>
+      <groupId>io.github.dbmdz.metadata</groupId>
+      <artifactId>metasvc-client</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>de.digitalcollections.cudami</groupId>
-      <artifactId>dc-cudami-model</artifactId>
+      <groupId>io.github.dbmdz.metadata</groupId>
+      <artifactId>metasvc-model</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
