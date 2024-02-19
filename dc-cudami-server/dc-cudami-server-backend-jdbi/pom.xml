@@ -89,7 +89,7 @@
     <dependency>
       <groupId>org.jdbi</groupId>
       <artifactId>jdbi3-testcontainers</artifactId>
-      <version>3.37.1</version>
+      <version>3.45.0</version>
       <scope>test</scope>
     </dependency>
     <dependency>
