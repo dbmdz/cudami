@@ -1,9 +1,9 @@
 info:
   app:
     project:
-      name: 'cudami-admin-webapp'
-      groupId: 'de.digitalcollections.cudami'
-      artifactId: 'cudami-admin-webapp'
+      name: 'cudami'
+      groupId: 'io.github.dbmdz.cudami'
+      artifactId: 'cudami'
       version: '1.2.3'
       buildDetails: 'build by foo@bar.com'
 
