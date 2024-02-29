@@ -34,28 +34,139 @@ cudami:
       - UNSPECIFIED
 
     expressionTypes:
-      - mainType: TEXT
+      - mainType: ANNIVERSARYPUB
         subType: HANDMADE
-      - mainType: TEXT
+      - mainType: ANNIVERSARYPUB
         subType: PRINT
-      - mainType: SCORE
+      - mainType: ARTISTBOOK
         subType: HANDMADE
-      - mainType: SCORE
+      - mainType: ARTISTBOOK
+        subType: PRINT
+      - mainType: AUTOGRAPH
+        subType: HANDMADE
+      - mainType: AUTOGRAPH
+        subType: PRINT
+      - mainType: BIOGRAPHY
+        subType: HANDMADE
+      - mainType: BIOGRAPHY
+        subType: PRINT
+      - mainType: BROADSHEET
+        subType: HANDMADE
+      - mainType: BROADSHEET
+        subType: PRINT
+      - mainType: CATALOGUE
+        subType: HANDMADE
+      - mainType: CATALOGUE
+        subType: PRINT
+      - mainType: CHILDRENSBOOK
+        subType: HANDMADE
+      - mainType: CHILDRENSBOOK
+        subType: PRINT
+      - mainType: COLLECTION
+        subType: HANDMADE
+      - mainType: COLLECTION
+        subType: PRINT
+      - mainType: COMMENT
+        subType: HANDMADE
+      - mainType: COMMENT
+        subType: PRINT
+      - mainType: DIARY
+        subType: HANDMADE
+      - mainType: DIARY
+        subType: PRINT
+      - mainType: DICTIONARY
+        subType: HANDMADE
+      - mainType: DICTIONARY
+        subType: PRINT
+      - mainType: DIRECTORY
+        subType: HANDMADE
+      - mainType: DIRECTORY
+        subType: PRINT
+      - mainType: FICTION
+        subType: HANDMADE
+      - mainType: FICTION
+        subType: PRINT
+      - mainType: GUIDE
+        subType: HANDMADE
+      - mainType: GUIDE
+        subType: PRINT
+      - mainType: ILLUSTRATEDBOOK
+        subType: HANDMADE
+      - mainType: ILLUSTRATEDBOOK
+        subType: PRINT
+      - mainType: INCUNABULUM
+        subType: HANDMADE
+      - mainType: INCUNABULUM
+        subType: PRINT
+      - mainType: JOURNAL
+        subType: HANDMADE
+      - mainType: JOURNAL
+        subType: PRINT
+      - mainType: LETTERS
+        subType: HANDMADE
+      - mainType: LETTERS
+        subType: PRINT
+      - mainType: MANUSCRIPT
+        subType: HANDMADE
+      - mainType: MANUSCRIPT
         subType: PRINT
       - mainType: MAP
         subType: HANDMADE
       - mainType: MAP
         subType: PRINT
-      - mainType: IMAGE
+      - mainType: NEWSPAPER
         subType: HANDMADE
-      - mainType: IMAGE
+      - mainType: NEWSPAPER
         subType: PRINT
-      - mainType: SPATIAL
+      - mainType: PAPYRUS
         subType: HANDMADE
-      - mainType: SPATIAL
+      - mainType: PAPYRUS
         subType: PRINT
-      - mainType: MICROFORM
+      - mainType: PROCEEDINGS
+        subType: HANDMADE
+      - mainType: PROCEEDINGS
         subType: PRINT
+      - mainType: PUBOFFICIAL
+        subType: HANDMADE
+      - mainType: PUBOFFICIAL
+        subType: PRINT
+      - mainType: PAMPHLET
+        subType: HANDMADE
+      - mainType: PAMPHLET
+        subType: PRINT
+      - mainType: REPORT
+        subType: HANDMADE
+      - mainType: REPORT
+        subType: PRINT
+      - mainType: SCHOOLPROGRAM
+        subType: HANDMADE
+      - mainType: SCHOOLPROGRAM
+        subType: PRINT
+      - mainType: SCORE
+        subType: HANDMADE
+      - mainType: SCORE
+        subType: PRINT
+      - mainType: SOURCE
+        subType: HANDMADE
+      - mainType: SOURCE
+        subType: PRINT
+      - mainType: SPEECH
+        subType: HANDMADE
+      - mainType: SPEECH
+        subType: PRINT
+      - mainType: STATISTICS
+        subType: HANDMADE
+      - mainType: STATISTICS
+        subType: PRINT
+      - mainType: TEXTBOOK
+        subType: HANDMADE
+      - mainType: TEXTBOOK
+        subType: PRINT
+      - mainType: THESIS
+        subType: HANDMADE
+      - mainType: THESIS
+        subType: PRINT
+
 
     titleTypes:
       - mainType: ABBR
