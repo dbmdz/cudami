@@ -166,6 +166,12 @@ cudami:
         subType: HANDMADE
       - mainType: THESIS
         subType: PRINT
+      - mainType: MICROFORM
+        subType: PRINT
+      - mainType: IMAGE
+        subType: HANDMADE
+      - mainType: IMAGE
+        subType: PRINT
 
 
     titleTypes:
