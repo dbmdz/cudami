@@ -26,7 +26,7 @@
   "prettier": "@fisker/prettier-config",
   "dependencies": {
     "@aeaton/prosemirror-footnotes": "^0.1.0",
-    "@aeaton/react-prosemirror": "^0.22.1",
+    "@aeaton/react-prosemirror": "^2.0.3",
     "@babel/runtime": "^7.20.1",
     "@types/pubsub-js": "^1.8.6",
     "classnames": "^2.3.2",
