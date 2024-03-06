@@ -621,6 +621,30 @@
           <url>${env.NEXUS_SNAPSHOT_REPOSITORY_URL}</url>
         </snapshotRepository>
       </distributionManagement>
+      <repositories>
+        <repository>
+          <id>maven-releases</id>
+          <name>Maven Releases</name>
+          <url>${env.NEXUS_RELEASE_REPOSITORY_URL}</url>
+          <releases>
+            <enabled>true</enabled>
+          </releases>
+          <snapshots>
+            <enabled>false</enabled>
+          </snapshots>
+        </repository>
+        <repository>
+          <id>maven-snapshots</id>
+          <name>Maven Snapshots</name>
+          <url>${env.NEXUS_SNAPSHOT_REPOSITORY_URL}</url>
+          <releases>
+            <enabled>false</enabled>
+          </releases>
+          <snapshots>
+            <enabled>true</enabled>
+          </snapshots>
+        </repository>
+      </repositories>
     </profile>
 
     <profile>
