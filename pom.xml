@@ -107,7 +107,7 @@
     <dependency>
       <groupId>io.github.dbmdz.metadata</groupId>
       <artifactId>metasvc-client</artifactId>
-      <version>9.0.0-SNAPSHOT</version>
+      <version>9.0.0-RC1</version>
     </dependency>
     <dependency>
       <groupId>javax.servlet</groupId>
