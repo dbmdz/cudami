@@ -6,7 +6,7 @@ image: "$BUILD_IMAGE_ANSIBLE_MAVEN_JDK17"
 
 variables:
   MAVEN_CLI_OPTS: "-Dmaven.repo.local=.m2/repository --batch-mode -Pcustom-nexus"
-  PLAYBOOK: "cudami/admin-webapp.yml"
+  PLAYBOOK: "cms/cudami.yml"
 
 ###################
 ### Stage build ###
