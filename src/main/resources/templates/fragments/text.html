@@ -18,7 +18,7 @@
           <th:block th:insert="cudami/fragments/structuredcontent::renderContentBlocks(${structuredContent.contentBlocks})"></th:block>
         </th:block>
         <th:block th:unless="${structuredContent}" th:with="keys=${localizedStructuredContent.keySet}">
-          <div th:unless="${keys==null || keys.isEmpty()}" th:with="alternativeLanguages=${localizedStructuredContent.keySet != null ? T(io.github.dbmdz.cudami.controller.fragments.FragmentsController).getDisplayLanguages(#locale, localizedStructuredContent.keySet) : ''}" th:utext="#{content_in_other_languages(${alternativeLanguages})}">available in other languages</div>
+          <div th:unless="${keys==null || keys.isEmpty()}" th:with="alternativeLanguages=${localizedStructuredContent.keySet != null ? @fragmentsController.getDisplayLanguages(#locale, localizedStructuredContent.keySet) : ''}" th:utext="#{content_in_other_languages(${alternativeLanguages})}">available in other languages</div>
         </th:block>
       </th:block>
     </th:block>
