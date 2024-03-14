@@ -36,7 +36,7 @@
             </div>
             <div class="row">
               <div class="col-md-3"><label th:text="#{lbl.language}">Language</label></div>
-              <div class="align-items-center col-md-9 d-flex" th:text="${T(de.digitalcollections.cudami.admin.controller.fragments.FragmentsController).getDisplayLanguage(#locale, headword.locale)}">...</div>
+              <div class="align-items-center col-md-9 d-flex" th:text="${T(io.github.dbmdz.cudami.controller.fragments.FragmentsController).getDisplayLanguage(#locale, headword.locale)}">...</div>
             </div>
 
           </div>
