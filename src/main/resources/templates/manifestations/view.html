@@ -116,12 +116,12 @@
 
             <div class="row">
               <div class="col-md-3"><label th:text="#{lbl.language}">Language</label></div>
-              <div class="align-items-center col-md-9 d-flex" th:text="${T(io.github.dbmdz.cudami.controller.fragments.FragmentsController).getDisplayLanguage(#locale, manifestation.language)}">...</div>
+              <div class="align-items-center col-md-9 d-flex" th:text="${@fragmentsController.getDisplayLanguage(#locale, manifestation.language)}">...</div>
             </div>
 
             <div class="row">
               <div class="col-md-3"><label th:text="#{lbl.other_languages}">Other languages</label></div>
-              <div class="align-items-center col-md-9 d-flex" th:text="${T(io.github.dbmdz.cudami.controller.fragments.FragmentsController).getDisplayLanguages(#locale, manifestation.otherLanguages)}">...</div>
+              <div class="align-items-center col-md-9 d-flex" th:text="${@fragmentsController.getDisplayLanguages(#locale, manifestation.otherLanguages)}">...</div>
             </div>
 
             <th:block th:insert="~{fragments/titles::renderTitles(${manifestation.titles}, ${dataLanguage})}"></th:block>
