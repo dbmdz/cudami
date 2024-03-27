@@ -76,7 +76,12 @@
             <div class="row">
               <div class="col-md-3"><label th:text="#{lbl.parent_work_s}">Parents</label></div>
               <div class="align-items-center col-md-9 d-flex" th:each="parent, iterStat: ${work.parents}">
-                <a th:href="@{/works/{uuid}(uuid=${parent.uuid})}" th:text="${parent.label?.getText(dataLanguage)} ?: ${parent.uuid}">parent label</a>&nbsp;
+                <th:block>
+                  <span th:if="${parent.uuid == work.uuid}" class="error">WORK HAS ITSELF AS PARENT!</span>
+                  <span th:if="${parent.uuid != work.uuid}">
+                    <a th:href="@{/works/{uuid}(uuid=${parent.uuid})}" th:text="${parent.label?.getText(dataLanguage)} ?: ${parent.uuid}">parent label</a>&nbsp;
+                  </span>
+                </th:block>
                 <br th:if="${!iterStat.last}" />
               </div>
             </div>
