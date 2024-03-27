@@ -192,26 +192,30 @@
       <div class="align-items-center col-md-9">
         <th:block th:each="relation, iterStat: ${relations}">
           <div>
-                    <span th:with="subject=${relation.subject}" th:switch="${subject.identifiableObjectType.name.toUpperCase()}">
-                      <th:block th:case="'AGENT'" th:insert="~{::renderAgent(${subject})}"></th:block>
-                      <th:block th:case="'PERSON'" th:insert="~{::renderAgent(${subject})}"></th:block>
-                      <th:block th:case="'CORPORATE_BODY'" th:insert="~{::renderAgent(${subject})}"></th:block>
-                      <th:block th:case="'HUMAN_SETTLEMENT'" th:insert="~{::renderGeolocation(${subject})}"></th:block>
-                      <th:block th:case="'GEOLOCATION'" th:insert="~{::renderGeolocation(${subject})}"></th:block>
-                      <th:block th:case="'GEO_LOCATION'" th:insert="~{::renderGeolocation(${subject})}"></th:block>
-                      <th:block th:case="'EVENT'" th:insert="~{::renderEvent(${subject})}"></th:block>
-                      <th:block th:case="'DIGITAL_OBJECT'" th:insert="~{::renderEntity(${subject})}"></th:block>
-                      <th:block th:case="'ITEM'" th:insert="~{::renderEntity(${subject})}"></th:block>
-                      <th:block th:case="'MANIFESTATION'" th:insert="~{::renderEntity(${subject})}"></th:block>
-                      <th:block th:case="'WORK'" th:insert="~{::renderEntity(${subject})}"></th:block>
-                    </span>
-            &nbsp;
-            <span class="border border-dark p-2 badge badge-light mr-2">
-                      <a th:href="@{/predicates/{predicate}(predicate=${relation.predicate})}" th:text="${relation.predicate}">predicate</a>
-                    </span>
-            <th:block th:each="additionalPredicate: ${relation.additionalPredicates}">
-              <span class="border border-dark p-2 badge badge-light mr-2" th:text="${additionalPredicate}"></span>
-            </th:block>
+            <span th:if="${relation != null && relation.subject != null}" th:with="subject=${relation.subject}" th:switch="${subject.identifiableObjectType.name.toUpperCase()}">
+              <th:block th:case="'AGENT'" th:insert="~{::renderAgent(${subject})}"></th:block>
+              <th:block th:case="'PERSON'" th:insert="~{::renderAgent(${subject})}"></th:block>
+              <th:block th:case="'CORPORATE_BODY'" th:insert="~{::renderAgent(${subject})}"></th:block>
+              <th:block th:case="'HUMAN_SETTLEMENT'" th:insert="~{::renderGeolocation(${subject})}"></th:block>
+              <th:block th:case="'GEOLOCATION'" th:insert="~{::renderGeolocation(${subject})}"></th:block>
+              <th:block th:case="'GEO_LOCATION'" th:insert="~{::renderGeolocation(${subject})}"></th:block>
+              <th:block th:case="'EVENT'" th:insert="~{::renderEvent(${subject})}"></th:block>
+              <th:block th:case="'DIGITAL_OBJECT'" th:insert="~{::renderEntity(${subject})}"></th:block>
+              <th:block th:case="'ITEM'" th:insert="~{::renderEntity(${subject})}"></th:block>
+              <th:block th:case="'MANIFESTATION'" th:insert="~{::renderEntity(${subject})}"></th:block>
+              <th:block th:case="'WORK'" th:insert="~{::renderEntity(${subject})}"></th:block>
+            </span>
+            <span th:if="${relation != null && relation.subject==null}" class="error">NULL subject!</span>
+            <span th:if="${relation == null}" class="error">NULL relation</span>
+    &nbsp;
+            <span th:if="${relation != null}" class="border border-dark p-2 badge badge-light mr-2">
+              <a th:href="@{/predicates/{predicate}(predicate=${relation.predicate})}" th:text="${relation.predicate}">predicate</a>
+            </span>
+            <span th:if="${(relation != null) && (relation.additionalPredicates != null)}">
+              <th:block  th:each="additionalPredicate: ${relation.additionalPredicates}">
+                <span class="border border-dark p-2 badge badge-light mr-2" th:text="${additionalPredicate}"></span>
+              </th:block>
+            </span>
           </div>
         </th:block>
       </div>
