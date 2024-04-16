@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
 
 ## Unreleased
 
+## [9.0.1](https://github.com/dbmdz/cudami/releases/tag/9.0.1) – 2024-04-16
+
 ### Fixed
 
 - Report errors on broken works and subjects instead of showing incomplete data
