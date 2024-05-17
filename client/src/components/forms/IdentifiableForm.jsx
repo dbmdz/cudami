@@ -38,6 +38,7 @@ import ProjectForm from './ProjectForm'
 import TopicForm from './TopicForm'
 import WebpageForm from './WebpageForm'
 import WebsiteForm from './WebsiteForm'
+import WorkForm from './WorkForm'
 
 class IdentifiableForm extends Component {
   identifiablesWithLongText = [
@@ -257,6 +258,7 @@ class IdentifiableForm extends Component {
       topic: TopicForm,
       webpage: WebpageForm,
       website: WebsiteForm,
+      work: WorkForm,
     }
     const FormComponent = FORM_COMPONENT_MAPPING[this.props.type]
     const {
