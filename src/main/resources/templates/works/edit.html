@@ -1,0 +1,34 @@
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="https://github.com/thymeleaf/thymeleaf-extras-springsecurity"
+      xmlns:data="https://github.com/mxab/thymeleaf-extras-data-attribute"
+      layout:decorate="~{base}">
+  <head>
+    <title th:text="|#{works}: #{work_edit}|">Works: Edit work</title>
+  </head>
+  <body>
+    <th:block layout:fragment="content">
+      <div class="content-header">
+        <div class="container-fluid">
+          <div class="row">
+            <div class="col-12">
+              <div id="editor"></div>
+              <script th:src="@{/js/identifiable-editor.bundle.js}"></script>
+              <script th:inline="javascript">
+                IdentifiableEditor({
+                  activeLanguage: /*[[${activeLanguage}]]*/ '',
+                  apiContextPath: /*[[@{/}]]*/ '',
+                  existingLanguages: /*[[${existingLanguages}]]*/ [],
+                  id: "editor",
+                  type: "work",
+                  uiLocale: /*[[${#locale.language}]]*/ '',
+                  uuid: /*[[${uuid}]]*/ ''
+                });
+              </script>
+            </div>
+          </div>
+        </div>
+      </div>
+    </th:block>
+  </body>
+</html>

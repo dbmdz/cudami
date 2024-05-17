@@ -92,4 +92,10 @@ public class WorksAPIController extends AbstractEntitiesController<Work, CudamiW
         ((CudamiWorksClient) service).findManifestations(uuid, btRequest);
     return new BTResponse<>(pageResponse);
   }
+
+  @GetMapping("/api/works/{uuid:" + ParameterHelper.UUID_PATTERN + "}")
+  @ResponseBody
+  public Work getByUuid(@PathVariable UUID uuid) throws TechnicalException {
+    return service.getByUuid(uuid);
+  }
 }

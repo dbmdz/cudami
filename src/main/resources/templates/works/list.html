@@ -111,7 +111,8 @@
            const baseUrl = [[@{'/works'}]] + '/' + row.uuid;
            +]*/
           return [
-            renderViewAction(baseUrl)
+            renderViewAction(baseUrl),
+            renderEditAction(baseUrl)
           ].join(' ');
         }
 
