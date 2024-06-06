@@ -14,8 +14,14 @@ import io.github.dbmdz.cudami.controller.identifiable.entity.AbstractEntitiesCon
 import io.github.dbmdz.cudami.model.bootstraptable.BTRequest;
 import io.github.dbmdz.cudami.model.bootstraptable.BTResponse;
 import java.util.UUID;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -23,6 +29,8 @@ import org.springframework.web.bind.annotation.RestController;
 /** Controller for all public "Works" endpoints (API). */
 @RestController
 public class WorksAPIController extends AbstractEntitiesController<Work, CudamiWorksClient> {
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(WorksAPIController.class);
 
   public WorksAPIController(CudamiClient client, LanguageService languageService) {
     super(client.forWorks(), client, languageService);
@@ -97,5 +105,16 @@ public class WorksAPIController extends AbstractEntitiesController<Work, CudamiW
   @ResponseBody
   public Work getByUuid(@PathVariable UUID uuid) throws TechnicalException {
     return service.getByUuid(uuid);
+  }
+
+  @PutMapping("/api/works/{uuid:" + ParameterHelper.UUID_PATTERN + "}")
+  public ResponseEntity update(@PathVariable UUID uuid, @RequestBody Work work) {
+    try {
+      Work workDb = service.update(uuid, work);
+      return ResponseEntity.ok(workDb);
+    } catch (TechnicalException e) {
+      LOGGER.error("Cannot save work with uuid={}", uuid, e);
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+    }
   }
 }
