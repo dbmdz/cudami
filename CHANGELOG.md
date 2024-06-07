@@ -10,6 +10,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
 
 - Added functionality to edit works
 
+### Fixed
+
+- Retrieval of identifiables, whose namespace contains numbers
+
 ## [9.0.1](https://github.com/dbmdz/cudami/releases/tag/9.0.1) – 2024-04-16
 
 ### Fixed

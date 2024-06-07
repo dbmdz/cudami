@@ -54,7 +54,7 @@ public class IdentifiableController
     return response.getContent();
   }
 
-  @GetMapping(value = {"/identifiables/{namespace:[a-zA-Z_\\-]+}:{id:.+}"})
+  @GetMapping(value = {"/identifiables/{namespace:[a-zA-Z\\d_\\-]+}:{id:.+}"})
   public String view(@PathVariable String namespace, @PathVariable String id, Model model)
       throws TechnicalException, ResourceNotFoundException {
     Identifiable identifiable =
