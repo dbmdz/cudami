@@ -1,5 +1,10 @@
 package io.github.dbmdz.cudami.controller;
 
+import de.digitalcollections.cudami.client.CudamiClient;
+import de.digitalcollections.cudami.client.identifiable.CudamiIdentifierTypesClient;
+import de.digitalcollections.model.identifiable.IdentifierType;
+import de.digitalcollections.model.list.paging.PageRequest;
+import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.security.User;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.github.dbmdz.cudami.business.api.service.exceptions.ServiceException;
@@ -17,9 +22,11 @@ import org.springframework.web.bind.annotation.SessionAttributes;
 public class MainController {
 
   private final UserService<User> userService;
+  private final CudamiIdentifierTypesClient identifierService;
 
   @SuppressFBWarnings(value = "EI_EXPOSE_REP2")
-  public MainController(UserService<User> userService) {
+  public MainController(CudamiClient cudamiClient, UserService<User> userService) {
+    this.identifierService = cudamiClient.forIdentifierTypes();
     this.userService = userService;
   }
 
@@ -43,5 +50,29 @@ public class MainController {
       }
     }
     return "main";
+  }
+
+  @GetMapping("/search")
+  public String search(@RequestParam(value = "q", defaultValue = "") String q, Model model)
+      throws Exception {
+    if (q == null || q.isEmpty()) {
+      return "main";
+    }
+
+    // Check, if the query string starts with an identifier
+    if (q.contains(":")) {
+      String identifierNamespace = q.split(":")[0];
+      PageResponse<IdentifierType> identifierTypePageResponse =
+          identifierService.find(PageRequest.builder().pageSize(9999).pageNumber(0).build());
+      for (IdentifierType identifierType : identifierTypePageResponse.getContent()) {
+        String namespace = identifierType.getNamespace();
+        if (namespace.equals(identifierNamespace)) {
+          return "forward:/identifiables/" + q;
+        }
+      }
+    }
+
+    // There was no identifiable, so we make a search over all labels as IdentifiableObjectType
+    return "redirect:/identifiables/?term=" + q;
   }
 }
