@@ -54,6 +54,31 @@ public class IdentifiableController
     return response.getContent();
   }
 
+  @GetMapping(value = "/identifiables/search")
+  @ResponseBody
+  public String search(
+      @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
+      @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
+      @RequestParam(name = "searchField", required = false, defaultValue = "label")
+          String searchField,
+      @RequestParam(name = "term", required = false) String searchTerm,
+      @RequestParam(name = "sortBy", required = false) List<Order> sortBy)
+      throws TechnicalException {
+    // TODO: find code using "term" instead "searchTerm" and change it to "searchTerm"
+    String dataLanguage = null;
+    PageRequest pageRequest =
+        createPageRequest(
+            Identifiable.class,
+            pageNumber,
+            pageSize,
+            sortBy,
+            searchField,
+            searchTerm,
+            dataLanguage);
+    PageResponse<Identifiable> response = service.find(pageRequest);
+    return "identifiables/list";
+  }
+
   @GetMapping(value = {"/identifiables/{namespace:[a-zA-Z\\d_\\-]+}:{id:.+}"})
   public String view(@PathVariable String namespace, @PathVariable String id, Model model)
       throws TechnicalException, ResourceNotFoundException {
@@ -62,7 +87,7 @@ public class IdentifiableController
     if (identifiable == null) {
       throw new ResourceNotFoundException("get entity by identifier with " + namespace + ":" + id);
     }
-    return doForward(identifiable, model);
+    return doRedirect(identifiable, model);
   }
 
   @GetMapping(value = {"/identifiables/{base64:[^:]+}"})
@@ -82,6 +107,6 @@ public class IdentifiableController
     if (identifiable == null) {
       throw new ResourceNotFoundException("get entity by identifier with " + namespace + ":" + id);
     }
-    return doForward(identifiable, model);
+    return doRedirect(identifiable, model);
   }
 }

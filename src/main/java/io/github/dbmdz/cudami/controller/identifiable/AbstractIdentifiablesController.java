@@ -11,7 +11,11 @@ import de.digitalcollections.model.list.paging.PageResponse;
 import io.github.dbmdz.cudami.business.i18n.LanguageService;
 import io.github.dbmdz.cudami.controller.AbstractUniqueObjectController;
 import io.github.dbmdz.cudami.controller.ParameterHelper;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Locale;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.apache.commons.lang3.tuple.Pair;
@@ -174,6 +178,40 @@ public class AbstractIdentifiablesController<
         return "forward:/topics/" + uuid;
       case WORK:
         return "forward:/works/" + uuid;
+      default:
+        throw new TechnicalException("Unhandled object type " + identifiableObjectType);
+    }
+  }
+
+  public String doRedirect(Identifiable identifiable, Model model) throws TechnicalException {
+    final String uuid = identifiable.getUuid().toString();
+    IdentifiableObjectType identifiableObjectType = identifiable.getIdentifiableObjectType();
+    switch (identifiableObjectType) {
+      case ARTICLE:
+        return "redirect:/articles/" + uuid;
+      case COLLECTION:
+        return "redirect:/collections/" + uuid;
+      case CORPORATE_BODY:
+        return "redirect:/corporatebodies/" + uuid;
+      case DIGITAL_OBJECT:
+        return "redirect:/digitalobjects/" + uuid;
+      case GEO_LOCATION:
+        return "redirect:/geolocations/" + uuid;
+      case HEADWORD_ENTRY:
+        HeadwordEntry headwordEntry =
+            cudamiClient.forHeadwordEntries().getByUuid(identifiable.getUuid());
+        UUID headwordUuid = headwordEntry.getHeadword().getUuid();
+        return "redirect:/headwords/" + headwordUuid;
+      case ITEM:
+        return "redirect:/items/" + uuid;
+      case MANIFESTATION:
+        return "redirect:/manifestations/" + uuid;
+      case PERSON:
+        return "redirect:/persons/" + uuid;
+      case TOPIC:
+        return "redirect:/topics/" + uuid;
+      case WORK:
+        return "redirect:/works/" + uuid;
       default:
         throw new TechnicalException("Unhandled object type " + identifiableObjectType);
     }
