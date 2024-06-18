@@ -275,7 +275,7 @@
     <dependency>
       <groupId>org.webjars.npm</groupId>
       <artifactId>filesize</artifactId>
-      <version>9.0.1</version>
+      <version>10.1.2</version>
       <scope>runtime</scope>
     </dependency>
     <dependency>
