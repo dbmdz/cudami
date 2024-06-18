@@ -34,13 +34,14 @@ public class IdentifiableAPIController extends AbstractUniqueObjectController<Id
   public BTResponse<Identifiable> find(
       @RequestParam(name = "offset", required = false, defaultValue = "0") int offset,
       @RequestParam(name = "limit", required = false, defaultValue = "10") int limit,
-      @RequestParam(name = "search", required = true) String searchTerm,
-      @RequestParam(name = "sort", required = false, defaultValue = "label") String sortProperty,
-      @RequestParam(name = "order", required = false, defaultValue = "asc") String sortOrder)
+      @RequestParam(name = "search", required = true) String searchTerm)
       throws TechnicalException, ServiceException {
     BTRequest btRequest = new BTRequest(offset, limit);
 
-    // add sorting
+    // add sorting in a very limited way, since we have very few fields, which exist
+    // in all identifiables
+    String sortProperty = "lastModified";
+    String sortOrder = "desc";
     Sorting sorting = createSorting(Identifiable.class, sortProperty, sortOrder, null);
     btRequest.setSorting(sorting);
 
