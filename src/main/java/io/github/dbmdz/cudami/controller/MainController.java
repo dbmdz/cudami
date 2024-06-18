@@ -73,6 +73,6 @@ public class MainController {
     }
 
     // There was no identifiable, so we make a search over all labels as IdentifiableObjectType
-    return "redirect:/identifiables/?term=" + q;
+    return "redirect:/identifiables/search?term=" + q;
   }
 }

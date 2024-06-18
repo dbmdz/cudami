@@ -149,6 +149,12 @@ div.nav-link a {
   color: #495057;
 }
 
+.searchbox {
+  width: 400px;
+  margin-right: auto !important;
+  margin-left: auto !important;
+}
+
 .required::after {
   content: " *";
   color: rgb(220, 53, 69);
@@ -187,3 +193,4 @@ div.nav-link a {
   -ms-flex-pack: center;
   justify-content: center;
 }
+

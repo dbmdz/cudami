@@ -2,6 +2,7 @@ package io.github.dbmdz.cudami.controller.identifiable;
 
 import de.digitalcollections.cudami.client.CudamiClient;
 import de.digitalcollections.cudami.client.identifiable.CudamiIdentifiablesClient;
+import de.digitalcollections.model.UniqueObject;
 import de.digitalcollections.model.exception.ResourceNotFoundException;
 import de.digitalcollections.model.exception.TechnicalException;
 import de.digitalcollections.model.identifiable.Identifiable;
@@ -9,8 +10,10 @@ import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.list.sorting.Order;
 import io.github.dbmdz.cudami.business.i18n.LanguageService;
+import io.github.dbmdz.cudami.controller.ParameterHelper;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.commons.codec.binary.Base64;
@@ -55,27 +58,17 @@ public class IdentifiableController
   }
 
   @GetMapping(value = "/identifiables/search")
-  @ResponseBody
   public String search(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
       @RequestParam(name = "searchField", required = false, defaultValue = "label")
           String searchField,
       @RequestParam(name = "term", required = false) String searchTerm,
-      @RequestParam(name = "sortBy", required = false) List<Order> sortBy)
+      @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
+      Model model)
       throws TechnicalException {
     // TODO: find code using "term" instead "searchTerm" and change it to "searchTerm"
-    String dataLanguage = null;
-    PageRequest pageRequest =
-        createPageRequest(
-            Identifiable.class,
-            pageNumber,
-            pageSize,
-            sortBy,
-            searchField,
-            searchTerm,
-            dataLanguage);
-    PageResponse<Identifiable> response = service.find(pageRequest);
+    model.addAttribute("search", searchTerm);
     return "identifiables/list";
   }
 
@@ -108,5 +101,15 @@ public class IdentifiableController
       throw new ResourceNotFoundException("get entity by identifier with " + namespace + ":" + id);
     }
     return doRedirect(identifiable, model);
+  }
+
+  @GetMapping(value = {"/identifiables/uuid/{uuid:" + ParameterHelper.UUID_PATTERN + "}"})
+  public String view(@PathVariable UUID uuid, Model model)
+      throws TechnicalException, ResourceNotFoundException {
+    UniqueObject identifiable = ((CudamiIdentifiablesClient) service).getByUuid(uuid);
+    if (identifiable == null || !(identifiable instanceof Identifiable)) {
+      throw new ResourceNotFoundException("get identifiable by uuid=" + uuid);
+    }
+    return doRedirect((Identifiable) identifiable, model);
   }
 }

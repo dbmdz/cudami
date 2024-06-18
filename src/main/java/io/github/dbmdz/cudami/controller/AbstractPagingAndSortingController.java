@@ -124,7 +124,7 @@ public abstract class AbstractPagingAndSortingController extends AbstractControl
     return pageRequest;
   }
 
-  private Sorting createSorting(
+  protected Sorting createSorting(
       Class targetClass, String sortProperty, String sortOrder, String dataLanguage)
       throws TechnicalException {
     if (sortProperty == null) {
@@ -181,7 +181,7 @@ public abstract class AbstractPagingAndSortingController extends AbstractControl
     return dataLanguage;
   }
 
-  private boolean isMultiLanguageField(Class clz, String fieldName) throws TechnicalException {
+  protected boolean isMultiLanguageField(Class clz, String fieldName) throws TechnicalException {
     Field field;
     try {
       Class fieldType = getFieldType(clz, fieldName);

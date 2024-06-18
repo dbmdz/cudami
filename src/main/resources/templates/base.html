@@ -50,17 +50,14 @@
           </li>
         </ul>
 
-        <!-- next to hamburger menu navbar search form -->
-        <ul class="navbar-nav">
-          <li class="nav-item">
-            <form role="form" name="input" th:action="@{/search}" method="get">
-                <input type="search" class="form-control" th:placeholder="#{lbl.search}" name="q" autofocus="autofocus">
-            </form>
-          </li>
-        </ul>
 
         <!-- Right navbar links -->
         <ul class="navbar-nav ml-auto">
+          <li class="nav-item searchbox">
+            <form role="form" name="input" th:action="@{/search}" method="get">
+              <input type="search" class="form-control" th:placeholder="#{lbl.search}" name="q" autofocus="autofocus">
+            </form>
+          </li>
           <li class="nav-item">
             <th:block th:unless="${#locale.language == 'en'}"><a id="change-locale" th:href="@{''(language=en)}" class="nav-link">English</a></th:block>
             <th:block th:if="${#locale.language == 'en'}"><a id="change-locale" th:href="@{''(language=de)}" class="nav-link">Deutsch</a></th:block>

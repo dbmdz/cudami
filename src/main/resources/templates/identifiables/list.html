@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="https://github.com/thymeleaf/thymeleaf-extras-springsecurity"
+      xmlns:data="https://github.com/mxab/thymeleaf-extras-data-attribute"
+      layout:decorate="~{base}">
+
+  <head>
+    <title th:text="#{page.title.searchresult}">Search result</title>
+  </head>
+
+  <body>
+    <th:block layout:fragment="content">
+      <div class="content-header">
+        <div class="container-fluid">
+
+          <div class="row">
+            <div class="col">
+              <h1 th:text="#{page.title.searchresult}">Search result</h1>
+              <hr>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col">
+
+              <div id="toolbar-identifiables">
+
+              </div>
+              <table id="table-identifiables"
+                     data-toggle="table"
+                     th:data-url="@{/api/identifiables}"
+                     th:data-locale="${#locale}"
+                     data-buttons="buttonsIdentifiables"
+                     data-cookie="true"
+                     data-cookie-id-table="table-identifiables"
+                     data-id-field="uuid"
+                     data-loading-template="loadingTemplate"
+                     data-pagination="true"
+                     data-pagination-v-align="both"
+                     data-query-params="queryParamsIdentifiables"
+                     data-search="false"
+                     data-search-highlight="true"
+                     data-search-on-enter-key="true"
+                     data-server-sort="true"
+                     data-show-search-button="true"
+                     data-show-search-clear-button="true"
+                     data-side-pagination="server"
+                     data-sort-name="lastModified"
+                     data-sort-order="desc"
+                     data-toolbar="#toolbar-identifiables"
+                     data-unique-id="uuid">
+                <thead>
+                  <tr>
+                    <th data-field="index" data-formatter="formatRowNumberIdentifiables" data-halign="right" data-align="right" th:text="#{lbl.row_number}">#</th>
+                    <th data-field="identifiableObjectType" data-formatter="renderIdentifiableObjectType" data-halign="center" data-align="center" th:text="#{lbl.type}">Type</th>
+                    <th data-field="label" data-sortable="true" data-formatter="formatLabelIdentifiables" th:text="#{lbl.label}">Label</th>
+                    <th data-field="identifiers" data-sortable="false" data-formatter="renderIdentifiers" th:text="#{lbl.identifiers}">Identifiers</th>
+                    <th data-field="lastModified" data-sortable="true" data-formatter="renderDateTime" th:text="#{lbl.last_modified}">last modified</th>
+                    <th data-field="created" data-sortable="true" data-formatter="renderDateTime" th:text="#{lbl.created}">created</th>
+                    <th data-field="actions" data-formatter="formatActionsIdentifiables" th:text="#{lbl.actions}">Actions</th>
+                  </tr>
+                </thead>
+              </table>
+
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </th:block>
+
+    <th:block layout:fragment="beforeBodyEnds">
+      <div th:replace="fragments/modals/confirm-yes-no :: confirm-yes-no-dialog"></div>
+      <div th:replace="fragments/bootstrap-table :: data-formatter"></div>
+
+      <script type="text/javascript">
+        function formatRowNumberIdentifiables(value, row, index) {
+          return renderRowNumber($('#table-identifiables'), index);
+        }
+
+        function renderIdentifiableObjectType(value, row) {
+          switch(value) {
+            case 'COLLECTION': return "<i class=\"fas fa-list nav-icon\" title=\"" + value + "\"></i>";
+            case 'CORPORATE_BODY': return "<i class=\"fas fa-university nav-icon\" title=\"" + value + "\"></i>";
+            case 'DIGITAL_OBJECT': return "<i class=\"fas fa-cubes nav-icon\" title=\"" + value + "\"></i>";
+            case 'EVENT': return "<i class=\"fas fa-calendar-alt nav-icon\" title=\"" + value + "\"></i>";
+            case 'FILERESOURCE': return "<i class=\"fa fa-file nav-icon\" title=\"" + value + "\"></i>";
+            case 'GEOLOCATION': return "<i class=\"fas fa-map-marker-alt nav-icon\" title=\"" + value + "\"></i>";
+            case 'ITEM': return "<i class=\"fas fa-cube nav-icon\" title=\"" + value + "\"></i>";
+            case 'MANIFESTATION': return "<i class=\"fas fa-layer-group nav-icon\" title=\"" + value + "\"></i>";
+            case 'PERSON': return "<i class=\"fas fa-users nav-icon\" title=\"" + value + "\"></i>";
+            case 'PROJECT': return "<i class=\"fas fa-industry nav-icon\" title=\"" + value + "\"></i>";
+            case 'SUBJECT': return "<i class=\"fas fa-inbox nav-icon\" title=\"" + value + "\"></i>";
+            case 'TAG': return "<i class=\"fas fa-hashtag nav-icon\" title=\"" + value + "\"></i>";
+            case 'TOPIC': return "<i class=\"fas fa-sitemap nav-icon\" title=\"" + value + "\"></i>";
+            case 'WEBSITE': return "<i class=\"fas fa-globe nav-icon\" title=\"" + value + "\"></i>";
+            case 'WEBPAGE': return "<i class=\"fas fa-laptop nav-icon\" title=\"" + value + "\"></i>";
+            case 'WORK': return "<i class=\"fas fa-lightbulb nav-icon\" title=\"" + value + "\"></i>";
+            default: return value;
+          }
+        }
+
+        /*<![CDATA[*/
+        function queryParamsIdentifiables(params) {
+          let search="[[${search}]]";
+          params.search=search;
+        return params;
+        }
+
+
+        function loadingTemplate(message) {
+          return "<span class=\"loading-wrap\"><span class=\"loading-text\" style=\"font-size: 32px;\">[[#{long_wait}]]</span><span class=\"animation-wrap\"><span class=\"animation-dot\"></span></span></span>";
+        }
+        /*]]>*/
+</script>
+
+      <script type="text/javascript" th:inline="javascript">
+        /*<![CDATA[*/
+        $('#table-identifiables').bootstrapTable({
+          formatSearch: function () {
+            /*[+
+            let columnName = [[#{lbl.labelAndIdentifier}]];
+            let placeholder = `[(#{placeholder.search})]`;
+            +]*/
+            return placeholder;
+          }
+        });
+
+        function buttonsIdentifiables() {
+          /*[+
+           const baseUrl = [[@{'/identifiables'}]];
+           const tooltipAdd = [[#{tooltip.add_new_table_entry}]];
+           +]*/
+          return {
+          };
+        }
+
+        function formatActionsIdentifiables(value, row) {
+          /*[+
+           const baseUrl = [[@{'/identifiables'}]] + '/' + row.uuid;
+           +]*/
+          return [
+            renderViewAction(baseUrl),
+            renderEditAction(baseUrl)
+          ].join(' ');
+        }
+
+        function formatLabelIdentifiables(value, row) {
+          /*[+
+           const baseUrl = [[@{'/identifiables/uuid'}]] + '/' + row.uuid;
+           +]*/
+          return '<a href="' + baseUrl + '">' + Object.values(value)[0] + '</a>';
+        }
+      /*]]>*/
+      </script>
+    </th:block>
+  </body>
+
+</html>
