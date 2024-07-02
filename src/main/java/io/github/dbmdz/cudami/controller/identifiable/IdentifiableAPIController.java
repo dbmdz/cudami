@@ -33,6 +33,7 @@ public class IdentifiableAPIController extends AbstractUniqueObjectController<Id
       @RequestParam(name = "search", required = true) String searchTerm)
       throws TechnicalException, ServiceException {
     if (searchTerm != null) {
+      // FIXME: This seems to be a thymeleaf problem in templates/identifiables/list.html
       searchTerm = searchTerm.replace("&quot;", "\"");
     }
 
