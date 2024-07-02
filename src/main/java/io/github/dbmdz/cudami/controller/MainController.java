@@ -9,6 +9,7 @@ import de.digitalcollections.model.security.User;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.github.dbmdz.cudami.business.api.service.exceptions.ServiceException;
 import io.github.dbmdz.cudami.business.api.service.security.UserService;
+import java.net.URLEncoder;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
@@ -74,6 +75,6 @@ public class MainController {
     }
 
     // There was no identifiable, so we make a search over all labels as IdentifiableObjectType
-    return "redirect:/identifiables/search?term=" + q;
+    return "redirect:/identifiables/search?term=" + URLEncoder.encode(q, "UTF-8");
   }
 }
