@@ -12,8 +12,6 @@ import io.github.dbmdz.cudami.business.api.service.exceptions.ServiceException;
 import io.github.dbmdz.cudami.controller.AbstractUniqueObjectController;
 import io.github.dbmdz.cudami.model.bootstraptable.BTRequest;
 import io.github.dbmdz.cudami.model.bootstraptable.BTResponse;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -21,8 +19,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 public class IdentifiableAPIController extends AbstractUniqueObjectController<Identifiable> {
-
-  private static final Logger LOGGER = LoggerFactory.getLogger(IdentifierTypeAPIController.class);
 
   public IdentifiableAPIController(CudamiClient client) {
     super(client.forIdentifiables(), null);
@@ -36,6 +32,10 @@ public class IdentifiableAPIController extends AbstractUniqueObjectController<Id
       @RequestParam(name = "limit", required = false, defaultValue = "10") int limit,
       @RequestParam(name = "search", required = true) String searchTerm)
       throws TechnicalException, ServiceException {
+    if (searchTerm != null) {
+      searchTerm = searchTerm.replace("&quot;", "\"");
+    }
+
     BTRequest btRequest = new BTRequest(offset, limit);
 
     // add sorting in a very limited way, since we have very few fields, which exist
