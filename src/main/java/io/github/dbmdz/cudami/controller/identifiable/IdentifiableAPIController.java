@@ -45,41 +45,14 @@ public class IdentifiableAPIController extends AbstractUniqueObjectController<Id
     Sorting sorting = createSorting(Identifiable.class, sortProperty, sortOrder, null);
     btRequest.setSorting(sorting);
 
-    // add filtering
-    Filtering filtering = null;
-
-    // Step1: Query for identifier
-    btRequest.setFiltering(getIdentifierFiltering(searchTerm));
-    PageResponse<Identifiable> pageResponse = service.find(btRequest);
-    if (pageResponse.hasContent()) {
-      return new BTResponse<>(pageResponse);
-    }
-
-    // Step2 (if 1 did not return anything): Query for label
     btRequest.setFiltering(getLabelFiltering(searchTerm));
-    pageResponse = service.find(btRequest);
+    PageResponse<Identifiable> pageResponse = service.find(btRequest);
     return new BTResponse<>(pageResponse);
   }
 
-  private Filtering getIdentifierFiltering(String searchTerm) {
+  private Filtering getLabelFiltering(String searchTerm) {
     return Filtering.builder()
-        .add(
-            FilterCriterion.builder().withExpression("identifiers.id").isEquals(searchTerm).build())
-        .build();
-  }
-
-  private Filtering getLabelFiltering(String searchTerm) throws TechnicalException {
-    String expression = "label";
-    String dataLanguage = null;
-    if (isMultiLanguageField(Identifiable.class, "label")) {
-      // FIXME: Does `dataLanguage` contain the script, e.g. "de-Latn"? What about the DB?
-      dataLanguage = getDataLanguage(dataLanguage, languageService);
-      // convention: add datalanguage as "sub"-expression to expression - to be handled later on
-      // serverside
-      expression += "." + dataLanguage;
-    }
-    return Filtering.builder()
-        .add(FilterCriterion.builder().withExpression(expression).contains(searchTerm).build())
+        .add(FilterCriterion.builder().withExpression("label").contains(searchTerm).build())
         .build();
   }
 }

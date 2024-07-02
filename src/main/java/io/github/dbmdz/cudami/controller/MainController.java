@@ -62,12 +62,13 @@ public class MainController {
     // Check, if the query string starts with an identifier
     if (q.contains(":")) {
       String identifierNamespace = q.split(":")[0];
+      // Check, if the namespace is valid. if yes, we can directly forward to the destination
       PageResponse<IdentifierType> identifierTypePageResponse =
           identifierService.find(PageRequest.builder().pageSize(9999).pageNumber(0).build());
       for (IdentifierType identifierType : identifierTypePageResponse.getContent()) {
         String namespace = identifierType.getNamespace();
-        if (namespace.equals(identifierNamespace)) {
-          return "forward:/identifiables/" + q;
+        if (namespace.equalsIgnoreCase(identifierNamespace)) {
+          return "forward:/identifiables/" + q.replaceFirst("^.*?:", namespace + ":");
         }
       }
     }
