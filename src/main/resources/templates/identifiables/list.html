@@ -106,7 +106,7 @@
         function queryParamsIdentifiables(params) {
           let search="[[${search}]]";
           params.search=search;
-        return params;
+          return params;
         }
 
 
@@ -133,8 +133,7 @@
            const baseUrl = [[@{'/identifiables'}]];
            const tooltipAdd = [[#{tooltip.add_new_table_entry}]];
            +]*/
-          return {
-          };
+          return {};
         }
 
         function formatActionsIdentifiables(value, row) {
