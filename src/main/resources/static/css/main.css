@@ -151,8 +151,10 @@ div.nav-link a {
 
 .searchbox {
   width: 400px;
-  margin-right: auto !important;
-  margin-left: auto !important;
+}
+
+.searchbox > input {
+  flex-grow: 1;
 }
 
 .required::after {
@@ -193,4 +195,3 @@ div.nav-link a {
   -ms-flex-pack: center;
   justify-content: center;
 }
-

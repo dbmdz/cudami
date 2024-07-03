@@ -48,16 +48,13 @@
           <li class="nav-item">
             <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
           </li>
+          <form class="form-inline searchbox" role="form" name="input" th:action="@{/search}" method="get">
+            <input class="form-control" type="search" th:placeholder="#{lbl.search}" name="q" autofocus="autofocus">
+          </form>
         </ul>
-
 
         <!-- Right navbar links -->
         <ul class="navbar-nav ml-auto">
-          <li class="nav-item searchbox">
-            <form role="form" name="input" th:action="@{/search}" method="get">
-              <input type="search" class="form-control" th:placeholder="#{lbl.search}" name="q" autofocus="autofocus">
-            </form>
-          </li>
           <li class="nav-item">
             <th:block th:unless="${#locale.language == 'en'}"><a id="change-locale" th:href="@{''(language=en)}" class="nav-link">English</a></th:block>
             <th:block th:if="${#locale.language == 'en'}"><a id="change-locale" th:href="@{''(language=de)}" class="nav-link">Deutsch</a></th:block>
