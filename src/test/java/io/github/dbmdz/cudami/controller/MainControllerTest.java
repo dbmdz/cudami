@@ -5,6 +5,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import de.digitalcollections.cudami.client.CudamiClient;
 import io.github.dbmdz.cudami.business.api.service.security.UserService;
 import io.github.dbmdz.cudami.propertyeditor.RoleEditor;
 import org.junit.jupiter.api.Test;
@@ -21,6 +22,7 @@ public class MainControllerTest {
   @MockBean private RoleEditor roleEditor;
   @MockBean private UserDetailsService userDetailsService;
   @MockBean private UserService userService;
+  @MockBean private CudamiClient cudamiClient;
 
   @Test
   public void testNoAdminUserExists() throws Exception {
