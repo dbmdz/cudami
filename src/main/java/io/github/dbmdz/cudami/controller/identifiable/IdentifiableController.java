@@ -78,7 +78,7 @@ public class IdentifiableController
     Identifiable identifiable =
         ((CudamiIdentifiablesClient) service).getByIdentifier(namespace, id);
     if (identifiable == null) {
-      return "/error/404";
+      throw new ResourceNotFoundException("get entity by identifier with " + namespace + ":" + id);
     }
     return doRedirect(identifiable, model);
   }
@@ -90,7 +90,7 @@ public class IdentifiableController
     Pattern identifierParamPattern = Pattern.compile("^([^:]+?):(.*)$");
     Matcher identifierParamMatcher = identifierParamPattern.matcher(paramString);
     if (!identifierParamMatcher.matches()) {
-      return "/error/404";
+      throw new ResourceNotFoundException("get entity by identifier with " + paramString);
     }
     String namespace = identifierParamMatcher.group(1);
     String id = identifierParamMatcher.group(2);
@@ -98,7 +98,7 @@ public class IdentifiableController
     Identifiable identifiable =
         ((CudamiIdentifiablesClient) service).getByIdentifier(namespace, id);
     if (identifiable == null) {
-      return "/error/404";
+      throw new ResourceNotFoundException("get entity by identifier with " + namespace + ":" + id);
     }
     return doRedirect(identifiable, model);
   }
