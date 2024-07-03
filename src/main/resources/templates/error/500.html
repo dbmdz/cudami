@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{base}">
+  <head>
+    <title>Main</title>
+  </head>
+  <body>
+    <section layout:fragment="content">
+      <div class="d-flex justify-content-center">
+        <div class="flex-column text-center">
+          <div style="font-size:96px;">😱</div>
+          <h1 th:text="#{error.internal}">internal error</h1>
+          <div class="mx-auto md:max-w-screen-sm">
+            <p th:if="${status}">
+              <label th:text="#{error.status_code}">Status code</label>: <span th:text="${status}">The status code</span>
+            </p>
+            <p th:if="${error}">
+              <label th:text="#{error.reason}">Error reason</label>: <span th:text="${error}">The error reason</span>
+            </p>
+            <p th:if="${message}">
+              <label th:text="#{error.message}">Error message</label>: <span th:text="${message}">The exception message</span>
+            </p>
+            <p th:if="${path}">
+              <label th:text="#{error.url}">Called url path</label>: <span th:text="${path}">The URL path when the exception was raised</span>
+            </p>
+            <p th:if="${timestamp}">
+              <label th:text="#{error.timestamp}">Time error occured</label>: <span th:text="${timestamp}">The time that the errors were extracted</span>
+            </p>
+            <pre th:if="${exception}">
+              <label th:text="#{error.exception}">Exception</label>: <span th:text="${exception}">The class name of the root exception (if configured)</span>
+            </pre>
+            <pre th:if="${trace}">
+              <label th:text="#{error.stacktrace}">Stacktrace</label>: <span th:text="${stacktrace}">The exception stack trace</span>
+            </pre>
+          </div>
+        </div>
+      </div>
+    </section>
+  </body>
+</html>
