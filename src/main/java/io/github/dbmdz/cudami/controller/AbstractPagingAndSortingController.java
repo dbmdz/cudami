@@ -181,7 +181,7 @@ public abstract class AbstractPagingAndSortingController extends AbstractControl
     return dataLanguage;
   }
 
-  protected boolean isMultiLanguageField(Class clz, String fieldName) throws TechnicalException {
+  private boolean isMultiLanguageField(Class clz, String fieldName) throws TechnicalException {
     Field field;
     try {
       Class fieldType = getFieldType(clz, fieldName);
