@@ -138,11 +138,10 @@
 
         function formatActionsIdentifiables(value, row) {
           /*[+
-           const baseUrl = [[@{'/identifiables'}]] + '/' + row.uuid;
+           const baseUrl = [[@{'/identifiables/uuid'}]] + '/' + row.uuid;
            +]*/
           return [
-            renderViewAction(baseUrl),
-            renderEditAction(baseUrl)
+            renderViewAction(baseUrl)
           ].join(' ');
         }
 
