@@ -59,14 +59,14 @@ public class IdentifiableAPIController extends AbstractUniqueObjectController<Id
 
   private Filtering getLabelFiltering(String searchTerm) {
     return Filtering.builder()
-        .add(FilterCriterion.builder().withExpression("label").isEquals(searchTerm).build())
+        .add(FilterCriterion.builder().withExpression("label").contains(searchTerm).build())
         .build();
   }
 
   private Filtering getIdFiltering(String searchTerm) {
     return Filtering.builder()
         .add(
-            FilterCriterion.builder().withExpression("identifiers.id").contains(searchTerm).build())
+            FilterCriterion.builder().withExpression("identifiers.id").isEquals(searchTerm).build())
         .build();
   }
 }
