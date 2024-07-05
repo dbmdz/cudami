@@ -116,6 +116,14 @@ public class AbstractIdentifiablesController<
     final String uuid = identifiable.getUuid().toString();
     IdentifiableObjectType identifiableObjectType = identifiable.getIdentifiableObjectType();
     switch (identifiableObjectType) {
+      case APPLICATION_FILE_RESOURCE:
+      case AUDIO_FILE_RESOURCE:
+      case FILE_RESOURCE:
+      case IMAGE_FILE_RESOURCE:
+      case LINKED_DATA_FILE_RESOURCE:
+      case TEXT_FILE_RESOURCE:
+      case VIDEO_FILE_RESOURCE:
+        return "forward:/fileresources/" + uuid;
       case ARTICLE:
         return "forward:/articles/" + uuid;
         // List<SubtopicImpl> subtopics =
@@ -179,8 +187,14 @@ public class AbstractIdentifiablesController<
         return "forward:/persons/" + uuid;
       case PROJECT:
         return "forward:/projects/" + uuid;
+      case SUBJECT:
+        return "forward:/subjects/" + uuid;
       case TOPIC:
         return "forward:/topics/" + uuid;
+      case WEBPAGE:
+        return "forward:/webpages/" + uuid;
+      case WEBSITE:
+        return "forward:/websites/" + uuid;
       case WORK:
         return "forward:/works/" + uuid;
       default:
@@ -192,6 +206,14 @@ public class AbstractIdentifiablesController<
     final String uuid = identifiable.getUuid().toString();
     IdentifiableObjectType identifiableObjectType = identifiable.getIdentifiableObjectType();
     switch (identifiableObjectType) {
+      case APPLICATION_FILE_RESOURCE:
+      case AUDIO_FILE_RESOURCE:
+      case FILE_RESOURCE:
+      case IMAGE_FILE_RESOURCE:
+      case LINKED_DATA_FILE_RESOURCE:
+      case TEXT_FILE_RESOURCE:
+      case VIDEO_FILE_RESOURCE:
+        return "redirect:/fileresources/" + uuid;
       case ARTICLE:
         return "redirect:/articles/" + uuid;
       case COLLECTION:
@@ -222,6 +244,10 @@ public class AbstractIdentifiablesController<
         return "redirect:/subjects/" + uuid;
       case TOPIC:
         return "redirect:/topics/" + uuid;
+      case WEBPAGE:
+        return "redirect:/webpages/" + uuid;
+      case WEBSITE:
+        return "redirect:/websites/" + uuid;
       case WORK:
         return "redirect:/works/" + uuid;
       default:
