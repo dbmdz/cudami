@@ -50,7 +50,7 @@ public class IdentifiableAPIController extends AbstractUniqueObjectController<Id
     // Step 1: Search over identifiers
     PageResponse<Identifiable> pageResponse = service.find(btRequest);
     if (!pageResponse.hasContent()) {
-      //Step 2: Search over labels
+      // Step 2: Search over labels
       btRequest.setFiltering(getLabelFiltering(searchTerm));
       pageResponse = service.find(btRequest);
     }
@@ -65,7 +65,8 @@ public class IdentifiableAPIController extends AbstractUniqueObjectController<Id
 
   private Filtering getIdFiltering(String searchTerm) {
     return Filtering.builder()
-        .add(FilterCriterion.builder().withExpression("identifiers.id").contains(searchTerm).build())
+        .add(
+            FilterCriterion.builder().withExpression("identifiers.id").contains(searchTerm).build())
         .build();
   }
 }
