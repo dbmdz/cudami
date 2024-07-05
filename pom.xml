@@ -11,7 +11,7 @@
 
   <groupId>io.github.dbmdz.cudami</groupId>
   <artifactId>cudami</artifactId>
-  <version>9.2.0-RC2</version>
+  <version>9.2.0-RC3</version>
   <packaging>jar</packaging>
 
   <name>DigitalCollections: cudami</name>
