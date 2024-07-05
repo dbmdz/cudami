@@ -1,5 +1,7 @@
 package io.github.dbmdz.cudami.controller;
 
+import static io.github.dbmdz.cudami.controller.ParameterHelper.UUID_PATTERN;
+
 import de.digitalcollections.cudami.client.CudamiClient;
 import de.digitalcollections.cudami.client.identifiable.CudamiIdentifierTypesClient;
 import de.digitalcollections.model.identifiable.IdentifierType;
@@ -72,6 +74,11 @@ public class MainController {
           return "forward:/identifiables/" + q.replaceFirst("^.*?:", namespace + ":");
         }
       }
+    }
+
+    // Check, if the query string is an UUID
+    if (q.matches(UUID_PATTERN)) {
+      return "forward:/identifiables/uuid/" + q;
     }
 
     // There was no identifiable, so we make a search over all labels as IdentifiableObjectType
