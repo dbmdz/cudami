@@ -46,14 +46,26 @@ public class IdentifiableAPIController extends AbstractUniqueObjectController<Id
     Sorting sorting = createSorting(Identifiable.class, sortProperty, sortOrder, null);
     btRequest.setSorting(sorting);
 
-    btRequest.setFiltering(getLabelFiltering(searchTerm));
+    btRequest.setFiltering(getIdFiltering(searchTerm));
+    // Step 1: Search over identifiers
     PageResponse<Identifiable> pageResponse = service.find(btRequest);
+    if (!pageResponse.hasContent()) {
+      //Step 2: Search over labels
+      btRequest.setFiltering(getLabelFiltering(searchTerm));
+      pageResponse = service.find(btRequest);
+    }
     return new BTResponse<>(pageResponse);
   }
 
   private Filtering getLabelFiltering(String searchTerm) {
     return Filtering.builder()
-        .add(FilterCriterion.builder().withExpression("label").contains(searchTerm).build())
+        .add(FilterCriterion.builder().withExpression("label").isEquals(searchTerm).build())
+        .build();
+  }
+
+  private Filtering getIdFiltering(String searchTerm) {
+    return Filtering.builder()
+        .add(FilterCriterion.builder().withExpression("identifiers.id").contains(searchTerm).build())
         .build();
   }
 }

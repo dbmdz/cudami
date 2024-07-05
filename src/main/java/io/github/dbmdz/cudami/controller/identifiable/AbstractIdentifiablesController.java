@@ -131,7 +131,10 @@ public class AbstractIdentifiablesController<
         return "forward:/corporatebodies/" + uuid;
       case DIGITAL_OBJECT:
         return "forward:/digitalobjects/" + uuid;
+      case EVENT:
+        return "forward:/events/" + uuid;
       case GEO_LOCATION:
+      case HUMAN_SETTLEMENT:
         return "forward:/geolocations/" + uuid;
         // GeoLocation geoLocation = geoLocationsService.findOne(entity.getUuid());
         // GeoLocationType geoLocationType = geoLocation.getGeoLocationType();
@@ -174,6 +177,8 @@ public class AbstractIdentifiablesController<
         return "forward:/manifestations/" + uuid;
       case PERSON:
         return "forward:/persons/" + uuid;
+      case PROJECT:
+        return "forward:/projects/" + uuid;
       case TOPIC:
         return "forward:/topics/" + uuid;
       case WORK:
@@ -195,7 +200,10 @@ public class AbstractIdentifiablesController<
         return "redirect:/corporatebodies/" + uuid;
       case DIGITAL_OBJECT:
         return "redirect:/digitalobjects/" + uuid;
+      case EVENT:
+        return "redirect:/events/" + uuid;
       case GEO_LOCATION:
+      case HUMAN_SETTLEMENT:
         return "redirect:/geolocations/" + uuid;
       case HEADWORD_ENTRY:
         HeadwordEntry headwordEntry =
@@ -208,6 +216,10 @@ public class AbstractIdentifiablesController<
         return "redirect:/manifestations/" + uuid;
       case PERSON:
         return "redirect:/persons/" + uuid;
+      case PROJECT:
+        return "redirect:/projects/" + uuid;
+      case SUBJECT:
+        return "redirect:/subjects/" + uuid;
       case TOPIC:
         return "redirect:/topics/" + uuid;
       case WORK:
