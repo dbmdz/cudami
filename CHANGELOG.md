@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
 
 ## Unreleased
 
+## [9.2.0](https://github.com/dbmdz/cudami/releases/tag/9.2.0) – 2024-07-08
+
 ### Added
 
 - Added search slot on all pages
