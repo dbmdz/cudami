@@ -3,6 +3,7 @@ package io.github.dbmdz.cudami.controller.identifiable.entity.work;
 import de.digitalcollections.cudami.client.CudamiClient;
 import de.digitalcollections.cudami.client.identifiable.entity.work.CudamiWorksClient;
 import de.digitalcollections.model.exception.TechnicalException;
+import de.digitalcollections.model.exception.http.HttpException;
 import de.digitalcollections.model.identifiable.entity.manifestation.Manifestation;
 import de.digitalcollections.model.identifiable.entity.work.Work;
 import de.digitalcollections.model.list.paging.PageResponse;
@@ -14,6 +15,7 @@ import io.github.dbmdz.cudami.controller.identifiable.entity.AbstractEntitiesCon
 import io.github.dbmdz.cudami.model.bootstraptable.BTRequest;
 import io.github.dbmdz.cudami.model.bootstraptable.BTResponse;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -111,10 +113,19 @@ public class WorksAPIController extends AbstractEntitiesController<Work, CudamiW
   public ResponseEntity update(@PathVariable UUID uuid, @RequestBody Work work) {
     try {
       Work workDb = service.update(uuid, work);
+      CompletableFuture.runAsync(this::refreshNewspapers);
       return ResponseEntity.ok(workDb);
     } catch (TechnicalException e) {
       LOGGER.error("Cannot save work with uuid={}", uuid, e);
       return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+    }
+  }
+
+  private void refreshNewspapers() {
+    try {
+      ((CudamiWorksClient) service).refreshNewspapers();
+    } catch (HttpException | TechnicalException e) {
+      LOGGER.error("Cannot refresh newspapers", e);
     }
   }
 }
