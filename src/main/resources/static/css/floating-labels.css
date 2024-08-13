@@ -263,7 +263,7 @@
     --normal-border-color: var(--dark, #343a40);
 }
 .form-label-group.outline input.border-white ~ span{
-    --normal-border-color: var(--white, ##fff);
+    --normal-border-color: var(--white, #fff);
 }
 
 
