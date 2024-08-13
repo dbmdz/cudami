@@ -257,7 +257,7 @@
     <dependency>
       <groupId>org.webjars.npm</groupId>
       <artifactId>bootstrap-table</artifactId>
-      <version>1.21.2</version>
+      <version>1.23.2</version>
       <scope>runtime</scope>
     </dependency>
     <dependency>
