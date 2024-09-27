@@ -56,7 +56,7 @@
     "react-movable": "^3.0.4",
     "react-paginate": "^8.2.0",
     "react-scripts": "5.0.1",
-    "reactstrap": "^8.10.1",
+    "reactstrap": "^9.2.3",
     "scheduler": "^0.23.0",
     "use-context-selector": "^1.4.1"
   },
