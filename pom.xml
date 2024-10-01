@@ -269,7 +269,7 @@
     <dependency>
       <groupId>org.webjars.npm</groupId>
       <artifactId>es-module-shims</artifactId>
-      <version>1.5.10</version>
+      <version>1.10.0</version>
       <scope>runtime</scope>
     </dependency>
     <dependency>
