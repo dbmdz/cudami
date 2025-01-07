@@ -21,6 +21,7 @@ const Teaser = ({
   onUpdate,
   previewImage,
   previewImageRenderingHints,
+  restrictedMenuForDescription = true,
   updatePreviewImage,
   urlAliases,
 }) => {
@@ -58,7 +59,7 @@ const Teaser = ({
               onUpdate={(document) => {
                 onUpdate('description', document)
               }}
-              restrictedMenu={true}
+              restrictedMenu={restrictedMenuForDescription}
               type="description"
             />
           </Col>

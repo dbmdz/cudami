@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
 
 ## Unreleased
 
+### Changed
+
+- Added full editor menu when editing a work's description
+
 ## [9.2.1](https://github.com/dbmdz/cudami/releases/tag/9.2.1) – 2024-08-13
 
 ### Added
