@@ -89,6 +89,7 @@ const WorkForm = ({
                   previewImageRenderingHints={
                     identifiable.previewImageRenderingHints
                   }
+                  restrictedMenuForDescription={false}
                   updatePreviewImage={onUpdate}
                   urlAliases={identifiable.localizedUrlAliases?.[language]}
                 />
