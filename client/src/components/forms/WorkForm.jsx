@@ -9,6 +9,7 @@ import ActionButtons from './ActionButtons'
 
 const WorkForm = ({
   activeLanguage,
+  enableUrlAliases,
   existingLanguages,
   formId,
   identifiable,
@@ -72,9 +73,8 @@ const WorkForm = ({
               /* TODO: extract as component */
               <TabPane key={language} tabId={language}>
                 <Teaser
-                  canEditLabel={false}
                   description={identifiable.description[language]}
-                  enableUrlAliases={false}
+                  enableUrlAliases={enableUrlAliases}
                   label={identifiable.label[language]}
                   language={language}
                   onUpdate={(updateKey, updateValue) =>

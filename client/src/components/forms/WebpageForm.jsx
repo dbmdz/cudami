@@ -25,6 +25,7 @@ import ActionButtons from './ActionButtons'
 const WebpageForm = ({
   activeLanguage,
   canAddLanguage,
+  enableUrlAliases,
   existingLanguages,
   formId,
   identifiable,
@@ -132,6 +133,7 @@ const WebpageForm = ({
                 <TabPane key={language} tabId={language}>
                   <Teaser
                     description={description[language]}
+                    enableUrlAliases={enableUrlAliases}
                     label={label[language]}
                     language={language}
                     onUpdate={(updateKey, updateValue) =>
