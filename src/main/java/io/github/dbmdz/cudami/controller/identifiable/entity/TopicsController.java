@@ -53,11 +53,11 @@ public class TopicsController extends AbstractEntitiesController<Topic, CudamiTo
       throws TechnicalException {
     final Locale displayLocale = LocaleContextHolder.getLocale();
     Topic topic = service.getByUuid(uuid);
-    List<Locale> existingLanguages =
-        languageService.sortLanguages(displayLocale, topic.getLabel().getLocales());
+    List<String> existingLanguages =
+        languageService.sortAndMapLanguages(displayLocale, topic.getLabel().getLocales());
 
-    if (activeLanguage != null && existingLanguages.contains(activeLanguage)) {
-      model.addAttribute("activeLanguage", activeLanguage);
+    if (activeLanguage != null && existingLanguages.contains(activeLanguage.toLanguageTag())) {
+      model.addAttribute("activeLanguage", activeLanguage.toLanguageTag());
     } else {
       model.addAttribute("activeLanguage", existingLanguages.get(0));
     }

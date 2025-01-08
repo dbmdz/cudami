@@ -7,6 +7,7 @@ import de.digitalcollections.model.text.LocalizedText;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
@@ -94,6 +95,13 @@ public class LanguageService {
       }
     }
     return localizedLanguageString;
+  }
+
+  public List<String> sortAndMapLanguages(
+      Locale displayLocale, Collection<Locale> languagesToSortAndMap) {
+    return sortLanguages(displayLocale, languagesToSortAndMap).stream()
+        .map(Locale::toLanguageTag)
+        .collect(Collectors.toCollection(LinkedList::new));
   }
 
   public List<Locale> sortLanguages(Locale displayLocale, Collection<Locale> languagesToSort) {

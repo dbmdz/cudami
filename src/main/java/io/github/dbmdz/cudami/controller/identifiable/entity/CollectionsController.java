@@ -54,11 +54,11 @@ public class CollectionsController
       throws TechnicalException {
     final Locale displayLocale = LocaleContextHolder.getLocale();
     Collection collection = service.getByUuid(uuid);
-    List<Locale> existingLanguages =
-        languageService.sortLanguages(displayLocale, collection.getLabel().getLocales());
+    List<String> existingLanguages =
+        languageService.sortAndMapLanguages(displayLocale, collection.getLabel().getLocales());
 
-    if (activeLanguage != null && existingLanguages.contains(activeLanguage)) {
-      model.addAttribute("activeLanguage", activeLanguage);
+    if (activeLanguage != null && existingLanguages.contains(activeLanguage.toLanguageTag())) {
+      model.addAttribute("activeLanguage", activeLanguage.toLanguageTag());
     } else {
       model.addAttribute("activeLanguage", existingLanguages.get(0));
     }
