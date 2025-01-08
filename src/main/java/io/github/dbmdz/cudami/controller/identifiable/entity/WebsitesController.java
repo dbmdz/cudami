@@ -79,11 +79,11 @@ public class WebsitesController extends AbstractEntitiesController<Website, Cuda
     if (useReact) {
       final Locale displayLocale = LocaleContextHolder.getLocale();
       Website website = service.getByUuid(uuid);
-      List<Locale> existingLanguages =
-          languageService.sortLanguages(displayLocale, website.getLabel().getLocales());
+      List<String> existingLanguages =
+          languageService.sortAndMapLanguages(displayLocale, website.getLabel().getLocales());
 
-      if (activeLanguage != null && existingLanguages.contains(activeLanguage)) {
-        model.addAttribute("activeLanguage", activeLanguage);
+      if (activeLanguage != null && existingLanguages.contains(activeLanguage.toLanguageTag())) {
+        model.addAttribute("activeLanguage", activeLanguage.toLanguageTag());
       } else {
         model.addAttribute("activeLanguage", existingLanguages.get(0));
       }

@@ -8,11 +8,9 @@ import de.digitalcollections.model.identifiable.entity.work.Work;
 import io.github.dbmdz.cudami.business.i18n.LanguageService;
 import io.github.dbmdz.cudami.controller.ParameterHelper;
 import io.github.dbmdz.cudami.controller.identifiable.entity.AbstractEntitiesController;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
-import java.util.stream.Collectors;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -48,9 +46,7 @@ public class WorksController extends AbstractEntitiesController<Work, CudamiWork
     final Locale displayLocale = LocaleContextHolder.getLocale();
     Work work = service.getByUuid(uuid);
     List<String> existingLanguages =
-        languageService.sortLanguages(displayLocale, work.getLabel().getLocales()).stream()
-            .map(Locale::toLanguageTag)
-            .collect(Collectors.toCollection(ArrayList::new));
+        languageService.sortAndMapLanguages(displayLocale, work.getLabel().getLocales());
 
     if (activeLanguage != null && existingLanguages.contains(activeLanguage.toLanguageTag())) {
       model.addAttribute("activeLanguage", activeLanguage.toLanguageTag());

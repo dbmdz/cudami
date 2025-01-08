@@ -45,11 +45,11 @@ public class PersonsController extends AbstractEntitiesController<Person, Cudami
       throws TechnicalException {
     final Locale displayLocale = LocaleContextHolder.getLocale();
     Person person = service.getByUuid(uuid);
-    List<Locale> existingLanguages =
-        languageService.sortLanguages(displayLocale, person.getLabel().getLocales());
+    List<String> existingLanguages =
+        languageService.sortAndMapLanguages(displayLocale, person.getLabel().getLocales());
 
-    if (activeLanguage != null && existingLanguages.contains(activeLanguage)) {
-      model.addAttribute("activeLanguage", activeLanguage);
+    if (activeLanguage != null && existingLanguages.contains(activeLanguage.toLanguageTag())) {
+      model.addAttribute("activeLanguage", activeLanguage.toLanguageTag());
     } else {
       model.addAttribute("activeLanguage", existingLanguages.get(0));
     }

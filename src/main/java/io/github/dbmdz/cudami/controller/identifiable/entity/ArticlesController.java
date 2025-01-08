@@ -44,11 +44,11 @@ public class ArticlesController extends AbstractEntitiesController<Article, Cuda
       throws TechnicalException {
     final Locale displayLocale = LocaleContextHolder.getLocale();
     Article article = service.getByUuid(uuid);
-    List<Locale> existingLanguages =
-        languageService.sortLanguages(displayLocale, article.getLabel().getLocales());
+    List<String> existingLanguages =
+        languageService.sortAndMapLanguages(displayLocale, article.getLabel().getLocales());
 
-    if (activeLanguage != null && existingLanguages.contains(activeLanguage)) {
-      model.addAttribute("activeLanguage", activeLanguage);
+    if (activeLanguage != null && existingLanguages.contains(activeLanguage.toLanguageTag())) {
+      model.addAttribute("activeLanguage", activeLanguage.toLanguageTag());
     } else {
       model.addAttribute("activeLanguage", existingLanguages.get(0));
     }

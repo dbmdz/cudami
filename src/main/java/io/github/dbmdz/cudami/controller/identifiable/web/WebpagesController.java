@@ -65,11 +65,11 @@ public class WebpagesController
       throws TechnicalException {
     final Locale displayLocale = LocaleContextHolder.getLocale();
     Webpage webpage = service.getByUuid(uuid);
-    List<Locale> existingLanguages =
-        languageService.sortLanguages(displayLocale, webpage.getLabel().getLocales());
+    List<String> existingLanguages =
+        languageService.sortAndMapLanguages(displayLocale, webpage.getLabel().getLocales());
 
-    if (activeLanguage != null && existingLanguages.contains(activeLanguage)) {
-      model.addAttribute("activeLanguage", activeLanguage);
+    if (activeLanguage != null && existingLanguages.contains(activeLanguage.toLanguageTag())) {
+      model.addAttribute("activeLanguage", activeLanguage.toLanguageTag());
     } else {
       model.addAttribute("activeLanguage", existingLanguages.get(0));
     }
