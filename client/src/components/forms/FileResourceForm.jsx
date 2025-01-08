@@ -11,6 +11,7 @@ import FileResourceUploadForm from './FileResourceUploadForm'
 const FileResourceForm = ({
   activeLanguage,
   canAddLanguage,
+  enableUrlAliases,
   existingLanguages,
   formId,
   identifiable,
@@ -75,6 +76,7 @@ const FileResourceForm = ({
               <TabPane key={language} tabId={language}>
                 <Teaser
                   description={identifiable.description[language]}
+                  enableUrlAliases={enableUrlAliases}
                   label={identifiable.label[language]}
                   language={language}
                   onUpdate={(updateKey, updateValue) =>

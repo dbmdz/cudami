@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
 
 ## Unreleased
 
+### Added
+
+- Added functionality to disable URL aliases at all
+
 ## [9.3.0](https://github.com/dbmdz/cudami/releases/tag/9.3.0) – 2025-01-07
 
 ### Changed

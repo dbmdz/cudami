@@ -265,6 +265,7 @@ class IdentifiableForm extends Component {
       activeLanguage,
       availableLanguages,
       existingLanguages,
+      generationExcludes,
       identifiable,
       invalidLanguages,
     } = this.state
@@ -272,6 +273,9 @@ class IdentifiableForm extends Component {
       <FormComponent
         activeLanguage={activeLanguage}
         canAddLanguage={availableLanguages.length > 0}
+        enableUrlAliases={
+          !generationExcludes.includes(identifiable.identifiableObjectType)
+        }
         existingLanguages={existingLanguages}
         formId={`${kebabCase(this.props.type)}-form`}
         identifiable={identifiable}
