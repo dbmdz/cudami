@@ -1,7 +1,7 @@
 package io.github.dbmdz.cudami.config;
 
-import de.digitalcollections.model.security.Role;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import io.github.dbmdz.cudami.model.security.Role;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
