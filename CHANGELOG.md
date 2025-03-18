@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
 
 ## Unreleased
 
+### Changed
+
+- Adoptions for using latest spring-free model
+
 ## [9.3.1](https://github.com/dbmdz/cudami/releases/tag/9.3.1) – 2025-01-14
 
 ### Added

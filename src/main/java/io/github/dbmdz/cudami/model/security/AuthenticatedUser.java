@@ -23,11 +23,7 @@ public class AuthenticatedUser implements UserDetails {
     return user.getRoles().stream()
         .map(
             r -> {
-              return (GrantedAuthority)
-                  () -> {
-                    // Prefix "ROLE_" needed by Spring Security
-                    return "ROLE_" + r.name();
-                  };
+              return (GrantedAuthority) Role.valueOf(r.name());
             })
         .collect(Collectors.toList());
   }

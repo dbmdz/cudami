@@ -2,13 +2,13 @@ package io.github.dbmdz.cudami.controller.security;
 
 import de.digitalcollections.model.exception.ResourceNotFoundException;
 import de.digitalcollections.model.exception.TechnicalException;
-import de.digitalcollections.model.security.Role;
 import de.digitalcollections.model.security.User;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.github.dbmdz.cudami.business.api.service.exceptions.ServiceException;
 import io.github.dbmdz.cudami.business.api.service.security.UserService;
 import io.github.dbmdz.cudami.controller.AbstractController;
 import io.github.dbmdz.cudami.controller.ParameterHelper;
+import io.github.dbmdz.cudami.model.security.Role;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
