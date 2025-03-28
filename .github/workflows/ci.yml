@@ -90,15 +90,15 @@ jobs:
           check-latest: true
           distribution: temurin
           java-version: 17
-          server-id: ossrh-snapshots
+          server-id: central
           server-password: MAVEN_PASSWORD
           server-username: MAVEN_USERNAME
       - name: Publish snapshot to the Maven Central Repository
         if: github.event_name == 'push' && endswith(env.PROJECT_VERSION, 'SNAPSHOT')
         run: mvn -B deploy -DskipTests -Pmaven-central
         env:
-          MAVEN_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
-          MAVEN_USERNAME: ${{ secrets.OSSRH_USERNAME }}
+          MAVEN_PASSWORD: ${{ secrets.CENTRAL_PASSWORD }}
+          MAVEN_USERNAME: ${{ secrets.CENTRAL_USERNAME }}
       # Publish release
       - name: Set up JDK 17 for publishing a release
         if: github.event_name == 'release' && !endswith(env.PROJECT_VERSION, 'SNAPSHOT')
@@ -109,7 +109,7 @@ jobs:
           gpg-passphrase: MAVEN_GPG_PASSPHRASE
           gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }}
           java-version: 17
-          server-id: ossrh
+          server-id: central
           server-password: MAVEN_PASSWORD
           server-username: MAVEN_USERNAME
       - name: Publish release to the Maven Central Repository
@@ -117,5 +117,5 @@ jobs:
         run: mvn -B deploy -DskipTests -Pmaven-central,sign
         env:
           MAVEN_GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
-          MAVEN_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
-          MAVEN_USERNAME: ${{ secrets.OSSRH_USERNAME }}
+          MAVEN_PASSWORD: ${{ secrets.CENTRAL_PASSWORD }}
+          MAVEN_USERNAME: ${{ secrets.CENTRAL_USERNAME }}
