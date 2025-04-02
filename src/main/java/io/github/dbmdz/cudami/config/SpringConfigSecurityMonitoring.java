@@ -1,24 +1,21 @@
 package io.github.dbmdz.cudami.config;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.actuate.autoconfigure.security.servlet.EndpointRequest;
 import org.springframework.boot.actuate.health.HealthEndpoint;
 import org.springframework.boot.actuate.info.InfoEndpoint;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.annotation.Order;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
-@Order(1)
-@SuppressFBWarnings(
-    value = "THROWS_METHOD_THROWS_CLAUSE_BASIC_EXCEPTION",
-    justification = "Spring Security throws java.lang.Exception...")
-public class SpringConfigSecurityMonitoring extends WebSecurityConfigurerAdapter {
+public class SpringConfigSecurityMonitoring {
 
   @Value("${management.endpoints.web.base-path}")
   private String actuatorBasePath;
@@ -29,41 +26,33 @@ public class SpringConfigSecurityMonitoring extends WebSecurityConfigurerAdapter
   @Value("${spring.security.user.name}")
   private String actuatorUsername;
 
-  @Override
-  protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-    auth.inMemoryAuthentication()
-        .passwordEncoder(passwordEncoderDummy())
-        .withUser(User.withUsername(actuatorUsername).password(actuatorPassword).roles("ACTUATOR"));
-  }
-
-  @Override
-  protected void configure(HttpSecurity http) throws Exception {
-    // Monitoring:
-    // see
-    // https://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/#production-ready-endpoints
-    http.antMatcher(actuatorBasePath + "/**")
-        .authorizeRequests()
-        .requestMatchers(EndpointRequest.to(HealthEndpoint.class, InfoEndpoint.class))
-        .permitAll()
-        .requestMatchers(EndpointRequest.to("prometheus", "version"))
-        .permitAll()
-        .requestMatchers(EndpointRequest.toAnyEndpoint())
-        .hasRole("ACTUATOR")
-        .and()
+  @Bean
+  public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    http.securityMatcher(actuatorBasePath + "/**")
+        .authorizeHttpRequests(
+            auth ->
+                auth.requestMatchers(EndpointRequest.to(HealthEndpoint.class, InfoEndpoint.class))
+                    .permitAll()
+                    .requestMatchers(EndpointRequest.to("prometheus", "version"))
+                    .permitAll()
+                    .requestMatchers(EndpointRequest.toAnyEndpoint())
+                    .hasRole("ACTUATOR"))
         .httpBasic();
+    return http.build();
   }
 
-  private PasswordEncoder passwordEncoderDummy() {
-    return new PasswordEncoder() {
-      @Override
-      public String encode(CharSequence rawPassword) {
-        return rawPassword.toString();
-      }
+  @Bean
+  public UserDetailsService userDetailsService() {
+    UserDetails user =
+        User.withUsername(actuatorUsername)
+            .password(passwordEncoder().encode(actuatorPassword))
+            .roles("ACTUATOR")
+            .build();
+    return username -> user;
+  }
 
-      @Override
-      public boolean matches(CharSequence rawPassword, String encodedPassword) {
-        return rawPassword.toString().equals(encodedPassword);
-      }
-    };
+  @Bean
+  public PasswordEncoder passwordEncoder() {
+    return PasswordEncoderFactories.createDelegatingPasswordEncoder();
   }
 }
