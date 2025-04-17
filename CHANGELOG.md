@@ -8,7 +8,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
 
 ### Changed
 
-- Adoptions for using latest spring-free model
+- Adoptions for using latest spring-free model and client
 
 ## [9.3.1](https://github.com/dbmdz/cudami/releases/tag/9.3.1) – 2025-01-14
 
