@@ -11,7 +11,7 @@
 
   <groupId>io.github.dbmdz.cudami</groupId>
   <artifactId>cudami</artifactId>
-  <version>9.3.2-rc.2</version>
+  <version>9.3.2</version>
   <packaging>jar</packaging>
 
   <name>DigitalCollections: cudami</name>
@@ -107,7 +107,7 @@
     <dependency>
       <groupId>io.github.dbmdz.metadata</groupId>
       <artifactId>metasvc-client</artifactId>
-      <version>11.0.0-rc.3</version>
+      <version>11.0.0</version>
     </dependency>
     <dependency>
       <groupId>javax.servlet</groupId>
