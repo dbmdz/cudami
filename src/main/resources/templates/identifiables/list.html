@@ -72,8 +72,8 @@
     </th:block>
 
     <th:block layout:fragment="beforeBodyEnds">
-      <div th:replace="fragments/modals/confirm-yes-no :: confirm-yes-no-dialog"></div>
-      <div th:replace="fragments/bootstrap-table :: data-formatter"></div>
+      <div th:replace="~{fragments/modals/confirm-yes-no :: confirm-yes-no-dialog}"></div>
+      <div th:replace="~{fragments/bootstrap-table :: data-formatter}"></div>
 
       <script type="text/javascript">
         function formatRowNumberIdentifiables(value, row, index) {

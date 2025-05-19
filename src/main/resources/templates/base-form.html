@@ -77,9 +77,9 @@
   <body>
 
   <th:block layout:fragment="beforeBodyEnds">
-    <th:block th:replace="fragments/modals/add-language :: add-language-dialog"></th:block>
-    <th:block th:replace="fragments/modals/add-link :: add-link-dialog"></th:block>
-    <div th:replace="fragments/modals/confirm-yes-no :: confirm-yes-no-dialog"></div>
+    <th:block th:replace="~{fragments/modals/add-language :: add-language-dialog}"></th:block>
+    <th:block th:replace="~{fragments/modals/add-link :: add-link-dialog}"></th:block>
+    <div th:replace="~{fragments/modals/confirm-yes-no :: confirm-yes-no-dialog}"></div>
 
     <script type="text/javascript">
       $('.localized-form').each(function (i, localizedForm) {

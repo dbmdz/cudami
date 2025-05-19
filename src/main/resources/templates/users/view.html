@@ -48,7 +48,7 @@
 
           <div id="content-body" class="rows-striped">
 
-            <th:block th:insert="fragments/uniqueobject::renderFields(${user})"></th:block>
+            <th:block th:insert="~{fragments/uniqueobject::renderFields(${user})}"></th:block>
 
             <hr>
 
@@ -76,7 +76,7 @@
     </th:block>
 
     <th:block layout:fragment="beforeBodyEnds">
-      <div th:replace="fragments/modals/confirm-yes-no :: confirm-yes-no-dialog"></div>
+      <div th:replace="~{fragments/modals/confirm-yes-no :: confirm-yes-no-dialog}"></div>
       <script th:inline="javascript">
         $(addUserStatusChangeHandler(/*[[@{/api/users/{uuid}(uuid=${user.uuid})}]]*/));
       </script>
