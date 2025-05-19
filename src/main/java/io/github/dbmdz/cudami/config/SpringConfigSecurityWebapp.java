@@ -1,17 +1,19 @@
 package io.github.dbmdz.cudami.config;
 
-import de.digitalcollections.model.security.Role;
+import io.github.dbmdz.cudami.model.security.Role;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.actuate.autoconfigure.security.servlet.EndpointRequest;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
@@ -21,14 +23,19 @@ public class SpringConfigSecurityWebapp {
   @Value("${spring.security.rememberme.secret-key}")
   private String rememberMeSecretKey;
 
-  private final UserDetailsService userDetailsService;
-
-  public SpringConfigSecurityWebapp(UserDetailsService userDetailsService) {
-    this.userDetailsService = userDetailsService;
+  @Bean
+  @Order(0)
+  SecurityFilterChain actuatorFilterChain(HttpSecurity http) throws Exception {
+    http.securityMatcher(EndpointRequest.toAnyEndpoint())
+        .authorizeHttpRequests(auth -> auth.anyRequest().permitAll());
+    return http.build();
   }
 
   @Bean
-  public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+  @Order(1)
+  SecurityFilterChain webappFilterChain(
+      HttpSecurity http, @Qualifier("userDetailsServiceImpl") UserDetailsService userDetailsService)
+      throws Exception {
     http.authorizeHttpRequests(
             auth ->
                 auth.requestMatchers(PathRequest.toStaticResources().atCommonLocations())
@@ -51,20 +58,15 @@ public class SpringConfigSecurityWebapp {
                     .key(rememberMeSecretKey)
                     .userDetailsService(userDetailsService)
                     .tokenValiditySeconds(14 * 24 * 3600));
-
     return http.build();
   }
 
   @Bean
-  public AuthenticationProvider authProvider() {
+  public AuthenticationProvider authProvider(
+      @Qualifier("userDetailsServiceImpl") UserDetailsService userDetailsService) {
     DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
-    authProvider.setPasswordEncoder(passwordEncoder());
+    authProvider.setPasswordEncoder(new BCryptPasswordEncoder());
     authProvider.setUserDetailsService(userDetailsService);
     return authProvider;
-  }
-
-  @Bean
-  public PasswordEncoder passwordEncoder() {
-    return new BCryptPasswordEncoder();
   }
 }
