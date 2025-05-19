@@ -18,7 +18,7 @@ import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
 @EnableWebSecurity
-public class SpringConfigSecurityWebapp {
+public class SpringConfigSecurity {
 
   @Value("${spring.security.rememberme.secret-key}")
   private String rememberMeSecretKey;
