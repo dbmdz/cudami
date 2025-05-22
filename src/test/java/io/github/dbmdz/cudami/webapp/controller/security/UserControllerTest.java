@@ -3,12 +3,12 @@ package io.github.dbmdz.cudami.webapp.controller.security;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import io.github.dbmdz.cudami.test.TestApplication;
+import org.assertj.core.api.Condition;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.test.context.support.WithMockUser;
 
@@ -47,8 +47,11 @@ public class UserControllerTest {
         this.testRestTemplate
             .withBasicAuth("admin", "secret")
             .getForEntity("/users/new", Object.class);
-    Object object = responseEntity.getBody();
-    MediaType contentType = responseEntity.getHeaders().getContentType();
-    // HttpStatus statusCode = responseEntity.getStatusCode();
+    assertThat(responseEntity.getStatusCode())
+        .is(
+            new Condition<>(
+                status -> status.is3xxRedirection(),
+                "No support for Basic Auth but redirection to login page failed."));
+    assertThat(responseEntity.getHeaders().getLocation()).isNotNull().hasPath("/login");
   }
 }

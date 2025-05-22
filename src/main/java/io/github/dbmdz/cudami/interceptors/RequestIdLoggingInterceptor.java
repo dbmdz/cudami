@@ -11,6 +11,7 @@ import org.springframework.web.servlet.ModelAndView;
 
 public class RequestIdLoggingInterceptor implements HandlerInterceptor {
   /** Clear MDC to avoid data leaking between two requests handled by the same thread. */
+  @Override
   public void postHandle(
       @NonNull HttpServletRequest request,
       @NonNull HttpServletResponse response,
@@ -23,6 +24,7 @@ public class RequestIdLoggingInterceptor implements HandlerInterceptor {
    * Register the request identifier (if received from client/frontend server) in the logging
    * context.
    */
+  @Override
   @SuppressFBWarnings(value = {"HRS_REQUEST_PARAMETER_TO_HTTP_HEADER"})
   public boolean preHandle(
       @NonNull HttpServletRequest request,
