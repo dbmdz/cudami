@@ -31,6 +31,7 @@ public class CreateAdminUserInterceptor implements HandlerInterceptor, MessageSo
     this.messageSource = messageSource;
   }
 
+  @Override
   public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
       throws ServiceException {
     LOGGER.info("checking if admin user exists...");
@@ -41,6 +42,7 @@ public class CreateAdminUserInterceptor implements HandlerInterceptor, MessageSo
     return true;
   }
 
+  @Override
   public void postHandle(
       HttpServletRequest request,
       HttpServletResponse response,

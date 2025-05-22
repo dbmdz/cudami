@@ -244,16 +244,11 @@
       <artifactId>thymeleaf-spring6</artifactId>
       <version>3.1.2.RELEASE</version>
     </dependency>
-    <!-- https://mvnrepository.com/artifact/org.apache.commons/commons-fileupload2-jakarta -->
     <dependency>
+      <!-- https://mvnrepository.com/artifact/org.apache.commons/commons-fileupload2-jakarta -->
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-fileupload2-jakarta</artifactId>
       <version>2.0.0-M1</version>
-    </dependency>
-    <dependency>
-      <groupId>commons-io</groupId>
-      <artifactId>commons-io</artifactId>
-      <version>2.17.0</version>
     </dependency>
     <dependency>
       <groupId>org.webjars</groupId>
