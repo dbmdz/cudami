@@ -6,7 +6,7 @@
     <th:block th:fragment="renderAllLocalizedStructuredContent(localizedStructuredContent)">
     <th:block th:if="${localizedStructuredContent}">
       <th:block th:each="entry : ${localizedStructuredContent}">
-        <th:block th:insert="cudami/fragments/structuredcontent::renderContentBlocks(${entry.value.contentBlocks})"></th:block>
+        <th:block th:insert="~{cudami/fragments/structuredcontent::renderContentBlocks(${entry.value.contentBlocks})}"></th:block>
       </th:block>
     </th:block>
   </th:block>
@@ -15,7 +15,7 @@
     <th:block th:if="${localizedStructuredContent}">
       <th:block th:if="${language}" th:with="structuredContent=${localizedStructuredContent.get(#locale.forLanguageTag(language))}">
         <th:block th:if="${structuredContent}">
-          <th:block th:insert="cudami/fragments/structuredcontent::renderContentBlocks(${structuredContent.contentBlocks})"></th:block>
+          <th:block th:insert="~{cudami/fragments/structuredcontent::renderContentBlocks(${structuredContent.contentBlocks})}"></th:block>
         </th:block>
         <th:block th:unless="${structuredContent}" th:with="keys=${localizedStructuredContent.keySet}">
           <div th:unless="${keys==null || keys.isEmpty()}" th:with="alternativeLanguages=${localizedStructuredContent.keySet != null ? @fragmentsController.getDisplayLanguages(#locale, localizedStructuredContent.keySet) : ''}" th:utext="#{content_in_other_languages(${alternativeLanguages})}">available in other languages</div>

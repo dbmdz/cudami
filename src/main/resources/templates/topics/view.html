@@ -32,7 +32,7 @@
                   <th:block th:if="${not #lists.isEmpty(breadcrumbs)}">
                     <th:block th:each="breadcrumb : ${breadcrumbs}">
                       <li class="breadcrumb-item"><a th:href="@{/topics/} + ${breadcrumb.targetId}">
-                          <th:block th:insert="cudami/fragments/localizedtext::renderLocalizedText(${breadcrumb.label}, ${locale})">Node Label</th:block>
+                          <th:block th:insert="~{cudami/fragments/localizedtext::renderLocalizedText(${breadcrumb.label}, ${locale})}">Node Label</th:block>
                         </a></li>
                     </th:block>
                   </th:block>
@@ -44,15 +44,15 @@
             <th:block th:if="${not #lists.isEmpty(existingLanguages)}">
               <div class="language-selection">
                 <span th:text="#{lbl.data_language}">Show language dependent values in</span>&nbsp;
-                <select th:replace="fragments/components/select-language-dropdown::render('data-languages', ${existingLanguages}, ${dataLanguage})">English</select>
+                <select th:replace="~{fragments/components/select-language-dropdown::render('data-languages', ${existingLanguages}, ${dataLanguage})}">English</select>
               </div>
             </th:block>
 
-            <th:block th:insert="fragments/uniqueobject::renderFields(${topic})"></th:block>
+            <th:block th:insert="~{fragments/uniqueobject::renderFields(${topic})}"></th:block>
 
-            <th:block th:insert="fragments/identifiable::renderFields(${topic})"></th:block>
+            <th:block th:insert="~{fragments/identifiable::renderFields(${topic})}"></th:block>
 
-            <th:block th:insert="fragments/entity::renderFields(${topic})"></th:block>
+            <th:block th:insert="~{fragments/entity::renderFields(${topic})}"></th:block>
 
             <hr />
 
@@ -63,7 +63,7 @@
                   <!-- TODO it always contains "und" undefined language? -->
                   <th:block th:if="${not #lists.isEmpty(existingSubtopicsLanguages)}">
                     <span th:text="#{lbl.data_language}">Show language dependent values in</span>&nbsp;
-                    <select th:replace="fragments/components/select-language-dropdown::render('subtopics-languages', ${existingSubtopicsLanguages}, ${dataLanguageSubtopics})">English</select>
+                    <select th:replace="~{fragments/components/select-language-dropdown::render('subtopics-languages', ${existingSubtopicsLanguages}, ${dataLanguageSubtopics})}">English</select>
                   </th:block>
                 </div>
                 <table id="table-subtopics"
@@ -118,7 +118,7 @@
                   <!-- TODO it always contains "und" undefined language? -->
                   <th:block th:if="${not #lists.isEmpty(existingEntitiesLanguages)}">
                     <span th:text="#{lbl.data_language}">Show language dependent values in</span>&nbsp;
-                    <select th:replace="fragments/components/select-language-dropdown::render('entities-languages', ${existingEntitiesLanguages}, ${dataLanguageEntities})">English</select>
+                    <select th:replace="~{fragments/components/select-language-dropdown::render('entities-languages', ${existingEntitiesLanguages}, ${dataLanguageEntities})}">English</select>
                   </th:block>
                 </div>
                 <table id="table-entities"
@@ -173,7 +173,7 @@
                   <!-- TODO it always contains "und" undefined language? -->
                   <th:block th:if="${not #lists.isEmpty(existingFileresourcesLanguages)}">
                     <span th:text="#{lbl.data_language}">Show language dependent values in</span>&nbsp;
-                    <select th:replace="fragments/components/select-language-dropdown::render('fileresources-languages', ${existingFileresourcesLanguages}, ${dataLanguageFileresources})">English</select>
+                    <select th:replace="~{fragments/components/select-language-dropdown::render('fileresources-languages', ${existingFileresourcesLanguages}, ${dataLanguageFileresources})}">English</select>
                   </th:block>
                 </div>
                 <table id="table-fileresources"
@@ -597,7 +597,7 @@
       /*]]>*/
       </script>
 
-      <div th:replace="fragments/bootstrap-table :: data-formatter"></div>
+      <div th:replace="~{fragments/bootstrap-table :: data-formatter}"></div>
     </section>
   </body>
 

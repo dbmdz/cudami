@@ -35,7 +35,7 @@
       <div class="col-md-9">
         <ul class="list-group">
           <th:block th:each="localizedNote : *{notes}">
-            <li class="list-group-item"><th:block th:insert="fragments/text::renderAllLocalizedStructuredContent(${localizedNote})"></th:block></li>
+            <li class="list-group-item"><th:block th:insert="~{fragments/text::renderAllLocalizedStructuredContent(${localizedNote})}"></th:block></li>
           </th:block>
         </ul>
       </div>
@@ -46,7 +46,7 @@
     <h2 th:text="#{notes}">Notes</h2>
     <th:block
       th:each="localizedNote,iter : ${notes}"
-      th:insert="::renderLocalizedNote(localizedNote, idx)"
+      th:insert="~{::renderLocalizedNote(localizedNote, idx)}"
       th:with="idx=${iter.index}"
       ></th:block>
   </th:block>
@@ -71,7 +71,7 @@
       <div th:each="note,iter : ${localizedNote}" th:id="${'note-' + idx + '-' + note.key}" class="tab-pane" th:classappend="${iter.index} == 0 ? active">
         <div class="card">
           <div class="card-body">
-            <th:block th:insert="cudami/fragments/structuredcontent::renderLocalizedStructuredContent(${localizedNote}, ${note.key})"></th:block>
+            <th:block th:insert="~{cudami/fragments/structuredcontent::renderLocalizedStructuredContent(${localizedNote}, ${note.key})}"></th:block>
           </div>
         </div>
       </div>

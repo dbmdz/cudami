@@ -29,10 +29,10 @@
             </div>
 
             <div id="content-body" class="rows-striped">
-              <div th:replace="fragments/feedback-messages :: form"></div>
+              <div th:replace="~{fragments/feedback-messages :: form}"></div>
 
               <th:block th:if="${mode} == 'edit'">
-                <th:block th:insert="fragments/uniqueobject::renderFields(${website})"></th:block>
+                <th:block th:insert="~{fragments/uniqueobject::renderFields(${website})}"></th:block>
                 <hr>
               </th:block>
 
@@ -62,7 +62,7 @@
                       <input type="hidden" th:id="previewImage-json" th:field="*{previewImage}" />
                       <input type="hidden" th:id="previewImageRenderingHints-json" th:field="*{previewImageRenderingHints}" />
                       <th:block th:each="language, iter : ${existingLanguages}">
-                        <div th:replace="fragments/forms/multilanguage-teaser::renderHtml(fieldLanguage='__${language}__',active=__${iter.index == 0}__,beanName='website')"></div>
+                        <div th:replace="~{fragments/forms/multilanguage-teaser::renderHtml(fieldLanguage='__${language}__',active=__${iter.index == 0}__,beanName='website')}"></div>
                       </th:block>
                     </div>
                   </div>
@@ -87,7 +87,7 @@
         </div>
       </div>
 
-      <th:block th:replace="fragments/modals/select-image :: select-image-dialog"></th:block>
+      <th:block th:replace="~{fragments/modals/select-image :: select-image-dialog}"></th:block>
     </th:block>
   </body>
 

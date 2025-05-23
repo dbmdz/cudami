@@ -30,15 +30,15 @@
             <th:block th:if="${not #lists.isEmpty(existingLanguages)}">
               <div class="language-selection">
                 <span th:text="#{lbl.data_language}">Show language dependent values in</span>&nbsp;
-                <select th:replace="fragments/components/select-language-dropdown::render('data-languages', ${existingLanguages}, ${dataLanguage})">English</select>
+                <select th:replace="~{fragments/components/select-language-dropdown::render('data-languages', ${existingLanguages}, ${dataLanguage})}">English</select>
               </div>
             </th:block>
 
-            <th:block th:insert="fragments/uniqueobject::renderFields(${headwordEntry})"></th:block>
+            <th:block th:insert="~{fragments/uniqueobject::renderFields(${headwordEntry})}"></th:block>
 
-            <th:block th:insert="fragments/identifiable::renderFields(${headwordEntry})"></th:block>
+            <th:block th:insert="~{fragments/identifiable::renderFields(${headwordEntry})}"></th:block>
 
-            <th:block th:insert="fragments/entity::renderFields(${headwordEntry})"></th:block>
+            <th:block th:insert="~{fragments/entity::renderFields(${headwordEntry})}"></th:block>
 
             <hr />
 
@@ -53,7 +53,7 @@
                 <th:block th:if="${headwordEntry.text?.containsKey(#locale.forLanguageTag(dataLanguage))}">
                   <div class="card">
                     <div class="card-body">
-                      <th:block th:insert="fragments/text::renderLocalizedStructuredContent(${headwordEntry.text}, ${dataLanguage})"></th:block>
+                      <th:block th:insert="~{fragments/text::renderLocalizedStructuredContent(${headwordEntry.text}, ${dataLanguage})}"></th:block>
                     </div>
                   </div>
                 </th:block>

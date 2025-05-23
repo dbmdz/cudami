@@ -6,6 +6,19 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
 
 ## Unreleased
 
+### Changed
+
+- upgrade to Spring Boot 3
+- several dependency upgrades
+
+### Fixed
+
+- Thymeleaf syntax (for `th:insert` & `th:replace`: using `~{path/to/fragment…}`)
+
+### Removed
+
+- **Breaking:** Removed authentication for monitoring endpoint(s)
+
 ## [9.3.2](https://github.com/dbmdz/cudami/releases/tag/9.3.2) – 2025-05-05
 
 ### Changed

@@ -24,7 +24,7 @@
           </div>
 
           <div id="content-body" class="rows-striped">
-            <th:block th:insert="fragments/uniqueobject::renderFields(${tag})"></th:block>
+            <th:block th:insert="~{fragments/uniqueobject::renderFields(${tag})}"></th:block>
 
             <hr />
 

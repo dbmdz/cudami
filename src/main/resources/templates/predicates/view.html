@@ -29,24 +29,24 @@
             <th:block th:if="${not #lists.isEmpty(existingLanguages)}">
               <div class="language-selection">
                 <span th:text="#{lbl.data_language}">Show language dependent values in</span>&nbsp;
-                <select th:replace="fragments/components/select-language-dropdown::render('data-languages', ${existingLanguages}, ${dataLanguage})">English</select>
+                <select th:replace="~{fragments/components/select-language-dropdown::render('data-languages', ${existingLanguages}, ${dataLanguage})}">English</select>
               </div>
             </th:block>
 
-            <th:block th:insert="fragments/uniqueobject::renderFields(${predicate})"></th:block>
+            <th:block th:insert="~{fragments/uniqueobject::renderFields(${predicate})}"></th:block>
 
             <hr />
 
             <div class="row">
               <div class="col-md-3 multilanguage"><label th:text="#{lbl.label}">Label</label></div>
               <div class="col-md-9">
-                <th:block th:insert="cudami/fragments/localizedtext::renderLocalizedText(*{label}, ${dataLanguage})"></th:block>
+                <th:block th:insert="~{cudami/fragments/localizedtext::renderLocalizedText(*{label}, ${dataLanguage})}"></th:block>
               </div>
             </div>
             <div class="row">
               <div class="col-md-3 multilanguage"><label th:text="#{lbl.description}">Abstract</label></div>
               <div class="col-md-9">
-                <th:block th:insert="cudami/fragments/localizedtext::renderLocalizedText(*{description}, ${dataLanguage})"></th:block>
+                <th:block th:insert="~{cudami/fragments/localizedtext::renderLocalizedText(*{description}, ${dataLanguage})}"></th:block>
               </div>
             </div>
             <div class="row">
@@ -60,7 +60,7 @@
     </th:block>
 
     <section layout:fragment="beforeBodyEnds">
-      <div th:replace="fragments/modals/confirm-yes-no :: confirm-yes-no-dialog"></div>
+      <div th:replace="~{fragments/modals/confirm-yes-no :: confirm-yes-no-dialog}"></div>
 
       <script type="text/javascript">
         $(addDataLanguageChangeHandler());

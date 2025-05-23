@@ -27,7 +27,7 @@ public class MainControllerTest {
   @Test
   public void testNoAdminUserExists() throws Exception {
     this.mockMvc
-        .perform(get("/"))
+        .perform(get("/").header("Accept", "text/html"))
         .andDo(print())
         .andExpect(status().is3xxRedirection())
         .andExpect(redirectedUrl("http://localhost/login"));

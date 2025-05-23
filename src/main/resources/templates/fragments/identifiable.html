@@ -8,37 +8,37 @@
       <div class="row">
         <div class="col-md-3 multilanguage"><label th:text="#{lbl.preview_image}">Preview Image</label></div>
         <div class="col-md-9">
-          <th:block th:insert="cudami/fragments/previewimage-to-html::renderImage(*{previewImage}, *{previewImageRenderingHints}, ${dataLanguage}, 100)"></th:block>
+          <th:block th:insert="~{cudami/fragments/previewimage-to-html::renderImage(*{previewImage}, *{previewImageRenderingHints}, ${dataLanguage}, 100)}"></th:block>
         </div>
       </div>
       <div class="row">
         <div class="col-md-3 multilanguage"><label th:text="#{lbl.label}">Label</label></div>
         <div class="col-md-9">
-          <th:block th:insert="fragments/text::renderLocalizedText(*{label}, ${dataLanguage})"></th:block>
+          <th:block th:insert="~{fragments/text::renderLocalizedText(*{label}, ${dataLanguage})}"></th:block>
         </div>
       </div>
       <div class="row">
         <div class="col-md-3 multilanguage"><label th:text="#{lbl.description}">Abstract</label></div>
         <div class="col-md-9">
-          <th:block th:insert="fragments/text::renderLocalizedStructuredContent(*{description}, ${dataLanguage})"></th:block>
+          <th:block th:insert="~{fragments/text::renderLocalizedStructuredContent(*{description}, ${dataLanguage})}"></th:block>
         </div>
       </div>
       <div class="row">
         <div class="col-md-3 multilanguage"><label th:text="#{lbl.url_aliases}">URL Aliases</label></div>
         <div class="col-md-9">
-          <th:block th:insert="::renderUrlAliases(*{localizedUrlAliases}, ${dataLanguage})"></th:block>
+          <th:block th:insert="~{::renderUrlAliases(*{localizedUrlAliases}, ${dataLanguage})}"></th:block>
         </div>
       </div>
       <div class="row">
         <div class="col-md-3"><label th:text="#{lbl.tags}">Tags</label></div>
         <div class="col-md-9">
-          <th:block th:insert="::renderTags(*{tags})"></th:block>
+          <th:block th:insert="~{::renderTags(*{tags})}"></th:block>
         </div>
       </div>
       <div class="row">
         <div class="col-md-3"><label th:text="#{lbl.identifiers}">Identifiers</label></div>
         <div class="col-md-9">
-          <th:block th:insert="::renderIdentifiers(*{identifiers})"></th:block>
+          <th:block th:insert="~{::renderIdentifiers(*{identifiers})}"></th:block>
         </div>
       </div>
     </th:block>
@@ -111,11 +111,11 @@
         <div th:each="language,iter : ${languages}" th:id="${language}" class="tab-pane" th:classappend="${iter.index} == 0 ? active">
           <div class="card">
             <div class="card-body bg-light">
-              <th:block th:insert="::renderTeaser(${identifiable}, ${language})"></th:block>
+              <th:block th:insert="~{::renderTeaser(${identifiable}, ${language})}"></th:block>
             </div>
             <th:block th:if="${hasLongText} and ${identifiable.text?.containsKey(language)}">
               <div class="card-body long-text">
-                <th:block th:insert="cudami/fragments/structuredcontent::renderLocalizedStructuredContent(${identifiable.text}, ${language})"></th:block>
+                <th:block th:insert="~{cudami/fragments/structuredcontent::renderLocalizedStructuredContent(${identifiable.text}, ${language})}"></th:block>
               </div>
             </th:block>
           </div>
@@ -126,14 +126,14 @@
     <th:block th:fragment="renderTeaser(identifiable, language)">
       <div class="row">
         <div class="col-sm-2">
-          <th:block th:insert="cudami/fragments/previewimage-to-html::renderImage(${identifiable.previewImage}, ${identifiable.previewImageRenderingHints}, ${language}, 100)"></th:block>
+          <th:block th:insert="~{cudami/fragments/previewimage-to-html::renderImage(${identifiable.previewImage}, ${identifiable.previewImageRenderingHints}, ${language}, 100)}"></th:block>
         </div>
         <div class="col-sm-10">
           <label class="font-weight-bold">
-            <th:block th:insert="cudami/fragments/localizedtext::renderLocalizedText(${identifiable.label}, ${language})"></th:block>
+            <th:block th:insert="~{cudami/fragments/localizedtext::renderLocalizedText(${identifiable.label}, ${language})}"></th:block>
           </label>
           <th:block th:if="${identifiable.description?.containsKey(language)}">
-            <div th:insert="cudami/fragments/structuredcontent::renderLocalizedStructuredContent(${identifiable.description}, ${language})"></div>
+            <div th:insert="~{cudami/fragments/structuredcontent::renderLocalizedStructuredContent(${identifiable.description}, ${language})}"></div>
           </th:block>
         </div>
       </div>

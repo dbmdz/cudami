@@ -71,7 +71,7 @@
   </th:block>
 
   <th:block layout:fragment="beforeBodyEnds">
-    <div th:replace="fragments/modals/confirm-yes-no :: confirm-yes-no-dialog"></div>
+    <div th:replace="~{fragments/modals/confirm-yes-no :: confirm-yes-no-dialog}"></div>
 
     <script type="text/javascript">
       function formatRowNumberUsers(value, row, index) {
@@ -153,7 +153,7 @@
       }
       /*]]>*/
     </script>
-    <div th:replace="fragments/bootstrap-table :: data-formatter"></div>
+    <div th:replace="~{fragments/bootstrap-table :: data-formatter}"></div>
   </th:block>
 </body>
 </html>

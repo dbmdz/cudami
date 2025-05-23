@@ -52,7 +52,7 @@
                 </div>
                 <div class="form-group">
                   <label th:text="#{lbl.abstract}">Abstract</label>
-                  <div th:id="description-menu-__${fieldLanguage}__" th:insert="fragments/tiptap :: editor-menu-short(editorId='description-editor-' + ${fieldLanguage})" class="editorMenu border-1 p-1"></div>
+                  <div th:id="description-menu-__${fieldLanguage}__" th:insert="~{fragments/tiptap :: editor-menu-short(editorId='description-editor-' + ${fieldLanguage})}" class="editorMenu border-1 p-1"></div>
                   <div th:id="description-editor-__${fieldLanguage}__" th:data-menu-id="description-menu-__${fieldLanguage}__"></div>
                   <input th:id="description-json-__${fieldLanguage}__" type="hidden" th:field="*{description['__${fieldLanguage}__']}" />
                   <script th:inline="javascript" type="module">

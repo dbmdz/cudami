@@ -3,25 +3,20 @@ package io.github.dbmdz.cudami.webapp.controller.security;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import io.github.dbmdz.cudami.test.TestApplication;
+import org.assertj.core.api.Condition;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 /**
  * see https://docs.spring.io/spring-boot/docs/current/reference/html/boot-features-testing.html
  * alternatively:
  * https://docs.spring.io/spring-boot/docs/current/reference/html/boot-features-testing.html#boot-features-testing-spring-boot-applications-testing-autoconfigured-mvc-tests
  */
-@ExtendWith(SpringExtension.class)
-// annotation which can be used as an alternative to the standard spring-test @ContextConfiguration
-// annotation when you need Spring Boot features:
 @SpringBootTest(
     classes = {TestApplication.class},
     webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -29,7 +24,8 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 // Embedded servlet containers are started and listening on a random port
 // SpringBootTest registers a TestRestTemplate bean for use in web tests that are using a fully
 // running container.
-// @ContextConfiguration
+@ConfigurationPropertiesScan(
+    basePackages = {"io.github.dbmdz.cudami.config", "io.github.dbmdz.cudami.test.config"})
 public class UserControllerTest {
 
   @Autowired private TestRestTemplate testRestTemplate;
@@ -51,8 +47,11 @@ public class UserControllerTest {
         this.testRestTemplate
             .withBasicAuth("admin", "secret")
             .getForEntity("/users/new", Object.class);
-    Object object = responseEntity.getBody();
-    MediaType contentType = responseEntity.getHeaders().getContentType();
-    HttpStatus statusCode = responseEntity.getStatusCode();
+    assertThat(responseEntity.getStatusCode())
+        .is(
+            new Condition<>(
+                status -> status.is3xxRedirection(),
+                "No support for Basic Auth but redirection to login page failed."));
+    assertThat(responseEntity.getHeaders().getLocation()).isNotNull().hasPath("/login");
   }
 }

@@ -27,7 +27,7 @@
             </div>
 
             <div id="content-body" class="rows-striped">
-              <div th:replace="fragments/feedback-messages :: form"></div>
+              <div th:replace="~{fragments/feedback-messages :: form}"></div>
 
               <div class="row">
                 <div class="col-sm-12">
@@ -53,7 +53,7 @@
                     </ul>
                     <div class="tab-content">
                       <th:block th:each="language, iter : ${existingLanguages}">
-                        <div th:replace="fragments/forms/label-description-form :: html(fieldLanguage=${language},active=${iter.index == 0},beanName='givenName')"></div>
+                        <div th:replace="~{fragments/forms/label-description-form :: html(fieldLanguage=${language},active=${iter.index == 0},beanName='givenName')}"></div>
                       </th:block>
                     </div>
                   </div>
@@ -62,7 +62,7 @@
               </div>
 
               <th:block th:if="${mode} == 'edit'">
-                <th:block th:insert="fragments/uniqueobject::renderFields(${givenName})"></th:block>
+                <th:block th:insert="~{fragments/uniqueobject::renderFields(${givenName})}"></th:block>
               </th:block>
             </div>
           </form>

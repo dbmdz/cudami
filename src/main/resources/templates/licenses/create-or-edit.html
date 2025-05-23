@@ -26,10 +26,10 @@
             </div>
 
             <div id="content-body" class="rows-striped">
-              <div th:replace="fragments/feedback-messages :: form"></div>
+              <div th:replace="~{fragments/feedback-messages :: form}"></div>
 
               <th:block th:if="${mode} == 'edit'">
-                <th:block th:insert="fragments/uniqueobject::renderFields(${license})"></th:block>
+                <th:block th:insert="~{fragments/uniqueobject::renderFields(${license})}"></th:block>
                 <hr>
               </th:block>
 
@@ -57,7 +57,7 @@
                     </ul>
                     <div class="tab-content">
                       <th:block th:each="language, iter : ${existingLanguages}">
-                        <div th:replace="fragments/forms/multilanguage-label-form :: html(fieldLanguage=${language},active=${iter.index == 0},beanName='license')"></div>
+                        <div th:replace="~{fragments/forms/multilanguage-label-form :: html(fieldLanguage=${language},active=${iter.index == 0},beanName='license')}"></div>
                       </th:block>
                     </div>
                   </div>
