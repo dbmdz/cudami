@@ -30,15 +30,15 @@
             <th:block th:if="${not #lists.isEmpty(existingLanguages)}">
               <div class="language-selection">
                 <span th:text="#{lbl.data_language}">Show language dependent values in</span>&nbsp;
-                <select th:replace="fragments/components/select-language-dropdown::render('data-languages', ${existingLanguages}, ${dataLanguage})">English</select>
+                <select th:replace="~{fragments/components/select-language-dropdown::render('data-languages', ${existingLanguages}, ${dataLanguage})}">English</select>
               </div>
             </th:block>
 
-            <th:block th:insert="fragments/uniqueobject::renderFields(${project})"></th:block>
+            <th:block th:insert="~{fragments/uniqueobject::renderFields(${project})}"></th:block>
 
-            <th:block th:insert="fragments/identifiable::renderFields(${project})"></th:block>
+            <th:block th:insert="~{fragments/identifiable::renderFields(${project})}"></th:block>
 
-            <th:block th:insert="fragments/entity::renderFields(${project})"></th:block>
+            <th:block th:insert="~{fragments/entity::renderFields(${project})}"></th:block>
 
             <hr />
 
@@ -48,7 +48,7 @@
                 <th:block th:if="${project.text?.containsKey(#locale.forLanguageTag(dataLanguage))}">
                   <div class="card">
                     <div class="card-body">
-                      <th:block th:insert="fragments/text::renderLocalizedStructuredContent(${project.text}, ${dataLanguage})"></th:block>
+                      <th:block th:insert="~{fragments/text::renderLocalizedStructuredContent(${project.text}, ${dataLanguage})}"></th:block>
                     </div>
                   </div>
                 </th:block>
@@ -70,7 +70,7 @@
                   <!-- TODO it always contains "und" undefined language? -->
                   <th:block th:if="${not #lists.isEmpty(existingDigitalObjectsLanguages)}">
                     <span th:text="#{lbl.data_language}">Show language dependent values in</span>&nbsp;
-                    <select th:replace="fragments/components/select-language-dropdown::render('digitalobjects-languages', ${existingDigitalObjectsLanguages}, ${dataLanguageDigitalObjects})">English</select>
+                    <select th:replace="~{fragments/components/select-language-dropdown::render('digitalobjects-languages', ${existingDigitalObjectsLanguages}, ${dataLanguageDigitalObjects})}">English</select>
                   </th:block>
                 </div>
                 <table id="table-digitalobjects"
@@ -115,8 +115,8 @@
     </th:block>
 
     <section layout:fragment="beforeBodyEnds">
-      <div th:replace="fragments/modals/confirm-yes-no :: confirm-yes-no-dialog-html"></div>
-      <div th:replace="fragments/modals/select-entities :: render"></div>
+      <div th:replace="~{fragments/modals/confirm-yes-no :: confirm-yes-no-dialog-html}"></div>
+      <div th:replace="~{fragments/modals/select-entities :: render}"></div>
 
       <script type="text/javascript">
         $(addDataLanguageChangeHandler());
@@ -283,7 +283,7 @@
       /*]]>*/
       </script>
 
-      <div th:replace="fragments/bootstrap-table :: data-formatter"></div>
+      <div th:replace="~{fragments/bootstrap-table :: data-formatter}"></div>
     </section>
   </body>
 

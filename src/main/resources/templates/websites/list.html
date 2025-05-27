@@ -26,7 +26,7 @@
               <!-- TODO it always contains "und" undefined language? -->
               <th:block th:if="${not #lists.isEmpty(existingLanguages)}">
                 <span th:text="#{lbl.data_language}">Show language dependent values in</span>&nbsp;
-                <select th:replace="fragments/components/select-language-dropdown::render('websites-languages', ${existingLanguages}, ${dataLanguage})">English</select>
+                <select th:replace="~{fragments/components/select-language-dropdown::render('websites-languages', ${existingLanguages}, ${dataLanguage})}">English</select>
               </th:block>
             </div>
             <table id="table-websites"
@@ -72,7 +72,7 @@
   </th:block>
 
   <th:block layout:fragment="beforeBodyEnds">
-    <div th:replace="fragments/modals/confirm-yes-no :: confirm-yes-no-dialog"></div>
+    <div th:replace="~{fragments/modals/confirm-yes-no :: confirm-yes-no-dialog}"></div>
 
     <script type="text/javascript">
       $(function () {
@@ -143,7 +143,7 @@
       }
       /*]]>*/
     </script>
-    <div th:replace="fragments/bootstrap-table :: data-formatter"></div>
+    <div th:replace="~{fragments/bootstrap-table :: data-formatter}"></div>
   </th:block>
 </body>
 </html>

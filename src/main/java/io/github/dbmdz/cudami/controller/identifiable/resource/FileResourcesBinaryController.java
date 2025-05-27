@@ -5,12 +5,12 @@ import de.digitalcollections.cudami.client.identifiable.resource.CudamiFileResou
 import de.digitalcollections.model.exception.TechnicalException;
 import de.digitalcollections.model.identifiable.resource.FileResource;
 import io.github.dbmdz.cudami.controller.AbstractController;
+import jakarta.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.io.InputStream;
-import javax.servlet.http.HttpServletRequest;
-import org.apache.tomcat.util.http.fileupload.FileItemIterator;
-import org.apache.tomcat.util.http.fileupload.FileItemStream;
-import org.apache.tomcat.util.http.fileupload.servlet.ServletFileUpload;
+import org.apache.commons.fileupload2.core.FileItemInput;
+import org.apache.commons.fileupload2.core.FileItemInputIterator;
+import org.apache.commons.fileupload2.jakarta.JakartaServletFileUpload;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -40,7 +40,7 @@ public class FileResourcesBinaryController extends AbstractController {
   @ResponseBody
   public FileResource upload(HttpServletRequest request, RedirectAttributes redirectAttributes)
       throws TechnicalException {
-    boolean isMultipart = ServletFileUpload.isMultipartContent(request);
+    boolean isMultipart = JakartaServletFileUpload.isMultipartContent(request);
     if (!isMultipart) {
       // Inform user about invalid request
       redirectAttributes.addFlashAttribute("message", "Invalid file resource!");
@@ -48,14 +48,14 @@ public class FileResourcesBinaryController extends AbstractController {
     }
     InputStream stream = null;
     try {
-      ServletFileUpload upload = new ServletFileUpload();
-      FileItemIterator iter = upload.getItemIterator(request);
+      JakartaServletFileUpload upload = new JakartaServletFileUpload();
+      FileItemInputIterator iter = upload.getItemIterator(request);
       while (iter.hasNext()) {
-        FileItemStream item = iter.next();
+        FileItemInput item = iter.next();
         if (!item.isFormField()) {
           String contentType = item.getContentType();
           String filename = item.getName();
-          stream = item.openStream();
+          stream = item.getInputStream();
 
           FileResource fileResource = service.upload(stream, filename, contentType);
           return fileResource;

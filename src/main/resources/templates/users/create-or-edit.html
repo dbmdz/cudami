@@ -26,10 +26,10 @@
             </div>
 
             <div id="content-body" class="rows-striped">
-              <div th:replace="fragments/feedback-messages :: form"></div>
+              <div th:replace="~{fragments/feedback-messages :: form}"></div>
 
               <th:block th:if="${mode} == 'edit'">
-                <th:block th:insert="fragments/uniqueobject::renderFields(${user})"></th:block>
+                <th:block th:insert="~{fragments/uniqueobject::renderFields(${user})}"></th:block>
                 <hr>
               </th:block>
 

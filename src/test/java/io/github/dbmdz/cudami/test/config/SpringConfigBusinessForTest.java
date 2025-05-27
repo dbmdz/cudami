@@ -12,7 +12,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 @Configuration
 public class SpringConfigBusinessForTest {
 
-  @Bean
+  @Bean(name = {"userDetailsServiceImpl", "userDetailsService"})
   public UserDetailsService userDetailsService(UserService userService) {
     return new UserDetailsServiceImpl(userService);
   }

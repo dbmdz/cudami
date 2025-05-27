@@ -35,7 +35,7 @@
                     <th:block th:each="breadcrumb : ${breadcrumbs}">
                       <li class="breadcrumb-item">
                         <a th:href="@{/collections/} + ${breadcrumb.targetId}">
-                          <th:block th:insert="cudami/fragments/localizedtext::renderLocalizedText(${breadcrumb.label}, ${locale})">Node Label</th:block>
+                          <th:block th:insert="~{cudami/fragments/localizedtext::renderLocalizedText(${breadcrumb.label}, ${locale})}">Node Label</th:block>
                         </a>
                       </li>
                     </th:block>
@@ -48,17 +48,17 @@
             <th:block th:if="${not #lists.isEmpty(existingLanguages)}">
               <div class="language-selection">
                 <span th:text="#{lbl.data_language}">Show language dependent values in</span>&nbsp;
-                <select th:replace="fragments/components/select-language-dropdown::render('data-languages', ${existingLanguages}, ${dataLanguage})">English </select>
+                <select th:replace="~{fragments/components/select-language-dropdown::render('data-languages', ${existingLanguages}, ${dataLanguage})}">English </select>
               </div>
             </th:block>
 
-            <th:block th:insert="fragments/uniqueobject::renderFields(${collection})"></th:block>
+            <th:block th:insert="~{fragments/uniqueobject::renderFields(${collection})}"></th:block>
 
-            <th:block th:insert="fragments/identifiable::renderFields(${collection})"></th:block>
+            <th:block th:insert="~{fragments/identifiable::renderFields(${collection})}"></th:block>
 
-            <th:block th:insert="fragments/entity::renderFields(${collection})"></th:block>
+            <th:block th:insert="~{fragments/entity::renderFields(${collection})}"></th:block>
 
-            <th:block th:insert="fragments/managedcontent::renderFields(${collection})"></th:block>
+            <th:block th:insert="~{fragments/managedcontent::renderFields(${collection})}"></th:block>
 
             <hr />
 
@@ -69,7 +69,7 @@
               <div class="col-md-9">
                 <th:block th:each="parent : ${parents}">
                   <a class="mr-2" th:href="@{/collections/} + ${parent.uuid}">
-                    <th:block th:insert="cudami/fragments/localizedtext::renderLocalizedText(${parent.label}, ${dataLanguage})">Parent Label</th:block>
+                    <th:block th:insert="~{cudami/fragments/localizedtext::renderLocalizedText(${parent.label}, ${dataLanguage})}">Parent Label</th:block>
                   </a>
                 </th:block>
               </div>
@@ -81,7 +81,7 @@
                 <th:block th:if="${collection.text?.containsKey(#locale.forLanguageTag(dataLanguage))}">
                   <div class="card">
                     <div class="card-body">
-                      <th:block th:insert="fragments/text::renderLocalizedStructuredContent(${collection.text}, ${dataLanguage})"></th:block>
+                      <th:block th:insert="~{fragments/text::renderLocalizedStructuredContent(${collection.text}, ${dataLanguage})}"></th:block>
                     </div>
                   </div>
                 </th:block>
@@ -105,7 +105,7 @@
                   <!-- TODO it always contains "und" undefined language? -->
                   <th:block th:if="${not #lists.isEmpty(existingSubcollectionsLanguages)}">
                     <span th:text="#{lbl.data_language}">Show language dependent values in</span>&nbsp;
-                    <select th:replace="fragments/components/select-language-dropdown::render('subcollections-languages', ${existingSubcollectionsLanguages}, ${dataLanguageSubcollections})">English
+                    <select th:replace="~{fragments/components/select-language-dropdown::render('subcollections-languages', ${existingSubcollectionsLanguages}, ${dataLanguageSubcollections})}">English
                     </select>
                   </th:block>
                 </div>
@@ -181,7 +181,7 @@
                   <!-- TODO it always contains "und" undefined language? -->
                   <th:block th:if="${not #lists.isEmpty(existingDigitalObjectsLanguages)}">
                     <span th:text="#{lbl.data_language}">Show language dependent values in</span>&nbsp;
-                    <select th:replace="fragments/components/select-language-dropdown::render('digitalobjects-languages', ${existingDigitalObjectsLanguages}, ${dataLanguageDigitalObjects})">English
+                    <select th:replace="~{fragments/components/select-language-dropdown::render('digitalobjects-languages', ${existingDigitalObjectsLanguages}, ${dataLanguageDigitalObjects})}">English
                     </select>
                   </th:block>
                 </div>
@@ -629,7 +629,7 @@
 			/*]]>*/
       </script>
 
-      <div th:replace="fragments/bootstrap-table :: data-formatter"></div>
+      <div th:replace="~{fragments/bootstrap-table :: data-formatter}"></div>
     </section>
   </body>
 
