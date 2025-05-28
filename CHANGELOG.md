@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
 
 ## Unreleased
 
+## [10.0.0](https://github.com/dbmdz/cudami/releases/tag/10.0.0) - still RC
+
 ### Changed
 
 - upgrade to Spring Boot 3
