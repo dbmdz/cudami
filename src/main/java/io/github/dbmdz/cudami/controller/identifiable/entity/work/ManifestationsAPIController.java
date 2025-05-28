@@ -7,7 +7,6 @@ import de.digitalcollections.model.exception.TechnicalException;
 import de.digitalcollections.model.identifiable.entity.item.Item;
 import de.digitalcollections.model.identifiable.entity.manifestation.Manifestation;
 import de.digitalcollections.model.list.paging.PageResponse;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.github.dbmdz.cudami.business.api.service.exceptions.ServiceException;
 import io.github.dbmdz.cudami.business.i18n.LanguageService;
 import io.github.dbmdz.cudami.controller.ParameterHelper;
@@ -32,7 +31,6 @@ public class ManifestationsAPIController
     super(client.forManifestations(), client, languageService);
   }
 
-  @SuppressFBWarnings
   @GetMapping("/api/manifestations")
   @ResponseBody
   public BTResponse<Manifestation> find(

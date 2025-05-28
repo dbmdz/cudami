@@ -4,7 +4,6 @@ import de.digitalcollections.cudami.client.CudamiClient;
 import de.digitalcollections.cudami.client.identifiable.entity.agent.CudamiPersonsClient;
 import de.digitalcollections.model.exception.TechnicalException;
 import de.digitalcollections.model.identifiable.entity.agent.Person;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.github.dbmdz.cudami.business.api.service.exceptions.ServiceException;
 import io.github.dbmdz.cudami.business.i18n.LanguageService;
 import io.github.dbmdz.cudami.controller.ParameterHelper;
@@ -40,7 +39,6 @@ public class PersonsAPIController extends AbstractEntitiesController<Person, Cud
     return service.create();
   }
 
-  @SuppressFBWarnings
   @GetMapping("/api/persons")
   @ResponseBody
   public BTResponse<Person> find(

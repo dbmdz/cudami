@@ -5,7 +5,6 @@ import de.digitalcollections.cudami.client.identifiable.entity.CudamiHeadwordEnt
 import de.digitalcollections.model.exception.TechnicalException;
 import de.digitalcollections.model.identifiable.entity.HeadwordEntry;
 import de.digitalcollections.model.relation.Predicate;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.github.dbmdz.cudami.business.i18n.LanguageService;
 import io.github.dbmdz.cudami.controller.ParameterHelper;
 import io.github.dbmdz.cudami.model.bootstraptable.BTResponse;
@@ -40,7 +39,6 @@ public class HeadwordEntriesAPIController
     return service.create();
   }
 
-  @SuppressFBWarnings
   @GetMapping("/api/headwordentries")
   @ResponseBody
   public BTResponse<HeadwordEntry> find(

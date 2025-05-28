@@ -9,7 +9,6 @@ import de.digitalcollections.model.list.sorting.Order;
 import de.digitalcollections.model.list.sorting.Sorting;
 import de.digitalcollections.model.text.LocalizedStructuredContent;
 import de.digitalcollections.model.text.LocalizedText;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.github.dbmdz.cudami.business.i18n.LanguageService;
 import io.github.dbmdz.cudami.model.bootstraptable.BTRequest;
 import java.lang.reflect.Field;
@@ -17,7 +16,6 @@ import java.util.List;
 import java.util.Locale;
 import org.apache.commons.lang3.reflect.FieldUtils;
 
-@SuppressFBWarnings
 public abstract class AbstractPagingAndSortingController extends AbstractController {
 
   protected final LanguageService languageService;
@@ -75,7 +73,6 @@ public abstract class AbstractPagingAndSortingController extends AbstractControl
     return filtering;
   }
 
-  @SuppressFBWarnings
   protected PageRequest createPageRequest(
       Class targetClass,
       int pageNumber,
@@ -100,7 +97,6 @@ public abstract class AbstractPagingAndSortingController extends AbstractControl
     return pageRequest;
   }
 
-  @SuppressFBWarnings
   protected PageRequest createPageRequest(
       Class targetClass,
       int pageNumber,

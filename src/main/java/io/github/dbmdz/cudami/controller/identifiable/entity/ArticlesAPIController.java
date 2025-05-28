@@ -5,7 +5,6 @@ import de.digitalcollections.cudami.client.identifiable.entity.CudamiArticlesCli
 import de.digitalcollections.model.exception.TechnicalException;
 import de.digitalcollections.model.identifiable.entity.Article;
 import de.digitalcollections.model.identifiable.entity.agent.Agent;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.github.dbmdz.cudami.business.i18n.LanguageService;
 import io.github.dbmdz.cudami.controller.ParameterHelper;
 import io.github.dbmdz.cudami.model.bootstraptable.BTResponse;
@@ -52,7 +51,6 @@ public class ArticlesAPIController
     return service.create();
   }
 
-  @SuppressFBWarnings
   @GetMapping("/api/articles")
   @ResponseBody
   public BTResponse<Article> find(

@@ -6,7 +6,6 @@ import de.digitalcollections.model.exception.TechnicalException;
 import de.digitalcollections.model.identifiable.entity.Website;
 import de.digitalcollections.model.identifiable.web.Webpage;
 import de.digitalcollections.model.list.paging.PageResponse;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.github.dbmdz.cudami.business.api.service.exceptions.ServiceException;
 import io.github.dbmdz.cudami.business.i18n.LanguageService;
 import io.github.dbmdz.cudami.controller.ParameterHelper;
@@ -44,7 +43,6 @@ public class WebsitesAPIController
     return service.create();
   }
 
-  @SuppressFBWarnings
   @GetMapping("/api/websites")
   @ResponseBody
   public BTResponse<Website> find(

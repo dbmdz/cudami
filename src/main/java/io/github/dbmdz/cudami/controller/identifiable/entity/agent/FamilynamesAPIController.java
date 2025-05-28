@@ -4,7 +4,6 @@ import de.digitalcollections.cudami.client.CudamiClient;
 import de.digitalcollections.cudami.client.identifiable.agent.CudamiFamilyNamesClient;
 import de.digitalcollections.model.exception.TechnicalException;
 import de.digitalcollections.model.identifiable.agent.FamilyName;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.github.dbmdz.cudami.business.api.service.exceptions.ServiceException;
 import io.github.dbmdz.cudami.business.i18n.LanguageService;
 import io.github.dbmdz.cudami.controller.ParameterHelper;
@@ -41,7 +40,6 @@ public class FamilynamesAPIController
     return service.create();
   }
 
-  @SuppressFBWarnings
   @GetMapping("/api/familynames")
   @ResponseBody
   public BTResponse<FamilyName> find(

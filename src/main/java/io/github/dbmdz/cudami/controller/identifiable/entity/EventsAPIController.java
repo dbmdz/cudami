@@ -4,7 +4,6 @@ import de.digitalcollections.cudami.client.CudamiClient;
 import de.digitalcollections.cudami.client.identifiable.entity.CudamiEventsClient;
 import de.digitalcollections.model.exception.TechnicalException;
 import de.digitalcollections.model.identifiable.entity.Event;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.github.dbmdz.cudami.business.api.service.exceptions.ServiceException;
 import io.github.dbmdz.cudami.business.i18n.LanguageService;
 import io.github.dbmdz.cudami.controller.ParameterHelper;
@@ -27,7 +26,6 @@ public class EventsAPIController extends AbstractEntitiesController<Event, Cudam
   /*
   Used in templates/events/list.html
   */
-  @SuppressFBWarnings
   @GetMapping("/api/events")
   @ResponseBody
   public BTResponse<Event> find(

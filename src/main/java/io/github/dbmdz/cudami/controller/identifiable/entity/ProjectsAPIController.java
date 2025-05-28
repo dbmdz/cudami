@@ -7,7 +7,6 @@ import de.digitalcollections.model.identifiable.entity.Project;
 import de.digitalcollections.model.identifiable.entity.digitalobject.DigitalObject;
 import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.relation.Predicate;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.github.dbmdz.cudami.business.api.service.exceptions.ServiceException;
 import io.github.dbmdz.cudami.business.i18n.LanguageService;
 import io.github.dbmdz.cudami.controller.ParameterHelper;
@@ -60,7 +59,6 @@ public class ProjectsAPIController
   /*
    * Used in templates/projects/list.html
    */
-  @SuppressFBWarnings
   @GetMapping("/api/projects")
   @ResponseBody
   public BTResponse<Project> find(

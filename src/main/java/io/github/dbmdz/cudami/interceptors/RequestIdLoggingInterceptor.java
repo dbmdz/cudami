@@ -1,6 +1,5 @@
 package io.github.dbmdz.cudami.interceptors;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.MDC;
@@ -25,7 +24,6 @@ public class RequestIdLoggingInterceptor implements HandlerInterceptor {
    * context.
    */
   @Override
-  @SuppressFBWarnings(value = {"HRS_REQUEST_PARAMETER_TO_HTTP_HEADER"})
   public boolean preHandle(
       @NonNull HttpServletRequest request,
       @NonNull HttpServletResponse response,

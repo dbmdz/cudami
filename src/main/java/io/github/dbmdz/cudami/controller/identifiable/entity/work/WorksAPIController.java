@@ -7,7 +7,6 @@ import de.digitalcollections.model.exception.http.HttpException;
 import de.digitalcollections.model.identifiable.entity.manifestation.Manifestation;
 import de.digitalcollections.model.identifiable.entity.work.Work;
 import de.digitalcollections.model.list.paging.PageResponse;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.github.dbmdz.cudami.business.api.service.exceptions.ServiceException;
 import io.github.dbmdz.cudami.business.i18n.LanguageService;
 import io.github.dbmdz.cudami.controller.ParameterHelper;
@@ -38,7 +37,6 @@ public class WorksAPIController extends AbstractEntitiesController<Work, CudamiW
     super(client.forWorks(), client, languageService);
   }
 
-  @SuppressFBWarnings
   @GetMapping("/api/works")
   @ResponseBody
   public BTResponse<Work> find(

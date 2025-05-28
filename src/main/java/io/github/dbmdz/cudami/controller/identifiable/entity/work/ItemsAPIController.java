@@ -6,7 +6,6 @@ import de.digitalcollections.model.exception.TechnicalException;
 import de.digitalcollections.model.identifiable.entity.digitalobject.DigitalObject;
 import de.digitalcollections.model.identifiable.entity.item.Item;
 import de.digitalcollections.model.list.paging.PageResponse;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.github.dbmdz.cudami.business.api.service.exceptions.ServiceException;
 import io.github.dbmdz.cudami.business.i18n.LanguageService;
 import io.github.dbmdz.cudami.controller.ParameterHelper;
@@ -14,7 +13,11 @@ import io.github.dbmdz.cudami.controller.identifiable.entity.AbstractEntitiesCon
 import io.github.dbmdz.cudami.model.bootstraptable.BTRequest;
 import io.github.dbmdz.cudami.model.bootstraptable.BTResponse;
 import java.util.UUID;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 
 /** Controller for all public "Items" endpoints (API). */
 @RestController
@@ -24,7 +27,6 @@ public class ItemsAPIController extends AbstractEntitiesController<Item, CudamiI
     super(client.forItems(), client, languageService);
   }
 
-  @SuppressFBWarnings
   @GetMapping("/api/items")
   @ResponseBody
   public BTResponse<Item> find(

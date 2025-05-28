@@ -7,6 +7,7 @@ import org.assertj.core.api.Condition;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
+import org.springframework.boot.http.client.ClientHttpRequestFactorySettings.Redirects;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.ResponseEntity;
@@ -45,6 +46,7 @@ public class UserControllerTest {
   public void testUsersNewRequest() {
     ResponseEntity<Object> responseEntity =
         this.testRestTemplate
+            .withRedirects(Redirects.DONT_FOLLOW)
             .withBasicAuth("admin", "secret")
             .getForEntity("/users/new", Object.class);
     assertThat(responseEntity.getStatusCode())

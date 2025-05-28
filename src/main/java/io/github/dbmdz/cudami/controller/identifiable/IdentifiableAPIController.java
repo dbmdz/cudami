@@ -7,7 +7,6 @@ import de.digitalcollections.model.list.filtering.FilterCriterion;
 import de.digitalcollections.model.list.filtering.Filtering;
 import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.list.sorting.Sorting;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.github.dbmdz.cudami.business.api.service.exceptions.ServiceException;
 import io.github.dbmdz.cudami.controller.AbstractUniqueObjectController;
 import io.github.dbmdz.cudami.model.bootstraptable.BTRequest;
@@ -24,7 +23,6 @@ public class IdentifiableAPIController extends AbstractUniqueObjectController<Id
     super(client.forIdentifiables(), null);
   }
 
-  @SuppressFBWarnings
   @GetMapping("/api/identifiables")
   @ResponseBody
   public BTResponse<Identifiable> find(
