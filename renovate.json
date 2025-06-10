@@ -24,6 +24,10 @@
             "matchPackageNames":[
                 "*"
             ]
+        },
+        {
+            "matchPackageNames": ["org.thymeleaf:*"],
+            "enabled": false
         }
     ],
     "schedule":[
