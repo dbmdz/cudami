@@ -28,6 +28,10 @@
         {
             "matchPackageNames": ["org.thymeleaf:*"],
             "enabled": false
+        },
+        {
+            "matchPackageNames": ["org.thymeleaf.extras:*"],
+            "enabled": false
         }
     ],
     "schedule":[
