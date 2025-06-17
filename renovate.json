@@ -1,40 +1,44 @@
 {
-    "$schema":"https://docs.renovatebot.com/renovate-schema.json",
-    "branchConcurrentLimit":0,
-    "extends":[
-        "config:base",
+    "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+    "branchConcurrentLimit": 0,
+    "extends": [
+        "config:recommended",
         ":preserveSemverRanges",
         ":dependencyDashboard",
         ":rebaseStalePrs",
         ":enableVulnerabilityAlertsWithLabel(security)",
         "group:recommended"
     ],
-    "groupName":"all dependencies",
-    "groupSlug":"all",
-    "labels":[
+    "groupName": "all dependencies",
+    "groupSlug": "all",
+    "labels": [
         "dependencies"
     ],
-    "lockFileMaintenance":{
-        "enabled":false
+    "lockFileMaintenance": {
+        "enabled": false
     },
-    "packageRules":[
+    "packageRules": [
         {
-            "groupName":"all dependencies",
-            "groupSlug":"all",
-            "matchPackageNames":[
+            "groupName": "all dependencies",
+            "groupSlug": "all",
+            "matchPackageNames": [
                 "*"
             ]
         },
         {
-            "matchPackageNames": ["org.thymeleaf:*"],
+            "matchPackageNames": [
+                "org.thymeleaf:*"
+            ],
             "enabled": false
         },
         {
-            "matchPackageNames": ["org.thymeleaf.extras:*"],
+            "matchPackageNames": [
+                "org.thymeleaf.extras:*"
+            ],
             "enabled": false
         }
     ],
-    "schedule":[
+    "schedule": [
         "every weekend"
     ]
 }
