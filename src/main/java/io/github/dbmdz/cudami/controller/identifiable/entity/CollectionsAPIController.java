@@ -280,4 +280,16 @@ public class CollectionsAPIController
       return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
     }
   }
+
+  @PutMapping("/api/collections/{uuid:" + ParameterHelper.UUID_PATTERN + "}/collections")
+  public ResponseEntity updateSubpagesOrder(
+      @PathVariable UUID uuid, @RequestBody List<Collection> subcollections)
+      throws TechnicalException {
+    boolean successful =
+        ((CudamiCollectionsClient) service).updateChildrenOrder(uuid, subcollections);
+    if (successful) {
+      return new ResponseEntity<>(successful, HttpStatus.OK);
+    }
+    return new ResponseEntity<>(successful, HttpStatus.NOT_FOUND);
+  }
 }
