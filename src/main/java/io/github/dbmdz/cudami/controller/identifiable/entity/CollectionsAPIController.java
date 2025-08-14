@@ -152,8 +152,8 @@ public class CollectionsAPIController
       @RequestParam(name = "offset", required = false, defaultValue = "0") int offset,
       @RequestParam(name = "limit", required = false, defaultValue = "10") int limit,
       @RequestParam(name = "search", required = false) String searchTerm,
-      @RequestParam(name = "sort", required = false, defaultValue = "label") String sortProperty,
-      @RequestParam(name = "order", required = false, defaultValue = "asc") String sortOrder,
+      @RequestParam(name = "sort", required = false) String sortProperty,
+      @RequestParam(name = "order", required = false) String sortOrder,
       @RequestParam(name = "dataLanguage", required = false) String dataLanguage)
       throws TechnicalException {
     BTRequest btRequest =
@@ -279,5 +279,17 @@ public class CollectionsAPIController
       LOGGER.error("Cannot save collection with uuid={}", uuid, e);
       return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
     }
+  }
+
+  @PutMapping("/api/collections/{uuid:" + ParameterHelper.UUID_PATTERN + "}/collections")
+  public ResponseEntity updateSubpagesOrder(
+      @PathVariable UUID uuid, @RequestBody List<Collection> subcollections)
+      throws TechnicalException {
+    boolean successful =
+        ((CudamiCollectionsClient) service).updateChildrenOrder(uuid, subcollections);
+    if (successful) {
+      return new ResponseEntity<>(successful, HttpStatus.OK);
+    }
+    return new ResponseEntity<>(successful, HttpStatus.NOT_FOUND);
   }
 }
