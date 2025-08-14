@@ -105,8 +105,7 @@
                   <!-- TODO it always contains "und" undefined language? -->
                   <th:block th:if="${not #lists.isEmpty(existingSubcollectionsLanguages)}">
                     <span th:text="#{lbl.data_language}">Show language dependent values in</span>&nbsp;
-                    <select th:replace="~{fragments/components/select-language-dropdown::render('subcollections-languages', ${existingSubcollectionsLanguages}, ${dataLanguageSubcollections})}">English
-                    </select>
+                    <select th:replace="~{fragments/components/select-language-dropdown::render('subcollections-languages', ${existingSubcollectionsLanguages}, ${dataLanguageSubcollections})}">English</select>
                   </th:block>
                 </div>
                 <table id="table-sub-collections"
@@ -114,12 +113,14 @@
                        th:data-url="@{/api/collections/__${collection.uuid}__/collections}"
                        th:data-locale="${#locale}"
                        data-buttons="buttonsCollections"
-                       data-cookie="true"
+                       data-cookie="false"
                        data-cookie-id-table="table-sub-collections"
+                       data-drag-handle=">tbody>tr>td.dndHandle"
                        data-id-field="uuid"
                        data-pagination="true"
                        data-pagination-v-align="both"
                        data-query-params="queryParamsSubcollections"
+                       data-reorderable-rows="false"
                        data-search="true"
                        data-search-highlight="true"
                        data-search-on-enter-key="true"
@@ -127,12 +128,22 @@
                        data-show-search-button="true"
                        data-show-search-clear-button="true"
                        data-side-pagination="server"
-                       data-sort-name="label"
-                       data-sort-order="asc"
                        data-toolbar="#toolbar-sub-collections"
-                       data-unique-id="uuid">
+                       data-unique-id="uuid"
+                       data-use-row-attr-func="true">
                   <thead>
                     <tr>
+                      <th data-field="dndHandle"
+                          data-formatter="renderDnDHandle"
+                          data-visible="false"
+                          class="dndHandle text-primary">
+                        <button onclick="updateListOrder('#table-sub-collections')"
+                                class="btn btn-primary btn-sm dndSave"
+                                th:title="#{tooltip.reorder_save}"
+                                disabled>
+                          <i class="fa fa-save"></i>
+                        </button>
+                      </th>
                       <th data-field="index"
                           data-formatter="formatRowNumberSubCollections"
                           data-halign="right" data-align="right"
@@ -245,6 +256,15 @@
 
       <script type="text/javascript">
         $(addDataLanguageChangeHandler());
+
+        $('#table-sub-collections').on('reorder-row.bs.table', function (e, data) {
+          // it is only fired if order changed (new position of dragged row)
+          // activate save button and set table data to new data
+          let table = $('#table-sub-collections');
+          $(table).find('button.dndSave').prop("disabled", false);
+          $(table).bootstrapTable('removeAll');
+          $(table).bootstrapTable('append', data);
+        });
 
         $(function () {
           $("#subcollections-languages").change(function () {
@@ -405,6 +425,7 @@
            const baseUrl = [[@{'/collections'}]];
            const textAdd = [[#{btn.add}]];
            const tooltipAdd = [[#{tooltip.add_new_table_entry}]];
+           const tooltipReorder = [[#{tooltip.reorder_list}]];
            const parentUuid = [[${collection.uuid}]]
            const optionsAddExistingCollections = [[#{options.add_existing_collections}]];
            const optionsCreateSubcollection = [[#{options.create_subcollection}]];
@@ -423,6 +444,27 @@
                   </div>
                 </div>
                 `
+            },
+            btnReorder: {
+              text: tooltipReorder,
+              icon: 'fa-exchange-alt fa-rotate-90',
+              event: function () {
+                // show/hide handle column and toggle table sortable and save button disabled
+                let table = $('#table-sub-collections');
+                let reorderingActive = $(table).bootstrapTable('getOptions').reorderableRows;
+
+                if (reorderingActive) {
+                  $(table).bootstrapTable('hideColumn', 'dndHandle');
+                  $(table).find('button.dndSave').prop("disabled", true);
+                } else {
+                  $(table).find('button.dndSave').prop("disabled", false);
+                  $(table).bootstrapTable('showColumn', 'dndHandle');
+                }
+                $(table).bootstrapTable('refreshOptions', {reorderableRows: !reorderingActive});
+              },
+              attributes: {
+                title: tooltipReorder
+              }
             }
           };
         }
@@ -625,6 +667,34 @@
           $(modalDialog).find('.modal-body').html(modalMessage);
           $(modalDialog).find('.modal-footer #confirm').attr('href', "javascript:removeSubcollection('" + uuid + "');");
           $(modalDialog).modal('show');
+        }
+
+        function updateListOrder(tableId) {
+          /*[+
+           const errorMessage = [[#{error.technical_error}]];
+           const apiUrl = [[@{/api/collections/__${collection.uuid}__/collections}]];
+           const successMessage = `[(#{msg.save_reordered_list.success})]`;
+           +]*/
+
+          let list = $(tableId).bootstrapTable('getData');
+
+          // update subcollections order
+          fetch(apiUrl,
+            {
+              method: "PUT", headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify(list)
+            })
+            .then(handleFetchErrors)
+            .then(function (response) {
+              $(tableId).find('button.dndSave').prop("disabled", true);
+              showMessage('alert-success', '#alert-subcollections', successMessage);
+            })
+            .catch(function (error) {
+              showMessage('alert-danger', '#alert-subcollections', errorMessage);
+            });
         }
 			/*]]>*/
       </script>
