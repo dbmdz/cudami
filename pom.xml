@@ -6,7 +6,7 @@
   <parent>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-parent</artifactId>
-    <version>3.5.4</version>
+    <version>3.5.5</version>
   </parent>
 
   <groupId>io.github.dbmdz.cudami</groupId>
@@ -81,7 +81,7 @@
     <dependency>
       <groupId>com.github.spotbugs</groupId>
       <artifactId>spotbugs-annotations</artifactId>
-      <version>4.9.3</version>
+      <version>4.9.4</version>
       <optional>true</optional>
     </dependency>
     <dependency>
@@ -409,13 +409,13 @@
       <plugin>
         <groupId>com.github.spotbugs</groupId>
         <artifactId>spotbugs-maven-plugin</artifactId>
-        <version>4.9.3.2</version>
+        <version>4.9.4.0</version>
         <dependencies>
           <!-- overwrite dependency on spotbugs if you want to specify the version of spotbugs -->
           <dependency>
             <groupId>com.github.spotbugs</groupId>
             <artifactId>spotbugs</artifactId>
-            <version>4.9.3</version>
+            <version>4.9.4</version>
           </dependency>
         </dependencies>
         <executions>
