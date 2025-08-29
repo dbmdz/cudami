@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
 
 ## Unreleased
 
+## [10.1.0](https://github.com/dbmdz/cudami/releases/tag/10.1.0) - 2025-08-29
+
 ### Added
 
 - Added functionality to update the order of subcollections
