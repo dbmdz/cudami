@@ -38,6 +38,7 @@ const WebpageForm = ({
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const {t} = useTranslation()
   const {
+    externalUrl,
     description,
     label,
     previewImage,
@@ -45,6 +46,7 @@ const WebpageForm = ({
     publicationEnd,
     publicationStart,
     renderingHints,
+    showExternalAsInternalUrl = false,
     text,
     uuid,
   } = identifiable
@@ -109,6 +111,31 @@ const WebpageForm = ({
                 })
               }
               templateName={renderingHints.templateName}
+            />
+          </Col>
+        </Row>
+        <Row>
+          <Col>
+            <InputWithLabel
+              id="external-url"
+              labelKey="externalUrl"
+              type="url"
+              value={externalUrl}
+              onChange={(externalUrl) => onUpdate({externalUrl})}
+            />
+          </Col>
+          <Col className="align-self-center">
+            <CustomInput
+              id="show-external-url-as-internal"
+              type="switch"
+              label={t('showExternalAsInternal')}
+              className="mt-2"
+              checked={showExternalAsInternalUrl}
+              onChange={(event) =>
+                onUpdate({
+                  showExternalAsInternalUrl: event.target.checked,
+                })
+              }
             />
           </Col>
         </Row>
