@@ -59,6 +59,22 @@
 
             <th:block th:insert="~{fragments/managedcontent::renderFields(${webpage})}"></th:block>
 
+            <div class="row">
+              <div class="col-md-3"><label th:text="#{webpage.external_url}">External URL</label></div>
+              <div class="col-md-9"><span th:text="*{externalUrl} ?: ''">-</span></div>
+            </div>
+            <div class="row" th:if="*{externalUrl} != null">
+              <div class="col-md-3"><label th:text="#{webpage.show_external_as_internal}">Show as internal URL</label></div>
+              <div class="align-items-center col-md-9 d-flex"
+                   th:if="*{showExternalAsInternalUrl}">
+                <i aria-hidden="true" class="fa fa-check text-success"></i>
+              </div>
+              <div class="align-items-center col-md-9 d-flex"
+                   th:if="*{showExternalAsInternalUrl == null} or *{not showExternalAsInternalUrl}">
+                <i aria-hidden="true" class="fa fa-times text-danger"></i>
+              </div>
+            </div>
+
             <hr />
 
             <div class="row">
