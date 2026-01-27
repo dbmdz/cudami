@@ -1,5 +1,6 @@
 package io.github.dbmdz.cudami.interceptors;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.MDC;
@@ -23,6 +24,7 @@ public class RequestIdLoggingInterceptor implements HandlerInterceptor {
    * Register the request identifier (if received from client/frontend server) in the logging
    * context.
    */
+  @SuppressFBWarnings("HRS_REQUEST_PARAMETER_TO_HTTP_HEADER")
   @Override
   public boolean preHandle(
       @NonNull HttpServletRequest request,
