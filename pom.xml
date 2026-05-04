@@ -6,7 +6,7 @@
   <parent>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-parent</artifactId>
-    <version>3.5.10</version>
+    <version>3.5.16</version>
   </parent>
 
   <groupId>io.github.dbmdz.cudami</groupId>
@@ -81,13 +81,13 @@
     <dependency>
       <groupId>com.github.spotbugs</groupId>
       <artifactId>spotbugs-annotations</artifactId>
-      <version>4.9.8</version>
+      <version>4.10.3</version>
       <optional>true</optional>
     </dependency>
     <dependency>
       <groupId>com.google.guava</groupId>
       <artifactId>guava</artifactId>
-      <version>33.5.0-jre</version>
+      <version>33.6.0-jre</version>
     </dependency>
     <dependency>
       <groupId>commons-codec</groupId>
@@ -228,17 +228,6 @@
     <dependency>
       <groupId>org.thymeleaf.extras</groupId>
       <artifactId>thymeleaf-extras-springsecurity6</artifactId>
-      <version>3.1.2.RELEASE</version>
-    </dependency>
-    <dependency>
-      <groupId>org.thymeleaf</groupId>
-      <artifactId>thymeleaf</artifactId>
-      <version>3.1.2.RELEASE</version>
-    </dependency>
-    <dependency>
-      <groupId>org.thymeleaf</groupId>
-      <artifactId>thymeleaf-spring6</artifactId>
-      <version>3.1.2.RELEASE</version>
     </dependency>
     <dependency>
       <groupId>org.apache.commons</groupId>
@@ -265,7 +254,7 @@
     <dependency>
       <groupId>org.webjars.npm</groupId>
       <artifactId>bootstrap-table</artifactId>
-      <version>1.26.0</version>
+      <version>1.27.3</version>
       <scope>runtime</scope>
     </dependency>
     <dependency>
@@ -409,13 +398,13 @@
       <plugin>
         <groupId>com.github.spotbugs</groupId>
         <artifactId>spotbugs-maven-plugin</artifactId>
-        <version>4.9.8.2</version>
+        <version>4.10.3.0</version>
         <dependencies>
           <!-- overwrite dependency on spotbugs if you want to specify the version of spotbugs -->
           <dependency>
             <groupId>com.github.spotbugs</groupId>
             <artifactId>spotbugs</artifactId>
-            <version>4.9.8</version>
+            <version>4.10.3</version>
           </dependency>
         </dependencies>
         <executions>
@@ -468,7 +457,7 @@
       <plugin>
         <groupId>org.jacoco</groupId>
         <artifactId>jacoco-maven-plugin</artifactId>
-        <version>0.8.14</version>
+        <version>0.8.15</version>
         <executions>
           <execution>
             <id>pre-unit-test</id>
@@ -549,7 +538,7 @@
       <plugin>
         <groupId>org.jacoco</groupId>
         <artifactId>jacoco-maven-plugin</artifactId>
-        <version>0.8.14</version>
+        <version>0.8.15</version>
       </plugin>
     </plugins>
   </reporting>
@@ -575,7 +564,7 @@
           <plugin>
             <groupId>com.github.eirslett</groupId>
             <artifactId>frontend-maven-plugin</artifactId>
-            <version>2.0.0</version>
+            <version>2.0.2</version>
             <configuration>
               <installDirectory>client/bin</installDirectory>
               <workingDirectory>client</workingDirectory>
@@ -663,7 +652,7 @@
           <plugin>
             <groupId>org.sonatype.central</groupId>
             <artifactId>central-publishing-maven-plugin</artifactId>
-            <version>0.10.0</version>
+            <version>0.11.0</version>
             <extensions>true</extensions>
             <configuration>
               <publishingServerId>central</publishingServerId>
