@@ -38,13 +38,13 @@ jobs:
           check-latest: true
           node-version: 24
       - name: Check Javascript codestyle
-        run: npm install && npm run format-check
+        run: npm ci --legacy-peer-deps && npm run format-check
         working-directory: client
       - name: Build with Maven
         run: mvn -B -U clean verify -Pproduction
     strategy:
       matrix:
-        java: [17]
+        java: [25]
   coverage:
     needs: build
     runs-on: ubuntu-latest
@@ -56,7 +56,7 @@ jobs:
         env:
           cache-name: cache-maven-artifacts
         with:
-          key: cudami-cache-java-17-${{ github.run_id }}
+          key: cudami-cache-java-25-${{ github.run_id }}
           path: |
             ~/.m2/repository
             **/target
@@ -74,7 +74,7 @@ jobs:
         env:
           cache-name: cache-maven-artifacts
         with:
-          key: cudami-cache-java-17-${{ github.run_id }}
+          key: cudami-cache-java-25-${{ github.run_id }}
           path: |
             ~/.m2/repository
             **/target
@@ -83,13 +83,13 @@ jobs:
       - name: Extract project version
         run: echo "PROJECT_VERSION=$(xmllint --xpath '/*[local-name()="project"]/*[local-name()="version"]/text()' pom.xml)" >> $GITHUB_ENV
       # Publish snapshot
-      - name: Set up JDK 17 for publishing a snapshot
+      - name: Set up JDK 25 for publishing a snapshot
         if: github.event_name == 'push' && endswith(env.PROJECT_VERSION, 'SNAPSHOT')
         uses: actions/setup-java@v5
         with:
           check-latest: true
           distribution: temurin
-          java-version: 17
+          java-version: 25
           server-id: central
           server-password: MAVEN_PASSWORD
           server-username: MAVEN_USERNAME
@@ -100,7 +100,7 @@ jobs:
           MAVEN_PASSWORD: ${{ secrets.CENTRAL_PASSWORD }}
           MAVEN_USERNAME: ${{ secrets.CENTRAL_USERNAME }}
       # Publish release
-      - name: Set up JDK 17 for publishing a release
+      - name: Set up JDK 25 for publishing a release
         if: github.event_name == 'release' && !endswith(env.PROJECT_VERSION, 'SNAPSHOT')
         uses: actions/setup-java@v5
         with:
@@ -108,7 +108,7 @@ jobs:
           distribution: temurin
           gpg-passphrase: MAVEN_GPG_PASSPHRASE
           gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }}
-          java-version: 17
+          java-version: 25
           server-id: central
           server-password: MAVEN_PASSWORD
           server-username: MAVEN_USERNAME
