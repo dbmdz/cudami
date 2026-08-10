@@ -22,7 +22,7 @@ const PreviewImage = ({
     <figure className={className} style={{maxWidth: `${width}px`}}>
       <img
         alt={
-          image ? altText?.[language] ?? image.filename : t('noPreviewImage')
+          image ? (altText?.[language] ?? image.filename) : t('noPreviewImage')
         }
         className="img-fluid mw-100"
         src={

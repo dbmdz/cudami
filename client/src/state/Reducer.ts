@@ -27,7 +27,7 @@ const Reducer = (state: State, action: Action): State => {
         ...state,
         activeLanguage:
           state.activeLanguage === languageToRemove.name
-            ? state.existingLanguages?.[0] ?? ''
+            ? (state.existingLanguages?.[0] ?? '')
             : state.activeLanguage,
         existingLanguages: state.existingLanguages?.filter(
           (lang) => lang != languageToRemove.name,

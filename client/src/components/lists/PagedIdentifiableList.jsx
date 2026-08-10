@@ -363,9 +363,8 @@ class PagedIdentifiableList extends Component {
   }
 
   updatePage = async ({selected}) => {
-    const {content, pageSize, totalElements} = await this.loadIdentifiables(
-      selected,
-    )
+    const {content, pageSize, totalElements} =
+      await this.loadIdentifiables(selected)
     this.setState({
       identifiables: content,
       numberOfPages: Math.ceil(totalElements / pageSize),
