@@ -4,7 +4,7 @@ This is the GUI for administrating (content and users in) cudami.
 
 ## Requirements
 
-The minimum version of the JRE used to start the applications is `17`.
+The minimum version of the JRE used to start the applications is `25`.
 
 ## Build
 
@@ -13,6 +13,8 @@ The minimum version of the JRE used to start the applications is `17`.
 ```
 $ cd <cudami source directory>
 $ mvn clean install
+$ cd client/
+$ npm install --legacy-peer-deps
 ```
 
 ### Production

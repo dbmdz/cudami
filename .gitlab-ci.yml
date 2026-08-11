@@ -2,7 +2,7 @@ include:
   - project: "mdz/devops/ci"
     file: "gitlab-ci-base.yml"
 
-image: "$BUILD_IMAGE_ANSIBLE_MAVEN_JDK17"
+image: "$BUILD_IMAGE_ANSIBLE_MAVEN_DEBIAN13_JDK25"
 
 variables:
   MAVEN_CLI_OPTS: "-Dmaven.repo.local=.m2/repository --batch-mode -Pcustom-nexus"
