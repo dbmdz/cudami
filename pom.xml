@@ -81,13 +81,13 @@
     <dependency>
       <groupId>com.github.spotbugs</groupId>
       <artifactId>spotbugs-annotations</artifactId>
-      <version>4.10.3</version>
+      <version>4.10.4</version>
       <optional>true</optional>
     </dependency>
     <dependency>
       <groupId>com.google.guava</groupId>
       <artifactId>guava</artifactId>
-      <version>33.6.0-jre</version>
+      <version>33.7.1-jre</version>
     </dependency>
     <dependency>
       <groupId>commons-codec</groupId>
@@ -398,13 +398,13 @@
       <plugin>
         <groupId>com.github.spotbugs</groupId>
         <artifactId>spotbugs-maven-plugin</artifactId>
-        <version>4.10.3.0</version>
+        <version>4.10.4.1</version>
         <dependencies>
           <!-- overwrite dependency on spotbugs if you want to specify the version of spotbugs -->
           <dependency>
             <groupId>com.github.spotbugs</groupId>
             <artifactId>spotbugs</artifactId>
-            <version>4.10.3</version>
+            <version>4.10.4</version>
           </dependency>
         </dependencies>
         <executions>
