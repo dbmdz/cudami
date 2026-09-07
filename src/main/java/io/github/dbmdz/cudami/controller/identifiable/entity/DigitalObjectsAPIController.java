@@ -53,7 +53,7 @@ public class DigitalObjectsAPIController
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy)
       throws TechnicalException {
     // TODO ?: add datalanguage as request param to allow search / autocompletion in
-    // selected data language
+    // selected data language – for now we try to ignore it!
     String dataLanguage = null;
     PageRequest pageRequest =
         createPageRequest(
