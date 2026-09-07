@@ -8,6 +8,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
 
 ## [11.0.0](https://github.com/dbmdz/cudami/releases/tag/11.0.0) - 2026-08-13
 
+### Fixed
+
+- Auto completion for adding entities, e.g. adding digital objects to collections
+
 ### Changed
 
 - **BREAKING:** Upgrade Java to version 25
