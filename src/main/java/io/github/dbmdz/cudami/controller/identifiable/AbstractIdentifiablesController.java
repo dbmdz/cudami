@@ -94,7 +94,7 @@ public class AbstractIdentifiablesController<
           }
           pageResponse.setRequest(pageRequest);
           return pageResponse;
-        case "identifier":
+        case "identifiers":
           Pair<String, String> namespaceAndId = ParameterHelper.extractPairOfStrings(searchTerm);
           identifiable =
               ((CudamiIdentifiablesClient<I>) service)

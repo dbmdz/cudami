@@ -54,13 +54,16 @@ public abstract class AbstractPagingAndSortingController extends AbstractControl
     Filtering filtering = null;
     if (searchProperty != null && searchTerm != null && targetClass != null) {
       String expression = searchProperty;
-      if (isMultiLanguageField(targetClass, searchProperty)) {
-        // FIXME: Does `dataLanguage` contain the script, e.g. "de-Latn"? What about the DB?
-        dataLanguage = getDataLanguage(dataLanguage, languageService);
-        // convention: add datalanguage as "sub"-expression to expression - to be handled later on
-        // serverside
-        expression += "." + dataLanguage;
-      }
+      // TODO: as long as param `dataLanguage` is not in use don't mess around with limiting
+      // language properties!
+      //      if (isMultiLanguageField(targetClass, searchProperty)) {
+      //        // FIXME: Does `dataLanguage` contain the script, e.g. "de-Latn"? What about the DB?
+      //        dataLanguage = getDataLanguage(dataLanguage, languageService);
+      //        // convention: add datalanguage as "sub"-expression to expression - to be handled
+      // later on
+      //        // serverside
+      //        expression += "." + dataLanguage;
+      //      }
       // TODO: default operation is "contains" for now, maybe pass other operators
       // (controller) if
       // we want search in non "string" fields....
@@ -147,6 +150,8 @@ public abstract class AbstractPagingAndSortingController extends AbstractControl
     if (sortBy != null) {
       String sortLanguage = getDataLanguage(dataLanguage, languageService);
       for (Order order : sortBy) {
+        // why would we overwrite an already existing subproperty?
+        if (order.getSubProperty().isPresent()) continue;
         String sortProperty = order.getProperty();
         if (isMultiLanguageField(targetClass, sortProperty)) {
           order.setSubProperty(sortLanguage);
