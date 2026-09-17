@@ -411,6 +411,7 @@
 
           const modalDialog = $('#selectEntitiesDialog');
           $(modalDialog).data('searchApiUrl', searchApiUrl);
+          $(modalDialog).data('parentUuid', parentUuid);
           $(modalDialog).data('mode', 'multi');
           $(modalDialog).find('.modal-title').text(modalTitle);
           $(modalDialog).find('.modal-message').html(modalMessage);
