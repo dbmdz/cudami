@@ -77,12 +77,16 @@
             apiUrl = apiUrl + `?pageNumber=0&pageSize=25&searchTerm=${encodeURI(currentValue)}`;
             apiUrl = apiUrl + '&sortBy=label_de';
             apiUrl = apiUrl + '&searchField=' + $("#selectEntitiesDialog-inputType").val();
+            const parentUuid = $('#selectEntitiesDialog').data('parentUuid');
             return new Promise((resolve) => {
               fetch(apiUrl)
                 .then((response) => response.json())
                 .then((data) => {
                   // only content property of PageResponse
-                  const result = data.content;
+                  let result = data.content;
+                  if (parentUuid) {
+                    result = result.filter(entity => entity.uuid !== parentUuid);
+                  }
                   resolve(result);
 
                   // save counts for paging message (if totalElementsEntities > maxRecordsEntities)

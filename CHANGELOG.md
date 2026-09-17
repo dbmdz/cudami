@@ -6,8 +6,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
 
 ## Unreleased
 
-## [11.0.0](https://github.com/dbmdz/cudami/releases/tag/11.0.0) - 2026-08-13
-
 ### Fixed
 
 - Auto completion for adding entities, e.g. adding digital objects to collections
@@ -16,6 +14,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
 
 - **BREAKING:** Upgrade Java to version 25
 - **BREAKING:** Upgrade Node and npm to v24.19.0 (11.17.0)
+- Added filtering of the current collection when adding existing sub-collections
 
 ## [10.2.0](https://github.com/dbmdz/cudami/releases/tag/10.2.0) - 2026-02-04
 
