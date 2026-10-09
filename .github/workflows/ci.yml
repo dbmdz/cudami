@@ -28,7 +28,7 @@ jobs:
           key: cudami-cache-java-${{ matrix.java }}-${{ github.run_id }}
           path: |
             ~/.m2/repository
-            **/target
+            target
       - name: Check Java codestyle
         run: mvn com.spotify.fmt:fmt-maven-plugin:check
       - name: Set up Node.js
@@ -58,7 +58,7 @@ jobs:
           key: cudami-cache-java-25-${{ github.run_id }}
           path: |
             ~/.m2/repository
-            **/target
+            target
       - name: Publish code coverage reports
         uses: codecov/codecov-action@v7
   release:
