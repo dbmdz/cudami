@@ -5,8 +5,7 @@ on:
     branches: [ main, release/* ]
   push:
     branches: [ main, release/* ]
-  release:
-    types: [ published ]
+    tags: [ "*" ]
   workflow_dispatch:
 
 jobs:
@@ -62,3 +61,32 @@ jobs:
             **/target
       - name: Publish code coverage reports
         uses: codecov/codecov-action@v7
+  release:
+    if: github.event_name == 'push' && github.ref_type == 'tag'
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+      - name: Set up cache
+        uses: actions/cache@v6
+        env:
+          cache-name: cache-maven-artifacts
+        with:
+          key: cudami-cache-java-25-${{ github.run_id }}
+          path: |
+            ~/.m2/repository
+            target
+      - name: Install XML utils
+        run: sudo apt update && sudo apt install libxml2-utils
+      - name: Extract project version
+        run: echo "PROJECT_VERSION=$(xmllint --xpath '/*[local-name()="project"]/*[local-name()="version"]/text()' pom.xml)" >> $GITHUB_ENV
+      - name: Create GitHub release
+        if: "!endswith(env.PROJECT_VERSION, 'SNAPSHOT') && env.PROJECT_VERSION == github.ref_name"
+        uses: softprops/action-gh-release@v3
+        with:
+          files: |
+            target/cudami-${{ env.PROJECT_VERSION }}.jar
+          name: "${{ env.PROJECT_VERSION }}"
+          prerelease: ${{ contains(env.PROJECT_VERSION, '-rc.') }}
+          tag_name: "${{ github.ref_name }}"
