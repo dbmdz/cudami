@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import de.digitalcollections.cudami.client.CudamiClient;
 import java.net.http.HttpClient;
 import java.time.Duration;
+import java.util.Map;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -21,6 +22,7 @@ public class SpringConfigBackend {
             .followRedirects(HttpClient.Redirect.ALWAYS)
             .connectTimeout(Duration.ofSeconds(10))
             .build();
-    return new CudamiClient(http, serverUrl, objectMapper);
+    final Map<String, String> requestHeaders = Map.of("Cache-Control", "no-cache");
+    return new CudamiClient(http, serverUrl, objectMapper, requestHeaders);
   }
 }
